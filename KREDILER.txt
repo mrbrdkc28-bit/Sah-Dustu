@@ -1,0 +1,78 @@
+════════════════════════════════════════════════════════════
+  ŞAH DÜŞTÜ — Lisanslar ve Teşekkürler (Credits)
+════════════════════════════════════════════════════════════
+
+Bu oyun, aşağıdaki açık kaynak ve telifsiz bileşenleri kullanır.
+Her bileşenin lisansı ve kaynağı belirtilmiştir.
+
+
+────────────────────────────────────────────────────────────
+1) SATRANÇ MOTORU — Stockfish
+────────────────────────────────────────────────────────────
+Oyun-sonu analizinde Stockfish satranç motoru kullanılır
+(stockfish.js — Nathan Rugg tarafından WebAssembly'ye derlenmiştir).
+
+Lisans: GNU General Public License v3.0 (GPL-3.0)
+Bu nedenle "Şah Düştü" uygulaması da GPL-3.0 koşullarına tabidir:
+uygulamanın tam kaynak kodu, isteyen kullanıcılara GPL-3.0
+koşullarıyla sunulur.
+
+Kaynak kod (bu uygulama): https://github.com/EMRE-KULLANICI-ADI/sah-dustu
+   [↑ Yayından önce kendi genel depo (GitHub vb.) linkinizi buraya yazın]
+
+Stockfish kaynağı:   https://github.com/official-stockfish/Stockfish
+stockfish.js:        https://github.com/nmrugg/stockfish.js
+GPL-3.0 tam metni:   https://www.gnu.org/licenses/gpl-3.0.txt
+
+
+────────────────────────────────────────────────────────────
+2) 2B TAŞ GÖRSELLERİ — Cburnett seti
+────────────────────────────────────────────────────────────
+Düz (2B) görünüm modundaki satranç taşı görselleri Cburnett setidir.
+
+Sanatçı: Colin M.L. Burnett
+Lisans:  GNU General Public License v2.0 veya sonrası (GPLv2+)
+Kaynak:  https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces
+GPLv2:   https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+
+(Lichess'in varsayılan taş setidir. Görsellerde değişiklik yapılmamıştır.)
+
+
+────────────────────────────────────────────────────────────
+3) 3B TAŞ MODELLERİ — KayKit: Board Game Bits
+────────────────────────────────────────────────────────────
+3B oyma taş modelleri KayKit "Board Game Bits" paketinden alınmıştır.
+
+Yapımcı: Kay Lousberg (www.kaylousberg.com)
+Lisans:  Creative Commons Zero (CC0) — kamu malı
+         Kişisel, eğitsel ve ticari projelerde serbestçe kullanılabilir.
+CC0:     http://creativecommons.org/publicdomain/zero/1.0/
+
+(Atıf zorunlu değildir; teşekkür olarak belirtilmiştir.)
+
+
+────────────────────────────────────────────────────────────
+4) SES EFEKTLERİ — CC0 / Telifsiz
+────────────────────────────────────────────────────────────
+Tüm ses efektleri CC0/telifsiz kaynaklardan sağlanmış ve oyuna
+göre işlenmiştir (kırpma, ses seviyesi eşitleme).
+
+Kaynaklar: BigSoundBank, Pixabay
+Lisans:    CC0 / telifsiz — ticari kullanıma uygun, atıf zorunlu değil
+BigSoundBank: https://bigsoundbank.com
+Pixabay:      https://pixabay.com/sound-effects/
+
+
+────────────────────────────────────────────────────────────
+5) ALTYAPI — Firebase
+────────────────────────────────────────────────────────────
+Hesap, bulut istatistik ve çevrimiçi oyun için Google Firebase
+(Authentication, Firestore) kullanılır.
+Gizlilik için bkz. Gizlilik Politikası.
+
+
+════════════════════════════════════════════════════════════
+  Bu dosya, kullanılan bileşenlerin lisans şartlarını (özellikle
+  GPL'in "lisans bildirimini koru" şartını) karşılamak için
+  uygulamayla birlikte dağıtılır.
+════════════════════════════════════════════════════════════
