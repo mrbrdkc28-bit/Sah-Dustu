@@ -1,0 +1,7 @@
+Bu sesler kullanici tarafindan CC0/telifsiz kaynaklardan (BigSoundBank, Pixabay) saglandi
+ve oyuna gore islendi (kirpma, ses seviyesi esitleme).
+Ayni adlarla dosya degistirirsen oyun yenisini kullanir:
+sec_p sec_r sec_n sec_b sec_q sec_k       (tas secimi)
+yeme_p_piyon yeme_p_diger                  (piyon yemeleri)
+yeme_r yeme_n yeme_b yeme_q yeme_k         (tas yemeleri)
+hamle rok sah basla sure1dk                (hamle, rok, sah, acilis, son 1 dk)
