@@ -1,0 +1,32 @@
+Bu uygulama, oyun-sonu analizinde Stockfish satranç motorunu (stockfish.js,
+Nathan Rugg / Chess.com tarafından WebAssembly'ye derlenmiş hali) kullanır.
+
+Stockfish, GNU General Public License sürüm 3 (GPL-3.0) altında lisanslanmıştır.
+Bu, "Şah Düştü" uygulamasının da GPL-3.0 koşullarına tabi olduğu anlamına gelir:
+bu uygulamanın tam kaynak kodu, isteyen kullanıcılara GPL-3.0 koşullarıyla
+sunulmalıdır.
+
+Kaynak kod: https://github.com/EMRE-KULLANICI-ADI/sah-dustu (yayından önce kendi linkinizle değiştirin)
+
+GPL-3.0 tam metni: https://www.gnu.org/licenses/gpl-3.0.txt
+Stockfish kaynak: https://github.com/official-stockfish/Stockfish
+Stockfish.js: https://github.com/nmrugg/stockfish.js
+
+Bu metin, GPL-3.0'ın "lisans bildirimini koru" şartını karşılamak için eklenmiştir.
+
+---
+
+2B TAŞ GÖRSELLERİ (Cburnett seti)
+
+Bu uygulamanın 2B (düz) görünüm modundaki satranç taşı görselleri, Colin
+M.L. Burnett tarafından oluşturulan "Cburnett" satranç taşı setidir.
+
+Cburnett seti, GNU General Public License sürüm 2 veya sonrası (GPLv2+)
+altında lisanslanmıştır.
+
+Sanatçı: Colin M.L. Burnett
+Kaynak: https://en.wikipedia.org/wiki/User:Cburnett/GFDL_images/Chess
+Wikimedia Commons: https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces
+GPLv2 tam metni: https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+
+Görsellerde değişiklik yapılmamıştır; oyun içinde olduğu gibi kullanılır.
