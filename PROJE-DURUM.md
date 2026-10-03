@@ -527,6 +527,14 @@ lisans, lider, bulmacaZorluk); oyun içi bilinçli koyu. Açık temada satır i�
 öznitelik seçicileriyle koyulaştırılır — YENİ satır içi renk yazma, değişken kullan.
 Menü altında dil + tema düğmeleri, alttan açılan `#secimSayfa` (eski 8'li dil sırası gizli).
 
+**8.15 — Oyun Kur + önizlemeler (3 Ekim 2026):** Oyun Kur: dolu seçili durum, renk simgeleri,
+süre 3x2 + Bullet/Blitz/Rapid, `#digerAyarlar` (Savaş Sahnesi + Grafik) katlanır. Arena/ordu
+önizlemeleri oyunun 3B motoruyla çekildi: `onizleme/arena_<id>.webp`, `ordu_<id>.webp` (416x256,
+toplam ~352 KB; eski PNG'ler silindi). YENİ arena/ordu eklenince önizlemesini aynı yolla çek:
+telefonda CDP ile renderer'ı 416x256'ya al, arena açısı pitch .40 yaw .75 uzak 11; ordu açısı
+pitch .26 yaw .38 uzak 4.3 hedef (0.2,.75,3.1), arena 'harp'; `toDataURL('image/webp',.82)`.
+Buzlu Cam teması: menü zemini boş, arkada canlı 3B sahne (ek çizim yükü yok, sahne zaten çiziliyor).
+
 ---
 
 ## 9. YAYIN ENGELLERİ (hepsi kullanıcı tarafında)
