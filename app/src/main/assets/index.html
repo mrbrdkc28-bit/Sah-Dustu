@@ -5894,6 +5894,7 @@ function dogrulukYaz(){
     }
   }catch(e){}
 }
+let oyunIstKaydedildi=false, oyunDogrulukEklendi=false;   // bu oyun istatistiğe yazıldı mı / doğruluğu eklendi mi
 let teslimSonu=false; // 'terk' teslimden mi geldi (başlık/metin için), rakip ayrılmasından mı
 function oyunSonu(d, terkKazanan){
   const teslim=(d==='terk' && teslimSonu); teslimSonu=false;
@@ -5928,6 +5929,7 @@ function oyunSonu(d, terkKazanan){
      "oyuncu" sayıldığından galibiyet/seri şişiyordu; iki tarafı aynı kişi oynayabilir. */
   const iptalOyun = !cevrimiciAktif && (mod!=='ai' || oyunKaydi.length < 2);
   if(fbKullanici && !misafirMod && !iptalOyun){
+    oyunIstKaydedildi=true;   // doğruluk da yalnız bu oyunlar için eklenir (bkz. stockfishDegerlendir)
     const oyuncuRenk = cevrimiciAktif ? Cevrimici.benimRenk
                      : (mod==='ai') ? aktifInsanRenk
                      : (kazanan==='Beyaz'?'w':'b');
@@ -6737,9 +6739,13 @@ async function stockfishDegerlendir(){
   if(typeof dogrulukYaz==='function') dogrulukYaz();
   // Bulut istatistiği
   const benimR=oyuncuRengi();
-  if(fbKullanici && !misafirMod){
+  /* DOĞRULUK YALNIZ İSTATİSTİĞE YAZILMIŞ OYUNA VE OYUN BAŞINA BİR KEZ (3 Ekim 2026).
+     Eskiden her analiz bitişinde ekleniyordu: iki kişilik/iptal sayılan oyunlar da ortalamaya
+     giriyor, aynı oyun iki kez analiz edilince iki kez sayılıyordu. */
+  if(fbKullanici && !misafirMod && oyunIstKaydedildi && !oyunDogrulukEklendi){
     const oyuncuDog=dogrulukHesapla(benimR);
     if(oyuncuDog){
+      oyunDogrulukEklendi=true;
       bulutIst.toplamDogruluk=(bulutIst.toplamDogruluk||0)+oyuncuDog;
       bulutIst.dogrulukSayi=(bulutIst.dogrulukSayi||0)+1;
       if(oyuncuDog>(bulutIst.enIyiDogruluk||0)) bulutIst.enIyiDogruluk=oyuncuDog;
@@ -7677,6 +7683,7 @@ function yeniOyun(){
   _analizIptal=true;            // süren analiz varsa kendini durdursun
   inceleAnalizVar=false;
   Motor.reset(); oyunBitti=false; kilit=false; secili=-1;
+  oyunIstKaydedildi=false; oyunDogrulukEklendi=false;
   ist.hamle=0; ist.esirB=[]; ist.esirS=[];
   saatler.w=sureSecim; saatler.b=sureSecim;
   sonDkCal.w=false; sonDkCal.b=false;
@@ -8432,6 +8439,7 @@ function cevrimiciSonucUygula(veri){
 }
 // Çevrimiçi sonucu istatistiğe yaz (oyunSonu'ndaki mantığın sade hali)
 function cevrimiciIstatistikGuncelle(sonuc){
+  oyunIstKaydedildi=true;
   const oyuncuRenk=Cevrimici.benimRenk;
   const rOn=oyuncuRenk==='w'?'beyaz':'siyah';
   bulutIst.oyun=(bulutIst.oyun||0)+1;
