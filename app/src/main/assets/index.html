@@ -353,6 +353,9 @@ h1 span{color:var(--brass)}
 #cevrimiciIcerik{flex:1;overflow-y:auto;padding:16px 20px 28px;display:flex;flex-direction:column;gap:14px;
   align-items:center;justify-content:flex-start;max-width:440px;margin:0 auto;width:100%}
 #cevrimiciHata{color:#E3432F;font-size:13px;text-align:center;min-height:18px}
+/* Kaydırılan sütunda öğeler sıkışmasın: içerik taşınca flex onları küçültüyordu,
+   misafir uyarısındaki GİRİŞ YAP düğmesi SÜRE kartlarının üstüne biniyordu. */
+#cevrimiciIcerik>*{flex-shrink:0}
 #cvSureBlok{width:100%;margin-bottom:4px}
 .cvSureBaslik{font-size:11px;letter-spacing:.3em;color:var(--dim);text-transform:uppercase;
   text-align:center;margin-bottom:10px}
@@ -1089,6 +1092,10 @@ body.azHareket #son.acik *{animation:none!important}
 #yardimKapla{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
   background:rgba(6,7,11,.82);backdrop-filter:blur(4px);padding:20px}
 #yardimKapla.acik{display:flex}
+/* Yatay telefonda kart ekrandan uzun: ortalanınca başlık üstten taşıyıp kesiliyordu.
+   Kaydırılabilir + margin:auto (sığarsa ortalı, sığmazsa baştan başlar). */
+#yardimKapla{overflow-y:auto}
+#yardimKart{margin:auto}
 #yardimKart{background:linear-gradient(150deg,#161a2b,#0c0e18);border:1px solid var(--brass);
   border-radius:16px;padding:22px 22px 18px;max-width:380px;width:100%;
   box-shadow:0 16px 50px rgba(0,0,0,.6);animation:ykBel .4s ease both}
@@ -1241,8 +1248,8 @@ body.azHareket #son.acik *{animation:none!important}
   border-top:env(safe-area-inset-top,0px) solid transparent;
   border-left:env(safe-area-inset-left,0px) solid transparent;
   border-right:env(safe-area-inset-right,0px) solid transparent;
-  background-origin:border-box}   /* gradyan kenarlıkta tekrar etmesin (üstte sert bant oluyordu) */
-#esirler{border-left:env(safe-area-inset-left,0px) solid transparent;border-right:env(safe-area-inset-right,0px) solid transparent;background-origin:border-box}
+  background-origin:border-box!important}   /* (!important: satır içi background kısaltması sıfırlamasın) gradyan kenarlıkta tekrar etmesin (üstte sert bant oluyordu) */
+#esirler{border-left:env(safe-area-inset-left,0px) solid transparent;border-right:env(safe-area-inset-right,0px) solid transparent;background-origin:border-box!important}
 #notPanel,#yonBtn{margin-left:env(safe-area-inset-left,0px)}
 #notPanelSag{margin-right:env(safe-area-inset-right,0px)}
 #notSeritUst,#beraberBildirim,#beraberBekle{margin-top:env(safe-area-inset-top,0px)}
