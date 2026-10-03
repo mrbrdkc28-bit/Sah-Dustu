@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Chess64 — 3D Satranç</title>
 <link href="lib/fonts/fonts.css" rel="stylesheet">
+<script>
+/* Tema: ilk boyamadan önce uygula (varsayılan Fildişi) */
+(function(){ var t='fildisi'; try{ t=localStorage.getItem('c64_tema')||'fildisi'; }catch(e){}
+  if(t!=='klasik') document.documentElement.setAttribute('data-tema', t); })();
+</script>
+
 <style>
 :root{
   --ink:#06070B; --panel:#11141D; --line:#262B3A;
@@ -1278,6 +1284,110 @@ body.azHareket #son.acik *{animation:none!important}
 #notSeritUst,#beraberBildirim,#beraberBekle{margin-top:env(safe-area-inset-top,0px)}
 #cevrimiciSerit{margin-top:env(safe-area-inset-top,0px);margin-right:env(safe-area-inset-right,0px)}
 #basarimBildirim.goster{top:calc(24px + env(safe-area-inset-top,0px))}
+
+/* ================================================================
+   TEMALAR (3 Ekim 2026) — sahibin seçimi: Fildişi varsayılan, diğerleri
+   menüdeki "tema" düğmesinden seçilir (localStorage c64_tema).
+   Kapsam: ana menü + menüden açılan ekranlar. Oyun içi (tahta, oyun sonu,
+   analiz) bilinçli olarak koyu kalır — 3B sahne karanlık.
+   Ekranlar renk değişkenlerini (--panel/--bone/--txt/--dim/--line/--brass)
+   kullandığı için çoğu kendiliğinden uyar; satır içi sabit renkler aşağıda
+   açık tema için ayrıca eşlenir.
+   ================================================================ */
+html[data-tema] #menu .anaBaslik{margin-top:26px}
+#altSecim{display:flex;justify-content:center;gap:10px;margin-top:20px;flex-wrap:wrap}
+#altSecim button{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:20px;font:500 12.5px Manrope,sans-serif;
+  cursor:pointer;border:1px solid rgba(232,182,76,.28);color:#d9d3c4;background:rgba(232,182,76,.06)}
+#altSecim button .ok{opacity:.6;font-size:10px}
+#dilSecici{display:none!important}
+#secimSayfa{position:fixed;inset:0;z-index:95;display:none;align-items:flex-end;justify-content:center;background:rgba(6,7,11,.55)}
+#secimSayfa.acik{display:flex}
+#secimSayfa .ssKutu{width:min(480px,100%);background:#12151f;border:1px solid rgba(232,182,76,.22);border-bottom:none;
+  border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));animation:ssGel .25s ease both;max-height:80vh;overflow-y:auto}
+@keyframes ssGel{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+#secimSayfa .ssBaslik{font-family:'Cinzel',serif;font-weight:700;letter-spacing:.14em;color:#E8B64C;text-align:center;font-size:14px;margin:2px 0 14px}
+#secimSayfa .ssSec{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;margin-bottom:8px;border-radius:13px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:#e6e1d6;font:500 14px Manrope,sans-serif;cursor:pointer;text-align:start}
+#secimSayfa .ssSec.secili{border-color:#E8B64C;background:rgba(232,182,76,.10)}
+#secimSayfa .ssSec .ssTik{margin-inline-start:auto;color:#E8B64C;font-size:15px;visibility:hidden}
+#secimSayfa .ssSec.secili .ssTik{visibility:visible}
+#secimSayfa .ssRenk{width:30px;height:30px;border-radius:9px;flex-shrink:0;border:1px solid rgba(255,255,255,.18);
+  display:flex;align-items:flex-end;justify-content:flex-end;padding:3px}
+#secimSayfa .ssRenk i{width:10px;height:10px;border-radius:3px;display:block}
+html[data-tema="fildisi"] #menu{background:radial-gradient(90% 40% at 50% 8%,#fffdf8,transparent 70%),linear-gradient(180deg,#f3ede2,#e8dfcf)!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk){--panel:#fbf8f1;--card:#fbf8f1;--line:rgba(120,95,50,.18);--bone:#1f1b14;--txt:#2b261d;--dim:#776f61;--brass:#A87618;color:#2b261d;background:radial-gradient(90% 40% at 50% 0%,#fffdf8,transparent 70%),linear-gradient(180deg,#f3ede2,#e8dfcf)!important}
+html[data-tema="fildisi"] .anaBaslik h1{color:#1c1914}
+html[data-tema="fildisi"] .anaBaslik h1 span{color:#B07E22}
+html[data-tema="fildisi"] .anaKart:not(.oyna){background:#fbf8f1;border-color:rgba(120,95,50,.16);box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 6px 16px rgba(90,70,30,.08)}
+html[data-tema="fildisi"] .anaKart:not(.oyna) .kartIkon{background:rgba(176,126,34,.09);border-color:rgba(176,126,34,.24);color:#9a6c1c}
+html[data-tema="fildisi"] .anaKart:not(.oyna) .kartAd{color:#1f1b14}
+html[data-tema="fildisi"] .anaKart:not(.oyna) .kartAlt{color:#6f685b}
+html[data-tema="fildisi"] .anaKart:not(.oyna) .kartOk{color:#9a8f7a}
+html[data-tema="fildisi"] .anaKart.oyna{background:linear-gradient(135deg,#1d2130,#10131c);box-shadow:0 12px 28px rgba(20,20,30,.28)}
+html[data-tema="fildisi"] .anaKart.oyna .kartAd,html[data-tema="fildisi"] .anaKart.oyna .kartOk{color:#E8B64C}
+html[data-tema="fildisi"] .anaKart.oyna .kartAlt{color:#b9b2a2}
+html[data-tema="fildisi"] .anaKart.oyna .kartIkon{background:rgba(232,182,76,.14)!important;color:#E8B64C!important}
+html[data-tema="fildisi"] #profilCubuk{background:rgba(255,255,255,.75);color:#2a261f;border-color:rgba(0,0,0,.08)}
+html[data-tema="fildisi"] #menu [onclick*="lisansEkran"],html[data-tema="fildisi"] #menu [onclick*="gizlilik"],html[data-tema="fildisi"] #menu [onclick*="Gizlilik"]{color:#6f685b}
+html[data-tema="fildisi"] #altSecim button{border-color:rgba(120,95,50,.25);color:#3a342a;background:rgba(255,255,255,.6)}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#E8E2D2"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="232, 226, 210"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#cfc9ba"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="207, 201, 186"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#C9C2B2"]{color:#2b261d!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#a9a493"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#7d7868"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#8a8578"]{color:#6f685b!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#E8B0A0"]{color:#A8402C!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="#3a382f"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="58, 56, 47"]{border-color:rgba(120,95,50,.25)!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="rgba(255,255,255,.02)"]{background:#fbf8f1!important;border:1px solid rgba(120,95,50,.12)}
+html[data-tema="fildisi"] #bulmacaZorluk .bzSec span{color:#6f685b}
+html[data-tema="gece"] #menu{background:radial-gradient(70% 32% at 50% 15%,rgba(232,182,76,.20),rgba(232,182,76,.06) 55%,transparent 80%),radial-gradient(120% 60% at 50% 100%,rgba(40,48,78,.35),transparent 70%),linear-gradient(180deg,#0c0f19,#080a11 55%,#06070b)!important}
+html[data-tema="gece"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk){--panel:#10131d;--line:rgba(232,182,76,.13);background:radial-gradient(90% 36% at 50% 0%,rgba(232,182,76,.10),transparent 70%),linear-gradient(180deg,#0c0f19,#06070b)!important}
+html[data-tema="gece"] .anaKart:not(.oyna){background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.008) 60%),#10131d;border-color:rgba(232,182,76,.11);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.3)}
+html[data-tema="gece"] .anaKart:not(.oyna) .kartIkon{background:linear-gradient(160deg,rgba(232,182,76,.16),rgba(232,182,76,.06));border-color:rgba(232,182,76,.22)}
+html[data-tema="gece"] .anaKart:not(.oyna) .kartAlt{color:#a29d90}
+html[data-tema="gece"] .anaBaslik h1{text-shadow:0 0 28px rgba(232,182,76,.18)}
+html[data-tema="obsidyen"] #menu{background:radial-gradient(80% 30% at 50% 0%,rgba(255,255,255,.05),transparent 70%),#050506!important}
+html[data-tema="obsidyen"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk){--panel:#0e0e10;--line:rgba(255,255,255,.09);background:radial-gradient(80% 30% at 50% 0%,rgba(255,255,255,.04),transparent 70%),#050506!important}
+html[data-tema="obsidyen"] .anaBaslik h1{font-size:36px;letter-spacing:.24em;color:#f1ede4}
+html[data-tema="obsidyen"] .anaBaslik::after{content:"";display:block;width:54px;height:1px;margin:16px auto 0;background:linear-gradient(90deg,transparent,#E8B64C,transparent)}
+html[data-tema="obsidyen"] .kartlar{gap:0;margin-top:30px}
+html[data-tema="obsidyen"] #hizliKart{margin-bottom:18px;border-radius:12px}
+html[data-tema="obsidyen"] .anaKart:not(.oyna){background:none;border:none;border-bottom:1px solid rgba(255,255,255,.07);border-radius:0;padding:15px 4px;box-shadow:none}
+html[data-tema="obsidyen"] .anaKart:not(.oyna)::before{display:none}
+html[data-tema="obsidyen"] .anaKart:not(.oyna) .kartIkon{background:none;border:none;width:30px;color:#cdbf98}
+html[data-tema="obsidyen"] .anaKart:not(.oyna) .kartAd{font-size:14px;letter-spacing:.16em;color:#ece7dc}
+html[data-tema="obsidyen"] .anaKart:not(.oyna) .kartAlt{color:#8d887e}
+html[data-tema="obsidyen"] .anaKart:not(.oyna) .kartOk{color:#E8B64C;opacity:.8}
+html[data-tema="obsidyen"] #altSecim button{border:none;border-bottom:1px solid rgba(232,182,76,.4);border-radius:0;background:none;color:#cfc9ba}
+html[data-tema="zumrut"] #menu{background:radial-gradient(80% 36% at 50% 12%,rgba(78,150,108,.28),transparent 75%),linear-gradient(180deg,#0d2a1f,#081a13 55%,#05110c)!important}
+html[data-tema="zumrut"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk){--panel:#0b241b;--line:rgba(201,168,92,.22);--bone:#efe6cf;--dim:#9fb3a5;background:radial-gradient(80% 36% at 50% 0%,rgba(78,150,108,.22),transparent 75%),linear-gradient(180deg,#0d2a1f,#05110c)!important}
+html[data-tema="zumrut"] .anaKart:not(.oyna){background:linear-gradient(180deg,rgba(255,255,255,.035),transparent),rgba(9,32,24,.85);border-color:rgba(201,168,92,.24);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.3)}
+html[data-tema="zumrut"] .anaKart:not(.oyna) .kartIkon{background:rgba(201,168,92,.12);border-color:rgba(201,168,92,.28)}
+html[data-tema="zumrut"] .anaKart:not(.oyna) .kartAlt{color:#9fb3a5}
+html[data-tema="zumrut"] .anaKart:not(.oyna) .kartAd{color:#efe6cf}
+html[data-tema="zumrut"] .anaBaslik h1{color:#f1e7cd}
+html[data-tema="zumrut"] .anaKart:not(.oyna) .kartIkon{color:#d8b866}
+html[data-tema="zumrut"] #profilCubuk{background:rgba(6,26,19,.75);border-color:rgba(201,168,92,.25)}
+html[data-tema="zumrut"] #altSecim button{border-color:rgba(201,168,92,.35);color:#e6dcc0;background:rgba(201,168,92,.07)}
+html[data-tema="bordo"] #menu{background:radial-gradient(80% 36% at 50% 10%,rgba(170,40,64,.38),transparent 75%),linear-gradient(180deg,#2a0b14,#17070c 55%,#0c0407)!important}
+html[data-tema="bordo"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk){--panel:#260a12;--line:rgba(232,182,76,.18);--bone:#f3e6d4;--dim:#bfa3a7;background:radial-gradient(80% 36% at 50% 0%,rgba(170,40,64,.30),transparent 75%),linear-gradient(180deg,#2a0b14,#0c0407)!important}
+html[data-tema="bordo"] .anaKart:not(.oyna){background:linear-gradient(180deg,rgba(255,255,255,.04),transparent),rgba(38,10,18,.82);border-color:rgba(232,182,76,.20);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.3)}
+html[data-tema="bordo"] .anaKart:not(.oyna) .kartIkon{background:rgba(232,182,76,.11);border-color:rgba(232,182,76,.26)}
+html[data-tema="bordo"] .anaKart:not(.oyna) .kartAlt{color:#bfa3a7}
+html[data-tema="bordo"] .anaKart:not(.oyna) .kartAd{color:#f3e6d4}
+html[data-tema="bordo"] .anaBaslik h1{color:#f6e9da}
+html[data-tema="bordo"] #profilCubuk{background:rgba(30,8,14,.75);border-color:rgba(232,182,76,.22)}
+html[data-tema="bordo"] #altSecim button{border-color:rgba(232,182,76,.32);color:#ead9c4}
+html[data-tema="cam"] #menu{background-image:linear-gradient(180deg,rgba(6,7,11,.48),rgba(6,7,11,.72) 60%,rgba(6,7,11,.94)),var(--menuFoto)!important;background-size:cover!important;background-position:center!important}
+html[data-tema="cam"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk){--panel:#161a26;--line:rgba(255,255,255,.12);background:linear-gradient(180deg,#0e1018,#06070b)!important}
+html[data-tema="cam"] #menu .anaBaslik h1{text-shadow:0 4px 30px rgba(0,0,0,.6)}
+html[data-tema="cam"] #menu .anaKart:not(.oyna){background:rgba(22,25,36,.42);border-color:rgba(255,255,255,.13);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 8px 22px rgba(0,0,0,.3)}
+html[data-tema="cam"] #menu .anaKart:not(.oyna) .kartIkon{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14)}
+html[data-tema="cam"] #menu .anaKart:not(.oyna) .kartAlt{color:#b8b3a8}
+/* Fildişi: seçim listesi de açık */
+html[data-tema="fildisi"] #secimSayfa{background:rgba(60,50,30,.28)}
+html[data-tema="fildisi"] #secimSayfa .ssKutu{background:#fbf8f1;border-color:rgba(120,95,50,.2);box-shadow:0 -10px 30px rgba(60,45,20,.15)}
+html[data-tema="fildisi"] #secimSayfa .ssBaslik{color:#9a6c1c}
+html[data-tema="fildisi"] #secimSayfa .ssSec{background:#fff;border-color:rgba(120,95,50,.14);color:#2b261d}
+html[data-tema="fildisi"] #secimSayfa .ssSec.secili{border-color:#B07E22;background:rgba(176,126,34,.08)}
+html[data-tema="fildisi"] #secimSayfa .ssTik{color:#B07E22}
+html[data-tema="cam"] #altSecim button{border-color:rgba(255,255,255,.2);color:#e6e1d6;background:rgba(22,25,36,.45)}
 </style>
 </head>
 <body>
@@ -11116,6 +11226,15 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["Vahim"]={"en": "Blunder", "ru": "Зевок", "ar": "خطأ فادح", "fr": "Gaffe", "de": "Patzer", "it": "Errore grave", "zh": "大错"};
   CEVM["Doğruluğun"]={"en": "Your accuracy", "ru": "Ваша точность", "ar": "دقتك", "fr": "Ta précision", "de": "Deine Genauigkeit", "it": "La tua precisione", "zh": "你的准确率"};
   CEVM["Rakip doğruluğu"]={"en": "Opponent accuracy", "ru": "Точность соперника", "ar": "دقة الخصم", "fr": "Précision de l'adversaire", "de": "Genauigkeit Gegner", "it": "Precisione dell'avversario", "zh": "对手准确率"};
+  CEVM['Tema']={en:'Theme',ru:'Тема',ar:'المظهر',fr:'Thème',de:'Design',it:'Tema',zh:'主题'};
+  CEVM['Dil']={en:'Language',ru:'Язык',ar:'اللغة',fr:'Langue',de:'Sprache',it:'Lingua',zh:'语言'};
+  CEVM['Fildişi']={en:'Ivory',ru:'Слоновая кость',ar:'عاجي',fr:'Ivoire',de:'Elfenbein',it:'Avorio',zh:'象牙白'};
+  CEVM['Gece Altını']={en:'Midnight Gold',ru:'Полночное золото',ar:'ذهب الليل',fr:'Or de minuit',de:'Mitternachtsgold',it:'Oro di mezzanotte',zh:'午夜金'};
+  CEVM['Obsidyen']={en:'Obsidian',ru:'Обсидиан',ar:'سبج',fr:'Obsidienne',de:'Obsidian',it:'Ossidiana',zh:'黑曜石'};
+  CEVM['Zümrüt Kulüp']={en:'Emerald Club',ru:'Изумрудный клуб',ar:'نادي الزمرد',fr:'Club émeraude',de:'Smaragd-Club',it:'Club smeraldo',zh:'翡翠俱乐部'};
+  CEVM['Bordo Kadife']={en:'Burgundy Velvet',ru:'Бордовый бархат',ar:'مخمل عنابي',fr:'Velours bordeaux',de:'Bordeaux-Samt',it:'Velluto bordeaux',zh:'酒红丝绒'};
+  CEVM['Buzlu Cam']={en:'Frosted Glass',ru:'Матовое стекло',ar:'زجاج مصنفر',fr:'Verre dépoli',de:'Milchglas',it:'Vetro satinato',zh:'磨砂玻璃'};
+  CEVM['Klasik']={en:'Classic',ru:'Классика',ar:'كلاسيكي',fr:'Classique',de:'Klassisch',it:'Classico',zh:'经典'};
   CEVM['Ort. Doğruluk']={en:'Avg. accuracy',ru:'Ср. точность',ar:'متوسط الدقة',fr:'Précision moy.',de:'Ø Genauigkeit',it:'Precisione media',zh:'平均准确率'};
   CEVM['Beyaz doğruluğu']={en:'White accuracy',ru:'Точность белых',ar:'دقة الأبيض',fr:'Précision des Blancs',de:'Genauigkeit Weiß',it:'Precisione del Bianco',zh:'白方准确率'};
   CEVM['Siyah doğruluğu']={en:'Black accuracy',ru:'Точность чёрных',ar:'دقة الأسود',fr:'Précision des Noirs',de:'Genauigkeit Schwarz',it:'Precisione del Nero',zh:'黑方准确率'};
@@ -13496,6 +13615,77 @@ function devPanelAc(){
       return _eskiGeri.apply(this,arguments);
     };
   }
+})();
+</script>
+<script>
+/* ================================================================
+   TEMA + DİL SEÇİCİ (3 Ekim 2026): menünün altında iki düğme; dokununca
+   alttan açılan seçim listesi. Eski 8'li dil düğme sırası gizli kalır
+   (dilKur mantığı aynen kullanılır).
+   ================================================================ */
+(function(){
+  const TEMALAR=[
+    {id:'fildisi', ad:'Fildişi', z:'#efe8dc', v:'#1d2130'},
+    {id:'gece', ad:'Gece Altını', z:'#0c0f19', v:'#E8B64C'},
+    {id:'obsidyen', ad:'Obsidyen', z:'#050506', v:'#cdbf98'},
+    {id:'zumrut', ad:'Zümrüt Kulüp', z:'#0d2a1f', v:'#d8b866'},
+    {id:'bordo', ad:'Bordo Kadife', z:'#2a0b14', v:'#E8B64C'},
+    {id:'cam', ad:'Buzlu Cam', z:'#3a3f4d', v:'#e6e1d6'},
+    {id:'klasik', ad:'Klasik', z:'#11141D', v:'#E8B64C'}
+  ];
+  const DIL_AD={tr:'Türkçe',en:'English',ru:'Русский',ar:'العربية',fr:'Français',de:'Deutsch',it:'Italiano',zh:'中文'};
+  const GLOBE='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.4 3.6 5.3 3.6 8.5s-1 6.1-3.6 8.5c-2.6-2.4-3.6-5.3-3.6-8.5s1-6.1 3.6-8.5z"/></svg>';
+  const PALET='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.3 0 1.9-.8 1.9-1.7 0-1.2-1-1.6-1-2.7 0-1 .8-1.6 1.9-1.6h2.1c2 0 3.6-1.5 3.6-3.6 0-4.2-3.8-7.4-8.5-7.4z"/><circle cx="7.6" cy="11" r="1"/><circle cx="10.2" cy="7.4" r="1"/><circle cx="14.6" cy="7.6" r="1"/></svg>';
+  function aktifTema(){ try{ return localStorage.getItem('c64_tema')||'fildisi'; }catch(e){ return 'fildisi'; } }
+  function temaKur(id){
+    try{ localStorage.setItem('c64_tema', id); }catch(e){}
+    if(id==='klasik') document.documentElement.removeAttribute('data-tema');
+    else document.documentElement.setAttribute('data-tema', id);
+    etiketle();
+  }
+  // Buzlu cam: menünün asıl fotoğrafını değişkene al
+  // (tema geçici kaldırılarak okunur: Buzlu Cam açıkken okununca değer boş kalıyordu)
+  try{ const h=document.documentElement, t=h.getAttribute('data-tema'); h.removeAttribute('data-tema');
+       const m=document.getElementById('menu'); const u=(getComputedStyle(m).backgroundImage.match(/url\([^)]*\)/)||[''])[0];
+       if(t) h.setAttribute('data-tema', t);
+       if(u) h.style.setProperty('--menuFoto', u); }catch(e){}
+  const sayfa=document.createElement('div'); sayfa.id='secimSayfa';
+  sayfa.innerHTML='<div class="ssKutu"><div class="ssBaslik"></div><div class="ssListe"></div></div>';
+  sayfa.onclick=e=>{ if(e.target===sayfa) sayfa.classList.remove('acik'); };
+  document.body.appendChild(sayfa);
+  function ac(baslik, secenekler, secili, sec){
+    sayfa.querySelector('.ssBaslik').textContent=baslik;
+    const l=sayfa.querySelector('.ssListe'); l.innerHTML='';
+    secenekler.forEach(o=>{
+      const b=document.createElement('button'); b.type='button'; b.className='ssSec'+(o.id===secili?' secili':'');
+      b.innerHTML=(o.renk||'')+'<span class="ssAd"></span><span class="ssTik">✓</span>';
+      b.querySelector('.ssAd').textContent=o.ad;
+      b.onclick=()=>{ sec(o.id); sayfa.classList.remove('acik'); };
+      l.appendChild(b);
+    });
+    sayfa.classList.add('acik');
+    try{ if(typeof agacTara==='function') agacTara(sayfa); }catch(e){}
+  }
+  const alt=document.createElement('div'); alt.id='altSecim';
+  const dB=document.createElement('button'); dB.type='button'; dB.id='dilAcBtn';
+  const tB=document.createElement('button'); tB.type='button'; tB.id='temaAcBtn';
+  alt.appendChild(dB); alt.appendChild(tB);
+  const ds=document.getElementById('dilSecici');
+  if(ds && ds.parentNode) ds.parentNode.insertBefore(alt, ds.nextSibling);
+  function etiketle(){
+    dB.innerHTML=GLOBE+'<span></span><span class="ok">▼</span>';
+    dB.querySelector('span').textContent=DIL_AD[uygDil]||'Türkçe';
+    const t=TEMALAR.find(x=>x.id===aktifTema())||TEMALAR[0];
+    tB.innerHTML=PALET+'<span></span><span class="ok">▼</span>';
+    tB.querySelector('span').textContent=(typeof metniCevir==='function'?metniCevir(t.ad):t.ad);
+  }
+  dB.onclick=()=>ac((typeof metniCevir==='function'?metniCevir('Dil'):'Dil'),
+    DILLER.map(d=>({id:d, ad:DIL_AD[d]})), uygDil, d=>{ dilKur(d); etiketle(); });
+  tB.onclick=()=>ac((typeof metniCevir==='function'?metniCevir('Tema'):'Tema'),
+    TEMALAR.map(t=>({id:t.id, ad:t.ad, renk:'<span class="ssRenk" style="background:'+t.z+'"><i style="background:'+t.v+'"></i></span>'})),
+    aktifTema(), temaKur);
+  etiketle();
+  window.temaKur=temaKur;
 })();
 </script>
 </body>

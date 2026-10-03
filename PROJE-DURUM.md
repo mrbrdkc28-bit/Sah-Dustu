@@ -519,6 +519,14 @@ harf yok). Kamera deliği: `LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES` + CSS "KA
 bloğu (tam ekran katmanlara env(safe-area-inset-*) kadar saydam kenarlık, background-origin
 border-box). YENİ TAM EKRAN KATMAN EKLERSEN o listeye ekle. Yatay oyun sonu iki sütun.
 
+**8.14 — Temalar (3 Ekim 2026):** 7 tema, varsayılan Fildişi (açık); diğerleri Gece Altını,
+Obsidyen, Zümrüt Kulüp, Bordo Kadife, Buzlu Cam, Klasik (eski görünüm). `html[data-tema]`
+(localStorage `c64_tema`, head'deki erken script; klasik = öznitelik yok). CSS bloğu "TEMALAR".
+Kapsam: menü + menüden açılan ekranlar (SC listesi: kurulum, ist, arkadas, cevrimici, giris,
+lisans, lider, bulmacaZorluk); oyun içi bilinçli koyu. Açık temada satır içi sabit açık renkler
+öznitelik seçicileriyle koyulaştırılır — YENİ satır içi renk yazma, değişken kullan.
+Menü altında dil + tema düğmeleri, alttan açılan `#secimSayfa` (eski 8'li dil sırası gizli).
+
 ---
 
 ## 9. YAYIN ENGELLERİ (hepsi kullanıcı tarafında)
