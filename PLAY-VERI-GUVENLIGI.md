@@ -31,13 +31,12 @@ olduğu için Play kurallarında *paylaşım sayılmaz*; AdMob reklam amaçlı i
 | Uygulama etkinliği › **Uygulama içi etkileşimler** (istatistikler, puan, arkadaşlar) | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği |
 | Cihaz veya diğer kimlikler › **Cihaz veya diğer kimlikler** (Reklam Kimliği) | Evet | **Evet** (AdMob) | İsteğe bağlı (reklam izlemek isteğe bağlı) | Reklamcılık veya pazarlama, Analiz |
 | Konum › **Yaklaşık konum** (AdMob, IP'den) | Evet | **Evet** (AdMob) | İsteğe bağlı | Reklamcılık veya pazarlama |
-| Ses › **Ses kayıtları** | **Hayır** — bkz. not | Hayır | — | — |
+| Ses › **Ses veya ses kayıtları** | **Evet** — bkz. not | **Evet** (cihazın konuşma tanıma hizmeti → Google) | İsteğe bağlı (sesli oynama açılırsa) | Uygulama işlevselliği; "geçici olarak işleniyor" = **Evet** |
 
-**Mikrofon notu:** Uygulama ses kaydetmez, saklamaz, sunucuya göndermez; konuşmayı telefonun kendi
-Android konuşma tanıma hizmeti metne çevirir ve uygulamaya yalnız tanınan metin ("at f4") gelir, o da
-saklanmaz. Google'ın tanımına göre geçici olarak cihazda işlenen ve hiçbir yere gönderilmeyen veri
-"toplanan" sayılmaz; bu yüzden **Ses kayıtları = Toplanmıyor**. Formdaki "Veriler geçici olarak mı
-işleniyor?" sorusu çıkarsa: **Evet, geçici**.
+**Mikrofon notu:** Uygulamanın kendisi ses kaydetmez, saklamaz, sunucusuna göndermez; konuşmayı telefonun
+Android konuşma tanıma hizmeti metne çevirir ve o hizmet sesi işlenmek üzere Google'a gönderebilir.
+Play'in tanımı bu durumda tartışmalı olduğu için **temkinli beyan** seçildi: toplanıyor + paylaşılıyor +
+geçici işleniyor + isteğe bağlı. Eksik beyan yayın reddine yol açar, fazla beyan açmaz.
 
 **Hiç toplanmayanlar** (hepsine "Hayır"): ad-soyad, adres, telefon, ırk/din/siyasi görüş, finansal bilgi,
 sağlık, kesin konum, kişiler/rehber, takvim, web geçmişi, dosyalar, uygulama listesi, kilitlenme

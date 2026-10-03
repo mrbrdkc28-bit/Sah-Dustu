@@ -562,15 +562,17 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
    için `app/src/main/assets/index.html`'e yönlendirir.
    ⚠ `.gitignore` şunları dışlıyor, **asla commit etme**:
    `keystore.properties`, `*.jks`, `*.keystore`, `google-services.json`.
-2. ✅ **Gizlilik politikası** `privacy.html` (eski adı `privacy_YENI.html`; TR+EN,
-   AdMob ve mikrofon dahil) yayında: https://mrbrdkc28-bit.github.io/Sah-Dustu/privacy.html
+2. ✅ **Gizlilik politikası** `privacy.html` (3 Ekim 2026: 8 dil — tr, en, ru, ar, fr, de, it, zh;
+   üstte dil seçici, uygulama bağlantısı `#<dil>` ile açar; AdMob ve mikrofon dahil) yayında: https://mrbrdkc28-bit.github.io/Sah-Dustu/privacy.html
    — Play Console'a bu adres girilecek.
 3. ✅ **Keystore** (3 Ekim 2026): `C:/Users/Emre/sahdustu-keys/sahdustu-upload.jks`,
    şifre aynı klasörde `OKU-BENI.txt`. `keystore.properties` buna bakıyor.
-   Klasör iki ayrı yere yedeklenmeli. Play App Signing açılacak.
-3b. **Firestore kuralları yayınlanmalı:** `firebase deploy --only firestore:rules
-   --project chess64-c6ff1` (ya da konsola yapıştır). Yeni APK ile birlikte.
-4. **Play Console Data Safety formu** — artık **"Ses / Audio"** satırı da
+   Klasör iki ayrı yere yedeklenmeli — HENÜZ YAPILMADI (otomatik kopyalama güvenlik denetimince
+   engellendi; OneDrive eşitlenmiyor). Kullanıcı elle yedeklemeli. Play App Signing açılacak.
+3b. ✅ **Firestore kuralları yayında** (3 Ekim 2026): `firebase deploy --only firestore:rules
+   --project chess64-c6ff1` (kökteki firebase.json). Emülatörde 34/34 test + canlıda doğrulandı:
+   normal kayıt geçiyor, sahte puan ve başkasının kaydına yazma reddediliyor.
+4. **Play Console Data Safety formu** — hazır cevaplar: `PLAY-VERI-GUVENLIGI.md`. **"Ses / Audio"** satırı da
    gerekiyor: toplanıyor **evet**, paylaşılıyor **evet** (Google'ın tanıma
    servisi), amaç *App functionality*, isteğe bağlı. Bu atlanırsa yayın reddedilir.
 5. **Mağaza listeleme** (açıklama, ekran görüntüleri, grafikler).
