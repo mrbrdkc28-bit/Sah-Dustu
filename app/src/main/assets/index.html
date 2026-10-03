@@ -4233,8 +4233,16 @@ function kameraGuncelle(){
   // Raycaster kameranın world matrisini kullanır. Güncellemezsek dokunma ışını
   // BAYAT matrisle atılır ve taş seçimi kayar (özellikle taş yeme sarsıntısından sonra).
   camera.updateMatrixWorld(true);
-  return true;
+  /* Yalnız kamera GERÇEKTEN değiştiyse true. Eskiden koşulsuz true dönüyordu:
+     döngü her karede çizim istiyor, "hareketsizken saniyede 2 kare" tasarrufu
+     hiç devreye girmiyordu (telefonda ölçüldü: tahta dururken 120 Hz ekranda
+     saniyede ~116 çizim, işlemci ~%290). */
+  const e=camera.matrixWorld.elements;
+  let degisti=false;
+  for(let i=0;i<16;i++){ if(Math.abs(e[i]-_kamSon[i])>1e-6){ degisti=true; _kamSon[i]=e[i]; } }
+  return degisti;
 }
+const _kamSon=new Float32Array(16);
 async function killCam(sald,kurb,tip,kurbTip,saldKare,kurbKare){
   const eski={yaw:kamYaw,pitch:kamPitch,uzak:kamUzak,hedef:kamHedef.clone()};
   document.body.classList.add('sinema');
@@ -9077,6 +9085,11 @@ window.addEventListener('online', ()=>{
    ediliyor ve GPU sürekli tam yükte kalıyor.
    Artık sahne yalnızca gerçekten değiştiğinde çizilir. */
 let cizimGerek=true, sonCizim=0;
+let _parcacikBirikim=0, _parcacikSon=0;
+/* Güvenlik ağı: dokunuş/sürükleme her zaman çizim istesin. Sürekli çizim varken
+   sahneyi değiştirip cizimIste() çağırmayan yerler fark edilmiyordu. */
+['pointerdown','pointermove','pointerup','touchstart','touchmove','touchend'].forEach(t=>
+  addEventListener(t, ()=>{ cizimGerek=true; }, {passive:true, capture:true}));
 function cizimIste(){ cizimGerek=true; }
 /* Sürekli hareket eden mücevherler her karede taranmasın diye bir kez toplanır */
 let mucevherler=[], mucevherNesil=-1;
@@ -9100,7 +9113,14 @@ function dongu(){
   const parcacikVar = !!parcacikSys;
 
   if(tweenVar){ tweenGuncelle(dt); cizimIste(); }
-  if(parcacikVar){ parcacikGuncelle(dt,t); cizimIste(); }
+  /* Parçacıklar (kül/kar/kum) saniyede ~30 güncellenir: yavaş süzüldükleri için
+     gözle fark edilmez, ama 120 Hz ekranda her karede çizim istemeleri tahtayı
+     sürekli tam yükte tutuyordu. Geçen süre biriktirilir; hız değişmez. */
+  const _simdi = (typeof performance!=='undefined'?performance.now():Date.now());
+  if(parcacikVar){
+    _parcacikBirikim += dt;
+    if(_simdi - _parcacikSon >= 33){ parcacikGuncelle(_parcacikBirikim,t); _parcacikBirikim=0; _parcacikSon=_simdi; cizimIste(); }
+  }
   if(sahHalka){
     const sc=1+Math.sin(t*6)*.13;
     sahHalka.scale.set(sc,sc,1);
@@ -9135,6 +9155,9 @@ function dongu(){
      Hareketsizken saniyede 2 kare çizilir — 60 yerine 2, yani GPU yükü ~%97 az. */
   const simdiMs = (typeof performance!=='undefined'?performance.now():Date.now());
   if(!cizimGerek && (simdiMs - sonCizim) < 500) return;
+  /* En çok ~60 Hz çiz: 120 Hz ekranlarda iki kat iş yapılıyordu. İstek bekler,
+     bir sonraki uygun karede çizilir (animasyonlar akıcı kalır). */
+  if(simdiMs - sonCizim < 15.5) return;
   cizimGerek=false; sonCizim=simdiMs;
   if(bloomKatman) bloomKatman.render();
   else renderer.render(scene,camera);
@@ -12889,6 +12912,8 @@ else { try{ SesOyun.kur(); }catch(e){} }
     btn.classList.toggle('gorunur', acik);
     etiket();
     uygula(acik ? kayitli() : 'dikey');
+    // Ekran yalnız oyun sırasında açık kalsın (menülerde normal süresinde kararır)
+    try{ if(window.AndroidEkran && AndroidEkran.acikTut) AndroidEkran.acikTut(acik); }catch(e){}
   }
   new MutationObserver(kontrol).observe(hud, {attributes:true, attributeFilter:['class']});
   kontrol();

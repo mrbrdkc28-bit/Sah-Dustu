@@ -439,7 +439,8 @@ class MainActivity : AppCompatActivity() {
 
         // Ekrani acik tut. Sistem navigasyon cubugu (alt tuslar) GORUNUR kalsin ki
         // kullanici oyundan cikabilsin; sadece ust durum cubugunu gizle, icerik altina kaymasin.
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        // Ekrani acik tutma artik yalniz oyun ekraninda (AndroidEkran.acikTut, JS cagirir).
+        // Eskiden tum uygulamada aciktu: menulerde de ekran hic kararmiyordu.
         /* TAM EKRAN — Android 16 (API 36) UYUMU
            Eski systemUiVisibility bayraklari kullanimdan kalkti ve targetSdk 35+
            uygulamalarda ETKISIZ: Android 16'da kenardan-kenara duzen ZORUNLU,
@@ -781,6 +782,13 @@ class MainActivity : AppCompatActivity() {
                     requestedOrientation = if (tip == "yatay")
                         android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                     else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            }
+            @JavascriptInterface
+            fun acikTut(acik: Boolean) {
+                runOnUiThread {
+                    if (acik) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 }
             }
         }, "AndroidEkran")

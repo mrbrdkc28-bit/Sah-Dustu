@@ -496,6 +496,17 @@ SINIRLAR: sesli oynama ve sesli anlatım yalnız tr/en (diğer dillerde İngiliz
 anlatım yorumları (yorumDil) tr/en. Çeviriler Claude'un — yayından önce her dilin ana
 dili konuşanlarca gözden geçirilmeli (özellikle ar, zh). Gizlilik politikası yalnız TR+EN.
 
+**8.12 — Isınma / şarj (3 Ekim 2026).** Telefonda ölçüldü (CDP + `top`): tahta dururken
+saniyede ~116 çizim (ekran 120 Hz), uygulama %146 + WebView çizim süreci %141 + surfaceflinger
+%55 işlemci. Sebepler: `kameraGuncelle()` koşulsuz `true` dönüyordu ("hareketsizken 2 kare"
+tasarrufu hiç çalışmıyordu) + parçacıklar her karede çizim istiyordu. Düzeltme: kamera yalnız
+matris değişince true; parçacıklar ~30 güncelleme/sn (dt biriktirilir); çizim en çok ~60 Hz;
+dokunuşta çizim isteği (güvenlik ağı); ekran yalnız oyun ekranında açık
+(`AndroidEkran.acikTut`, eskiden tüm uygulamada). Sonuç: boşta 27 çizim/sn, %74 + %73 + %28;
+hamle animasyonu 56, kill-cam 57 kare/sn. Denenip etkisiz bulunan: gölgeyi her karede
+hesaplamamak, CSS sonsuz animasyonlarını durdurmak. Kalan yük parçacıklı 3B çizimin kendisi;
+daha fazlası için seçenek: parçacıkları 20/sn, pixelRatio 2 → 1.5 (görsel kalite, onay gerek).
+
 **8.6 — Dil kapsamı:** (8.11 ile büyük ölçüde kapandı) sözlükte karşılığı olmayan yeni metin
 Türkçe kalır — yeni arayüz metni eklerken DIL_EK'e de ekle.
 
