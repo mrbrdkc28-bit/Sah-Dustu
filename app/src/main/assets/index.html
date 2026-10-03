@@ -4226,7 +4226,11 @@ function isikDikeyAyar(){
 }
 function dikeyMi(){ return innerHeight > innerWidth; }
 // Dikey modda kamerayı daha yatay açıya al → tahta perspektifle uzar, taşlar büyük/görkemli görünür
-function dikeyKamPitch(){ return dikeyMi() ? 0.82 : 0.92; }
+/* Varsayılan açılar telefonda karşılaştırılarak seçildi (3 Ekim 2026):
+   dikey 0.82'de tahtanın alt köşeleri ekran dışına taşıyordu → 0.95 (tahta tam görünür,
+   arka sıra daha okunur); yatay 0.92'de alt kenar + a–h harfleri alt şeridin altında
+   kalıyordu → 0.91 ve %6 uzak (bkz. uygunUzaklik). */
+function dikeyKamPitch(){ return dikeyMi() ? 0.95 : 0.91; }
 function panelYerlesimGuncelle(){
   const p=document.getElementById('notPanel'); if(!p) return;
   if(dikeyMi()){ p.classList.add('dikey'); p.classList.remove('yatay'); document.body.classList.add('dikeyAktif'); }
@@ -4243,10 +4247,10 @@ function uygunUzaklik(){
   const tahtaYari = 5.2;
   const gerekenY = tahtaYari / Math.tan(fovY/2);
   const gerekenX = tahtaYari / Math.tan(fovX/2);
-  let uzak = Math.max(gerekenX, gerekenY) * 0.92; // sıkı kadraj (kenar boşluğu az)
+  let uzak = Math.max(gerekenX, gerekenY) * 0.92 * 1.06; // sıkı kadraj; alt kenar/harfler alt şeride girmesin
   if(dikeyMi()){
     // Dikey: tahta ekranı kenardan kenara doldursun. Genişlik kısıtlayıcı; tam sığdır, boşluk bırakma.
-    uzak = gerekenX * 0.88;
+    uzak = gerekenX * 0.88 * 0.97;
     uzak = Math.max(uzak, gerekenY*0.72); // taş tepesi kesilmesin diye alt sınır (gevşek)
   }
   return Math.max(6.5, Math.min(uzak, 26));
@@ -13038,31 +13042,45 @@ else { try{ SesOyun.kur(); }catch(e){} }
     'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+
     '<rect x="2.5" y="9" width="13" height="8" rx="1.6"/><path d="M5 13h.01"/>'+
     '<path d="M12.5 3.5a8 8 0 0 1 8 8"/><path d="M20.5 8.4v3.1h-3.1"/></svg>';
+  /* Analiz (tahtada inceleme + hamle analizi listesi) HER ZAMAN dikey başlar
+     (sahibin isteği). Düğmeyle yataya çevrilebilir ama bu geçicidir: oyunun
+     kayıtlı yönünü değiştirmez, analizden çıkınca oyun yönüne dönülür. */
+  const inceleHUD=document.getElementById('inceleHUD'), analizEk=document.getElementById('analizEkran');
+  const analizde=()=>!!((inceleHUD&&inceleHUD.classList.contains('acik'))||(analizEk&&analizEk.classList.contains('acik')));
+  let analizYon='dikey';
+  const simdiki=()=>analizde()?analizYon:kayitli();
   function etiket(){
-    const yatay=kayitli()==='yatay';
+    const yatay=simdiki()==='yatay';
     const tr=(typeof uygDil==='undefined'||uygDil==='tr');
     const en = yatay ? 'Switch to portrait' : 'Switch to landscape';
     const m = tr ? (yatay?'Dikeye geç':'Yataya geç') : (typeof metniCevir==='function' ? metniCevir(en) : en);
     btn.setAttribute('aria-label', m); btn.title=m;
   }
   btn.onclick=()=>{
-    const yeni = kayitli()==='yatay' ? 'dikey' : 'yatay';
-    try{ localStorage.setItem(ANAHTAR, yeni); }catch(e){}
+    const yeni = simdiki()==='yatay' ? 'dikey' : 'yatay';
+    if(analizde()) analizYon=yeni;
+    else { try{ localStorage.setItem(ANAHTAR, yeni); }catch(e){} }
     uygula(yeni); etiket();
   };
   document.body.appendChild(btn);
-  let oyunda=null;
+  let oyunda=null, analizOnce=false;
   function kontrol(){
     const acik=hud.classList.contains('acik');
+    const az=analizde();
+    if(az!==analizOnce){
+      analizOnce=az; analizYon='dikey';     // analize her girişte dikey
+      if(acik===oyunda){ etiket(); uygula(acik ? simdiki() : 'dikey'); return; }
+    }
     if(acik===oyunda) return;
     oyunda=acik;
     btn.classList.toggle('gorunur', acik);
     etiket();
-    uygula(acik ? kayitli() : 'dikey');
+    uygula(acik ? simdiki() : 'dikey');
     // Ekran yalnız oyun sırasında açık kalsın (menülerde normal süresinde kararır)
     try{ if(window.AndroidEkran && AndroidEkran.acikTut) AndroidEkran.acikTut(acik); }catch(e){}
   }
   new MutationObserver(kontrol).observe(hud, {attributes:true, attributeFilter:['class']});
+  [inceleHUD, analizEk].forEach(e=>{ if(e) new MutationObserver(kontrol).observe(e, {attributes:true, attributeFilter:['class']}); });
   kontrol();
 })();
 
