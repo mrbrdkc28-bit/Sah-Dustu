@@ -415,7 +415,7 @@ h1 span{color:var(--brass)}
 #cvKodGiris{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:12px;
   padding:14px;color:var(--bone);font-family:'Cinzel',serif;font-size:18px;letter-spacing:.2em;
   text-align:center;text-transform:uppercase}
-.cvBtn.cvKatil{width:auto;padding:14px 22px;justify-content:center;background:var(--panel)}
+.cvBtn.cvKatil{width:auto;padding:14px 22px;justify-content:center;background:var(--panel);color:var(--bone);font-weight:600}   /* renk yoktu: koyu temalarda siyah yazı */
 /* ---------- ARKADAŞLAR ---------- */
 #arkadasEkran{position:fixed;inset:0;z-index:33;display:none;flex-direction:column;
   background:radial-gradient(120% 90% at 50% 0%, #131726 0%, var(--ink) 62%)}
@@ -1434,6 +1434,35 @@ html[data-tema="fildisi"] #kurulumEkran .arena.secili{border-color:#B07E22;box-s
 #digerAyarlar summary::after{content:"▾";letter-spacing:0;font-size:12px;transition:transform .2s}
 #digerAyarlar[open] summary::after{transform:rotate(180deg)}
 #digerAyarlar .blok{margin-top:16px}
+
+/* ===== ÇEVRİMİÇİ (Oyun Kur ile aynı tasarım dili, 3 Ekim 2026) ===== */
+#cevrimiciIcerik{gap:18px}
+.cvSureBaslik{font-size:11.5px;letter-spacing:.28em;font-weight:600}
+.cvSure{border-radius:14px;font-family:'Cinzel',serif;font-size:17px;font-weight:700;padding:11px 4px}
+.cvSure small{font:600 9.5px Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;opacity:.65;color:inherit}
+.cvSure.secili{background:linear-gradient(180deg,#F0C565,#D9A53A)!important;color:#1a1408!important;border-color:transparent!important;
+  box-shadow:0 6px 16px rgba(232,182,76,.25),inset 0 1px 0 rgba(255,255,255,.4)}
+.cvSure.secili small{color:inherit}
+html[data-tema="fildisi"] .cvSure{background:#fffdf8;border-color:rgba(120,95,50,.16);box-shadow:0 2px 6px rgba(90,70,30,.05)}
+html[data-tema="fildisi"] .cvSure.secili{background:linear-gradient(180deg,#232838,#12151f)!important;color:#E8B64C!important;
+  box-shadow:0 6px 16px rgba(20,22,30,.22),inset 0 1px 0 rgba(255,255,255,.08)}
+.cvIkon svg{width:24px;height:24px}
+.cvBtn{border-radius:16px}
+html[data-tema="fildisi"] .cvBtn:not(.cvAna){background:#fffdf8;border-color:rgba(120,95,50,.16);box-shadow:0 4px 12px rgba(90,70,30,.06)}
+html[data-tema="fildisi"] .cvBtn:not(.cvAna) .cvIkon{background:rgba(176,126,34,.09);border:1px solid rgba(176,126,34,.24);color:#9a6c1c}
+html[data-tema="fildisi"] .cvBtn.cvAna{background:linear-gradient(135deg,#1d2130,#10131c);box-shadow:0 12px 28px rgba(20,20,30,.28)}
+html[data-tema="fildisi"] .cvBtn.cvAna .cvAd,html[data-tema="fildisi"] .cvBtn.cvAna .cvIkon{color:#E8B64C}
+html[data-tema="fildisi"] .cvBtn.cvAna .cvAlt{color:#b9b2a2}
+html[data-tema="fildisi"] .cvBtn.cvAna .cvIkon{background:rgba(232,182,76,.14)}
+html[data-tema="fildisi"] #cvKodGiris{background:#fffdf8;border-color:rgba(120,95,50,.18);color:#2b261d}
+html[data-tema="fildisi"] #cevrimiciEkran .arena{background:#fffdf8;border-color:rgba(120,95,50,.16);box-shadow:0 4px 12px rgba(90,70,30,.07)}
+html[data-tema="fildisi"] #cevrimiciEkran .arena.secili{border-color:#B07E22;box-shadow:0 10px 22px rgba(176,126,34,.22)}
+/* misafir uyarısı: sert kırmızı yazı yerine yumuşak bir bilgi kartı */
+#cevrimiciHata:not(:empty){width:100%;padding:14px 16px;border-radius:16px;font-size:13px;line-height:1.5;
+  color:#E8A493;background:rgba(192,83,62,.10);border:1px solid rgba(192,83,62,.28)}
+html[data-tema="fildisi"] #cevrimiciHata:not(:empty){color:#9A3B28;background:rgba(192,83,62,.07);border-color:rgba(192,83,62,.22)}
+#cvGirisBtn{border-radius:12px!important;font-weight:700!important}
+html[data-tema="fildisi"] #cevrimiciEkran #cvGirisBtn[style]{background:linear-gradient(180deg,#232838,#12151f)!important;color:#E8B64C!important;border-color:transparent!important}
 </style>
 </head>
 <body>
@@ -1791,13 +1820,13 @@ html[data-tema="fildisi"] #kurulumEkran .arena.secili{border-color:#B07E22;box-s
     </div>
 
     <button class="cvBtn cvAna" id="cvRastgele">
-      <div class="cvIkon">⚡</div>
+      <div class="cvIkon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.2 3.5 5.8 13.2h5.4l-1 7.3 7.5-9.8h-5.4z"/></svg></div>
       <div class="cvMetin"><div class="cvAd">Rastgele Eşleş</div>
         <div class="cvAlt">Hazır bir rakiple hemen başla</div></div>
     </button>
 
     <button class="cvBtn" id="cvOdaOlustur">
-      <div class="cvIkon">＋</div>
+      <div class="cvIkon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg></div>
       <div class="cvMetin"><div class="cvAd">Oda Oluştur</div>
         <div class="cvAlt">Arkadaşına kod gönder</div></div>
     </button>
