@@ -8475,6 +8475,23 @@ async function inceleStockfishDoldur(ilerleCb){
   }
   Motor.reset();
 }
+/* Analiz fonksiyonları paylaşılan Motor'u başa sarıp hamleleri yeniden oynatıyor,
+   sonunda eski konuma DÖNMÜYORDU: oyun bittikten ~0.4 sn sonra motor başlangıç
+   konumundaydı, ekrandaki taşlar son konumda (telefonda ölçüldü). Analiz biterken
+   aynı oyun hâlâ açıksa motor, analizden önceki konuma geri yüklenir. */
+function _motoruKoruyarak(asil){
+  return async function(){
+    const fen=Motor.fen(), kayit=oyunKaydi, n=oyunKaydi.length;
+    try{ return await asil.apply(this, arguments); }
+    finally{
+      if(oyunKaydi===kayit && oyunKaydi.length===n && !(typeof _analizIptal!=='undefined' && _analizIptal)){
+        try{ Motor.fenYukle(fen); }catch(e){}
+      }
+    }
+  };
+}
+inceleStockfishDoldur=_motoruKoruyarak(inceleStockfishDoldur);
+stockfishDegerlendir=_motoruKoruyarak(stockfishDegerlendir);
 function inceleGit(idx){
   inceleOtoDur();
   if(!oyunKaydi.length) return;
