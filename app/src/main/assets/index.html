@@ -349,7 +349,7 @@ h1 span{color:var(--brass)}
 #cevrimiciEkran.acik{display:flex}
 #cevrimiciUst{display:flex;align-items:center;gap:8px;padding:18px 16px 12px;flex-shrink:0}
 #cevrimiciUst span{font-family:'Cinzel',serif;font-weight:700;letter-spacing:.14em;font-size:16px;color:var(--bone)}
-#cevrimiciGeri{background:none;border:none;color:var(--brass);font-size:30px;line-height:1;cursor:pointer;padding:0 6px}
+#cevrimiciGeri,#arkadasGeri{background:none;border:none;color:var(--brass);font-size:30px;line-height:1;cursor:pointer;padding:0 6px}
 #cevrimiciIcerik{flex:1;overflow-y:auto;padding:16px 20px 28px;display:flex;flex-direction:column;gap:14px;
   align-items:center;justify-content:flex-start;max-width:440px;margin:0 auto;width:100%}
 #cevrimiciHata{color:#E3432F;font-size:13px;text-align:center;min-height:18px}
@@ -1095,6 +1095,9 @@ body.azHareket #son.acik *{animation:none!important}
 /* Yatay telefonda kart ekrandan uzun: ortalanınca başlık üstten taşıyıp kesiliyordu.
    Kaydırılabilir + margin:auto (sığarsa ortalı, sığmazsa baştan başlar). */
 #yardimKapla{overflow-y:auto}
+/* Hamle yazıları her dilde soldan sağa: Arapçada "1.e5" → "e5.1", "2... Qh4#" ters görünüyordu */
+.notSerit .shm,#notListe .sat,#notListeS .sat,#inceleYorum .iyNot,#inceleYorum .iyNo,#inceleYorum .iyOneri b,
+.anKart .anNot,.anKart .anNo{unicode-bidi:isolate;direction:ltr}
 #yardimKart{margin:auto}
 #yardimKart{background:linear-gradient(150deg,#161a2b,#0c0e18);border:1px solid var(--brass);
   border-radius:16px;padding:22px 22px 18px;max-width:380px;width:100%;
@@ -5371,17 +5374,19 @@ function karneSatirlari(renk){
 /* Yüzde sıfırdan hedefe sayarak çıkar — sonucun "hesaplandığı" hissi verir. */
 function sayacAnimasyon(el, hedef, sure){
   if(!el || hedef===null || hedef===undefined){ return; }
-  if(document.body.classList.contains('azHareket')){ el.textContent='%'+hedef; return; }
+  if(document.body.classList.contains('azHareket')){ el.textContent=yzYaz(hedef); return; }
   const bas=performance.now(), s0=sure||900;
   function adim(t){
     const o=Math.min(1,(t-bas)/s0);
     const yumusak=1-Math.pow(1-o,3);      // sona doğru yavaşlar
-    el.textContent='%'+Math.round(hedef*yumusak);
+    el.textContent=yzYaz(Math.round(hedef*yumusak));
     if(o<1) requestAnimationFrame(adim);
-    else el.textContent='%'+hedef;
+    else el.textContent=yzYaz(hedef);
   }
   requestAnimationFrame(adim);
 }
+/* Yüzde yazımı dile göre: Türkçe "%24", diğerleri "24%" (eskiden her dilde %24) */
+function yzYaz(v){ return (typeof uygDil==='undefined'||uygDil==='tr') ? '%'+v : v+'%'; }
 function dogrulukYaz(){
   try{
     const ikiKisilik = (typeof cevrimiciAktif!=='undefined' && !cevrimiciAktif && mod!=='ai');
@@ -5407,12 +5412,12 @@ function dogrulukYaz(){
         const d=document.createElement('div');
         d.className='krSatir'; d.id='krDogSade';
         /* İki kişilik oyunda "senin/rakibin" yok: Beyaz / Siyah yazılır */
-        d.innerHTML='<span class="krEt">'+(ikiKisilik?'Beyaz doğruluğu':'Doğruluğun')+'</span><span class="krSay">%'+dBen+'</span>';
+        d.innerHTML='<span class="krEt">'+(ikiKisilik?'Beyaz doğruluğu':'Doğruluğun')+'</span><span class="krSay">'+yzYaz(dBen)+'</span>';
         liste.insertBefore(d, liste.firstChild);
         if(dRak!==null && !document.getElementById('krDogSadeRak')){
           const r=document.createElement('div');
           r.className='krSatir'; r.id='krDogSadeRak';
-          r.innerHTML='<span class="krEt">'+(ikiKisilik?'Siyah doğruluğu':'Rakip doğruluğu')+'</span><span class="krSay">%'+dRak+'</span>';
+          r.innerHTML='<span class="krEt">'+(ikiKisilik?'Siyah doğruluğu':'Rakip doğruluğu')+'</span><span class="krSay">'+yzYaz(dRak)+'</span>';
           liste.insertBefore(r, d.nextSibling);
         }
       }
@@ -5559,7 +5564,7 @@ function oyunSonu(d, terkKazanan){
     if(dogrulukGoster && analizAcik){
       /* Derin analiz bitmediyse sayı yerine '—' gösterilir */
       const analizBekliyor = oyunKaydi.length && !oyunKaydi.some(k=>k._kSinif);
-      const yaz = (v)=> (analizBekliyor || v===null) ? '—' : ('%'+v);
+      const yaz = (v)=> (analizBekliyor || v===null) ? '—' : yzYaz(v);
       let kr='<div class="karne">';
       kr+='<div class="krDog">';
       kr+='<div class="krDogYan"><div class="krDogEt">SEN</div><div class="krDogPuan" id="krDogBen">'+yaz(benimDog)+'</div><div class="krDogAlt">DOĞRULUK</div></div>';
@@ -5603,7 +5608,7 @@ function oyunSonu(d, terkKazanan){
           const n=evreNotu(d2.yuzde);
           ev+='<div class="krEvre"><div class="krEvreAd">'+EVRE_AD[e]+'</div>'+
               '<div class="krEvreNot" style="color:'+n.renk+'">'+n.harf+'</div>'+
-              '<div class="krEvreYuz" style="color:'+n.renk+'">%'+d2.yuzde+'</div></div>';
+              '<div class="krEvreYuz" style="color:'+n.renk+'">'+yzYaz(d2.yuzde)+'</div></div>';
         }
         if(ev) kr+='<div class="krEvreler">'+ev+'</div>';
       }
@@ -6120,12 +6125,12 @@ function anOzetCiz(){
     dg.innerHTML=
       '<div class="anDogUst">'+
         '<div class="anDogYan"><div class="anDogEt">SEN</div>'+
-          '<div class="anDogPuan" style="color:'+dogRenk(dB)+'">'+(dB!==null?'%'+dB:'—')+'</div>'+
+          '<div class="anDogPuan" style="color:'+dogRenk(dB)+'">'+(dB!==null?yzYaz(dB):'—')+'</div>'+
           '<div class="anDogNot" style="color:'+dogRenk(dB)+'">'+dogEtiket(dB)+'</div></div>'+
         '<div class="anDogOrta"><div class="anDogEt">HAMLE</div>'+
           '<div class="anDogSay">'+anSonuclar.length+'</div></div>'+
         '<div class="anDogYan"><div class="anDogEt">RAKİP</div>'+
-          '<div class="anDogPuan" style="color:'+dogRenk(dR)+'">'+(dR!==null?'%'+dR:'—')+'</div>'+
+          '<div class="anDogPuan" style="color:'+dogRenk(dR)+'">'+(dR!==null?yzYaz(dR):'—')+'</div>'+
           '<div class="anDogNot" style="color:'+dogRenk(dR)+'">'+dogEtiket(dR)+'</div></div>'+
       '</div>'+
       '<div class="anDogBar"><i style="width:'+Math.round(tB/tp*100)+'%;background:'+dogRenk(dB)+'"></i>'+
@@ -9962,12 +9967,13 @@ function istRender(){
       '<div class="pG" style="width:'+yzd(gal)+'%"></div>'+
       '<div class="pB" style="width:'+yzd(ber)+'%"></div>'+
       '<div class="pM" style="width:'+yzd(mag)+'%"></div></div>'+
-    '<div class="istBandAlt"><span>%'+yzd(gal)+' Galibiyet</span>'+
-      '<span>%'+yzd(ber)+' Berabere</span><span>%'+yzd(mag)+' Mağlubiyet</span></div></div>';
+    /* Sayı ve etiket ayrı: "%50 Galibiyet" tek metin olunca hiçbir dile çevrilmiyordu */
+    '<div class="istBandAlt"><span>'+yzYaz(yzd(gal))+' <span>Galibiyet</span></span>'+
+      '<span>'+yzYaz(yzd(ber))+' <span>Berabere</span></span><span>'+yzYaz(yzd(mag))+' <span>Mağlubiyet</span></span></div></div>';
   // Kartlar
   h+='<div class="istKartlar">'+
     '<div class="istKart"><div class="buyuk">'+oyun+'</div><div class="etiket">Toplam Oyun</div></div>'+
-    '<div class="istKart"><div class="buyuk">'+(dogrulukOrt!==null?'%'+dogrulukOrt:'—')+'</div><div class="etiket">Ort. Doğruluk</div></div>'+
+    '<div class="istKart"><div class="buyuk">'+(dogrulukOrt!==null?yzYaz(dogrulukOrt):'—')+'</div><div class="etiket">Ort. Doğruluk</div></div>'+
     '<div class="istKart"><div class="buyuk">'+(B.enIyiSeri||0)+'</div><div class="etiket">En İyi Seri</div></div>'+
     '<div class="istKart"><div class="buyuk">'+(B.anlikSeri||0)+'</div><div class="etiket">Güncel Seri</div></div>'+
     '</div>';
@@ -11083,6 +11089,7 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["Vahim"]={"en": "Blunder", "ru": "Зевок", "ar": "خطأ فادح", "fr": "Gaffe", "de": "Patzer", "it": "Errore grave", "zh": "大错"};
   CEVM["Doğruluğun"]={"en": "Your accuracy", "ru": "Ваша точность", "ar": "دقتك", "fr": "Ta précision", "de": "Deine Genauigkeit", "it": "La tua precisione", "zh": "你的准确率"};
   CEVM["Rakip doğruluğu"]={"en": "Opponent accuracy", "ru": "Точность соперника", "ar": "دقة الخصم", "fr": "Précision de l'adversaire", "de": "Genauigkeit Gegner", "it": "Precisione dell'avversario", "zh": "对手准确率"};
+  CEVM['Ort. Doğruluk']={en:'Avg. accuracy',ru:'Ср. точность',ar:'متوسط الدقة',fr:'Précision moy.',de:'Ø Genauigkeit',it:'Precisione media',zh:'平均准确率'};
   CEVM['Beyaz doğruluğu']={en:'White accuracy',ru:'Точность белых',ar:'دقة الأبيض',fr:'Précision des Blancs',de:'Genauigkeit Weiß',it:'Precisione del Bianco',zh:'白方准确率'};
   CEVM['Siyah doğruluğu']={en:'Black accuracy',ru:'Точность чёрных',ar:'دقة الأسود',fr:'Précision des Noirs',de:'Genauigkeit Schwarz',it:'Precisione del Nero',zh:'黑方准确率'};
   CEVM['Erkek']={en:'Male',ru:'Мужской',ar:'ذكر',fr:'Homme',de:'Männlich',it:'Uomo',zh:'男声'};
@@ -11246,12 +11253,24 @@ function bedavaDonem(){ const t=parseInt(pOku('c64_ilk'),10)||Date.now(); return
 /* ================= ARKADAŞLAR EKRANI ================= */
 let arkSekme='liste', arkVeri={liste:[],istek:[],ara:[]};
 function arkadasAc(){
+  const ek=document.getElementById('arkadasEkran'), ic=document.getElementById('arkadasIcerik');
+  const eski=document.getElementById('arkGirisKutu'); if(eski) eski.remove();
   if(!fbKullanici || misafirMod){
-    if(typeof anlatimGoster==='function')
-      anlatimGoster('Arkadaş eklemek için hesabınla giriş yapmalısın.');
+    /* Misafir: Liderlik ve Çevrimiçi gibi ekran açılır, içinde açıklama + GİRİŞ YAP.
+       Eskiden yalnız kısa bir uyarı yazısı çıkıp kayboluyordu (dokunuş boşa gitmiş gibi). */
+    if(ic) ic.style.display='none';
+    const k=document.createElement('div'); k.id='arkGirisKutu';
+    k.innerHTML='<div style="text-align:center;color:#a9a493;padding:40px 20px 18px;font-size:13px;line-height:1.6">Arkadaş eklemek için hesabınla giriş yapmalısın.</div>';
+    const b=document.createElement('button'); b.textContent='GİRİŞ YAP';
+    b.style.cssText='display:block;margin:0 auto;padding:11px 30px;border-radius:10px;border:1px solid var(--brass);background:rgba(185,154,91,.14);color:#E8E2D2;font-size:13px;letter-spacing:.1em;cursor:pointer;font-family:inherit';
+    b.onclick=()=>{ arkadasKapat(); const g=document.getElementById('girisEkran'); if(g) g.classList.remove('gizli'); };
+    k.appendChild(b);
+    if(ic && ic.parentNode) ic.parentNode.insertBefore(k, ic.nextSibling); else ek.appendChild(k);
+    ek.classList.add('acik');
     return;
   }
-  document.getElementById('arkadasEkran').classList.add('acik');
+  if(ic) ic.style.display='';
+  ek.classList.add('acik');
   arkSekmeSec('liste');
 }
 function arkadasKapat(){ document.getElementById('arkadasEkran').classList.remove('acik'); }
