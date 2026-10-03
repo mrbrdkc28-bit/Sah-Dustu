@@ -123,6 +123,17 @@ canvas{display:block}
   border-radius:12px;padding:14px 20px;text-align:center;min-width:280px;max-width:92vw;
   box-shadow:0 8px 30px rgba(0,0,0,.6);transition:transform .5s cubic-bezier(.3,1.3,.5,1)}
 #bulmacaSerit.acik{transform:translateX(-50%) translateY(0)}
+/* Analiz ekranı, yatay telefon: özet bölümleri 392 px'in 272'sini alıp hamle listesine
+   tek satır bırakıyordu (telefonda ölçüldü). Boşluklar ve yazılar sıkıştırılır. */
+@media (orientation: landscape) and (max-height: 520px){
+  #anBar{padding-top:4px!important;padding-bottom:4px!important;min-height:0!important}
+  #anDog{padding-top:2px!important;padding-bottom:2px!important}
+  #anDog .anDogUst{margin:0!important;padding:0!important}
+  #anDog .anDogSay{font-size:19px!important;line-height:1.1!important}
+  #anDog .anDogNot{display:none!important}
+  #anCip,#anSuz{padding-top:3px!important;padding-bottom:3px!important}
+  #anSes{padding-top:5px!important;padding-bottom:5px!important}
+}
 /* Yatay telefonda alt orta kart tahtanın alt sıralarını (oyuncunun kendi taşlarını)
    kapatıyordu; tahtanın sağındaki boş alana dar kart olarak al. */
 @media (orientation: landscape) and (max-height: 520px){

@@ -473,7 +473,14 @@ yatay) `AndroidEkran.yon()` ile kilitlenir (yatay = SENSOR_LANDSCAPE, 180° çev
 dikey = PORTRAIT); telefonun kendi döndürmesi yok sayılır. Oyun ekranında sol üstte
 `#yonBtn` (dikeyde süre çubuğunun altında). Telefonda test edildi: menü 392×842, oyun
 842×392, düğme ↔, menüye dönüş dikey, yeni oyun son seçimle.
-Kontrol edilmedi: yatayda analiz/sohbet/bulmaca/çevrimiçi ekranlarının yerleşimi.
+Yatayda telefonda kontrol edildi (3 Ekim): Seçenekler (kayar, uygun), kill-cam (yan paneller ve
+yön düğmesi `body.sinema` iken gizlenir), şah uyarısı (okunur, biraz daha belirgin olabilir),
+oyun sonu kartı (sığar, içerik kayar), premium kilit penceresi (uygun), bulmaca (kart tahtayı
+kapatıyordu → yatayda sağda dar kart), analiz (özet 272/392 px alıyordu → sıkıştırıldı,
+liste 55 → 166 px). Kontrol edilmedi: sohbet ve çevrimiçi ekranlar (iki cihaz gerekir).
+Açık gözlemler: yatayda solda kamera çentiği bölgesi siyah şerit (cutout modu); notasyon
+Cinzel yazı tipiyle "f3" → "F3" görünüyor (Cinzel'de küçük harf yok; piyon hamlesi taş
+hamlesi gibi okunabilir).
 
 **8.6 — Dil kapsamı:** yeni sesli oynama arayüz metinlerinin bir kısmı için
 ru/ar karşılığı yok; sözlükte karşılığı olmayan metin Türkçe kalır.
