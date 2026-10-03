@@ -9773,6 +9773,56 @@ function dongu(){
 }
 
 /* ---- Başlat ---- */
+/* Açılış notaları — marimba benzeri tını: temel sinüs + 4. harmonik, hızlı sönüm */
+function acilisNotalari(perde){
+  try{
+    if(typeof Ses!=='undefined' && Ses.sessizMi) return;          // kullanıcı sesi kapattıysa
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    const ctx=new AC(); if(ctx.state==='suspended') ctx.resume();
+    const ana=ctx.createGain(); ana.gain.value=0.55; ana.connect(ctx.destination);
+    // Hafif yankı: kısa gecikme + geri besleme (salon hissi)
+    const yanki=ctx.createDelay(); yanki.delayTime.value=0.19;
+    const geri=ctx.createGain(); geri.gain.value=0.28;
+    const yankiCikis=ctx.createGain(); yankiCikis.gain.value=0.35;
+    yanki.connect(geri); geri.connect(yanki); yanki.connect(yankiCikis); yankiCikis.connect(ana);
+    // CSS animasyonuyla eşle: animasyon zaten başladıysa geçen süreyi düş
+    let gecen=0;
+    try{ const an=perde && perde.querySelector('.aT') && perde.querySelector('.aT').getAnimations()[0];
+         if(an && an.startTime!=null && document.timeline) gecen=Math.max(0,(document.timeline.currentTime-an.startTime)/1000); }catch(e){}
+    const t0=ctx.currentTime+0.02-gecen;
+    function nota(f, t, sure, guc){
+      const g=ctx.createGain(); g.gain.setValueAtTime(0.0001,t);
+      g.gain.exponentialRampToValueAtTime(guc,t+0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+sure);
+      g.connect(ana); g.connect(yanki);
+      [[1,1],[4,0.18],[2.76,0.07]].forEach(([k,a])=>{
+        const o=ctx.createOscillator(); o.type='sine'; o.frequency.value=f*k;
+        const ga=ctx.createGain(); ga.gain.value=a; o.connect(ga); ga.connect(g);
+        o.start(t); o.stop(t+sure+0.05);
+      });
+    }
+    function damla(t, f){
+      const o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine';
+      o.frequency.setValueAtTime(f*1.9,t); o.frequency.exponentialRampToValueAtTime(f,t+0.07);
+      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.16,t+0.006);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+0.16);
+      o.connect(g); g.connect(ana); g.connect(yanki); o.start(t); o.stop(t+0.2);
+    }
+    // Re majör pentatonik, yükselen: D4 F#4 A4 B4 D5 E5
+    const NOTA=[293.66,369.99,440.00,493.88,587.33,659.25];
+    for(let g=0; g<6; g++){
+      const in_ = 0.35 + g*0.42;
+      nota(NOTA[g], t0+in_+0.384, 0.9, 0.22);                      // taş oturdu
+      damla(t0+in_+0.95, NOTA[g]*2.5);                              // boya damlası değdi
+    }
+    // Logo: yumuşak akor (D4 A4 D5 F#5), kısa arpej
+    [293.66,440,587.33,739.99].forEach((f,i)=>nota(f, t0+3.45+i*0.045, 2.2, 0.11));
+    // Dokunup geçilirse sus
+    const sus=()=>{ try{ ana.gain.cancelScheduledValues(ctx.currentTime); ana.gain.setTargetAtTime(0.0001,ctx.currentTime,0.05); }catch(e){} };
+    if(perde) perde.addEventListener('pointerdown', sus, {once:true});
+    setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 7500);
+  }catch(e){}
+}
 // Açılış perdesi: bitince kaldır, dokununca atla
 (function(){
   function perdeKapat(){
@@ -9781,10 +9831,12 @@ function dongu(){
   }
   const p=document.getElementById('acilisPerde');
   if(p){
-    /* Açılış sesi (sfx/basla.mp3): taşlar inmeye başlarken bir kez. Eskiden açılışta hiç
-       çağrılmıyordu. Android tarafında dokunmadan çalmaya izin var
-       (mediaPlaybackRequiresUserGesture=false); ses kapalıysa Ses.cal zaten çalmaz. */
-    setTimeout(()=>{ try{ if(!p.classList.contains('bitti') && typeof Ses!=='undefined') Ses.cal('basla'); }catch(e){} }, 300);
+    /* AÇILIŞ NOTALARI (sahibin isteği): oyun başlama sesi (basla.mp3) burada çalmaz.
+       Her taş yere oturduğunda yükselen bir nota, her boya damlası çarptığında küçük bir
+       "damla" sesi, logo belirirken yumuşak bir akor. Ses dosyası yok, anlık üretilir.
+       Zamanlar CSS ile aynı: iniş .35+g*.42 sn, oturma anı %62 → +.384; damla teması +.95.
+       Dokunmadan çalabildiği telefonda doğrulandı (AudioContext 'running' açılıyor). */
+    acilisNotalari(p);
     // animasyon toplam ~5.1s; sonra kesin kapat (load beklemeden, hemen sayar)
     setTimeout(perdeKapat, 5800);
     p.addEventListener('pointerdown', perdeKapat); // dokununca atla

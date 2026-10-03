@@ -548,7 +548,7 @@ Parçacıklar grafik kalitesine bağlı (`KADEME.*.parcacikMs`: 33/66/0). Lisans
 Açılış: taşlar indikten sonra her birine kendi renginde boya damlası düşer, boya tepeden akar
 (`@property --boya` + background-clip:text; text-shadow KAPALI olmalı, yoksa taş griye boğulur).
 Perde 4.8 sn'de kalkar (eskiden 4.2; bağlı zamanlayıcılar 5800). Açılış sesi sfx/basla.mp3 artık
-perdede çalar (dokunmadan çalabildiği telefonda doğrulandı; ses kapalıysa çalmaz).
+X
 
 ---
 
