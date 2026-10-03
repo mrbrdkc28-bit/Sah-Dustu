@@ -1550,6 +1550,15 @@ html[data-tema="fildisi"] .arkSatir,html[data-tema="fildisi"] #arkAraGiris{backg
   color:#F0C565;background:rgba(10,12,18,.72);border:1px solid rgba(232,182,76,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .kilitKart .pano img{filter:saturate(.55) brightness(.86)}
 .kilitKart .ad{opacity:.85}
+
+/* ===== MENÜ SLOGANI (3 Ekim 2026, sahibin isteği): el yazısı, kırmızı, küçük ===== */
+.menuSlogan{font-family:'SloganYazi','Great Vibes',cursive;font-size:24px;line-height:1.1;color:#B3261E;
+  text-align:center;margin-top:2px;transform:rotate(-3deg);letter-spacing:.01em;
+  text-shadow:0 1px 0 rgba(255,255,255,.35)}
+html:not([data-tema="fildisi"]) .menuSlogan{color:#E0503F;text-shadow:0 2px 10px rgba(0,0,0,.45)}
+html[lang="ar"] .menuSlogan{font-size:22px;transform:rotate(-2deg)}
+html[lang="zh"] .menuSlogan{font-size:20px;letter-spacing:.08em}
+html[lang="ru"] .menuSlogan{font-size:23px}
 </style>
 </head>
 <body>
@@ -1630,6 +1639,7 @@ html[data-tema="fildisi"] .arkSatir,html[data-tema="fildisi"] #arkAraGiris{backg
   <div id="profilCubuk"></div>
   <div class="anaBaslik">
     <h1>CHESS <span>64</span></h1>
+    <div class="menuSlogan">Satranç her şeydir.</div>
   </div>
 
   <div class="kartlar">
@@ -11396,6 +11406,7 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["Doğruluğun"]={"en": "Your accuracy", "ru": "Ваша точность", "ar": "دقتك", "fr": "Ta précision", "de": "Deine Genauigkeit", "it": "La tua precisione", "zh": "你的准确率"};
   CEVM["Rakip doğruluğu"]={"en": "Opponent accuracy", "ru": "Точность соперника", "ar": "دقة الخصم", "fr": "Précision de l'adversaire", "de": "Genauigkeit Gegner", "it": "Precisione dell'avversario", "zh": "对手准确率"};
   CEVM['Diğer ayarlar']={en:'More settings',ru:'Другие настройки',ar:'إعدادات أخرى',fr:'Autres réglages',de:'Weitere Einstellungen',it:'Altre impostazioni',zh:'更多设置'};
+  CEVM['Satranç her şeydir.']={en:'Chess is everything.',ru:'Шахматы — это всё.',ar:'الشطرنج هو كل شيء.',fr:'Les échecs sont tout.',de:'Schach ist alles.',it:'Gli scacchi sono tutto.',zh:'国际象棋就是一切。'};
   CEVM['Tema']={en:'Theme',ru:'Тема',ar:'المظهر',fr:'Thème',de:'Design',it:'Tema',zh:'主题'};
   CEVM['Dil']={en:'Language',ru:'Язык',ar:'اللغة',fr:'Langue',de:'Sprache',it:'Lingua',zh:'语言'};
   CEVM['Fildişi']={en:'Ivory',ru:'Слоновая кость',ar:'عاجي',fr:'Ivoire',de:'Elfenbein',it:'Avorio',zh:'象牙白'};
