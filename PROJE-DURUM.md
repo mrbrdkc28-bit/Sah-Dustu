@@ -6,7 +6,7 @@
 > hiçbir kaynak dosyada yazmıyor ve her yeni sohbette sıfırdan keşfedilmesi
 > gerekiyor — ya da bu dosya okunur.
 >
-> Son güncelleme: 29 Eylül 2026 · Doğrulama: aşağıdaki tüm sürüm/ayar değerleri
+> Son güncelleme: 3 Ekim 2026 · Doğrulama: aşağıdaki tüm sürüm/ayar değerleri
 > `C:\Users\Emre\Desktop\SahDustu` içindeki gerçek dosyalardan okunarak yazıldı.
 
 ---
@@ -37,7 +37,7 @@ SahDustu/
 │     ├─ engine/             ← Stockfish wasm
 │     ├─ models/             ← GLB taş setleri
 │     ├─ dokular/  onizleme/  sfx/
-├─ privacy_YENI.html         ← GİZLİLİK POLİTİKASI — HENÜZ YAYINLANMADI
+├─ privacy.html              ← GİZLİLİK POLİTİKASI (GitHub Pages'te yayında)
 ├─ VARLIK-REHBERI.md         ← ⚠ BAYAT, bkz. Bölüm 8
 ├─ README.md · FIRESTORE-GUVENLIK-KURALLARI.txt · GOOGLE-GIRISI-DUZELTME.txt
 └─ keystore.properties.ORNEK ← gerçeği yok, oluşturulacak (Bölüm 9)
@@ -395,8 +395,24 @@ yansıtmıyor (bkz. 7.7). Güncellenmeli ya da silinmeli.
 **8.4 — AGP 8.5.2 / compileSdk 36 uyumsuzluk uyarısı** susturuldu, kalıcı
 çözüm AGP 8.9+ (ertelendi).
 
-**8.5 — Ölü dosyalar:** `klasik_*.glb` (12 dosya, ~2.3 MB) hiç yüklenmiyor.
-Silinebilir.
+**8.5 — Ölü dosyalar:** ✅ 3 Ekim 2026: `klasik_*.glb` (12 dosya, 2.3 MB) APK'dan
+çıkarıldı, `_yedek_2026-09-29/kullanilmayan_klasik_glb/` içinde duruyor.
+(`klasikModelleriYukle()` hiç çağrılmıyor; Klasik ordu bilerek geometrik taş kullanır.)
+
+**8.7 — Çevrimiçi puan koruması (3 Ekim 2026).** Eskiden bilgisayara (her zorlukta
+1000 sayılırdı) ve yerel 2 kişilik oyuna (oyuncu hep kazanan sayılırdı) karşı da puan
+değişiyordu; puanı istemci yazıyordu. Şimdi: yerel oyunlar puanı değiştirmez;
+çevrimiçi puanı yalnızca `puanIsle()` yazar, oda kaydındaki sonuca göre.
+Kurallar (`firestore.rules`): oda `bitti`, iki tarafın `katilim` kaydı var, oyun başına
+bir `sayim` (aynı batch), |değişim| ≤ 24 (beraberlik ≤ 12) ve sonuçla aynı yön,
+haftalık `hp_` artışı ≤ puan artışı, profil alan beyaz listesi, bitmiş oda sonucu kilitli.
+Oyun ortasında kapatılan uygulama: `acikOda` → sonraki açılışta sayılır.
+Emülatörde 34/34 senaryo + gerçek `puanIsle` uçtan uca doğrulandı.
+**Kalan risk:** iki hesapla kendine karşı oynamak (~+12/oyun) ve değiştirilmiş istemcinin
+gerçek rakibe karşı kendini kazanan yazması. Tam çözüm: Cloud Functions (Blaze).
+Test: `firebase emulators:exec --only firestore` (Java: Android Studio `jbr`).
+Kural dili notları: `math.max` yok; yol için `path('/databases/'+database+'/documents/'+p)`
+kullan — `$(p)` içine `a/b` verilirse tek parça sayılır.
 
 **8.6 — Dil kapsamı:** yeni sesli oynama arayüz metinlerinin bir kısmı için
 ru/ar karşılığı yok; sözlükte karşılığı olmayan metin Türkçe kalır.
@@ -405,16 +421,20 @@ ru/ar karşılığı yok; sözlükte karşılığı olmayan metin Türkçe kalı
 
 ## 9. YAYIN ENGELLERİ (hepsi kullanıcı tarafında)
 
-1. **GPL-3.0 kaynak yükümlülüğü.** Stockfish GPL-3.0 olduğu için uygulamanın
-   tamamı GPL-3.0'a tabi. `KREDILER.txt` kaynak kodu şu adreste vaat ediyor:
-   `github.com/mrbrdkc28-bit/Sah-Dustu`. **Şu an orada yalnızca web varlıkları
-   var ve yayınlanmış `index.html` bayat.** Tam Android kaynağı yüklenmeli.
+1. ✅ **GPL-3.0 kaynak yükümlülüğü** (3 Ekim 2026). Proje artık git deposu;
+   tam kaynak `github.com/mrbrdkc28-bit/Sah-Dustu` `main` dalında (eski web
+   yüklemelerinin geçmişi korunarak birleştirildi). Kök `index.html` GitHub Pages
+   için `app/src/main/assets/index.html`'e yönlendirir.
    ⚠ `.gitignore` şunları dışlıyor, **asla commit etme**:
    `keystore.properties`, `*.jks`, `*.keystore`, `google-services.json`.
-2. **Gizlilik politikası yayınlanmalı.** `privacy_YENI.html` hazır (TR+EN,
-   AdMob ve **mikrofon** maddeleri dahil). GitHub Pages'te `privacy.html`
-   olarak yayınlanacak ve Play Console'a bu adres girilecek.
-3. **Keystore oluşturulmalı** (`keystore.properties.ORNEK` şablonu var).
+2. ✅ **Gizlilik politikası** `privacy.html` (eski adı `privacy_YENI.html`; TR+EN,
+   AdMob ve mikrofon dahil) yayında: https://mrbrdkc28-bit.github.io/Sah-Dustu/privacy.html
+   — Play Console'a bu adres girilecek.
+3. ✅ **Keystore** (3 Ekim 2026): `C:/Users/Emre/sahdustu-keys/sahdustu-upload.jks`,
+   şifre aynı klasörde `OKU-BENI.txt`. `keystore.properties` buna bakıyor.
+   Klasör iki ayrı yere yedeklenmeli. Play App Signing açılacak.
+3b. **Firestore kuralları yayınlanmalı:** `firebase deploy --only firestore:rules
+   --project chess64-c6ff1` (ya da konsola yapıştır). Yeni APK ile birlikte.
 4. **Play Console Data Safety formu** — artık **"Ses / Audio"** satırı da
    gerekiyor: toplanıyor **evet**, paylaşılıyor **evet** (Google'ın tanıma
    servisi), amaç *App functionality*, isteğe bağlı. Bu atlanırsa yayın reddedilir.
