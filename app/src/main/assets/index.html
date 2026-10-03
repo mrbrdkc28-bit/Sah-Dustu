@@ -10606,14 +10606,28 @@ window.addEventListener('load',()=>{
       '3B kütüphanesi yüklenemedi.<br>İlk açılış için internet bağlantısı gerekir.</div>';
     return;
   }
-  kur();
-  try{ arenaKur(ARENALAR[0]); }catch(e){ console.log('arenaKur hata:',e); }
-  try{ taslariDiz(); }catch(e){ console.log('taslariDiz hata:',e); }
-  try{ cburnettYukle(); }catch(e){}
-  menuKur();
-  dongu();
-  document.getElementById('yukleniyor').classList.add('gizli');
-  document.getElementById('menu').classList.remove('gizli');
+  /* 3B kurulumu açılış animasyonunun DURGUN anına ertele. Telefonda ölçüldü: kur()+arena+taşlar
+     ana iş parçacığını ~520 ms kilitliyordu ve ilk taşın inişine denk geliyordu (animasyon kasıyordu).
+     ~4,25 sn'de tüm taşlar boyanmış, logo yerinde, hiçbir şey hareket etmiyor; perde 4,8'de kalkar.
+     Dokunup geçilirse hemen kurulur. */
+  let kuruldu=false;
+  const agirKurulum=()=>{
+    if(kuruldu) return; kuruldu=true;
+    kur();
+    try{ arenaKur(ARENALAR[0]); }catch(e){ console.log('arenaKur hata:',e); }
+    try{ taslariDiz(); }catch(e){ console.log('taslariDiz hata:',e); }
+    try{ cburnettYukle(); }catch(e){}
+    menuKur();
+    dongu();
+    document.getElementById('yukleniyor').classList.add('gizli');
+    document.getElementById('menu').classList.remove('gizli');
+  };
+  const perde=document.getElementById('acilisPerde');
+  const perdeVar = perde && !perde.classList.contains('bitti') && getComputedStyle(perde).display!=='none';
+  if(perdeVar){
+    setTimeout(agirKurulum, Math.max(0, 4250 - performance.now()));
+    perde.addEventListener('pointerdown', ()=>setTimeout(agirKurulum, 0), {once:true});
+  } else agirKurulum();
 });
 </script>
 <script>
