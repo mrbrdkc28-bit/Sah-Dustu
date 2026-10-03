@@ -12274,6 +12274,44 @@ const SesOyun = (function(){
     belkiYenidenAc(400);
   }
 
+  // ---------- yasal olmayan komut için açıklama ----------
+  const TAS_AD_TR={p:'Piyon',n:'At',b:'Fil',r:'Kale',q:'Vezir',k:'Şah'};
+  const TAS_AD_EN={p:'Pawn',n:'Knight',b:'Bishop',r:'Rook',q:'Queen',k:'King'};
+  // Rakamın okunuşuna göre yönelme eki: bir'e, iki'ye, üç'e, dört'e, beş'e, altı'ya, yedi'ye, sekiz'e
+  const YONELME={1:'e',2:'ye',3:'e',4:'e',5:'e',6:'ya',7:'ye',8:'e'};
+  function yasalDegilAciklama(adaylar){
+    try{
+      const ham=adaylar&&adaylar[0]; const metin=(ham&&(ham.metin||ham))||'';
+      const tk=SesKomut.tokenle(SesKomut.katla(String(metin)));
+      let tas=null, harf=null, rakam=null;
+      for(const t of tk){
+        if(!tas) for(const k in SesKomut.TAS_SES) if(SesKomut.TAS_SES[k].indexOf(t)>=0){ tas=k; break; }
+        if(!harf && /^[a-h]$/.test(t)) { harf=t; continue; }
+        if(harf && !rakam){
+          if(/^[1-8]$/.test(t)) rakam=+t;
+          else for(const r in SesKomut.RAKAM_SES) if(SesKomut.RAKAM_SES[r].some(w=>t===w||t.indexOf(w)===0)){ rakam=+r; break; }
+        }
+      }
+      if(!harf || !rakam) return null;
+      const kare=harf+rakam;
+      // Söylenen taş o kareye gerçekten gidebiliyorsa bu bir "yasal değil" durumu değildir.
+      const hedef=(8-rakam)*8+('abcdefgh'.indexOf(harf));
+      const yasal=Motor.legal(Motor.turn);
+      if(yasal.some(m=>m.to===hedef && (!tas || (Motor.tasAl(m.from)||{}).t===tas))) return null;
+      if(tr()) return tas ? TAS_AD_TR[tas]+' '+kare+"'"+YONELME[rakam]+' gidemez.' : kare+"'"+YONELME[rakam]+' giden taş yok.';
+      return tas ? TAS_AD_EN[tas]+" can't go to "+kare+'.' : 'Nothing can go to '+kare+'.';
+    }catch(e){ return null; }
+  }
+  // Uyarıyı söyle; eller serbestte "geri bildirim" kapalı olsa da (ekrana bakılmıyor).
+  let uyariBitis=0;   // uyarı bu ana kadar ekranda kalsın ("Dinliyorum…" ezmesin)
+  function uyariSoyle(metin){
+    uyariBitis=Date.now()+2600;
+    if(!(ayar.geriBildirim || ayar.mik==='oto') || typeof Konus==='undefined'){ belkiYenidenAc(900); return; }
+    const cins=(typeof sesProfili!=='undefined')?sesProfili.cinsiyet:'kadin';
+    try{ Konus.oku(metin, dilKodu(), cins, ()=>belkiYenidenAc(250)); }
+    catch(e){ belkiYenidenAc(900); }
+  }
+
   // ---------- tanınan metni işle ----------
   function isle(adaylar){
     if(!ayar.acik) return;
@@ -12329,10 +12367,14 @@ const SesOyun = (function(){
 
     if(s.tur==='yok'){
       const ilk=(adaylar[0]&&(adaylar[0].metin||adaylar[0]))||'';
-      bar((tr()?'Anlamadım':'Didn\'t catch that')+
-          (ilk?' <span style="opacity:.55">('+String(ilk).slice(0,28)+')</span>':''),{sure:2200});
+      // Taş + kare anlaşıldı ama yasal değilse bunu söyle: eller serbestte ekrana
+      // bakılmıyor, "Anlamadım" yazısı görülmüyordu ("fil f2" üç kez sessizce düştü).
+      const neden=yasalDegilAciklama(adaylar);
+      bar(neden ? neden : (tr()?'Anlamadım':'Didn\'t catch that')+
+          (ilk?' <span style="opacity:.55">('+String(ilk).slice(0,28)+')</span>':''),{sure:2600});
       try{ if(typeof Ses!=='undefined'&&Ses.cal) Ses.cal('hata'); }catch(e){}
-      uyanik=false; belkiYenidenAc(900);
+      uyanik=false;
+      if(neden) uyariSoyle(neden); else belkiYenidenAc(900);
       return;
     }
 
@@ -12366,9 +12408,10 @@ const SesOyun = (function(){
     // bir eşleşmenin de yüksek güvenli gibi işlenmesiydi. Artık eşiğin altındaysa
     // TAHMİN ETMİYORUZ: ya iki adayı gösterip seçtiriyoruz ya da tekrar istiyoruz.
     if(s.guven < GUVEN_SOR){
-      bar((tr()?'Emin olamadım — tekrar söyler misin?':'Not sure — say it again?'),{sure:2600});
+      const neden=yasalDegilAciklama(adaylar);
+      bar(neden || (tr()?'Emin olamadım — tekrar söyler misin?':'Not sure — say it again?'),{sure:2600});
       try{ if(typeof Ses!=='undefined'&&Ses.cal) Ses.cal('hata'); }catch(e){}
-      belkiYenidenAc(900);
+      if(neden) uyariSoyle(neden); else belkiYenidenAc(900);
       return;
     }
     // İkinci aday da yakınsa (oran>=.85) kullanıcıya iki seçenek sun
@@ -12434,7 +12477,7 @@ const SesOyun = (function(){
   // ---------- Kotlin -> JS geri çağrıları ----------
   window.sesDurum=function(d){
     if(d==='dinliyor'){ dinliyor=true; ustUsteHata=0;
-      if(!bekleyen) bar(tr()?'Dinliyorum…':'Listening…'); }
+      if(!bekleyen && Date.now()>=uyariBitis) bar(tr()?'Dinliyorum…':'Listening…'); }
     else if(d==='konusma'){ /* ses geldi */ }
     else if(d==='isliyor'){ dinliyor=false; if(!bekleyen) bar(tr()?'Çözümlüyorum…':'Working…'); }
     else if(d==='bitti'){ dinliyor=false; if(!bekleyen) bar(null); }
@@ -12486,6 +12529,8 @@ const SesOyun = (function(){
     const metin=M[kod]||((tr()?'Ses hatası: ':'Voice error: ')+kod);
 
     if(kod==='izin_yok'){ bar(metin,{sure:3200}); izinAkisi(); return; }
+    // Biz konuşurken mikrofon açılmak istendi: sessizce bekle, ekrandaki uyarıyı ezme.
+    if(kod==='tts_konusuyor'){ belkiYenidenAc(500); return; }
     // Sessizlik/anlaşılmadı sürekli modda normaldir: sessizce yeniden aç
     if((kod==='sessizlik'||kod==='anlasilmadi') && ayar.mik!=='bas'){
       if(ustUsteHata>=6){

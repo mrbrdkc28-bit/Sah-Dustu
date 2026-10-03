@@ -464,7 +464,8 @@ Test araçları depoda değil: debug derlemede `setWebContentsDebuggingEnabled(t
   açık kalır; "evet" ya da aynı hamleyi tekrar söylemek oynatır.
 Test için: `adb shell pm grant com.emre.sahdustu android.permission.RECORD_AUDIO`,
 olay kaydı: window.sesDurum/sesHata/sesSonuc/sesBolum sarmalanıp zaman damgalı tutulur.
-Açık fikir: yasal olmayan hamle duyulunca sesli geri bildirim ("Fil f2'ye gidemez").
+Yasal olmayan taş+kare duyulunca sesli ve yazılı uyarı ("Fil f2'ye gidemez", ek rakamın
+okunuşuna göre: `YONELME`); eller serbestte "geri bildirim" kapalı olsa da söylenir.
 
 **8.6 — Dil kapsamı:** yeni sesli oynama arayüz metinlerinin bir kısmı için
 ru/ar karşılığı yok; sözlükte karşılığı olmayan metin Türkçe kalır.
