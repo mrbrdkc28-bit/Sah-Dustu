@@ -467,6 +467,14 @@ class MainActivity : AppCompatActivity() {
            Modern karsiligi WindowInsetsController ile "sürükleyici" tam ekran.
            Web katmani zaten hazir: viewport-fit=cover + CSS safe-area-inset. */
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        /* Kamera deligi (kesik) tarafina da ciz: yatay modda o yanda siyah serit
+           kaliyordu. Arayuz CSS env(safe-area-inset-*) ile delikten uzak tutulur. */
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode =
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
+        }
         WindowInsetsControllerCompat(window, window.decorView).apply {
             hide(WindowInsetsCompat.Type.systemBars())
             systemBarsBehavior =

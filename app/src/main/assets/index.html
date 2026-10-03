@@ -1217,6 +1217,37 @@ body.azHareket #son.acik *{animation:none!important}
 .krDogPuan{font-size:40px}
 #sonAlan{border-top:none;background:linear-gradient(180deg,transparent,rgba(6,7,11,.85) 40%);
   padding:14px 16px max(16px,env(safe-area-inset-bottom))}
+/* Yatay telefon: tek sütunda başlık + düğmeler 392 px yüksekliğin çoğunu alıyor,
+   karneye tek satır kalıyordu (düğmeler kartın üstüne biniyordu). İki sütun:
+   solda başlık + karne (kaydırılabilir), sağda düğmeler dikeyde ortalı. */
+@media (orientation: landscape) and (max-height: 520px){
+  #sonKart{width:min(880px,100%);display:grid;grid-template-columns:minmax(0,1fr) 300px;
+    grid-template-rows:auto minmax(0,1fr);column-gap:18px}
+  #sonUst{grid-column:1;grid-row:1;padding:12px 16px 2px}
+  #son h2{font-size:34px;margin:2px 0 2px}
+  #son .alt{font-size:13px}
+  #sonGovde{grid-column:1;grid-row:2;min-height:0;padding:6px 16px 12px}
+  #sonAlan{grid-column:2;grid-row:1 / span 2;align-self:center;background:none;padding:12px 14px 12px 0}
+}
+
+/* ===== KAMERA DELİĞİ (3 Ekim 2026) =====
+   Uygulama artık kamera deliğinin olduğu kenara da çiziyor (yatayda yanda kalan
+   siyah şerit kalktı). Tam ekran katmanlarda o kenara SAYDAM kenarlık eklenir:
+   arka plan kenara kadar uzanır, yazı/düğmeler eskisi gibi delikten uzak kalır.
+   Delik olmayan kenarda env() 0'dır, hiçbir şey değişmez. */
+#yukleniyor,#acilisPerde,#istEkran,#girisEkran,#menu,#lisansEkran,#kurulumEkran,#arkadasEkran,
+#istekBildirim,#davetPop,#cevrimiciEkran,#hud,#secenekModal,#sesKurModal,#sohbetModal,#terfiModal,
+#yardimKapla,#inceleHUD,#analizEkran,#son,#liderEkran{
+  border-top:env(safe-area-inset-top,0px) solid transparent;
+  border-left:env(safe-area-inset-left,0px) solid transparent;
+  border-right:env(safe-area-inset-right,0px) solid transparent;
+  background-origin:border-box}   /* gradyan kenarlıkta tekrar etmesin (üstte sert bant oluyordu) */
+#esirler{border-left:env(safe-area-inset-left,0px) solid transparent;border-right:env(safe-area-inset-right,0px) solid transparent;background-origin:border-box}
+#notPanel,#yonBtn{margin-left:env(safe-area-inset-left,0px)}
+#notPanelSag{margin-right:env(safe-area-inset-right,0px)}
+#notSeritUst,#beraberBildirim,#beraberBekle{margin-top:env(safe-area-inset-top,0px)}
+#cevrimiciSerit{margin-top:env(safe-area-inset-top,0px);margin-right:env(safe-area-inset-right,0px)}
+#basarimBildirim.goster{top:calc(24px + env(safe-area-inset-top,0px))}
 </style>
 </head>
 <body>
