@@ -7982,6 +7982,24 @@ function kurulumSecimEsitle(){
       if(aktifArena && kilitli('arena', aktifArena.id)) aktifArena=ARENALAR[0];
     }
   }catch(e){}
+  /* Mod/zorluk/renk/süre düğmeleri de gerçek değeri göstersin. Eskiden HTML'deki
+     sabit "İki Oyuncu" işareti kalıyordu: Hızlı Oyna mod'u 'ai' yaptıktan sonra
+     ekranda İki Oyuncu seçili görünürken yapay zekâ oyunu açılıyordu (sahibi buldu). */
+  try{
+    const isaretle=(sec, esit)=>document.querySelectorAll(sec).forEach(x=>x.classList.toggle('secili', esit(x)));
+    isaretle('.mod[data-mod]', x=>x.dataset.mod===mod);
+    isaretle('.mod[data-zor]', x=>x.dataset.zor===aiZorluk);
+    isaretle('.mod[data-renk]', x=>x.dataset.renk===insanRenk);
+    const art=(typeof sureArtis!=='undefined')?sureArtis:0;
+    let bulundu=false;
+    document.querySelectorAll('.mod[data-sure]').forEach(x=>{
+      const ok=!bulundu && +x.dataset.sure===+sureSecim && +(x.dataset.inc||0)===+art;
+      x.classList.toggle('secili', ok); if(ok) bulundu=true;
+    });
+    const zb=document.getElementById('zorlukBlok'), rb=document.getElementById('renkBlok');
+    if(zb) zb.style.display=(mod==='ai')?'block':'none';
+    if(rb) rb.style.display=(mod==='ai')?'block':'none';
+  }catch(e){}
   document.querySelectorAll('#orduListe .arena, #arenaListe .arena').forEach(el=>{
     const secili = el.dataset.kTur==='ordu' ? (aktifOrdu&&aktifOrdu.id) : (aktifArena&&aktifArena.id);
     el.classList.toggle('secili', el.dataset.kId===secili);
