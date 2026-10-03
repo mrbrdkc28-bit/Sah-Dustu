@@ -370,6 +370,18 @@ aday olamıyor. **Ölçüldü: duymama oranı %3.8 → %16.3.** Çözüm: elemek
 sayısı arttıkça net komutlar da düşük güven alıyordu ("e dört" → 0.68).
 Doğru sinyal **ikinciye göre göreli marj**.
 
+**7.13 — Renk kontrastını malzeme renginden hesaplamak (5.5).** `tasRenkleri()`
+koyu taşı koyu kareye karşı 1.9 olsun diye AÇIYORDU (Klasik 0x14161B → 0x495062).
+Malzeme renginde doğru görünen kontrast, ekranda yok oldu: 6 ışık × pozlama 2.6 ×
+Reinhard sahneyi doyurup her şeyi 150-220 arasına sıkıştırıyordu. Telefonda
+ölçüldü: Klasik beyaz/siyah ayrımı **1.25** (siyah taş açık gri). Ders: kontrastı
+**çizilmiş pikselde** ölç, malzemede değil. Işık tek tek kısılınca neredeyse hiçbir
+şey değişmemesi de doygunluğun işaretiydi (diğer ışıklar yine doyuruyor).
+
+**7.14 — Dikeyde kararmayı ışık artırarak çözmek.** `isikDikeyAyar` ortamı ×1.7,
+tepeyi ×1.5, ön dolguyu ×4.5 yapıyordu; sahneyi daha da doyurdu. Pozlama ya da ışık
+yükseltmek yerine `ISIK_OLCEK` ile ayarla.
+
 ---
 
 ## 8. Bilinen açık sorunlar ve riskler
@@ -413,6 +425,24 @@ gerçek rakibe karşı kendini kazanan yazması. Tam çözüm: Cloud Functions (
 Test: `firebase emulators:exec --only firestore` (Java: Android Studio `jbr`).
 Kural dili notları: `math.max` yok; yol için `path('/databases/'+database+'/documents/'+p)`
 kullan — `$(p)` içine `a/b` verilirse tek parça sayılır.
+
+**8.8 — Taş okunurluğu / aydınlatma (3 Ekim 2026).** 17 ordu × 12 arena, telefonda
+dikey + yatay ölçüldü (WebView'e CDP ile bağlanıp: normal kare, taşsız kare ve
+taş-kimlik maskesi aynı karede çizilip her taşın ekrandaki rengi arkasındaki zeminle
+karşılaştırıldı; ekran görüntüsüyle birkaç birim farkla doğrulandı). Değişiklik:
+ACES + pozlama 1.0 + `ISIK_OLCEK=0.35`, koyu taş ordu rengi olduğu gibi,
+`GLB_BEYAZ_TAVAN` 0.45 → 0.80 (0.45/0.65/0.80 denendi), metal yüzeylere PMREM ile
+basit stüdyo yansıması (`ortamHaritasi`), Altın & Gümüş'ün ana metal rengi parlatıldı.
+Sonuç (telefon, 2×204): beyaz/siyah ayrımı zayıf (<1.6) kombinasyon dikeyde 92 → 5,
+yatayda 79 → 0. Klasik 1.25 → 4.55 (dikey), 1.35 → 5.94 (yatay). Kalan 5'in hepsi
+Altın & Gümüş (karşı taraf gövdesi siyah lake; gözle gümüş/siyah-altın net).
+Kalan: Mermer Salon / Usta Masası'nda açık taş açık karede, koyu taş koyu karede az
+ayrışır (gerçek takımlarda da böyle; taban halkası taşıyor).
+Aynı çalışmada: Oyma/Usta/Retro GLB tahtaları 90° dönüktü (h1 koyuydu, `tahtaDon`);
+Oyun Kur ekranı Hızlı Oyna sonrası eski seçimi gösteriyordu (`kurulumSecimEsitle`);
+Hızlı Oyna kilitli ordu/arenayı açıyordu.
+Test araçları depoda değil: debug derlemede `setWebContentsDebuggingEnabled(true)`,
+`adb forward tcp:9222 localabstract:webview_devtools_remote_<pid>`.
 
 **8.6 — Dil kapsamı:** yeni sesli oynama arayüz metinlerinin bir kısmı için
 ru/ar karşılığı yok; sözlükte karşılığı olmayan metin Türkçe kalır.

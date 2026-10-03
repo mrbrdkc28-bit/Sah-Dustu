@@ -432,6 +432,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // Yalniz debug derlemede: chrome://inspect ile cihazda olcum/hata ayiklama.
+        if (BuildConfig.DEBUG) WebView.setWebContentsDebuggingEnabled(true)
         webView = WebView(this)
         setContentView(webView)
 

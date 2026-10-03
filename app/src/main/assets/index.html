@@ -2423,22 +2423,57 @@ const ARENALAR = [
     gok:0x101408, sis:0x18200E, sisYog:0.012, zemin:0x141A0C,
     acikKare:0x9AB06A, koyuKare:0x2A3A1C, isik:0xF2FFDE, ortam:0x7A8A5A,
     aksan:'#9FBF6F', parcacik:'yildiz', acikTas:0xE8E4D0, koyuTas:0x556441,
-    tahtaGLB:'models/tahta_retro.glb', grad:'linear-gradient(160deg,#2A3618,#0C1206 72%)' },
+    tahtaGLB:'models/tahta_retro.glb', tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#2A3618,#0C1206 72%)' },
   { id:'oymamasa', ad:'Oyma Tahta', desc:'El oyması iki renk ahşap — Criistinaa modeli.',
     gok:0x171008, sis:0x201709, sisYog:0.012, zemin:0x1A130A,
     acikKare:0xB07A42, koyuKare:0x241108, isik:0xFFE8C8, ortam:0x8A6844,
     aksan:'#A8703A', parcacik:'yildiz', acikTas:0xE2C9A2, koyuTas:0x5C3329,
-    tahtaGLB:'models/tahta_oyma.glb', grad:'linear-gradient(160deg,#3A2510,#140C05 72%)',
+    tahtaGLB:'models/tahta_oyma.glb', tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#3A2510,#140C05 72%)',
     kareAcik:0x74350C, kareKoyu:0x0D0002   /* GLB malzemesinden okundu */},
   { id:'ustamasa', ad:'Ustanın Masası', desc:'Altın şeritli koyu ahşap çerçeve — Verfassen masası.',
     gok:0x120E08, sis:0x1A1408, sisYog:0.012, zemin:0x161009,
     acikKare:0xCFCFCF, koyuKare:0x141414, isik:0xFFF2D8, ortam:0x8A7A58,
     aksan:'#C89A4A', parcacik:'yildiz', acikTas:0xE8E8E4, koyuTas:0x3D3D3D,
-    tahtaGLB:'models/tahta_usta.glb', grad:'linear-gradient(160deg,#33270F,#0E0A05 72%)',
+    tahtaGLB:'models/tahta_usta.glb', tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#33270F,#0E0A05 72%)',
     kareAcik:0xCCCCCC, kareKoyu:0x020202   /* GLB malzemesinden okundu */},
 ];
 
 let scene, camera, renderer, saat;
+const ISIK_OLCEK = 0.35; // arena ışıklarının ortak çarpanı (bkz. renderer kurulumu)
+let GLB_BEYAZ_TAVAN = 0.80; // model orduların açık taraf renk tavanı (bkz. tak)
+/* 0.45 eski 2.6 pozlamaya göreydi; yeni ışıkta beyazları griye çekiyordu.
+   0.45 / 0.65 / 0.80 denendi (11 model ordu × 6 arena): 0.80'de beyaz/siyah ayrımı
+   en yüksek (ör. Mermer & Altın 1.85 → 2.99), beyaz taş beyaz karede kaybolmuyor. */
+let METAL_ORTAM = true;     // metal yüzeylere yansıma ortamı (bkz. ortamHaritasi)
+/* Metal (metalness>0.5) yüzeyler yalnızca çevreyi yansıtarak parlar. Sahnede ortam
+   haritası yoktu; eski aşırı ışık bunu örtüyordu. Işık kısılınca Altın & Gümüş
+   ordusu kararıyordu. Basit bir stüdyo küresi (üst sıcak, alt koyu + iki parlak
+   panel) PMREM ile bir kez hazırlanır, yalnız metal taş malzemelerine verilir. */
+let _ortamHarita=null;
+function ortamHaritasi(){
+  if(_ortamHarita!==null) return _ortamHarita||null;
+  try{
+    const es=new THREE.Scene();
+    const geo=new THREE.SphereGeometry(10,32,16);
+    const p=geo.attributes.position, renk=[];
+    for(let i=0;i<p.count;i++){
+      const t=(p.getY(i)/10+1)/2, t2=t*t;
+      renk.push(0.06+0.85*t2, 0.05+0.78*t2, 0.04+0.66*t2);
+    }
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(renk,3));
+    es.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({vertexColors:true, side:THREE.BackSide})));
+    const panel=(x,y,z,g,y2)=>{
+      const m=new THREE.Mesh(new THREE.PlaneGeometry(g,y2), new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.DoubleSide}));
+      m.position.set(x,y,z); m.lookAt(0,0,0); es.add(m);
+    };
+    panel(5,6,4,5,3); panel(-6,4,-3,3,2);
+    const pm=new THREE.PMREMGenerator(renderer);
+    _ortamHarita=pm.fromScene(es,0.04).texture;
+    pm.dispose();
+    es.traverse(o=>{ if(o.geometry) o.geometry.dispose(); if(o.material) o.material.dispose(); });
+  }catch(e){ _ortamHarita=false; }
+  return _ortamHarita||null;
+}
 // Grafik kademesi: 'dusuk' | 'orta' | 'yuksek'. Cihaza göre otomatik başlar, menüden değişir.
 let grafikKademe = (()=>{
   try{
@@ -2479,8 +2514,15 @@ function kur(){
   renderer.shadowMap.enabled = K.golge;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputEncoding = THREE.sRGBEncoding;
-  renderer.toneMapping = THREE.ReinhardToneMapping; // ACES çok karanlıktı; Reinhard daha aydınlık
-  renderer.toneMappingExposure = 2.6; // güçlü pozlama (tahta net aydınlık)
+  /* AYDINLATMA (3 Ekim 2026, telefonda 204 ordu×arena ölçülerek seçildi).
+     Eskiden Reinhard + pozlama 2.6 + 6 güçlü ışık: sahne doyuyor, ton eşleme her
+     şeyi 150-220 arasına sıkıştırıyordu. Siyah taşlar açık gri çıkıyor, kendi
+     çizdiğimiz 6 orduda beyaz/siyah ayrımı 1.25'te kalıyordu (okunur değil).
+     Şimdi: ACES + pozlama 1.0 + ışıklar ISIK_OLCEK ile kısık → ayrım 2.0-4.5.
+     Not: ışığı açmak için pozlamayı değil ISIK_OLCEK'i oyna; ikisi birlikte
+     yükselince sorun geri gelir. */
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
   renderer.physicallyCorrectLights = false;
   document.getElementById('stage').appendChild(renderer.domElement);
   saat = new THREE.Clock();
@@ -2544,13 +2586,14 @@ function arenaKur(a){
     if(c.userData.arena){ scene.remove(c); nesneyiSerbestBirak(c, true); }
   });
 
-  const hemi = new THREE.HemisphereLight(a.isik, a.ortam, 1.0);
+  const K = ISIK_OLCEK;
+  const hemi = new THREE.HemisphereLight(a.isik, a.ortam, 1.0*K);
   hemi.userData.arena=true; scene.add(hemi);
   // Genel dolgu (dikey/uzak kamerada sahne kararmasın)
-  const ortamIsik = new THREE.AmbientLight(0xffffff, 0.66);
+  const ortamIsik = new THREE.AmbientLight(0xffffff, 0.66*K);
   ortamIsik.userData.arena=true; scene.add(ortamIsik);
-  ortamIsikRef=ortamIsik; ortamIsikBaz=0.66;
-  const gun = new THREE.DirectionalLight(a.isik, 1.3);
+  ortamIsikRef=ortamIsik; ortamIsikBaz=0.66*K;
+  const gun = new THREE.DirectionalLight(a.isik, 1.3*K);
   gun.position.set(6,12,4);
   gunRef=gun;
   gun.castShadow=KADEME[grafikKademe].golge;
@@ -2560,16 +2603,16 @@ function arenaKur(a){
   gun.shadow.camera.left=-7; gun.shadow.camera.right=7;
   gun.shadow.camera.top=7; gun.shadow.camera.bottom=-7;
   gun.userData.arena=true; scene.add(gun);
-  const dolgu = new THREE.PointLight(new THREE.Color(a.aksan), 0.5, 30);
+  const dolgu = new THREE.PointLight(new THREE.Color(a.aksan), 0.5*K, 30);
   dolgu.position.set(-6,5,-6); dolgu.userData.arena=true; scene.add(dolgu);
-  const tepe = new THREE.DirectionalLight(0xffffff, 0.55);
+  const tepe = new THREE.DirectionalLight(0xffffff, 0.55*K);
   tepe.position.set(0,14,0); tepe.userData.arena=true; scene.add(tepe);
-  tepeIsik=tepe; tepeIsikBaz=0.55;
+  tepeIsik=tepe; tepeIsikBaz=0.55*K;
   // ÖN DOLGU: oyuncunun kendi tarafındaki (yakın) taşların ön yüzünü aydınlat —
   // tepeden ışıkta yakın taşlar gölgeli/düz görünüyordu, bu onları belirginleştirir.
-  const onDolgu = new THREE.DirectionalLight(0xffffff, 0.42);
+  const onDolgu = new THREE.DirectionalLight(0xffffff, 0.42*K);
   onDolgu.position.set(0,4,14); onDolgu.userData.arena=true; scene.add(onDolgu);
-  onDolguRef=onDolgu; onDolguBaz=0.42;
+  onDolguRef=onDolgu; onDolguBaz=0.42*K;
 
   const zemin = new THREE.Mesh(
     new THREE.CircleGeometry(60,48),
@@ -2682,6 +2725,9 @@ function tahtaYap(a){
        dispose edilmemesi için işaretle. */
     m.traverse(ch=>{ if(ch.isMesh) ch.userData.paylasilanGeo=true; });
       m.traverse(ch=>{ if(ch.isMesh) ch.receiveShadow=true; });
+      /* Satranç kuralı: her oyuncunun sağ alt köşesi (h1/a8) AÇIK kare olmalı.
+         Bu modeller 90° dönük geliyordu (a1 açık, h1 koyu); ölçümle bulundu. */
+      if(a.tahtaDon) m.rotateY(a.tahtaDon);
       tahtaGrup.add(m);
     }).catch(()=>{});
     if(!a.kendiKoordinat) koordinatlarEkle(tahtaGrup, a.aksan || '#C8A870', 0.012);
@@ -2951,9 +2997,11 @@ function tasRenkleri(){
   const temelB = (o.b!==undefined) ? o.b : 0x14161B;
   // Açık taş: yalnızca açılarak hedefe gitmeye çalışır; ulaşamazsa ordu rengi kalır.
   const w = (_oran(temelW, kare.acik)>=1.9) ? temelW : _kaydir(temelW, kare.acik, 1.9, 0.97);
-  // Koyu taş: koyu kareye karşı 1.9 VE açık taşla ayrım 3.5
-  const b = (_oran(temelB, kare.koyu)>=1.9 && _oran(temelB, w)>=3.5)
-            ? temelB : _kaydir(temelB, kare.koyu, 1.9, 0.62, w);
+  /* Koyu taş: ordu rengi OLDUĞU GİBİ. Eskiden koyu kareye karşı 1.9 kontrast için
+     açılıyordu (Klasik 0x14161B → 0x495062); güçlü ışıkla birleşince siyah taşı
+     griye çeviren buydu (telefonda ölçüldü, beyaz/siyah ayrımı 1.25). Koyu taşın
+     koyu karede ayrışması taban halkasından gelir (bkz. tasYap). */
+  const b = temelB;
   const sonuc = {w:w, b:b, kare:kare};
   _tasRenkOnbellek[anahtar]=sonuc;
   return sonuc;
@@ -3440,7 +3488,7 @@ function modelDene(g,t,c){
           // oransal çek (doku/kimlik korunur), mat yüzeye hafif speküler ver.
           if(c==='w' && mat.color){
             const L=Math.max(mat.color.r, mat.color.g, mat.color.b);
-            if(L>0.55) mat.color.multiplyScalar(0.45/L);
+            if(L>GLB_BEYAZ_TAVAN+0.1) mat.color.multiplyScalar(GLB_BEYAZ_TAVAN/L);
             if('roughness' in mat && mat.roughness>0.6) mat.roughness=0.42;
             if('metalness' in mat && mat.metalness<0.05) mat.metalness=0.18;
           }
@@ -3453,6 +3501,17 @@ function modelDene(g,t,c){
             if(c==='b'){ mat.emissive.set(0x14171d); mat.emissiveIntensity=0.06; }
             else { mat.emissive.set(0x000000); mat.emissiveIntensity=0; }
           }
+        }
+        /* Altın & Gümüş: modelin metal renkleri çok koyu (gümüş 0x535C6F). Metal,
+           ortamı kendi renginde yansıtır; koyu temel renk ışık kısılınca taşı
+           karartıyordu. Ana metal rengi parlak gümüş/altın düzeyine çekilir
+           (ton korunur); koyu detay malzemelerine dokunulmaz. */
+        if(aktifOrdu.id==='metal' && mat.color && mat.metalness>0.5){
+          const L=Math.max(mat.color.r, mat.color.g, mat.color.b);
+          if(L>0.15) mat.color.multiplyScalar(0.9/L);
+        }
+        if(METAL_ORTAM && 'metalness' in mat && mat.metalness>0.5){
+          const env=ortamHaritasi(); if(env){ mat.envMap=env; mat.envMapIntensity=1.0; }
         }
         mat.needsUpdate = true;
         ch.material = mat;
@@ -4068,7 +4127,7 @@ function isikDikeyAyar(){
     if(dikey) gunRef.position.set(3, 9, 12);
     else gunRef.position.set(6, 12, 4);
   }
-  if(renderer){ renderer.toneMappingExposure = 2.6; } // yatay referans, sabit
+  if(renderer){ renderer.toneMappingExposure = 1.0; } // dikey/yatay aynı (bkz. renderer kurulumu)
 }
 function dikeyMi(){ return innerHeight > innerWidth; }
 // Dikey modda kamerayı daha yatay açıya al → tahta perspektifle uzar, taşlar büyük/görkemli görünür
@@ -6566,6 +6625,13 @@ function menuKur(){
     if(a){
       aktifOrdu=ORDULAR.find(o=>o.id===a.ordu)||ORDULAR[0];
       aktifArena=ARENALAR.find(x=>x.id===a.arena)||ARENALAR[0];
+      // Son ayardaki ordu/arena artık kilitliyse (ödül süresi bitti) ücretsize dön;
+      // eskiden Hızlı Oyna kilitli seçimi kontrol etmeden açıyordu.
+      try{
+        if(typeof premiumYenile==='function') premiumYenile();
+        if(kilitli('ordu', aktifOrdu.id)) aktifOrdu=ORDULAR[0];
+        if(kilitli('arena', aktifArena.id)) aktifArena=ARENALAR[0];
+      }catch(e){}
       aiZorluk=a.zor||'orta'; insanRenk=a.renk||'w';
       sureSecim=a.sure||0; if(typeof sureArtis!=='undefined') sureArtis=a.artis||0;
     } else {
@@ -7138,7 +7204,7 @@ function duzGorunumDegistir(){
     kamYaw = siyahTaraf ? Math.PI : 0;
     kamPitch=1.55; // ~89°, tam tepeden
     kamUzak=uygunUzaklik()*0.92; // tahta ekranı tam doldursun
-    if(tepeIsik) tepeIsik.intensity=0.12; // merkez parlamasını önle
+    if(tepeIsik) tepeIsik.intensity=0.12*ISIK_OLCEK; // merkez parlamasını önle
     duzKatmanKur();
   } else {
     // 3D'ye dön
@@ -7784,7 +7850,26 @@ function cvBeklemeGoster(metin, kod){
     cvBilgiZamanlayici=setInterval(()=>{ bm.textContent=rastgeleBilgi(); }, 60000);
   }
 }
-function kurulumAc(){  document.getElementById('kurulumEkran').classList.add('acik');
+function kurulumAc(){
+  kurulumSecimEsitle();
+  document.getElementById('kurulumEkran').classList.add('acik');
+}
+/* Oyun Kur kartlarındaki seçim işareti yalnızca kartlar kurulurken ve tıklanınca
+   güncelleniyordu. Hızlı Oyna aktifOrdu/aktifArena'yı değiştirince ekran eski
+   seçimi gösteriyor, oyun başka bir ordu/arena ile başlıyordu. Ayrıca kilidi
+   (ödül süresi) bitmiş seçim burada ücretsize döner. */
+function kurulumSecimEsitle(){
+  try{
+    if(typeof premiumYenile==='function') premiumYenile();
+    if(typeof kilitli==='function'){
+      if(aktifOrdu && kilitli('ordu', aktifOrdu.id)) aktifOrdu=ORDULAR[0];
+      if(aktifArena && kilitli('arena', aktifArena.id)) aktifArena=ARENALAR[0];
+    }
+  }catch(e){}
+  document.querySelectorAll('#orduListe .arena, #arenaListe .arena').forEach(el=>{
+    const secili = el.dataset.kTur==='ordu' ? (aktifOrdu&&aktifOrdu.id) : (aktifArena&&aktifArena.id);
+    el.classList.toggle('secili', el.dataset.kId===secili);
+  });
 }
 function kurulumKapat(){
   document.getElementById('kurulumEkran').classList.remove('acik');
