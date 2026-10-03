@@ -1543,6 +1543,13 @@ html[data-tema="fildisi"] .arkSekme.secili{background:linear-gradient(180deg,#23
 html[data-tema="fildisi"] .arkSatir,html[data-tema="fildisi"] #arkAraGiris{background:#fffdf8;border-color:rgba(120,95,50,.14)}
 .arkAvatar{border-radius:50%}
 .arkBtn{border-radius:20px;padding:8px 14px}
+
+/* ===== KİLİTLİ KARTLAR (3 Ekim 2026) ===== */
+.kilitRozet{position:absolute;top:7px;right:7px;z-index:2;pointer-events:none;display:inline-flex;align-items:center;gap:4px;
+  padding:3px 8px 3px 7px;border-radius:20px;font:700 9px Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;
+  color:#F0C565;background:rgba(10,12,18,.72);border:1px solid rgba(232,182,76,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.kilitKart .pano img{filter:saturate(.55) brightness(.86)}
+.kilitKart .ad{opacity:.85}
 </style>
 </head>
 <body>
@@ -11966,9 +11973,11 @@ function rozetGuncelle(){
   document.querySelectorAll('[data-k-tur]').forEach(el=>{
     const kil=kilitli(el.dataset.kTur, el.dataset.kId);
     let r=el.querySelector('.kilitRozet');
+    el.classList.toggle('kilitKart', kil);   // önizleme hafif soluk (CSS)
     if(kil && !r){
-      r=document.createElement('div'); r.className='kilitRozet'; r.textContent='🔒';
-      r.style.cssText='position:absolute;top:6px;right:6px;font-size:14px;z-index:2;filter:drop-shadow(0 1px 2px #000);pointer-events:none';
+      /* Emoji kilit yerine ince çizgili kilit + "Premium" etiketi */
+      r=document.createElement('div'); r.className='kilitRozet';
+      r.innerHTML='<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9.5" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Premium</span>';
       el.style.position='relative'; el.appendChild(r);
     } else if(!kil && r) r.remove();
   });
