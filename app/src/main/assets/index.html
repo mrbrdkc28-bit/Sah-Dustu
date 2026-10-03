@@ -5450,7 +5450,12 @@ function oyunSonu(d, terkKazanan){
                 : (Motor.turn==='w'?'Siyah':'Beyaz'); // sırası gelen kaybetti
   if(d==='mat'||d==='sure'||d==='terk'){ kazanan==='Beyaz'?ist.galibiyetB++:ist.galibiyetS++; }
   // Bulut istatistik güncelle (giriş yapılmışsa)
-  if(fbKullanici && !misafirMod){
+  /* İPTAL SAYILAN OYUN: iki taraf da en az birer hamle yapmadan biten yerel oyun
+     (hemen teslim vb.) istatistiğe ve son oyunlara YAZILMAZ — chess.com'daki
+     "abort" gibi. Eskiden 0 hamlelik oyunlar galibiyet/mağlubiyet sayılıyordu.
+     Çevrimiçi oyunlar ayrı yoldan (puanIsle) işlenir, bu kural onlara dokunmaz. */
+  const iptalOyun = !cevrimiciAktif && oyunKaydi.length < 2;
+  if(fbKullanici && !misafirMod && !iptalOyun){
     const oyuncuRenk = cevrimiciAktif ? Cevrimici.benimRenk
                      : (mod==='ai') ? aktifInsanRenk
                      : (kazanan==='Beyaz'?'w':'b');
