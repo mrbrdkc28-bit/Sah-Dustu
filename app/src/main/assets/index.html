@@ -39,6 +39,15 @@ canvas{display:block}
 #inceleUst button{background:var(--panel);border:1px solid var(--line);color:var(--txt);
   font-family:inherit;font-size:13px;padding:8px 12px;border-radius:6px;cursor:pointer}
 #inceleSes.aktif{background:var(--brass);color:var(--ink);border-color:var(--brass)}
+/* İki seçenekli anahtar: ikisi de görünür, seçili olan dolu. Tek simgeli düğmede
+   "şu anki mi, geçilecek olan mı?" belirsizliği vardı (sahibin önerisi). */
+.seg2{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  background:var(--panel);vertical-align:middle}
+.seg2 span{padding:7px 9px;font-size:11.5px;font-weight:700;letter-spacing:.03em;color:var(--dim);
+  transition:background .18s,color .18s;cursor:pointer;line-height:1.1}
+.seg2 span.secili{background:var(--brass);color:var(--ink)}
+#inceleUst #inceleDil,#inceleUst #inceleCins{padding:0;border:none;background:none}
+#anSes .seg2 span{padding:10px 12px;font-size:13px}
 #inceleSayac{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.08em;color:var(--bone)}
 #inceleKapsam{display:flex;gap:6px;justify-content:center}
 #inceleKapsam.gizli{display:none}
@@ -6316,11 +6325,11 @@ async function degerlendirmeGoster(){
     if(dl) dl.onchange=()=>{ yorumDil=dl.value;
       for(const o of anSonuclar){ const k=oyunKaydi[o.i];
         if(k && k._kSinif){ k._yorum=yorumUret(k._kSinif, o.oneri, yorumDil); o.yorum=k._yorum; } }
-      anListeCiz(); if(typeof sesAyariKaydet==='function') sesAyariKaydet(); };
+      anListeCiz(); if(typeof sesAyariKaydet==='function') sesAyariKaydet(); sesSegmentTazele(); };
     const cs=document.getElementById('cinsSec');
     if(cs) cs.value=sesProfili.cinsiyet;
     if(cs) cs.onchange=()=>{ sesProfili.cinsiyet=cs.value;
-      if(typeof sesAyariKaydet==='function') sesAyariKaydet(); };
+      if(typeof sesAyariKaydet==='function') sesAyariKaydet(); sesSegmentTazele(); };
     const to=document.getElementById('tumOku');
     if(to) to.onclick=()=>{
       const KOTU=['yanlislik','kacirilan','hata','vahim'];
@@ -6987,7 +6996,8 @@ function menuKur(){
   function inceleCinsYaz(){
     if(!ic_) return;
     const e = (typeof sesProfili!=='undefined' && sesProfili.cinsiyet==='erkek');
-    ic_.textContent = e ? '♂' : '♀';
+    ic_.innerHTML = seg2Html(['Kadın','Erkek'], e?1:0);
+    if(typeof sesSegmentTazele==='function') sesSegmentTazele();
     ic_.title = e ? 'Anlatıcı: erkek ses (değiştirmek için dokun)'
                   : 'Anlatıcı: kadın ses (değiştirmek için dokun)';
   }
@@ -7015,10 +7025,11 @@ function menuKur(){
   }
   const id_=document.getElementById('inceleDil');
   if(id_){
-    id_.textContent=(typeof yorumDil!=='undefined'&&yorumDil==='en')?'EN':'TR';
+    id_.innerHTML=seg2Html(['TR','EN'], (typeof yorumDil!=='undefined'&&yorumDil==='en')?1:0);
     id_.onclick=()=>{
       yorumDil=(yorumDil==='tr')?'en':'tr';
-      id_.textContent=yorumDil.toUpperCase();
+      id_.innerHTML=seg2Html(['TR','EN'], yorumDil==='en'?1:0);
+      if(typeof sesSegmentTazele==='function') sesSegmentTazele();
       if(typeof sesAyariKaydet==='function') sesAyariKaydet();
       if(typeof Konus!=='undefined') Konus.sustur();
       /* Mevcut yorumları yeni dilde yeniden üret ve ekrandakini tazele */
@@ -7026,7 +7037,50 @@ function menuKur(){
       if(typeof inceleYorumGoster==='function' && inceleAktif) inceleYorumGoster();
     };
   }
+  // Seçili tarafa dokunmak bir şey değiştirmesin; yalnız diğer taraf geçiş yapar.
+  [ic_, id_].forEach(b=>{
+    if(!b || b._segSarili) return; b._segSarili=true;
+    const asil=b.onclick;
+    b.onclick=(ev)=>{
+      const t=ev&&ev.target&&ev.target.closest?ev.target.closest('[data-i]'):null;
+      if(t && t.classList.contains('secili')) return;
+      if(asil) asil.call(b, ev);
+    };
+  });
+  sesSegmentKur();
   document.getElementById('grafikBtn').onclick=grafikCiz;
+}
+function seg2Html(etiketler, secili){
+  return '<span class="seg2">'+etiketler.map((e,i)=>'<span data-i="'+i+'"'+(i===secili?' class="secili"':'')+'>'+e+'</span>').join('')+'</span>';
+}
+/* Analiz ekranındaki dil/ses açılır menüleri: görünümde iki seçenekli anahtar;
+   asıl <select>'ler gizli kalır ve değişiklik onlar üzerinden yapılır (mevcut
+   onchange mantığı aynen çalışır). İnceleme üst barıyla senkron tutulur. */
+function sesSegmentKur(){
+  const kutu=document.getElementById('anSes'); if(!kutu || kutu.dataset.seg) return;
+  kutu.dataset.seg='1';
+  [['dilSec',['TR','EN'],['tr','en']],['cinsSec',['Kadın','Erkek'],['kadin','erkek']]].forEach(([id,et,deg])=>{
+    const sel=document.getElementById(id); if(!sel) return;
+    sel.style.display='none';
+    const s2=document.createElement('span'); s2.id=id+'Seg';
+    sel.parentNode.insertBefore(s2, sel);
+    s2.onclick=(ev)=>{
+      const t=ev.target.closest('[data-i]'); if(!t || t.classList.contains('secili')) return;
+      sel.value=deg[+t.dataset.i];
+      if(sel.onchange) sel.onchange();
+      sesSegmentTazele();
+    };
+  });
+  sesSegmentTazele();
+}
+function sesSegmentTazele(){
+  const d1=document.getElementById('dilSecSeg'), c1=document.getElementById('cinsSecSeg');
+  if(d1) d1.innerHTML=seg2Html(['TR','EN'], (typeof yorumDil!=='undefined'&&yorumDil==='en')?1:0);
+  if(c1) c1.innerHTML=seg2Html(['Kadın','Erkek'], (typeof sesProfili!=='undefined'&&sesProfili.cinsiyet==='erkek')?1:0);
+  const ic=document.getElementById('inceleCins');
+  if(ic && typeof sesProfili!=='undefined') ic.innerHTML=seg2Html(['Kadın','Erkek'], sesProfili.cinsiyet==='erkek'?1:0);
+  const idl=document.getElementById('inceleDil');
+  if(idl && typeof yorumDil!=='undefined') idl.innerHTML=seg2Html(['TR','EN'], yorumDil==='en'?1:0);
 }
 function yeniOyun(){
   // İnceleme modu açıksa TAM kapat — yoksa eski oyunun tahtası/otomatik oynatıcısı
@@ -10928,6 +10982,8 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVR.push([/^Beyaz: (.*)$/, {en:'White: $1', ru:'Белые: $1', ar:'الأبيض: $1', fr:'Blancs : $1', de:'Weiß: $1', it:'Bianco: $1', zh:'白方：$1'}]);
   CEVR.push([/^Siyah: (.*)$/, {en:'Black: $1', ru:'Чёрные: $1', ar:'الأسود: $1', fr:'Noirs : $1', de:'Schwarz: $1', it:'Nero: $1', zh:'黑方：$1'}]);
   if(CEVM['"şah" de'] && !CEVM['"şah" de'].ar) CEVM['"şah" de'].ar='قل «şah»';
+  CEVM['Kadın']={en:'Female',ru:'Женский',ar:'أنثى',fr:'Femme',de:'Weiblich',it:'Donna',zh:'女声'};
+  CEVM['Erkek']={en:'Male',ru:'Мужской',ar:'ذكر',fr:'Homme',de:'Männlich',it:'Uomo',zh:'男声'};
   // İlk dil uygulaması bu bloktan önce çalıştı: ek SOZLUK girdileri için yeniden uygula.
   try{ dilUygula(); }catch(e){}
 })();
