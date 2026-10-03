@@ -48,7 +48,7 @@ canvas{display:block}
 .seg2 span.secili{background:var(--brass);color:var(--ink)}
 #inceleUst #inceleDil,#inceleUst #inceleCins{padding:0;border:none;background:none}
 #anSes .seg2 span{padding:10px 12px;font-size:13px}
-#inceleSayac{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.08em;color:var(--bone)}
+#inceleSayac{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.08em;color:var(--bone);white-space:nowrap}
 #inceleKapsam{display:flex;gap:6px;justify-content:center}
 #inceleKapsam.gizli{display:none}
 #inceleKapsam button{flex:1;max-width:170px;background:var(--panel);border:1px solid var(--line);color:var(--dim);
@@ -80,14 +80,15 @@ canvas{display:block}
   justify-content:center;font-weight:900;font-size:13px;color:#fff;flex-shrink:0;
   box-shadow:0 2px 7px rgba(0,0,0,.5)}
 #inceleYorum .iyNo{color:var(--dim);font-size:13px}
-#inceleYorum .iyNot{font-family:'Cinzel',serif;font-weight:700;font-size:20px;color:var(--bone)}
+/* Hamle yazısı (Nxf7, O-O): Cinzel'de küçük harf yok, "NXF7" görünüyordu → Manrope */
+#inceleYorum .iyNot{font-family:'Manrope',sans-serif;font-weight:800;letter-spacing:.01em;font-variant-numeric:tabular-nums;font-size:20px;color:var(--bone)}
 #inceleYorum .iyAd{font-size:11.5px;letter-spacing:.07em;font-weight:800;text-transform:uppercase}
 #inceleYorum .iyKayip{margin-left:auto;font-size:12.5px;font-weight:700;color:#E0813F;
   background:rgba(224,129,63,.13);border-radius:11px;padding:3px 9px}
 #inceleYorum .iyMetin{color:var(--dim);font-size:13.5px;line-height:1.55;margin-top:7px}
 #inceleYorum .iyOneri{margin-top:8px;font-size:13.5px;padding-top:8px;
   border-top:1px solid rgba(255,255,255,.08)}
-#inceleYorum .iyOneri b{color:#81B64C;font-family:'Cinzel',serif;font-size:16px}
+#inceleYorum .iyOneri b{color:#81B64C;font-family:'Manrope',sans-serif;font-weight:800;letter-spacing:.01em;font-variant-numeric:tabular-nums;font-size:16px}
 #inceleYorum .iyOk{color:#5FBF6A;font-size:11.5px;letter-spacing:.04em;margin-left:6px}
 #inceleYorum .iyiR{color:#5FBF6A}#inceleYorum .uyariR{color:#E0A445}#inceleYorum .kotuR{color:#E3432F}
 #inceleKontrol{display:flex;gap:6px;justify-content:center}
@@ -853,7 +854,7 @@ body.dikeyAktif #notPanelSag{display:none!important}
 .anKart .anGov{flex:1;min-width:0}
 .anKart .anUst{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
 .anKart .anNo{color:var(--dim);font-size:13px;min-width:32px}
-.anKart .anNot{font-family:'Cinzel',serif;font-weight:700;font-size:19px;color:var(--bone);letter-spacing:.02em}
+.anKart .anNot{font-family:'Manrope',sans-serif;font-weight:800;letter-spacing:.01em;font-variant-numeric:tabular-nums;font-size:19px;color:var(--bone)}
 .anKart .anAd{font-size:12px;letter-spacing:.06em;font-weight:700;text-transform:uppercase}
 .anKart .anYor{color:var(--dim);font-size:13.5px;line-height:1.55;margin-top:6px}
 .anKart .anIyi{margin-top:7px;font-size:13px;color:var(--txt)}
@@ -8705,7 +8706,7 @@ function inceleYorumGoster(otomatik){
   h+='<span class="iyRoz" style="background:'+renk+'">'+sem+'</span>';
   h+='<span class="iyNo">'+turNo+'</span>';
   h+='<span class="iyNot">'+k.notasyon+'</span>';
-  if(ad && !rakipHamlesi) h+='<span class="iyAd" style="color:'+renk+'">'+ad+'</span>';
+  if(ad && !rakipHamlesi) h+='<span class="iyAd" lang="'+((typeof yorumDil!=='undefined'&&yorumDil)||'tr')+'" style="color:'+renk+'">'+ad+'</span>';
   if(rakipMi) h+='<span class="iyAd" style="color:var(--dim)">Rakip</span>';
   if(typeof k._kayip==='number' && k._kayip>12 && !rakipHamlesi)
     h+='<span class="iyKayip">−'+Math.round(k._kayip)+'</span>';
