@@ -900,6 +900,9 @@ body.sinema .serit{height:9vh}
 #vinyet{position:fixed;inset:0;pointer-events:none;z-index:24;opacity:0;transition:opacity .4s;
   box-shadow:inset 0 0 140px 40px var(--vinyet-renk,#C03A2B)}
 body.sinema #vinyet{opacity:.5}
+/* Kill-cam sırasında sahne temiz kalsın: yön düğmesi ve hamle panelleri geçici gizlenir */
+#yonBtn, #notPanel, #notPanelSag{transition:opacity .25s}
+body.sinema #yonBtn, body.sinema #notPanel, body.sinema #notPanelSag{opacity:0;pointer-events:none}
 #flas{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;
   z-index:23;transition:opacity .06s}
 #anlatim{position:fixed;bottom:11vh;left:0;right:0;text-align:center;z-index:26;pointer-events:none;
