@@ -572,10 +572,16 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
 3b. ✅ **Firestore kuralları yayında** (3 Ekim 2026): `firebase deploy --only firestore:rules
    --project chess64-c6ff1` (kökteki firebase.json). Emülatörde 34/34 test + canlıda doğrulandı:
    normal kayıt geçiyor, sahte puan ve başkasının kaydına yazma reddediliyor.
-4. **Play Console Data Safety formu** — hazır cevaplar: `PLAY-VERI-GUVENLIGI.md`. **"Ses / Audio"** satırı da
-   gerekiyor: toplanıyor **evet**, paylaşılıyor **evet** (Google'ın tanıma
-   servisi), amaç *App functionality*, isteğe bağlı. Bu atlanırsa yayın reddedilir.
-5. **Mağaza listeleme** (açıklama, ekran görüntüleri, grafikler).
+4. ✅ **Play Console › Uygulama içeriği** (3 Ekim 2026) — uygulama "Chess64 – 3D Satranç" olarak açıldı,
+   7 beyanın hepsi tamam: Veri güvenliği (`PLAY-VERI-GUVENLIGI.md`'deki cevaplar), gizlilik politikası,
+   reklam var, reklam kimliği (Reklam + Analiz), **hedef kitle yalnız 18+** (13-17 seçilince Aile
+   politikası şartları geliyordu; sohbet yüzünden bilerek dışarıda bırakıldı), oturum açma bilgileri
+   (test hesabını kullanıcı girdi), resmi kurum/finans/sağlık hayır, IARC anketi → Tüm yaşlar / PEGI 3.
+5. ✅ **Mağaza girişi** (3 Ekim 2026): kategori Oyun › Masa, iletişim emvmete1223@gmail.com; Türkçe
+   ad/kısa/tam açıklama (`magaza/aciklama-tr.txt`), ikon `magaza/ikon-512.png`, öne çıkan görsel
+   `magaza/one-cikan-1024x500.png`, 7 ekran görüntüsü `magaza/ekran-1..7.png` (1080×1920; şablon
+   `magaza/sablon.html`, ham telefon görüntüleri `magaza/ham/`). Headless Chrome ile yeniden üretilebilir.
+   Kalan: **kapalı test** (en az 12 test kullanıcısı, 14 gün) → AAB yükleme, test kullanıcı listesi.
 
 ---
 

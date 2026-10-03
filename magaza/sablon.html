@@ -1,0 +1,48 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../app/src/main/assets/lib/fonts/fonts.css">
+<style>
+html,body{margin:0;padding:0}
+body{width:1080px;height:1920px;overflow:hidden;position:relative;font-family:'Manrope',sans-serif}
+.zemin{position:absolute;inset:0}
+.ust{position:absolute;left:0;right:0;top:118px;text-align:center;padding:0 70px}
+.baslik{font-family:'Cinzel',serif;font-weight:700;font-size:68px;letter-spacing:.04em;white-space:nowrap;line-height:1.08;margin:0}
+.alt{font-weight:600;font-size:34px;line-height:1.35;white-space:nowrap;margin:22px auto 0;max-width:900px}
+.cizgi{width:120px;height:3px;margin:30px auto 0;border-radius:2px}
+.telefon{position:absolute;left:50%;top:392px;transform:translateX(-50%);width:668px;height:1484px;border-radius:64px;padding:14px;box-sizing:content-box}
+.telefon img{width:668px;height:1484px;border-radius:52px;display:block;object-fit:cover;object-position:top}
+/* koyu tasarım */
+.koyu .zemin{background:radial-gradient(90% 45% at 50% 0%,rgba(232,182,76,.20),transparent 70%),linear-gradient(180deg,#151823,#0B0D14 70%)}
+.koyu .baslik{color:#F0E9D8}.koyu .baslik span{color:#E8B64C}
+.koyu .alt{color:#b9b2a2}.koyu .cizgi{background:linear-gradient(90deg,transparent,#E8B64C,transparent)}
+.koyu .telefon{background:linear-gradient(160deg,#2a2d38,#0f1118);box-shadow:0 0 0 2px rgba(232,182,76,.35),0 40px 90px rgba(0,0,0,.65)}
+/* açık (fildişi) tasarım */
+.acik .zemin{background:radial-gradient(90% 45% at 50% 0%,#fffdf8,transparent 70%),linear-gradient(180deg,#f3ede2,#e3d8c4)}
+.acik .baslik{color:#1c1914}.acik .baslik span{color:#B07E22}
+.acik .alt{color:#6f685b}.acik .cizgi{background:linear-gradient(90deg,transparent,#B07E22,transparent)}
+.acik .telefon{background:linear-gradient(160deg,#ffffff,#e9e0cf);box-shadow:0 0 0 2px rgba(176,126,34,.30),0 40px 80px rgba(90,70,30,.25)}
+/* mor (saray) */
+.mor .zemin{background:radial-gradient(90% 45% at 50% 0%,rgba(180,150,255,.22),transparent 70%),linear-gradient(180deg,#2a1f4a,#130d24 75%)}
+.mor .baslik{color:#F3EEFF}.mor .baslik span{color:#E8B64C}
+.mor .alt{color:#c9bfe6}.mor .cizgi{background:linear-gradient(90deg,transparent,#E8B64C,transparent)}
+.mor .telefon{background:linear-gradient(160deg,#3a2f5c,#150f28);box-shadow:0 0 0 2px rgba(232,182,76,.35),0 40px 90px rgba(0,0,0,.6)}
+</style></head>
+<body>
+<div class="zemin"></div>
+<div class="ust"><h1 class="baslik" id="b"></h1><div class="cizgi"></div><p class="alt" id="a"></p></div>
+<div class="telefon"><img id="r"></div>
+<script>
+const S={
+ 1:['koyu','Gerçek <span>3B</span> satranç','Her açıdan izle, istersen 2B oyna','oyun5'],
+ 2:['koyu','Hamleni <span>analiz et</span>','Stockfish ile parlak hamleler ve hatalar','analiz2'],
+ 3:['mor','<span>12</span> arena · <span>17</span> ordu','Saraydan volkana, Osmanlı’dan Sparta’ya','oyun6'],
+ 4:['mor','Sana uyan <span>tema</span>','Fildişi, Buzlu Cam, Gece ve daha fazlası','menu_cam'],
+ 5:['koyu','Bulmacalarla <span>geliş</span>','Bir, iki ve üç hamlede mat','bul3'],
+ 6:['acik','Oyununu <span>kur</span>','Arenanı ve ordunu seç, savaş başlasın','kur1'],
+ 7:['acik','Çevrimiçi <span>oyna</span>','Gerçek rakipler, arkadaşlar, liderlik','menu_f']
+};
+const n=new URLSearchParams(location.search).get('n')||'1'; const s=S[n];
+document.body.className=s[0]; document.getElementById('b').innerHTML=s[1]; document.getElementById('a').textContent=s[2];
+document.getElementById('r').src='ham/'+s[3]+'.png';
+</script>
+</body></html>

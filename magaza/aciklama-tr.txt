@@ -1,0 +1,36 @@
+UYGULAMA ADI (en çok 30)
+Chess64 – 3D Satranç
+
+KISA AÇIKLAMA (en çok 80)
+3B tahtada satranç: yapay zekâ, çevrimiçi maç, bulmacalar ve hamle analizi.
+
+TAM AÇIKLAMA (en çok 4000)
+Satranç her şeydir.
+
+Chess64, klasik satrancı özenle tasarlanmış üç boyutlu arenalara taşır. Taşları ister 3B tahtada izle, ister tek dokunuşla sade 2B görünüme geç. Hamleni yap, gerisini Chess64 halleder.
+
+OYNA
+• Yapay zekâya karşı: Stockfish motoru, acemiden ustaya kadar zorluk seviyeleri
+• Çevrimiçi maç: hesabınla gerçek rakiplerle oyna, arkadaşlarını ekle ve oyuna davet et
+• Aynı cihazda iki kişi: arkadaşınla karşılıklı oyna
+• Süreli ya da süresiz oyun, ön hamle desteği
+
+GELİŞ
+• Oyun sonu analizi: her hamlen için doğruluk yüzdesi, değerlendirme grafiği ve hamle sınıfları (parlak, en iyi, yanılgı, hata…)
+• Hamle hamle sesli anlatım ve tahtada inceleme
+• Açılış tanıma: oynadığın açılışın adını gör
+• Bulmacalar: zorluk seviyelerine göre taktik çözmeyi öğren
+• İstatistikler, başarımlar ve liderlik tablosu
+
+SESLE OYNA
+Hamleni söyle, taş gitsin. "At f3", "kale e1" gibi komutlarla elini kullanmadan oyna.
+
+KENDİ TARZIN
+• 12 arena ve 17 farklı ordu (taş seti); bir kısmı reklam izleyerek ya da Premium ile açılır
+• Fildişi, Gece, Obsidyen, Zümrüt, Bordo, Buzlu Cam ve Klasik menü temaları
+• 8 dil: Türkçe, English, Русский, العربية, Français, Deutsch, Italiano, 中文
+
+GİZLİLİK
+Hesap açmak isteğe bağlıdır; misafir olarak da oynayabilirsin. Hesabını ve verilerini uygulamanın içinden istediğin an silebilirsin.
+
+Chess64 açık kaynaklıdır (GPL-3.0). Kaynak kodu: github.com/mrbrdkc28-bit/Sah-Dustu
