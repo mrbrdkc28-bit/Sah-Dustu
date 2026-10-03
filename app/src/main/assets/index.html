@@ -244,7 +244,7 @@ canvas{display:block}
 /* ---------- SİNEMATİK AÇILIŞ ---------- */
 #acilisPerde{position:fixed;inset:0;z-index:60;background:#05060a;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;
-  animation:perdeKalk .9s ease 4.2s forwards}
+  animation:perdeKalk .9s ease 4.8s forwards}   /* boya efekti için 4.2→4.8 */
 #acilisPerde.bitti{display:none}
 @keyframes perdeKalk{to{opacity:0;visibility:hidden}}
 
@@ -1618,6 +1618,49 @@ body.azHareket .menuSlogan.yaz,body.azHareket .menuSlogan.sil{animation:none}
 body:has(#bulmacaSerit.acik) .notSerit{display:none!important}
 #bulmacaSerit{border-radius:20px}
 #bulmacaSerit #bulmacaCik{border-radius:20px!important;padding:9px 20px!important;font-weight:600}
+
+/* ===== AÇILIŞ: BOYA DÖKÜLMESİ (3 Ekim 2026, sahibin fikri) =====
+   Taş yere oturur → yukarıdan kendi renginde bir damla düşer → çarptığı an boya
+   tepeden aşağı akar ve taşı o renge boyar. Metin, arka planı yazıya kırpılarak
+   (background-clip:text) boyanır; boya sınırı yumuşak, ıslak bir kenar. */
+@property --boya{syntax:'<percentage>';inherits:false;initial-value:0%}
+#acilisTaslar .aT{
+  --dus:calc(.35s + var(--g) * .42s);            /* iniş başlangıcı (tasKondu ile aynı) */
+  --dok:calc(var(--dus) + .95s);                 /* boyanın değdiği an */
+  background:linear-gradient(180deg,
+    color-mix(in srgb,var(--renk) 82%,#fff) 0%, var(--renk) calc(var(--boya) * .55),
+    var(--renk) var(--boya), #e9e2d0 calc(var(--boya) + 7%));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:tasKondu .62s cubic-bezier(.34,1.32,.5,1) forwards, boyaDok .85s cubic-bezier(.45,.05,.4,1) forwards;
+  animation-delay:var(--dus), var(--dok);
+  text-shadow:none;   /* metin-gölgesi kırpılmış boyanın ÜSTÜNE çiziliyor, taşı griye boğuyordu */
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.45));
+}
+@keyframes boyaDok{0%{--boya:0%}100%{--boya:115%}}
+/* düşen damla */
+#acilisTaslar .aT::before{
+  content:'';position:absolute;left:50%;top:-6px;width:9px;height:13px;margin-left:-4.5px;
+  background:radial-gradient(circle at 35% 35%,color-mix(in srgb,var(--renk) 55%,#fff),var(--renk) 60%);
+  border-radius:50% 50% 50% 50% / 62% 62% 38% 38%;
+  opacity:0;transform:translateY(-90px) scaleY(1.25);
+  animation:damlaDus .42s cubic-bezier(.55,0,.9,.6) forwards;
+  animation-delay:calc(var(--dok) - .4s);
+  pointer-events:none;
+}
+@keyframes damlaDus{
+  0%{opacity:0;transform:translateY(-90px) scaleY(1.3)}
+  15%{opacity:1}
+  88%{opacity:1;transform:translateY(0) scaleY(1.3)}
+  100%{opacity:0;transform:translateY(4px) scale(1.9,.35)}   /* çarpınca yayılır */
+}
+/* yere değen gölge boyanın rengini alır */
+#acilisTaslar .aT::after{
+  background:radial-gradient(ellipse,color-mix(in srgb,var(--renk) 70%,transparent),transparent 70%);
+}
+@media(prefers-reduced-motion:reduce){
+  #acilisTaslar .aT{animation-duration:.3s,.3s;animation-delay:.1s,.4s}
+  #acilisTaslar .aT::before{display:none}
+}
 </style>
 </head>
 <body>
@@ -1627,12 +1670,12 @@ body:has(#bulmacaSerit.acik) .notSerit{display:none!important}
 
 <div id="acilisPerde">
   <div id="acilisTaslar">
-    <span class="aT" style="--g:0">♟</span>
-    <span class="aT" style="--g:1">♞</span>
-    <span class="aT" style="--g:2">♝</span>
-    <span class="aT" style="--g:3">♛</span>
-    <span class="aT" style="--g:4">♚</span>
-    <span class="aT" style="--g:5">♜</span>
+    <span class="aT" style="--g:0;--renk:#C8322B">♟︎</span>
+    <span class="aT" style="--g:1;--renk:#2F62C8">♞︎</span>
+    <span class="aT" style="--g:2;--renk:#1E9C66">♝︎</span>
+    <span class="aT" style="--g:3;--renk:#E8B64C">♛︎</span>
+    <span class="aT" style="--g:4;--renk:#8C52CC">♚︎</span>
+    <span class="aT" style="--g:5;--renk:#E07A2C">♜︎</span>
   </div>
   <div id="acilisLogo">CHESS<span>64</span></div>
 </div>
@@ -2337,7 +2380,7 @@ let fbAuth=null, fbDb=null, fbKullanici=null;
         // Oturum yok: perde kapandıktan sonra giriş ekranını göster
         const perde=document.getElementById('acilisPerde');
         const goster=()=>{ const g=document.getElementById('girisEkran'); if(g) g.classList.remove('gizli'); };
-        if(perde && !perde.classList.contains('bitti')){ setTimeout(goster, 5200); }
+        if(perde && !perde.classList.contains('bitti')){ setTimeout(goster, 5800); }
         else { goster(); }
       }
       if(typeof girisDurumGuncelle==='function') girisDurumGuncelle();
@@ -9738,8 +9781,12 @@ function dongu(){
   }
   const p=document.getElementById('acilisPerde');
   if(p){
+    /* Açılış sesi (sfx/basla.mp3): taşlar inmeye başlarken bir kez. Eskiden açılışta hiç
+       çağrılmıyordu. Android tarafında dokunmadan çalmaya izin var
+       (mediaPlaybackRequiresUserGesture=false); ses kapalıysa Ses.cal zaten çalmaz. */
+    setTimeout(()=>{ try{ if(!p.classList.contains('bitti') && typeof Ses!=='undefined') Ses.cal('basla'); }catch(e){} }, 300);
     // animasyon toplam ~5.1s; sonra kesin kapat (load beklemeden, hemen sayar)
-    setTimeout(perdeKapat, 5200);
+    setTimeout(perdeKapat, 5800);
     p.addEventListener('pointerdown', perdeKapat); // dokununca atla
   }
 })();
@@ -10039,7 +10086,7 @@ function otomatikGiris(){
     aktifOyunaDonKontrol();
   };
   if(perde && !perde.classList.contains('bitti')){
-    setTimeout(gec, 5200);
+    setTimeout(gec, 5800);
   } else { gec(); }
 }
 

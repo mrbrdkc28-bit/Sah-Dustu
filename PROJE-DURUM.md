@@ -545,6 +545,10 @@ yazı tipi `SloganYazi` = Great Vibes/Aref Ruqaa/Ma Shan Zheng ALT KÜMELERİ (y
 slogan metni değişirse alt küme yeniden üretilmeli (fontTools pyftsubset). Grafik (oyun sonu): Stockfish
 `_cpBeyaz` ile avantaj grafiği. Menüye dönüşte `menuSahnesiniSifirla()` sahneyi başlangıca alır.
 Parçacıklar grafik kalitesine bağlı (`KADEME.*.parcacikMs`: 33/66/0). Lisanslar ekranında Yazı Tipleri bölümü.
+Açılış: taşlar indikten sonra her birine kendi renginde boya damlası düşer, boya tepeden akar
+(`@property --boya` + background-clip:text; text-shadow KAPALI olmalı, yoksa taş griye boğulur).
+Perde 4.8 sn'de kalkar (eskiden 4.2; bağlı zamanlayıcılar 5800). Açılış sesi sfx/basla.mp3 artık
+perdede çalar (dokunmadan çalabildiği telefonda doğrulandı; ses kapalıysa çalmaz).
 
 ---
 
