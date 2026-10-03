@@ -1390,6 +1390,50 @@ html[data-tema="fildisi"] #secimSayfa .ssSec{background:#fff;border-color:rgba(1
 html[data-tema="fildisi"] #secimSayfa .ssSec.secili{border-color:#B07E22;background:rgba(176,126,34,.08)}
 html[data-tema="fildisi"] #secimSayfa .ssTik{color:#B07E22}
 html[data-tema="cam"] #altSecim button{border-color:rgba(255,255,255,.2);color:#e6e1d6;background:rgba(22,25,36,.45)}
+
+/* ===== OYUN KUR (3 Ekim 2026, sahibin onayı): dolu seçili durum, renk simgeleri,
+   süre 3x2 + kategori, "Diğer ayarlar" katlanır, temaya uygun kartlar ===== */
+/* başlıklar biraz daha belirgin */
+#kurulumEkran .blok-baslik{font-size:11.5px;letter-spacing:.28em;color:var(--dim);font-weight:600}
+#kurulumEkran .blok{gap:12px}
+#kurulumIcerik{gap:24px!important}
+/* seçili durum: dolu (Fildişi: koyu lacivert + altın; koyu temalar: altın dolgu) */
+#kurulumEkran .mod{border-radius:14px;font-weight:600;min-height:48px}
+#kurulumEkran .mod.secili{background:linear-gradient(180deg,#F0C565,#D9A53A)!important;color:#1a1408!important;border-color:transparent!important;
+  box-shadow:0 6px 16px rgba(232,182,76,.25),inset 0 1px 0 rgba(255,255,255,.4)}
+#kurulumEkran .mod.secili::after{display:none}
+html[data-tema="fildisi"] #kurulumEkran .mod.secili{background:linear-gradient(180deg,#232838,#12151f)!important;color:#E8B64C!important;
+  box-shadow:0 6px 16px rgba(20,22,30,.22),inset 0 1px 0 rgba(255,255,255,.08)}
+html[data-tema="fildisi"] #kurulumEkran .mod{background:#fffdf8;border-color:rgba(120,95,50,.16);box-shadow:0 2px 6px rgba(90,70,30,.05)}
+/* renk: taş simgesi */
+#renkler .mod{display:flex;align-items:center;justify-content:center;gap:8px}
+#renkler .mod::before{font-size:20px;line-height:1;font-family:'DejaVu Sans','Noto Sans Symbols 2',serif;font-variant-emoji:text}
+#renkler .mod[data-renk="w"]::before{content:"\2654\FE0E"}
+#renkler .mod[data-renk="b"]::before{content:"\265A\FE0E"}
+#renkler .mod[data-renk="rastgele"]::before{content:"\25D0\FE0E";font-size:17px}
+/* süre: Süresiz tek satır, altı süre 3x2 kart, kategori etiketiyle */
+#sureler{display:grid!important;grid-template-columns:repeat(3,1fr);gap:9px}
+#sureler .mod[data-sure="0"]{grid-column:1/-1;min-height:44px}
+#sureler .mod:not([data-sure="0"]){display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:11px 4px;
+  font-family:'Cinzel',serif;font-size:17px;font-weight:700}
+#sureler .mod:not([data-sure="0"])::after{display:block!important;position:static!important;height:auto!important;background:none!important;
+  font:600 9.5px Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;opacity:.65}
+#sureler .mod[data-sure="60"]::after{content:"Bullet"}
+#sureler .mod[data-sure="180"]::after,#sureler .mod[data-sure="300"]::after{content:"Blitz"}
+#sureler .mod[data-sure="600"]::after,#sureler .mod[data-sure="900"]::after{content:"Rapid"}
+/* kartlar: daha büyük önizleme, kilitli olanlar sönük */
+#kurulumEkran .arena{min-width:156px;border-radius:16px}
+#kurulumEkran .arena .pano{height:96px}
+html[data-tema="fildisi"] #kurulumEkran .arena{background:#fffdf8;border-color:rgba(120,95,50,.16);box-shadow:0 4px 12px rgba(90,70,30,.07)}
+html[data-tema="fildisi"] #kurulumEkran .arena.secili{border-color:#B07E22;box-shadow:0 10px 22px rgba(176,126,34,.22)}
+/* diğer ayarlar katlanır */
+#digerAyarlar{width:100%;max-width:560px}
+#digerAyarlar summary{list-style:none;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;
+  font-size:11.5px;letter-spacing:.28em;color:var(--dim);font-weight:600;text-transform:uppercase;padding:6px 0}
+#digerAyarlar summary::-webkit-details-marker{display:none}
+#digerAyarlar summary::after{content:"▾";letter-spacing:0;font-size:12px;transition:transform .2s}
+#digerAyarlar[open] summary::after{transform:rotate(180deg)}
+#digerAyarlar .blok{margin-top:16px}
 </style>
 </head>
 <body>
@@ -1650,6 +1694,7 @@ html[data-tema="cam"] #altSecim button{border-color:rgba(255,255,255,.2);color:#
       </div>
     </div>
 
+    <details id="digerAyarlar"><summary>Diğer ayarlar</summary>
     <div class="blok">
       <div class="blok-baslik">Savaş Sahnesi</div>
       <div class="modlar" id="sahneler">
@@ -1667,6 +1712,7 @@ html[data-tema="cam"] #altSecim button{border-color:rgba(255,255,255,.2);color:#
         <button class="mod" data-grafik="yuksek">Yüksek</button>
       </div>
     </div>
+    </details>
   </div>
   <button id="basla">SAVAŞ BAŞLASIN</button>
 </div>
@@ -11228,6 +11274,7 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["Vahim"]={"en": "Blunder", "ru": "Зевок", "ar": "خطأ فادح", "fr": "Gaffe", "de": "Patzer", "it": "Errore grave", "zh": "大错"};
   CEVM["Doğruluğun"]={"en": "Your accuracy", "ru": "Ваша точность", "ar": "دقتك", "fr": "Ta précision", "de": "Deine Genauigkeit", "it": "La tua precisione", "zh": "你的准确率"};
   CEVM["Rakip doğruluğu"]={"en": "Opponent accuracy", "ru": "Точность соперника", "ar": "دقة الخصم", "fr": "Précision de l'adversaire", "de": "Genauigkeit Gegner", "it": "Precisione dell'avversario", "zh": "对手准确率"};
+  CEVM['Diğer ayarlar']={en:'More settings',ru:'Другие настройки',ar:'إعدادات أخرى',fr:'Autres réglages',de:'Weitere Einstellungen',it:'Altre impostazioni',zh:'更多设置'};
   CEVM['Tema']={en:'Theme',ru:'Тема',ar:'المظهر',fr:'Thème',de:'Design',it:'Tema',zh:'主题'};
   CEVM['Dil']={en:'Language',ru:'Язык',ar:'اللغة',fr:'Langue',de:'Sprache',it:'Lingua',zh:'语言'};
   CEVM['Fildişi']={en:'Ivory',ru:'Слоновая кость',ar:'عاجي',fr:'Ivoire',de:'Elfenbein',it:'Avorio',zh:'象牙白'};
