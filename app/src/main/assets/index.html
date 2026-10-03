@@ -11961,7 +11961,10 @@ function esle(adaylar, yasal, tasAl, secenek){
     // n-best sırası bilgi taşır: alt sıradaki adayın oyu daha az ağırlıklı.
     // Tanıyıcı güven skoru verdiyse onu da çarpan olarak kullan.
     let sirBonus = Math.pow(ADAY_SONUM, ai);
-    if(typeof ham==='object' && ham && typeof ham.skor==='number' && ham.skor>=0){
+    /* Skor 0 "bilinmiyor" sayılır: cihaz üstü tanıyıcı skor vermiyor, hep 0 gönderiyor.
+       0'ı "hiç emin değil" saymak her komutu (net "at f3" bile) güven 0.65'e
+       düşürüyor, e karelerini 0.59 ile reddettiriyordu (telefonda ölçüldü). */
+    if(typeof ham==='object' && ham && typeof ham.skor==='number' && ham.skor>0){
       sirBonus *= (0.55 + 0.45*Math.max(0,Math.min(1,ham.skor)));
     }
     const tk = tokenle(metin);
@@ -12239,7 +12242,9 @@ const SesOyun = (function(){
   function belkiYenidenAc(gecikme){
     if(!ayar.acik) return;
     if(ayar.mik==='bas') return;
-    if(bekleyen && ayar.onay!=='sesli') return;
+    // Eller serbestte onay beklerken de dinle: "evet" ya da hamleyi tekrar söylemek
+    // yetsin; eskiden mikrofon kapanıyor, tek yol tahtaya dokunmaktı.
+    if(bekleyen && ayar.onay!=='sesli' && ayar.mik!=='oto') return;
     if(ayar.mik==='oto' && !benimSiraMi() && !bekleyen) return;
     clearTimeout(yenidenBaslatZaman);
     yenidenBaslatZaman=setTimeout(baslatDinleme, gecikme||500);
@@ -12309,6 +12314,7 @@ const SesOyun = (function(){
       }
       // onay beklerken yeni bir hamle söylenmiş olabilir: aşağı düş
     }
+    const onceki = bekleyen;
 
     // 3) Hamle eşleştir
     if(!benimSiraMi()){
@@ -12370,6 +12376,22 @@ const SesOyun = (function(){
     // 0.82: ölçülen tipik ikinci-aday oranı 0.848 — 0.85 eşiği bunu ıskalıyordu.
     if(s.adaylar && s.adaylar.length>1 && s.adaylar[1].oran>=0.82 && s.adaylar[1].hamle!==s.hamle)
       ikinciAday=s.adaylar[1].hamle;
+    /* "piyon e3" denince a3/b3 de 0.82 oran alıyordu: harf benzerliği tavanı (0.38)
+       sesli/kafiyeli harflere hep pay veriyor. Tanıyıcının hiçbir adayında ikinci
+       hamlenin sütun harfi geçmiyorsa o bir rakip değildir; sormadan oyna. */
+    if(ikinciAday){
+      const duyulan=new Set();
+      for(const a of adaylar){
+        try{ for(const t of SesKomut.tokenle(SesKomut.katla(a.metin||a))) if(/^[a-h]$/.test(t)) duyulan.add(t); }catch(e){}
+      }
+      const sutun=k=>'abcdefgh'[k%8];
+      if(duyulan.has(sutun(s.hamle.to)) && !duyulan.has(sutun(ikinciAday.to)) && sutun(ikinciAday.to)!==sutun(s.hamle.to))
+        ikinciAday=null;
+    }
+    // Onay beklerken AYNI hamle yeniden söylendiyse bu bir onaydır.
+    if(onceki && onceki.hamle && onceki.hamle.from===s.hamle.from && onceki.hamle.to===s.hamle.to){
+      oyna(s.hamle); return;
+    }
 
     const eminMiyiz = (s.guven>=GUVEN_OYNA) && !ikinciAday;
 
@@ -12399,7 +12421,9 @@ const SesOyun = (function(){
               ()=>belkiYenidenAc(250));
       else belkiYenidenAc(1600);
     } else {
-      bar(bas+' — '+(tr()?'kareye dokun ya da Oyna':'tap the square or Play')+
+      bar(bas+' — '+(ayar.mik==='oto'
+            ? (tr()?'&quot;evet&quot; de ya da tekrar söyle':'say &quot;yes&quot; or repeat it')
+            : (tr()?'kareye dokun ya da Oyna':'tap the square or Play'))+
           (dusukGuven?(tr()?' <span style="opacity:.55">(emin değilim)</span>':' <span style="opacity:.55">(unsure)</span>'):''),
           secenekler);
       if(ayar.geriBildirim && !dusukGuven) soyle(hamleAdi(s.hamle));
@@ -12643,7 +12667,7 @@ const SesOyun = (function(){
      Canlı denemede bir istemci hatasından sonra döngü kopmuştu. */
   setInterval(()=>{
     try{
-      if(!ayar.acik || ayar.mik!=='oto' || bekleyen || !oyunEkraniAcikMi() || !benimSiraMi()) return;
+      if(!ayar.acik || ayar.mik!=='oto' || !oyunEkraniAcikMi() || !benimSiraMi()) return;
       if(typeof oyunBitti!=='undefined' && oyunBitti) return;
       const k=KOPRU(); if(!k || !k.dinliyorMu) return;
       if(k.dinliyorMu() || (k.ttsKonusuyorMu && k.ttsKonusuyorMu())) return;
