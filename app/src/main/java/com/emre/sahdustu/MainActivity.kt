@@ -771,6 +771,20 @@ class MainActivity : AppCompatActivity() {
             }
         }, "AndroidGuvenlik")
 
+        /* Ekran yonu koprusu. Menuler hep dikey; oyun ekraninda oyuncunun sectigi yon
+           (yatay/dikey) kilitlenir, telefonun kendi dondurmesi yok sayilir. Yatayda 180
+           derece cevirmeye izin var (telefon ters tutulunca ekran bas asagi kalmasin). */
+        webView.addJavascriptInterface(object {
+            @JavascriptInterface
+            fun yon(tip: String) {
+                runOnUiThread {
+                    requestedOrientation = if (tip == "yatay")
+                        android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                    else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            }
+        }, "AndroidEkran")
+
         // Bildirim koprusu: JS'ten "sira sende" bildirimi goster
         olusturBildirimKanali()
         webView.addJavascriptInterface(object {

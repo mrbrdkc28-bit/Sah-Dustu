@@ -467,6 +467,14 @@ olay kaydı: window.sesDurum/sesHata/sesSonuc/sesBolum sarmalanıp zaman damgal�
 Yasal olmayan taş+kare duyulunca sesli ve yazılı uyarı ("Fil f2'ye gidemez", ek rakamın
 okunuşuna göre: `YONELME`); eller serbestte "geri bildirim" kapalı olsa da söylenir.
 
+**8.10 — Ekran yönü (3 Ekim 2026).** Manifest `portrait`; menüler hep dikey. Oyun ekranı
+(`#hud.acik`, MutationObserver) açılınca kayıtlı yön (`localStorage.oyunYonu`, ilk sefer
+yatay) `AndroidEkran.yon()` ile kilitlenir (yatay = SENSOR_LANDSCAPE, 180° çevirmeye izin;
+dikey = PORTRAIT); telefonun kendi döndürmesi yok sayılır. Oyun ekranında sol üstte
+`#yonBtn` (dikeyde süre çubuğunun altında). Telefonda test edildi: menü 392×842, oyun
+842×392, düğme ↔, menüye dönüş dikey, yeni oyun son seçimle.
+Kontrol edilmedi: yatayda analiz/sohbet/bulmaca/çevrimiçi ekranlarının yerleşimi.
+
 **8.6 — Dil kapsamı:** yeni sesli oynama arayüz metinlerinin bir kısmı için
 ru/ar karşılığı yok; sözlükte karşılığı olmayan metin Türkçe kalır.
 

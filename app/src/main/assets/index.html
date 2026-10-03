@@ -603,6 +603,17 @@ body.azHareket #basla::after{display:none}
   justify-content:space-between;align-items:center;padding:10px 14px;
   background:linear-gradient(180deg,rgba(6,7,11,.85),transparent)}
 #hud.acik{display:flex}
+/* Ekran yönü düğmesi: yalnız oyun ekranında, tahtaya değmeyen sol üst köşede */
+#yonBtn{position:fixed;left:12px;top:calc(env(safe-area-inset-top,0px) + 62px);
+  width:44px;height:44px;border-radius:50%;border:1px solid var(--line);
+  background:rgba(17,20,29,.72);color:var(--txt);display:none;align-items:center;
+  justify-content:center;z-index:21;padding:0;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:transform .12s}
+#yonBtn.gorunur{display:flex}
+#yonBtn svg{width:22px;height:22px}
+#yonBtn:active{transform:scale(.92)}
+/* Dikeyde üstte rakip/süre çubuğu var: onun altındaki boş alana in */
+@media (orientation: portrait){ #yonBtn{top:calc(env(safe-area-inset-top,0px) + 150px)} }
 .hud-sol{display:flex;align-items:center;gap:10px}
 #sira{font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:15px;letter-spacing:.08em}
 #sira .nokta{display:inline-block;width:9px;height:9px;border-radius:50%;
@@ -12745,6 +12756,49 @@ window.SesOyun  = SesOyun;
 if(document.readyState==='loading')
   document.addEventListener('DOMContentLoaded', ()=>{ try{ SesOyun.kur(); }catch(e){} });
 else { try{ SesOyun.kur(); }catch(e){} }
+
+/* ================================================================
+   EKRAN YÖNÜ: menüler hep dikey; oyun ekranında oyuncunun seçtiği yön
+   (ilk seferde yatay) kilitlenir, telefonun kendi döndürmesi yok sayılır.
+   Oyun ekranı (#hud.acik) izlenir: normal oyun, çevrimiçi, bulmaca — hangi
+   yoldan girilirse girilsin aynı kural işler. Android: AndroidEkran.yon().
+   ================================================================ */
+(function(){
+  const ANAHTAR='oyunYonu';
+  const kayitli=()=>{ try{ return localStorage.getItem(ANAHTAR)==='dikey'?'dikey':'yatay'; }catch(e){ return 'yatay'; } };
+  const uygula=t=>{ try{ if(window.AndroidEkran && AndroidEkran.yon) AndroidEkran.yon(t); }catch(e){} };
+  const hud=document.getElementById('hud');
+  if(!hud) return;
+  const btn=document.createElement('button');
+  btn.id='yonBtn'; btn.type='button';
+  btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" '+
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+
+    '<rect x="2.5" y="9" width="13" height="8" rx="1.6"/><path d="M5 13h.01"/>'+
+    '<path d="M12.5 3.5a8 8 0 0 1 8 8"/><path d="M20.5 8.4v3.1h-3.1"/></svg>';
+  function etiket(){
+    const yatay=kayitli()==='yatay';
+    const tr=(typeof uygDil==='undefined'||uygDil==='tr');
+    const m = yatay ? (tr?'Dikeye geç':'Switch to portrait') : (tr?'Yataya geç':'Switch to landscape');
+    btn.setAttribute('aria-label', m); btn.title=m;
+  }
+  btn.onclick=()=>{
+    const yeni = kayitli()==='yatay' ? 'dikey' : 'yatay';
+    try{ localStorage.setItem(ANAHTAR, yeni); }catch(e){}
+    uygula(yeni); etiket();
+  };
+  document.body.appendChild(btn);
+  let oyunda=null;
+  function kontrol(){
+    const acik=hud.classList.contains('acik');
+    if(acik===oyunda) return;
+    oyunda=acik;
+    btn.classList.toggle('gorunur', acik);
+    etiket();
+    uygula(acik ? kayitli() : 'dikey');
+  }
+  new MutationObserver(kontrol).observe(hud, {attributes:true, attributeFilter:['class']});
+  kontrol();
+})();
 
 // Ayarlar modalındaki vekil butonlar: dikey modda üst bardan kaldırılan
 // butonların yerine geçer, orijinal butona tıklayarak aynı işi yapar.
