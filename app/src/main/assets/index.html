@@ -5245,7 +5245,9 @@ function dogrulukYaz(){
     }
   }catch(e){}
 }
+let teslimSonu=false; // 'terk' teslimden mi geldi (başlık/metin için), rakip ayrılmasından mı
 function oyunSonu(d, terkKazanan){
+  const teslim=(d==='terk' && teslimSonu); teslimSonu=false;
   oyunBitti=true; kilit=true;
   Ses.son();
   // Şah mat olunca: açılış sesi + şah yere yuvarlanır + "ŞAH MAT" + sesli anons
@@ -5322,7 +5324,7 @@ function oyunSonu(d, terkKazanan){
     }
   }
   document.getElementById('sonBaslik').textContent =
-    d==='mat' ? 'ŞAH DÜŞTÜ' : d==='sure' ? 'SÜRE DOLDU' : d==='terk' ? 'RAKİP AYRILDI'
+    d==='mat' ? 'ŞAH DÜŞTÜ' : d==='sure' ? 'SÜRE DOLDU' : d==='terk' ? (teslim ? 'TESLİM' : 'RAKİP AYRILDI')
     : d==='berabere' ? '½ BERABERE' : d==='yetersiz' ? 'YETERSİZ MATERYAL'
     : d==='3tekrar' ? 'ÜÇ TEKRAR' : d==='50hamle' ? '50 HAMLE KURALI' : 'PAT';
   // Çevrimiçi: sonuç durumunu rakiple senkronla (özellikle süre — iki saat bağımsız sayar)
@@ -5338,7 +5340,7 @@ function oyunSonu(d, terkKazanan){
   document.getElementById('sonAlt').textContent =
     d==='mat' ? kazanan+' meydanın hâkimi.'
     : d==='sure' ? kazanan+' kazandı — rakibin zamanı tükendi.'
-    : d==='terk' ? kazanan+' kazandı — rakip oyuna dönmedi.'
+    : d==='terk' ? kazanan+' kazandı — '+(teslim ? (kazanan==='Beyaz'?'Siyah':'Beyaz')+' teslim oldu.' : 'rakip oyuna dönmedi.')
     : d==='berabere' ? 'İki taraf da anlaştı. Beraberlik.'
     : 'Kimse diz çökmedi. Berabere.';
   /* Karne çizimi TEKRAR ÇAĞRILABİLİR: arka plandaki Stockfish analizi
@@ -6768,7 +6770,12 @@ function menuKur(){
     secModal.style.display='none';
     if(!confirm('Teslim olmak istediğinize emin misiniz?')) return;
     if(cevrimiciAktif){ Cevrimici.sonucBildir('terk', Cevrimici.rakipRengi()); }
-    oyunSonu('terk', mod==='ai'?aktifInsanRenk:(cevrimiciAktif?Cevrimici.benimRenk:Motor.turn));
+    /* İkinci parametre KAZANAN renktir. Eskiden teslim olan tarafın rengi
+       geçiliyordu: yapay zekâya teslim olan oyuncu galibiyet alıyor, çevrimiçi
+       teslim olan kendi ekranında kazanmış görünüyordu. */
+    const teslimEden = mod==='ai' ? aktifInsanRenk : (cevrimiciAktif ? Cevrimici.benimRenk : Motor.turn);
+    teslimSonu=true;
+    oyunSonu('terk', teslimEden==='w'?'b':'w');
   };
 
   // ===== SOHBET =====
@@ -10544,6 +10551,7 @@ const CEVM={
 'ŞAH DÜŞTÜ':{en:'CHECKMATE',ru:'МАТ',ar:'كش مات'},
 'SÜRE DOLDU':{en:'TIME OUT',ru:'ВРЕМЯ ВЫШЛО',ar:'انتهى الوقت'},
 'RAKİP AYRILDI':{en:'OPPONENT LEFT',ru:'СОПЕРНИК ВЫШЕЛ',ar:'غادر الخصم'},
+'TESLİM':{en:'RESIGNED',ru:'СДАЧА',ar:'استسلام'},
 'PAT':{en:'STALEMATE',ru:'ПАТ',ar:'جمود'},
 'Kimse diz çökmedi. Berabere.':{en:'No one knelt. Draw.',ru:'Никто не преклонил колен. Ничья.',ar:'لم يركع أحد. تعادل.'},
 'Berabere.':{en:'Draw.',ru:'Ничья.',ar:'تعادل.'},
@@ -10707,6 +10715,8 @@ const CEVR=[
 [/^Beyaz kazandı — (.+)$/,{en:'White won — $1',ru:'Белые победили — $1',ar:'فاز الأبيض — $1'}],
 [/^Siyah kazandı — (.+)$/,{en:'Black won — $1',ru:'Чёрные победили — $1',ar:'فاز الأسود — $1'}],
 [/^rakibin zamanı tükendi\.$/,{en:'opponent ran out of time.',ru:'у соперника вышло время.',ar:'نفد وقت الخصم.'}],
+[/^Beyaz teslim oldu\.$/,{en:'White resigned.',ru:'Белые сдались.',ar:'استسلم الأبيض.'}],
+[/^Siyah teslim oldu\.$/,{en:'Black resigned.',ru:'Чёрные сдались.',ar:'استسلم الأسود.'}],
 [/^rakip oyuna dönmedi\.$/,{en:'opponent did not return.',ru:'соперник не вернулся.',ar:'لم يعد الخصم.'}],
 [/^Doğruluk — Sen: %(\S+)\s+·\s+Rakip: %(\S+)$/,{en:'Accuracy — You: $1%  ·  Opponent: $2%',ru:'Точность — Ты: $1%  ·  Соперник: $2%',ar:'الدقة — أنت: $1%  ·  الخصم: $2%'}],
 [/^Doğruluk — Beyaz: %(\S+)\s+·\s+Siyah: %(\S+)$/,{en:'Accuracy — White: $1%  ·  Black: $2%',ru:'Точность — Белые: $1%  ·  Чёрные: $2%',ar:'الدقة — الأبيض: $1%  ·  الأسود: $2%'}]
