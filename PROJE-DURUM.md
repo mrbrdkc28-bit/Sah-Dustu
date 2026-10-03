@@ -547,8 +547,10 @@ slogan metni değişirse alt küme yeniden üretilmeli (fontTools pyftsubset). G
 Parçacıklar grafik kalitesine bağlı (`KADEME.*.parcacikMs`: 33/66/0). Lisanslar ekranında Yazı Tipleri bölümü.
 Açılış: taşlar indikten sonra her birine kendi renginde boya damlası düşer, boya tepeden akar
 (`@property --boya` + background-clip:text; text-shadow KAPALI olmalı, yoksa taş griye boğulur).
-Perde 4.8 sn'de kalkar (eskiden 4.2; bağlı zamanlayıcılar 5800). Açılış sesi sfx/basla.mp3 artık
-X
+Perde 4.8 sn'de kalkar (eskiden 4.2; bağlı zamanlayıcılar 5800). Açılışta basla.mp3 ÇALMAZ (sahibi
+istemedi: oyun başlama sesiyle aynı). Onun yerine `acilisNotalari()`: her taş oturuşunda yükselen
+pentatonik nota (D4..E5), her boya damlasında küçük "damla", logoda akor; WebAudio ile anlık üretilir,
+zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıysa çalmaz.
 
 ---
 
