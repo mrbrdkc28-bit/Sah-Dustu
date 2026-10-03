@@ -621,7 +621,7 @@ h1 span{color:var(--brass)}
   box-shadow:0 2px 8px rgba(0,0,0,.5);animation:modCizgi .3s ease both}
 .arena .pano{height:84px;position:relative;overflow:hidden}
 .arena .pano::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,transparent 40%,rgba(6,7,11,.85))}
+  background:linear-gradient(180deg,transparent 62%,rgba(6,7,11,.32))}   /* gerçek önizlemeler örtülmesin (eskiden %85 karartma) */
 .arena .ad{font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:14px;
   color:var(--bone);padding:10px 12px 2px;letter-spacing:.05em}
 .arena .desc{font-size:11px;color:var(--dim);padding:0 12px 12px;line-height:1.5}
@@ -6790,7 +6790,8 @@ function menuKur(){
   // Ordu kartları
   const oListe=document.getElementById('orduListe');
   const ORDU_IKON={klasik:'\u265E',misir:'\u25B2',pers:'\u272F',osmanli:'\u262A',sparta:'\u03A9',napolyon:'\u2692'};
-  const GORSELLI=['klasik','gercek3','gercek4','gercek5','gercek6','gercek7','retropc','c2','metal','lowpoly','sade','scifi'];
+  /* Önizlemeler oyunun 3B motoruyla çekildi (3 Ekim 2026, onizleme/*.webp): tüm ordular görselli */
+  const GORSELLI=ORDULAR.map(x=>x.id);
   ORDULAR.forEach((o,i)=>{
     const el=document.createElement('div');
     el.className='arena'+(o===aktifOrdu?' secili':'');
@@ -6798,8 +6799,7 @@ function menuKur(){
     if(GORSELLI.indexOf(o.id)>=0){
       pano='<div class="pano" style="background:radial-gradient(120% 100% at 50% 30%,#20263A,#0A0C12 72%);'+
         'display:flex;align-items:flex-end;justify-content:center">'+
-        '<img src="onizleme/ordu_'+o.id+'.png" style="width:100%;height:100%;object-fit:contain;'+
-        'object-position:center 62%" loading="lazy"></div>';
+        '<img src="onizleme/ordu_'+o.id+'.webp" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div>';
     } else {
       pano='<div class="pano" style="background:linear-gradient(160deg,#1B2030,#0A0C12 70%);'+
         'display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--brass)">'+
@@ -6819,7 +6819,7 @@ function menuKur(){
     const el=document.createElement('div');
     el.className='arena'+(i===0?' secili':'');
     el.innerHTML='<div class="pano" style="background:'+a.grad+';display:flex;align-items:center;justify-content:center">'+
-      '<img src="onizleme/arena_'+a.id+'.png" style="width:88%;height:88%;object-fit:contain" loading="lazy"'+
+      '<img src="onizleme/arena_'+a.id+'.webp" style="width:100%;height:100%;object-fit:cover" loading="lazy"'+
       ' onerror="this.style.display=\'none\'"></div>'+
       '<div class="ad">'+a.ad+'</div><div class="desc">'+a.desc+'</div>';
     el.dataset.kTur='arena'; el.dataset.kId=a.id;
@@ -6920,7 +6920,8 @@ function menuKur(){
   const cvOrd=document.getElementById('cvOrdular');
   if(cvOrd && !cvOrd.dataset.kuruldu){
     cvOrd.dataset.kuruldu='1';
-    const GORSELLI=['klasik','gercek3','gercek4','gercek5','gercek6','gercek7','retropc','c2','metal','lowpoly','sade','scifi'];
+    /* Önizlemeler oyunun 3B motoruyla çekildi (3 Ekim 2026, onizleme/*.webp): tüm ordular görselli */
+  const GORSELLI=ORDULAR.map(x=>x.id);
     const ORDU_IKON={klasik:'\u265E',misir:'\u25B2',pers:'\u272F',osmanli:'\u262A',sparta:'\u03A9',napolyon:'\u2692'};
     ORDULAR.forEach(o=>{
       const el=document.createElement('div');
@@ -6929,8 +6930,7 @@ function menuKur(){
       if(GORSELLI.indexOf(o.id)>=0){
         pano='<div class="pano" style="background:radial-gradient(120% 100% at 50% 30%,#20263A,#0A0C12 72%);'+
           'display:flex;align-items:flex-end;justify-content:center">'+
-          '<img src="onizleme/ordu_'+o.id+'.png" style="width:100%;height:100%;object-fit:contain;'+
-          'object-position:center 62%" loading="lazy"></div>';
+          '<img src="onizleme/ordu_'+o.id+'.webp" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div>';
       } else {
         pano='<div class="pano" style="background:linear-gradient(160deg,#1B2030,#0A0C12 70%);'+
           'display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--brass)">'+
@@ -6953,7 +6953,7 @@ function menuKur(){
       const el=document.createElement('div');
       el.className='arena'+(aktifArena&&a.id===aktifArena.id?' secili':'');
       el.innerHTML='<div class="pano" style="background:'+a.grad+';display:flex;align-items:center;justify-content:center">'+
-        '<img src="onizleme/arena_'+a.id+'.png" style="width:88%;height:88%;object-fit:contain" loading="lazy"'+
+        '<img src="onizleme/arena_'+a.id+'.webp" style="width:100%;height:100%;object-fit:cover" loading="lazy"'+
         ' onerror="this.style.display=\'none\'"></div>'+
         '<div class="ad">'+a.ad+'</div><div class="desc">'+a.desc+'</div>';
       el.dataset.kTur='arena'; el.dataset.kId=a.id;
