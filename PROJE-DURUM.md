@@ -510,6 +510,15 @@ daha fazlası için seçenek: parçacıkları 20/sn, pixelRatio 2 → 1.5 (görs
 **8.6 — Dil kapsamı:** (8.11 ile büyük ölçüde kapandı) sözlükte karşılığı olmayan yeni metin
 Türkçe kalır — yeni arayüz metni eklerken DIL_EK'e de ekle.
 
+**8.13 — 3 Ekim 2026 düzeltmeleri:** Oyun Kur düğmeleri gerçek seçimi gösterir
+(`kurulumSecimEsitle`; Hızlı Oyna sonrası "İki Oyuncu" görünürken AI açılıyordu). İncelemede
+oynatırken ses/dil değişince oynatma takılmaz (`inceleOtoNesil`, `otoDevam`, `inceleSesDegisti`).
+Sınıf adları ekranda ARAYÜZ dilinde (`sinifAd(s)`; yorum kutusu `sinifAd(s, yorumDil)`), eksik
+çeviriler eklendi. İki kişilikte "Beyaz/Siyah doğruluğu". Hamle yazısı Manrope (Cinzel'de küçük
+harf yok). Kamera deliği: `LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES` + CSS "KAMERA DELİĞİ"
+bloğu (tam ekran katmanlara env(safe-area-inset-*) kadar saydam kenarlık, background-origin
+border-box). YENİ TAM EKRAN KATMAN EKLERSEN o listeye ekle. Yatay oyun sonu iki sütun.
+
 ---
 
 ## 9. YAYIN ENGELLERİ (hepsi kullanıcı tarafında)
