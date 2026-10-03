@@ -7016,8 +7016,8 @@ function menuKur(){
          DURUYORSA. Oynatma sürerken yeniden okumak, biten konuşmanın ardından
          fazladan bir ilerleme adımı doğurup hamleleri hızlandırıyordu.
          Oynatma sürüyorsa ses sessizce değişir, SONRAKİ hamlede duyulur. */
-      const oynuyor = (typeof inceleOtoCalisirken!=='undefined' && inceleOtoCalisirken);
-      if(!oynuyor && typeof inceleAktif!=='undefined' && inceleAktif && inceleSesAcik &&
+      if(inceleSesDegisti()) return;
+      if(typeof inceleAktif!=='undefined' && inceleAktif && inceleSesAcik &&
          typeof inceleYorumGoster==='function' && inceleIdx>=0){
         try{ inceleYorumGoster(); }catch(e){}
       }
@@ -7034,6 +7034,7 @@ function menuKur(){
       if(typeof Konus!=='undefined') Konus.sustur();
       /* Mevcut yorumları yeni dilde yeniden üret ve ekrandakini tazele */
       if(typeof oyunKaydi!=='undefined') for(const k of oyunKaydi){ if(k._kSinif) k._yorum=yorumUret(k._kSinif, k._sfNot, yorumDil); }
+      if(inceleSesDegisti()) return;
       if(typeof inceleYorumGoster==='function' && inceleAktif) inceleYorumGoster();
     };
   }
@@ -8726,7 +8727,7 @@ function inceleYorumGoster(otomatik){
   el.innerHTML=h;
   if(rakipHamlesi){
     /* 'Benim hamlelerim' kapsamında rakip hamlesi seslendirilmez; malzeme olayı ekranda yazılı kalır. */
-    if(otomatik){ setTimeout(()=>{ if(inceleOtoCalisirken) inceleOtoAdim(); }, 900); }
+    if(otomatik){ otoDevam(900); }
     return;
   }
   const sinif='';
@@ -8739,21 +8740,41 @@ function inceleYorumGoster(otomatik){
     const okunusMetni = (rakipMi ? (dil==='tr'?'Rakip, ':'Opponent: ') : '') + notasyonuSesleKurala(k.notasyon, dil);
     Konus.oku(okunusMetni+'. '+(olayMetni?olayMetni+' ':'')+konusmaMetni(yorum, dil), dil==='tr'?'tr-TR':'en-US', cins, ()=>{
       if(otomatik && inceleOtoCalisirken){
-        setTimeout(()=>{ if(inceleOtoCalisirken) inceleOtoAdim(); }, 700);
+        otoDevam(700);
       }
     });
   } else if(otomatik){
     // Ses kapalıysa kısa beklemeyle ilerle
-    setTimeout(()=>{ if(inceleOtoCalisirken) inceleOtoAdim(); }, 1800);
+    otoDevam(1800);
   }
 }
 function inceleOtoDur(){
-  inceleOtoCalisirken=false;
+  inceleOtoCalisirken=false; inceleOtoNesil++;
   if(inceleOtoTimer){ clearInterval(inceleOtoTimer); inceleOtoTimer=null; }
   const b=document.getElementById('iOtomatik'); if(b) b.innerHTML='▶ Oynat';
   if(typeof Konus!=='undefined') Konus.sustur();
 }
 let inceleOtoCalisirken=false;
+/* Oynatma nesli: her durdurmada artar. Bekleyen zamanlayıcılar yalnız kendi
+   neslinde ilerletir; böylece ses/dil değişince oynatma yeniden kurulabilir,
+   eski zincir ikinci bir ilerleme üretmez. */
+let inceleOtoNesil=0;
+function otoDevam(ms){
+  const n=inceleOtoNesil;
+  setTimeout(()=>{ if(inceleOtoCalisirken && n===inceleOtoNesil) inceleOtoAdim(); }, ms);
+}
+/* Dil/cinsiyet değişti: oynatma sürüyorsa durmadan devam etsin — o anki yorumu
+   yeni sesle baştan okur, bitince sıradaki hamleye geçer. Eskiden cinsiyet
+   değişince konuşma susturuluyor, bitiş haberi iptal edildiği için oynatma
+   "Durdur" görünürken takılı kalıyordu (sahibi buldu). */
+function inceleSesDegisti(){
+  if(!inceleOtoCalisirken) return false;
+  inceleOtoDur();
+  inceleOtoCalisirken=true;
+  const b=document.getElementById('iOtomatik'); if(b) b.innerHTML='⏸ Durdur';
+  if(inceleIdx>=0) inceleYorumGoster(true); else inceleOtoAdim();
+  return true;
+}
 function inceleKritikMi(k){
   // Antrenör YALNIZCA kritik anlarda konuşur: yanılgı, hata, vahim hata, kaçırılan fırsat.
   // Sıradan iyi/en iyi/tutarlı hamleler sessiz geçer.
@@ -8771,12 +8792,13 @@ function inceleOtoBasla(){
 }
 function inceleOtoAdim(){
   if(!inceleOtoCalisirken) return;
+  const _n=inceleOtoNesil;
   if(inceleIdx>=oyunKaydi.length-1){ inceleOtoDur(); return; }
   // Sonraki KRİTİK hamleye atla; aradaki sıradanları tahtada hızlıca göster ama konuşturma
   let hedef=inceleIdx+1;
   // Ara (sıradan) hamleleri tahtada hızlı oynat
   function araOynat(j){
-    if(!inceleOtoCalisirken) return;
+    if(!inceleOtoCalisirken || _n!==inceleOtoNesil) return;
     if(j>=hedef || !inceleAnalizVar){ kritikGoster(); return; }
     inceleIdx=j;
     konumGoster(j); vurguTemizle(); hamleVurgula(j);
@@ -8789,7 +8811,7 @@ function inceleOtoAdim(){
     while(hedef<oyunKaydi.length-1 && !inceleKritikMi(oyunKaydi[hedef])) hedef++;
   }
   function kritikGoster(){
-    if(!inceleOtoCalisirken) return;
+    if(!inceleOtoCalisirken || _n!==inceleOtoNesil) return;
     inceleIdx=hedef;
     konumGoster(hedef); vurguTemizle(); hamleVurgula(hedef);
     if(inceleAnalizVar && oyunKaydi[hedef] && oyunKaydi[hedef]._sfNot) dahaIyiOkGoster(hedef);
@@ -8807,7 +8829,7 @@ window.ttsBitti=function(id){
     if(Konus._bitti(id)) return;   // callback çalıştı; eski yola düşme
   }
   if(inceleOtoCalisirken){
-    setTimeout(()=>{ if(inceleOtoCalisirken) inceleOtoAdim(); }, 600);
+    otoDevam(600);
   }
 };
 function tahtadaIncelemeBitir(){
