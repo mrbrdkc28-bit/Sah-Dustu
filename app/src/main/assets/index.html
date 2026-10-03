@@ -1613,6 +1613,11 @@ body.azHareket .menuSlogan.yaz,body.azHareket .menuSlogan.sil{animation:none}
 #notListe,#notListeS,#notPanel,#notPanelSag,#saatKutu{font-family:'Manrope',sans-serif!important;font-variant-numeric:tabular-nums;font-weight:600}
 #notListe,#notListeS{font-size:12px!important}
 #saatKutu{font-weight:700}
+
+/* Bulmaca: hamle şeritleri gizli (bulmaca kartı alttakinin üstüne biniyordu, üstteki boş kalıyordu) */
+body:has(#bulmacaSerit.acik) .notSerit{display:none!important}
+#bulmacaSerit{border-radius:20px}
+#bulmacaSerit #bulmacaCik{border-radius:20px!important;padding:9px 20px!important;font-weight:600}
 </style>
 </head>
 <body>

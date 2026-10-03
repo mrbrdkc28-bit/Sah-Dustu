@@ -535,6 +535,17 @@ telefonda CDP ile renderer'ı 416x256'ya al, arena açısı pitch .40 yaw .75 uz
 pitch .26 yaw .38 uzak 4.3 hedef (0.2,.75,3.1), arena 'harp'; `toDataURL('image/webp',.82)`.
 Buzlu Cam teması: menü zemini boş, arkada canlı 3B sahne (ek çizim yükü yok, sahne zaten çiziliyor).
 
+**8.16 — Tasarım birliği (3 Ekim 2026, devam):** Tüm ekranlar aynı dil: seçili = dolu (Fildişi lacivert+altın,
+koyu temalarda altın), radius 12-16, ince çizgi SVG ikonlar (`window.IKON`, head'deki erken script; emoji
+YOK — yeni simge gerekirse oraya ekle). Çevrimiçi, Profil, Liderlik (sınıf tabanlı satırlar `.liderSatir`,
+`.ben`), Arkadaşlar, kilitli kartlar (`.kilitKart` + "Premium" rozeti), oyun içi HUD (cam düğmeler),
+seçenekler, yardım, inceleme. Hamle yazıları/listeleri Manrope (Cinzel'de küçük harf yok).
+Menü sloganı "Satranç her şeydir." (`.menuSlogan`): 10 sn'de bir silinip yeniden yazılır, renk döner;
+yazı tipi `SloganYazi` = Great Vibes/Aref Ruqaa/Ma Shan Zheng ALT KÜMELERİ (yalnız slogan harfleri) —
+slogan metni değişirse alt küme yeniden üretilmeli (fontTools pyftsubset). Grafik (oyun sonu): Stockfish
+`_cpBeyaz` ile avantaj grafiği. Menüye dönüşte `menuSahnesiniSifirla()` sahneyi başlangıca alır.
+Parçacıklar grafik kalitesine bağlı (`KADEME.*.parcacikMs`: 33/66/0). Lisanslar ekranında Yazı Tipleri bölümü.
+
 ---
 
 ## 9. YAYIN ENGELLERİ (hepsi kullanıcı tarafında)
