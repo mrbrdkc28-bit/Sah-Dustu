@@ -2889,9 +2889,12 @@ let grafikKademe = (()=>{
   }catch(e){ return 'orta'; }
 })();
 const KADEME={
-  dusuk:{ pixelRatio:1,   golge:true,  golgeBoyut:512,  bloom:false, yansima:false, doku:true },
-  orta: {  pixelRatio:1.5, golge:true,  golgeBoyut:1024, bloom:true,  yansima:false, doku:true  },
-  yuksek:{ pixelRatio:2,   golge:true,  golgeBoyut:2048, bloom:true,  yansima:true,  doku:true  },
+  dusuk:{ pixelRatio:1,   golge:true,  golgeBoyut:512,  bloom:false, yansima:false, doku:true, parcacikMs:0 },
+  orta: {  pixelRatio:1.5, golge:true,  golgeBoyut:1024, bloom:true,  yansima:false, doku:true, parcacikMs:66 },
+  yuksek:{ pixelRatio:2,   golge:true,  golgeBoyut:2048, bloom:true,  yansima:true,  doku:true, parcacikMs:33 },
+  /* parcacikMs: kül/kar/kum güncelleme aralığı. Telefonda ölçüldü (3 Ekim 2026): oyun ekranındaki
+     işlemci yükünün çoğu parçacıklardan (parçacıkla ~%160-200, parçacıksız ~%78; çizim 28/sn → 2/sn).
+     Yüksek aynı kalır; Orta yarı hızda; Düşük kapalı. */
 };
 /* Düşük grafik kademesinde menü parlamalarını kapat (zayıf GPU'da kare düşüyor) */
 try{ if(grafikKademe==='dusuk') document.body.classList.add('azHareket'); }catch(e){}
@@ -9565,10 +9568,12 @@ function dongu(){
      gözle fark edilmez, ama 120 Hz ekranda her karede çizim istemeleri tahtayı
      sürekli tam yükte tutuyordu. Geçen süre biriktirilir; hız değişmez. */
   const _simdi = (typeof performance!=='undefined'?performance.now():Date.now());
-  if(parcacikVar){
+  const _pms = (KADEME[grafikKademe] && KADEME[grafikKademe].parcacikMs!==undefined) ? KADEME[grafikKademe].parcacikMs : 33;
+  if(parcacikVar && _pms){
+    if(!parcacikSys.visible){ parcacikSys.visible=true; cizimIste(); }
     _parcacikBirikim += dt;
-    if(_simdi - _parcacikSon >= 33){ parcacikGuncelle(_parcacikBirikim,t); _parcacikBirikim=0; _parcacikSon=_simdi; cizimIste(); }
-  }
+    if(_simdi - _parcacikSon >= _pms){ parcacikGuncelle(_parcacikBirikim,t); _parcacikBirikim=0; _parcacikSon=_simdi; cizimIste(); }
+  } else if(parcacikVar && parcacikSys.visible){ parcacikSys.visible=false; cizimIste(); }   // Düşük: kapalı
   if(sahHalka){
     const sc=1+Math.sin(t*6)*.13;
     sahHalka.scale.set(sc,sc,1);
