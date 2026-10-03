@@ -1559,6 +1559,19 @@ html:not([data-tema="fildisi"]) .menuSlogan{color:#E0503F;text-shadow:0 2px 10px
 html[lang="ar"] .menuSlogan{font-size:22px;transform:rotate(-2deg)}
 html[lang="zh"] .menuSlogan{font-size:20px;letter-spacing:.08em}
 html[lang="ru"] .menuSlogan{font-size:23px}
+/* Canlı yazım (sahibin isteği): her 10 sn'de silinir, kalemle yazılır gibi baştan çıkar,
+   her seferinde sıradaki renge geçer. Hareket azaltma açıksa sabit kalır. */
+.menuSlogan{--sloganRenk:#B3261E;color:var(--sloganRenk);transition:color .6s ease}
+html:not([data-tema="fildisi"]) .menuSlogan{color:var(--sloganRenk)}
+.menuSlogan.yaz{animation:sloganYaz 2.6s cubic-bezier(.3,.12,.45,1) both}
+.menuSlogan.sil{animation:sloganSil .5s ease both}
+@keyframes sloganYaz{0%{clip-path:inset(-20% 100% -20% 0);filter:blur(1.2px)}
+  80%{filter:blur(0)}100%{clip-path:inset(-20% -4% -20% 0);filter:blur(0)}}
+@keyframes sloganSil{to{opacity:0;filter:blur(3px)}}
+html[dir="rtl"] .menuSlogan.yaz{animation-name:sloganYazRtl}
+@keyframes sloganYazRtl{0%{clip-path:inset(-20% 0 -20% 100%);filter:blur(1.2px)}
+  80%{filter:blur(0)}100%{clip-path:inset(-20% 0 -20% -4%);filter:blur(0)}}
+body.azHareket .menuSlogan.yaz,body.azHareket .menuSlogan.sil{animation:none}
 </style>
 </head>
 <body>
@@ -13858,6 +13871,31 @@ function devPanelAc(){
     aktifTema(), temaKur);
   etiketle();
   window.temaKur=temaKur;
+})();
+</script>
+<script>
+/* MENÜ SLOGANI — canlı yazım döngüsü (10 sn) */
+(function(){
+  const el=document.querySelector('.menuSlogan'), menu=document.getElementById('menu'); if(!el||!menu) return;
+  const ACIK=['#B3261E','#B07E22','#2B5197','#1F7A4D','#7A2E6E','#A2441C'];   // Fildişi
+  const KOYU=['#E0503F','#E8B64C','#7FA8E8','#5CC08A','#C77DBA','#E8894A'];   // koyu temalar
+  let i=0;
+  function renk(){ const p=document.documentElement.getAttribute('data-tema')==='fildisi'?ACIK:KOYU; return p[i%p.length]; }
+  function yaz(){
+    el.style.setProperty('--sloganRenk', renk());
+    el.classList.remove('sil','yaz'); void el.offsetWidth; el.classList.add('yaz');
+  }
+  function dongu(){
+    // Menü görünmüyorsa (oyun ekranı vb.) boşuna çalışma
+    if(menu.classList.contains('gizli') || getComputedStyle(menu).display==='none') return;
+    el.classList.remove('yaz'); el.classList.add('sil');
+    setTimeout(()=>{ i++; yaz(); }, 520);
+  }
+  yaz();
+  setInterval(dongu, 10000);
+  // Tema değişince o anki renk yeni paletten gelsin
+  new MutationObserver(()=>el.style.setProperty('--sloganRenk', renk()))
+    .observe(document.documentElement,{attributes:true,attributeFilter:['data-tema']});
 })();
 </script>
 </body>
