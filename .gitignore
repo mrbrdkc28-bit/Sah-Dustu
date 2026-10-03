@@ -25,3 +25,6 @@ build/
 
 # --- Yerel yedekler ---
 _yedek_*/
+
+# Geçici test dosyası
+app/src/main/assets/_eski_test.html

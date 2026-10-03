@@ -1189,6 +1189,24 @@ body.azHareket #son.acik *{animation:none!important}
   /* Çevrimiçi bilgi şeridi üstte HUD'a binmesin */
   #cevrimiciSerit{top:auto;bottom:150px;left:50%;right:auto;transform:translateX(-50%);max-width:90vw;text-align:center;font-size:11px;padding:6px 12px}
 }
+
+/* ---------- OYUN SONU: TAM EKRAN (3 Ekim 2026) ----------
+   Sahibin isteği: eski tam ekran ihtişamı geri. Dar opak kart kalktı; arka planda
+   oyunun son konumu bulanık görünür, başlık büyük, karne yarı saydam cam.
+   Kademeli giriş animasyonları ve altta sabit düğme alanı korunur. */
+#son{background:rgba(6,7,11,.66);backdrop-filter:blur(3px);padding:0}
+#sonKart{width:min(480px,100%);height:100%;max-height:none;background:none;border:none;
+  border-radius:0;box-shadow:none}
+#sonUst{background:none;border-bottom:none;padding:max(28px,env(safe-area-inset-top)) 20px 8px}
+#son h2{font-size:clamp(34px,8.5vw,58px);letter-spacing:.12em;margin:10px 0 6px;
+  text-shadow:0 4px 24px rgba(0,0,0,.6)}
+#son .alt{font-size:15px;letter-spacing:.08em}
+#sonGovde{padding:10px 16px 6px}
+.karne{background:rgba(14,17,26,.55);border-color:rgba(232,182,76,.28);border-radius:18px;
+  backdrop-filter:blur(2px)}
+.krDogPuan{font-size:40px}
+#sonAlan{border-top:none;background:linear-gradient(180deg,transparent,rgba(6,7,11,.85) 40%);
+  padding:14px 16px max(16px,env(safe-area-inset-bottom))}
 </style>
 </head>
 <body>
