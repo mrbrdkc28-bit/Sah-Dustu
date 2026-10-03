@@ -399,24 +399,42 @@ class MainActivity : AppCompatActivity() {
     private var enKadin: android.speech.tts.Voice? = null
     private var enErkek: android.speech.tts.Voice? = null
     private var enTara = false
+    /* INGILIZCE SES CINSIYETI — ACIK TABLO (Turkce'deki ders: bkz. TR_ERKEK).
+       Google ses adlarinda "male/female" GECMEZ ("en-us-x-iom-local"); eski kod bu
+       kelimeleri aradigi icin hicbir ses eslesmiyor, kadin ve erkek ICIN AYNI ses
+       seciliyordu (kullanici: "Ingilizce erkek seste sorun var"). */
+    private val EN_ERKEK = setOf("iol", "iom", "tpd", "gbb", "gbd", "rjs", "aub", "aud", "end")
+    private val EN_KADIN = setOf("sfg", "iob", "iog", "tpc", "tpf", "gba", "gbc", "gbg",
+                                 "afh", "aua", "auc", "ahp", "cxx", "ene")
+    private var enAyniSes = false   // telefonda ayri erkek ses yok: perdeyle ayirt edilir
+
     private fun ingilizceSes(kadin: Boolean): android.speech.tts.Voice? {
         if (!enTara) {
-            enTara = true
             try {
                 val hepsi = tts?.voices?.filter { it.locale.language == "en" } ?: emptyList()
-                val gomulu = hepsi.filter { !it.isNetworkConnectionRequired }
-                val agli = hepsi.filter { it.isNetworkConnectionRequired }
-                fun k(v: android.speech.tts.Voice) = v.name.lowercase().let {
-                    it.contains("female") || it.contains("#f") }
-                fun e(v: android.speech.tts.Voice) = v.name.lowercase().let {
-                    (it.contains("male") && !it.contains("female")) || it.contains("#m") }
-                enKadin = gomulu.filter { k(it) }.maxByOrNull { it.quality }
-                       ?: agli.filter { k(it) }.maxByOrNull { it.quality }
-                enErkek = gomulu.filter { e(it) }.maxByOrNull { it.quality }
-                       ?: agli.filter { e(it) }.maxByOrNull { it.quality }
-                val enIyi = gomulu.maxByOrNull { it.quality } ?: agli.maxByOrNull { it.quality }
+                if (hepsi.isEmpty()) return null       // bos taramayi onbellege alma
+                enTara = true
+                fun kod(v: android.speech.tts.Voice) =
+                    Regex("-x-([a-z]{3})").find(v.name.lowercase())?.groupValues?.getOrNull(1) ?: ""
+                fun kadinMi(v: android.speech.tts.Voice): Boolean {
+                    val n = v.name.lowercase()
+                    return n.contains("female") || n.contains("#f") || kod(v) in EN_KADIN
+                }
+                fun erkekMi(v: android.speech.tts.Voice): Boolean {
+                    val n = v.name.lowercase()
+                    return (n.contains("male") && !n.contains("female")) || n.contains("#m") || kod(v) in EN_ERKEK
+                }
+                // Siralama: once ABD, sonra Ingiltere, sonra digerleri; once gomulu (cevrimdisi)
+                fun puan(v: android.speech.tts.Voice): Int {
+                    val ulke = v.locale.country.uppercase()
+                    val u = when (ulke) { "US" -> 3; "GB" -> 2; else -> 1 }
+                    return u * 1000 + (if (v.isNetworkConnectionRequired) 0 else 500) + v.quality
+                }
+                enKadin = hepsi.filter { kadinMi(it) }.maxByOrNull { puan(it) }
+                enErkek = hepsi.filter { erkekMi(it) }.maxByOrNull { puan(it) }
+                val enIyi = hepsi.maxByOrNull { puan(it) }
                 if (enKadin == null) enKadin = enIyi
-                if (enErkek == null) enErkek = enIyi
+                if (enErkek == null) { enErkek = enKadin; enAyniSes = true }
             } catch (t: Throwable) {}
         }
         return if (kadin) enKadin else enErkek
@@ -620,7 +638,8 @@ class MainActivity : AppCompatActivity() {
                         val enSes = ingilizceSes(kadin)
                         if (enSes != null) tts?.voice = enSes
                         else tts?.language = Locale.ENGLISH
-                        tts?.setPitch(1.0f)
+                        // Ayri erkek ses yoksa erkegi perdeyle ayir (Turkce ile ayni yaklasim)
+                        tts?.setPitch(if (enAyniSes && !kadin) 0.86f else 1.0f)
                         tts?.setSpeechRate(0.98f)
                     }
                     // speak() DONUS DEGERI KONTROL EDILIR: hata donerse
@@ -674,6 +693,18 @@ class MainActivity : AppCompatActivity() {
                         .append("\"rol\":\"").append(rol).append("\"}")
                 }
                 sb.append("]")
+                return sb.toString()
+            }
+
+            /* Tani: Ingilizce sesler ve hangisinin kadin/erkek secildigi */
+            @JavascriptInterface
+            fun enSesler(): String {
+                ingilizceSes(true)
+                val sb = StringBuilder("kadin=" + (enKadin?.name ?: "-") + " erkek=" + (enErkek?.name ?: "-") +
+                        " ayni=" + enAyniSes + "\n")
+                tts?.voices?.filter { it.locale.language == "en" }?.sortedBy { it.name }?.forEach {
+                    sb.append(it.name).append(if (it.isNetworkConnectionRequired) " (ag)" else "").append("\n")
+                }
                 return sb.toString()
             }
 
