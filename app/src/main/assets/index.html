@@ -5363,12 +5363,13 @@ function dogrulukYaz(){
            hiçbir yerde görünmüyordu. Artık ikisi de yazılır. */
         const d=document.createElement('div');
         d.className='krSatir'; d.id='krDogSade';
-        d.innerHTML='<span class="krEt">Doğruluğun</span><span class="krSay">%'+dBen+'</span>';
+        /* İki kişilik oyunda "senin/rakibin" yok: Beyaz / Siyah yazılır */
+        d.innerHTML='<span class="krEt">'+(ikiKisilik?'Beyaz doğruluğu':'Doğruluğun')+'</span><span class="krSay">%'+dBen+'</span>';
         liste.insertBefore(d, liste.firstChild);
         if(dRak!==null && !document.getElementById('krDogSadeRak')){
           const r=document.createElement('div');
           r.className='krSatir'; r.id='krDogSadeRak';
-          r.innerHTML='<span class="krEt">Rakip doğruluğu</span><span class="krSay">%'+dRak+'</span>';
+          r.innerHTML='<span class="krEt">'+(ikiKisilik?'Siyah doğruluğu':'Rakip doğruluğu')+'</span><span class="krSay">%'+dRak+'</span>';
           liste.insertBefore(r, d.nextSibling);
         }
       }
@@ -5862,7 +5863,11 @@ const SINIF_BILGI={
 };
 function sinifSembol(s){ const b=SINIF_BILGI[s]; return b?b.sembol:''; }
 function sinifRenk(s){ const b=SINIF_BILGI[s]; return b?b.renk:'#9FB4C7'; }
-function sinifAd(s){ const b=SINIF_BILGI[s]; const d=(typeof yorumDil!=='undefined'?yorumDil:'tr'); return b?(b.ad[d]||b.ad.tr):''; }
+/* Ekrandaki sınıf adları ARAYÜZ dilinde: Türkçe ad yazılır, dil gözcüsü çevirir.
+   Eskiden sesli yorumun dili (TR/EN) kullanılıyordu: ses İngilizceye alınınca
+   Türkçe arayüzde oyun sonu çipleri "Mistake/Blunder" görünüyordu.
+   dil verilirse (inceleme yorum kutusu) o dilde döner — yorum metniyle aynı dilde. */
+function sinifAd(s, dil){ const b=SINIF_BILGI[s]; if(!b) return ''; return dil ? (b.ad[dil]||b.ad.tr) : b.ad.tr; }
 function yorumUret(kalite, sfNot, dil){
   const Y=YORUM[dil]||YORUM.tr;
   const grup = Y[kalite] || Y.iyi;
@@ -8693,7 +8698,7 @@ function inceleYorumGoster(otomatik){
   const bilgi = sn && SINIF_BILGI[sn] ? SINIF_BILGI[sn] : null;
   const renk = bilgi ? bilgi.renk : '#9FA8B5';
   const sem  = bilgi ? (bilgi.sembol||'•') : '•';
-  const ad   = bilgi ? sinifAd(sn) : '';
+  const ad   = bilgi ? sinifAd(sn, (typeof yorumDil!=='undefined'?yorumDil:'tr')) : '';
 
   /* 1. satır: rozet + notasyon + sınıf adı + kayıp */
   let h='<div class="iySatir">';
@@ -11023,6 +11028,20 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVR.push([/^Siyah: (.*)$/, {en:'Black: $1', ru:'Чёрные: $1', ar:'الأسود: $1', fr:'Noirs : $1', de:'Schwarz: $1', it:'Nero: $1', zh:'黑方：$1'}]);
   if(CEVM['"şah" de'] && !CEVM['"şah" de'].ar) CEVM['"şah" de'].ar='قل «şah»';
   CEVM['Kadın']={en:'Female',ru:'Женский',ar:'أنثى',fr:'Femme',de:'Weiblich',it:'Donna',zh:'女声'};
+  /* Hamle sınıfı adları (chess.com terimleri) + karne etiketleri; eskiden çoğu çevrilmiyordu,
+     'Yanılgı' yanlışlıkla Blunder'a eşlenmişti (doğrusu Inaccuracy). */
+  CEVM["Harika"]={"en": "Great", "ru": "Отлично", "ar": "رائع", "fr": "Très bien", "de": "Stark", "it": "Ottima", "zh": "好棋"};
+  CEVM["Mükemmel"]={"en": "Excellent", "ru": "Превосходно", "ar": "ممتاز", "fr": "Excellent", "de": "Exzellent", "it": "Eccellente", "zh": "极佳"};
+  CEVM["Kitap"]={"en": "Book", "ru": "Теория", "ar": "نظري", "fr": "Théorique", "de": "Theorie", "it": "Teoria", "zh": "开局库"};
+  CEVM["Parlak"]={"en": "Brilliant", "ru": "Блестяще", "ar": "عبقري", "fr": "Brillant", "de": "Brillant", "it": "Brillante", "zh": "妙着"};
+  CEVM["En İyi"]={"en": "Best", "ru": "Лучший", "ar": "الأفضل", "fr": "Meilleur", "de": "Bester", "it": "Migliore", "zh": "最佳"};
+  CEVM["İyi"]={"en": "Good", "ru": "Хорошо", "ar": "جيد", "fr": "Bon", "de": "Gut", "it": "Buona", "zh": "好"};
+  CEVM["Yanılgı"]={"en": "Inaccuracy", "ru": "Неточность", "ar": "عدم دقة", "fr": "Imprécision", "de": "Ungenauigkeit", "it": "Imprecisione", "zh": "不准确"};
+  CEVM["Vahim"]={"en": "Blunder", "ru": "Зевок", "ar": "خطأ فادح", "fr": "Gaffe", "de": "Patzer", "it": "Errore grave", "zh": "大错"};
+  CEVM["Doğruluğun"]={"en": "Your accuracy", "ru": "Ваша точность", "ar": "دقتك", "fr": "Ta précision", "de": "Deine Genauigkeit", "it": "La tua precisione", "zh": "你的准确率"};
+  CEVM["Rakip doğruluğu"]={"en": "Opponent accuracy", "ru": "Точность соперника", "ar": "دقة الخصم", "fr": "Précision de l'adversaire", "de": "Genauigkeit Gegner", "it": "Precisione dell'avversario", "zh": "对手准确率"};
+  CEVM['Beyaz doğruluğu']={en:'White accuracy',ru:'Точность белых',ar:'دقة الأبيض',fr:'Précision des Blancs',de:'Genauigkeit Weiß',it:'Precisione del Bianco',zh:'白方准确率'};
+  CEVM['Siyah doğruluğu']={en:'Black accuracy',ru:'Точность чёрных',ar:'دقة الأسود',fr:'Précision des Noirs',de:'Genauigkeit Schwarz',it:'Precisione del Nero',zh:'黑方准确率'};
   CEVM['Erkek']={en:'Male',ru:'Мужской',ar:'ذكر',fr:'Homme',de:'Männlich',it:'Uomo',zh:'男声'};
   // İlk dil uygulaması bu bloktan önce çalıştı: ek SOZLUK girdileri için yeniden uygula.
   try{ dilUygula(); }catch(e){}
