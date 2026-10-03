@@ -8,6 +8,7 @@
 <script>
 /* Tema: ilk boyamadan önce uygula (varsayılan Fildişi) */
 window.GOZ_A='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>';window.GOZ_K='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5c2 0 3.7.7 5.1 1.7M21.5 12S18 18.5 12 18.5c-2 0-3.7-.7-5.1-1.7"/><path d="M4 20 20 4"/></svg>';
+window.PM_IK={"kilit": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"5\" y=\"11\" width=\"14\" height=\"9.5\" rx=\"2.2\"/><path d=\"M8 11V8a4 4 0 0 1 8 0v3\"/><path d=\"M12 15v2\"/></svg>", "reklam": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"5.5\" width=\"18\" height=\"12\" rx=\"2\"/><path d=\"M10.2 9.2v5.6l4.6-2.8z\" fill=\"currentColor\"/><path d=\"M8.5 20.5h7\"/></svg>", "tac": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4.5 18.5h15M5.2 18.5 4 8.5l4.6 3.6L12 5.5l3.4 6.6L20 8.5l-1.2 10\"/></svg>", "bekle": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"/><path d=\"M12 7.5V12l3 2\"/></svg>"};
 window.IKON={"sesAcik": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 9.5h3.5L12 5.5v13l-4.5-4H4z\"/><path d=\"M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11\"/></svg>", "sesKapali": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 9.5h3.5L12 5.5v13l-4.5-4H4z\"/><path d=\"m16 9.5 5 5M21 9.5l-5 5\"/></svg>", "ayar": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 2.8v2.4M12 18.8v2.4M4.2 7.5l2.1 1.2M17.7 15.3l2.1 1.2M4.2 16.5l2.1-1.2M17.7 8.7l2.1-1.2\"/><circle cx=\"12\" cy=\"12\" r=\"6.6\"/></svg>", "mik": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"9\" y=\"3.5\" width=\"6\" height=\"11\" rx=\"3\"/><path d=\"M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5M9 20.5h6\"/></svg>", "sohbet": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4.5 6.5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-4 3.5v-3.5h0a2 2 0 0 1-1.5-2z\"/></svg>", "duz": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"/><path d=\"M4 9.3h16M4 14.7h16M9.3 4v16M14.7 4v16\"/></svg>", "etiket": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.4 0z\"/><circle cx=\"8\" cy=\"8\" r=\"1.4\"/></svg>", "yardim": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"/><path d=\"M9.6 9.5a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2 1-1.2 1.8v.5\"/><path d=\"M12 17.2v.1\"/></svg>", "sahne": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3.5\" y=\"9\" width=\"17\" height=\"11\" rx=\"1.5\"/><path d=\"m3.8 9 15.6-4.4.6 2.4L4.4 11.3M8 6.8l2.6 3.3M13 5.4l2.6 3.3\"/></svg>", "yeni": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"6.5\" r=\"2.6\"/><path d=\"M9.6 9.6h4.8M10.3 9.8 9.4 16h5.2l-.9-6.2M7.5 19.5h9M8.6 16h6.8l1 3.5h-8.8z\"/></svg>", "ara": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"10.5\" cy=\"10.5\" r=\"6\"/><path d=\"m15 15 5 5\"/></svg>", "oynat": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 5.5v13l10.5-6.5z\" fill=\"currentColor\"/></svg>", "durdur": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8.5 5.5v13M15.5 5.5v13\"/></svg>", "basa": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6.5 5.5v13M18 6l-8.5 6 8.5 6z\"/></svg>", "sona": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M17.5 5.5v13M6 6l8.5 6L6 18z\"/></svg>", "dinle": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 9.5h3.5L12 5.5v13l-4.5-4H4z\"/><path d=\"M15.5 9a4 4 0 0 1 0 6\"/></svg>", "tahta": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"/><path d=\"M4 12h16M12 4v16\"/><path d=\"M4 4h8v8H4zM12 12h8v8h-8z\" fill=\"currentColor\" stroke=\"none\" opacity=\".35\"/></svg>"};
 (function(){ var t='fildisi'; try{ t=localStorage.getItem('c64_tema')||'fildisi'; }catch(e){}
   if(t!=='klasik') document.documentElement.setAttribute('data-tema', t); })();
@@ -1684,6 +1685,27 @@ html:not([data-tema="fildisi"]) .girisSlogan{color:#E0503F}
 html[data-tema="fildisi"] #btnGiris{background:linear-gradient(180deg,#232838,#12151f);color:#E8B64C;box-shadow:0 8px 20px rgba(20,22,30,.22)}
 html[data-tema="fildisi"] #girisForm input{background:#fffdf8;border-color:rgba(120,95,50,.18)}
 #btnGoogle{border-radius:14px!important;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+
+/* ===== KİLİTLİ İÇERİK PENCERESİ (3 Ekim 2026) ===== */
+.pmKutu{max-width:340px;width:100%;text-align:center;padding:26px 22px 16px;border-radius:24px;
+  background:radial-gradient(120% 70% at 50% 0%,rgba(232,182,76,.14),transparent 60%),linear-gradient(170deg,#171a26,#0b0d14 80%);
+  border:1px solid rgba(232,182,76,.32);box-shadow:0 24px 60px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);animation:pmGel .28s ease both}
+@keyframes pmGel{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.pmKilit{width:58px;height:58px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#E8B64C;
+  background:radial-gradient(circle at 35% 30%,rgba(232,182,76,.25),rgba(232,182,76,.06));border:1px solid rgba(232,182,76,.45)}
+.pmKilit svg{width:26px;height:26px}
+.pmBaslik{font-family:'Cinzel',Georgia,serif;font-weight:700;color:#F0E9D8;font-size:18px;letter-spacing:.1em;margin-bottom:8px}
+.pmMetin{color:#aaa497;font-size:13px;line-height:1.55;margin-bottom:18px}
+.pmKutu button{font-family:inherit;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:10px}
+.pmKutu button svg{width:20px;height:20px;flex-shrink:0}
+.pmPremium{padding:13px 14px;margin-bottom:10px;border-radius:16px;border:none;color:#1a1408;
+  background:linear-gradient(180deg,#F2CC6E,#D69F33);box-shadow:0 10px 24px rgba(232,182,76,.28),inset 0 1px 0 rgba(255,255,255,.45)}
+.pmPAd{display:flex;flex-direction:column;align-items:flex-start;line-height:1.15}
+.pmPAd b{font-family:'Cinzel',serif;font-size:15px;letter-spacing:.08em}
+.pmPAd small{font-size:11px;font-weight:600;opacity:.72;margin-top:2px}
+.pmReklam{padding:12px 14px;margin-bottom:6px;border-radius:16px;border:1px solid rgba(232,182,76,.5);background:rgba(232,182,76,.06);
+  color:#E8D9B0;font-size:14px;font-weight:600}
+.pmVazgec{padding:10px;border:none;background:none;color:#7d7868;font-size:13px}
 </style>
 </head>
 <body>
@@ -1770,7 +1792,7 @@ html[data-tema="fildisi"] #girisForm input{background:#fffdf8;border-color:rgba(
 
   <div class="kartlar">
     <button class="anaKart" id="oyunaDonKart" style="display:none">
-      <div class="kartIkon">⏵</div>
+      <div class="kartIkon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg></div>
       <div class="kartMetin">
         <div class="kartAd">OYUNA DÖN</div>
         <div class="kartAlt">Devam eden çevrimiçi oyunun var</div>
@@ -2162,7 +2184,7 @@ html[data-tema="fildisi"] #girisForm input{background:#fffdf8;border-color:rgba(
           <span>Sesli Geri Bildirim<br><small style="color:var(--dim);font-size:11px">Anladığı hamleyi sesle tekrarlar</small></span>
           <button class="secToggle acik" id="secSesGeri">•</button>
         </div>
-        <button class="hbtn" id="secSesTest" style="width:100%;margin-top:6px">🎤 Mikrofonu Dene</button>
+        <button class="hbtn" id="secSesTest" style="width:100%;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5M9 20.5h6"/></svg><span>Mikrofonu Dene</span></button>
         <div id="secSesTanı" style="display:none;margin-top:8px;padding:8px;border:1px solid var(--line);border-radius:8px;font-family:ui-monospace,monospace;font-size:10.5px;color:var(--dim);white-space:pre-wrap"></div>
       </div>
     </div>
@@ -11658,6 +11680,11 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Grafik için önce Analiz Et']={en:'Tap Analyze first to see the graph',ru:'Сначала нажмите «Анализ»',ar:'اضغط تحليل أولاً لعرض الرسم',fr:'Lancez d’abord l’analyse',de:'Zuerst analysieren',it:'Prima avvia l’analisi',zh:'请先进行分析'};
   CEVM['Yazı Tipleri']={en:'Fonts',ru:'Шрифты',ar:'الخطوط',fr:'Polices',de:'Schriftarten',it:'Caratteri',zh:'字体'};
   CEVM['Tümünü oku']={en:'Read all',ru:'Читать всё',ar:'قراءة الكل',fr:'Tout lire',de:'Alles vorlesen',it:'Leggi tutto',zh:'全部朗读'};
+  CEVM['Premium Al']={en:'Go Premium',ru:'Купить Premium',ar:'احصل على المميز',fr:'Passer Premium',de:'Premium holen',it:'Passa a Premium',zh:'获取高级版'};
+  CEVM['reklamsız, hepsi açık']={en:'no ads, everything unlocked',ru:'без рекламы, всё открыто',ar:'بلا إعلانات، كل شيء مفتوح',fr:'sans pub, tout débloqué',de:'werbefrei, alles freigeschaltet',it:'senza pubblicità, tutto sbloccato',zh:'无广告，全部解锁'};
+  CEVM['Reklam İzle']={en:'Watch Ad',ru:'Смотреть рекламу',ar:'مشاهدة الإعلان',fr:'Regarder une pub',de:'Werbung ansehen',it:'Guarda la pubblicità',zh:'观看广告'};
+  CEVM['Reklam yükleniyor…']={en:'Loading ad…',ru:'Загрузка рекламы…',ar:'جارٍ تحميل الإعلان…',fr:'Chargement de la pub…',de:'Werbung wird geladen…',it:'Caricamento pubblicità…',zh:'广告加载中…'};
+  CEVM['Mikrofonu Dene']={en:'Test Microphone',ru:'Проверить микрофон',ar:'اختبر الميكروفون',fr:'Tester le micro',de:'Mikrofon testen',it:'Prova il microfono',zh:'测试麦克风'};
   CEVM['Tema']={en:'Theme',ru:'Тема',ar:'المظهر',fr:'Thème',de:'Design',it:'Tema',zh:'主题'};
   CEVM['Dil']={en:'Language',ru:'Язык',ar:'اللغة',fr:'Langue',de:'Sprache',it:'Lingua',zh:'语言'};
   CEVM['Fildişi']={en:'Ivory',ru:'Слоновая кость',ar:'عاجي',fr:'Ivoire',de:'Elfenbein',it:'Avorio',zh:'象牙白'};
@@ -12129,20 +12156,22 @@ function pmPencereAc(tur){
     ?'Analizi açmak için kısa bir reklam izle — ya da Premium ile sınırsız analiz yap.'
     :'Bu içeriği 24 saatliğine açmak için kısa bir reklam izle — ya da Premium ile her şeyi kalıcı aç.';
   const kut=document.createElement('div');
-  kut.style.cssText='max-width:340px;width:100%;background:linear-gradient(165deg,#151823,#0B0D14 75%);border:1px solid #3a382f;border-radius:14px;padding:20px;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.6)';
-  const b1=document.createElement('div'); b1.textContent='🔒'; b1.style.cssText='font-size:30px;margin-bottom:6px';
-  const b2=document.createElement('div'); b2.textContent='Kilitli İçerik'; b2.style.cssText="font-family:'Cinzel',Georgia,serif;color:#E8E2D2;font-size:17px;letter-spacing:.08em;margin-bottom:8px";
-  const b3=document.createElement('div'); b3.textContent=metin; b3.style.cssText='color:#a9a493;font-size:13px;line-height:1.5;margin-bottom:16px';
-  const btnR=document.createElement('button'); btnR.textContent='📺 Reklam İzle'; btnR.id='pmReklamBtn';
-  btnR.style.cssText='display:block;width:100%;padding:12px;margin-bottom:8px;border-radius:10px;border:1px solid var(--brass,#B99A5B);background:rgba(185,154,91,.12);color:#E8E2D2;font-size:14px;cursor:pointer;font-family:inherit';
-  btnR.onclick=pmReklamIste;
-  const btnP=document.createElement('button'); btnP.textContent='⭐ Premium Al — reklamsız, hepsi açık';
-  btnP.style.cssText='display:block;width:100%;padding:12px;margin-bottom:8px;border-radius:10px;border:1px solid #3a382f;background:#141722;color:#cfc9ba;font-size:13px;cursor:pointer;font-family:inherit';
+  /* Kilitli içerik penceresi (3 Ekim 2026): emoji yerine çizgi ikonlar, premium görünüm.
+     Premium altın dolgulu ana düğme, reklam altın çerçeveli ikincil seçenek. */
+  kut.className='pmKutu';
+  const b1=document.createElement('div'); b1.className='pmKilit'; b1.innerHTML=window.PM_IK.kilit;
+  const b2=document.createElement('div'); b2.textContent='Kilitli İçerik'; b2.className='pmBaslik';
+  const b3=document.createElement('div'); b3.textContent=metin; b3.className='pmMetin';
+  const btnP=document.createElement('button'); btnP.className='pmPremium';
+  btnP.innerHTML=window.PM_IK.tac+'<span class="pmPAd"><b>Premium Al</b><small>reklamsız, hepsi açık</small></span>';
   btnP.onclick=pmSatinAlIste;
-  const btnV=document.createElement('button'); btnV.textContent='Vazgeç';
-  btnV.style.cssText='display:block;width:100%;padding:10px;border-radius:10px;border:none;background:none;color:#7d7868;font-size:13px;cursor:pointer;font-family:inherit';
+  const btnR=document.createElement('button'); btnR.id='pmReklamBtn'; btnR.className='pmReklam';
+  btnR.innerHTML=window.PM_IK.reklam+'<span>Reklam İzle</span>';
+  btnR.onclick=pmReklamIste;
+  const btnV=document.createElement('button'); btnV.textContent='Vazgeç'; btnV.className='pmVazgec';
   btnV.onclick=()=>{ pmBekleyen=null; pmPencereKapat(); };
-  kut.append(b1,b2,b3,btnR,btnP,btnV);
+  kut.append(b1,b2,b3,btnP,btnR,btnV);
+  try{ if(typeof agacTara==='function') agacTara(kut); }catch(e){}
   p.appendChild(kut);
   document.body.appendChild(p);
 }
@@ -12161,7 +12190,8 @@ function pmDugmeDurum(yukleniyor){
   if(!b) return;
   b.disabled=!!yukleniyor;
   b.style.opacity=yukleniyor?'.55':'1';
-  b.textContent=yukleniyor?'⏳ Reklam yükleniyor…':'📺 Reklam İzle';
+  b.innerHTML=(yukleniyor?window.PM_IK.bekle:window.PM_IK.reklam)+'<span>'+(yukleniyor?'Reklam yükleniyor…':'Reklam İzle')+'</span>';
+  try{ if(typeof agacTara==='function') agacTara(b); }catch(e){}
 }
 function pmReklamIste(){
   const b=document.getElementById('pmReklamBtn');
