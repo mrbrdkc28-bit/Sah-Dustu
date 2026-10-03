@@ -482,8 +482,22 @@ Açık gözlemler: yatayda solda kamera çentiği bölgesi siyah şerit (cutout 
 Cinzel yazı tipiyle "f3" → "F3" görünüyor (Cinzel'de küçük harf yok; piyon hamlesi taş
 hamlesi gibi okunabilir).
 
-**8.6 — Dil kapsamı:** yeni sesli oynama arayüz metinlerinin bir kısmı için
-ru/ar karşılığı yok; sözlükte karşılığı olmayan metin Türkçe kalır.
+**8.11 — Diller (3 Ekim 2026): tr, en, ru, ar + fr, de, it, zh.** Eklemeler `DIL_EK` bloğunda
+(HAMLE_SAYI'nın hemen arkasında), açılışta SOZLUK/CEVM/CEVR'e birleştirilir:
+fr/de/it/zh tüm mevcut metinlere; en/ru/ar'da hiç çevrilmeyen ~150 arayüz metni (arena/ordu
+ad+açıklama, arkadaşlar, giriş/kayıt hataları, hesap silme, şikâyet, analiz yorumları,
+lisans metni); 291 açılış adı 7 dilde; kodda `tr()?…:…` ile İngilizce üretilen mesajlar
+İngilizce anahtarla. Ülke adları `Intl.DisplayNames` ile otomatik. `cev()` artık eksikte
+Türkçeye değil İngilizceye düşer. Boşluk/satır sonu farkı olan metinler de eşleşir.
+Arapça'da `dir=rtl` (menü, giriş, yardım, oyun ekranı tarayıcıda kontrol edildi; tahta
+olduğu gibi kalır). Dil düğmeleri: TR EN RU AR FR DE IT 中文; telefon dili otomatik.
+Android `res/values*`: bildirim kanalı adı/açıklaması ve satın alma mesajı 8 dilde.
+SINIRLAR: sesli oynama ve sesli anlatım yalnız tr/en (diğer dillerde İngilizce);
+anlatım yorumları (yorumDil) tr/en. Çeviriler Claude'un — yayından önce her dilin ana
+dili konuşanlarca gözden geçirilmeli (özellikle ar, zh). Gizlilik politikası yalnız TR+EN.
+
+**8.6 — Dil kapsamı:** (8.11 ile büyük ölçüde kapandı) sözlükte karşılığı olmayan yeni metin
+Türkçe kalır — yeni arayüz metni eklerken DIL_EK'e de ekle.
 
 ---
 

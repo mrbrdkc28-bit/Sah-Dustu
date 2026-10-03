@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bildirim_kanal_ad">دور اللعب</string>
+    <string name="bildirim_kanal_aciklama">إشعار عندما يلعب خصمك نقلته</string>
+    <string name="satin_alma_yakinda">عمليات الشراء قادمة قريبًا</string>
+</resources>

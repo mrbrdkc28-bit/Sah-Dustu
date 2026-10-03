@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bildirim_kanal_ad">Turno di gioco</string>
+    <string name="bildirim_kanal_aciklama">Ti avvisa quando l\'avversario ha mosso</string>
+    <string name="satin_alma_yakinda">Gli acquisti arriveranno presto</string>
+</resources>

@@ -575,7 +575,7 @@ class MainActivity : AppCompatActivity() {
             fun satinAlBaslat() {
                 runOnUiThread {
                     Toast.makeText(this@MainActivity,
-                        "Satın alma yakında eklenecek", Toast.LENGTH_SHORT).show()
+                        getString(R.string.satin_alma_yakinda), Toast.LENGTH_SHORT).show()
                 }
             }
         }, "AndroidKopru")
@@ -1333,10 +1333,10 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val kanal = NotificationChannel(
                 BILDIRIM_KANAL,
-                "Oyun Sırası",
+                getString(R.string.bildirim_kanal_ad),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Rakip hamle yaptığında bildirim"
+                description = getString(R.string.bildirim_kanal_aciklama)
             }
             val mgr = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             mgr.createNotificationChannel(kanal)

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bildirim_kanal_ad">Tour de jeu</string>
+    <string name="bildirim_kanal_aciklama">Vous prévient quand votre adversaire a joué</string>
+    <string name="satin_alma_yakinda">Les achats arrivent bientôt</string>
+</resources>

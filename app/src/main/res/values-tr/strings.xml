@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bildirim_kanal_ad">Oyun Sırası</string>
+    <string name="bildirim_kanal_aciklama">Rakip hamle yaptığında bildirim</string>
+    <string name="satin_alma_yakinda">Satın alma yakında eklenecek</string>
+</resources>

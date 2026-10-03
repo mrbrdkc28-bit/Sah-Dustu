@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bildirim_kanal_ad">轮到你走棋</string>
+    <string name="bildirim_kanal_aciklama">对手走棋时通知你</string>
+    <string name="satin_alma_yakinda">购买功能即将推出</string>
+</resources>

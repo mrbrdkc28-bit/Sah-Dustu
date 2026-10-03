@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bildirim_kanal_ad">Ваш ход</string>
+    <string name="bildirim_kanal_aciklama">Уведомление, когда соперник сделал ход</string>
+    <string name="satin_alma_yakinda">Покупки скоро появятся</string>
+</resources>
