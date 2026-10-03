@@ -12112,6 +12112,8 @@ const SesOyun = (function(){
   let uyandirmaZaman=null;
   let yenidenBaslatZaman=null;
   let sonHataZaman=0, ustUsteHata=0;
+  let bosOturum=0;            // kesintisiz modda hiç söz gelmeden biten oturum sayısı
+  const SUREKLI_MS=180000;    // kesintisiz oturum süresi (3 dk; bitince yeniden açılır)
 
   // ---------- ayar kalıcılığı ----------
   function yukle(){
@@ -12218,7 +12220,11 @@ const SesOyun = (function(){
         yenidenBaslatZaman=setTimeout(baslatDinleme, 350);
         return;
       }
-      k.dinle(dilKodu());
+      /* Eller serbest / uyandırma: Android 13+'ta tek kesintisiz oturum. Eski yol
+         her ~5 sn kapanıp açılıyordu: aradaki boşlukta sözün başı kayboluyor,
+         çoğu cihazda her açılışta bip çalıyordu (telefonda ölçüldü). */
+      if(ayar.mik!=='bas' && k.surekliDestek && k.surekliDestek()) k.dinleSurekli(dilKodu(), SUREKLI_MS);
+      else k.dinle(dilKodu());
     }catch(e){}
   }
   function durdurDinleme(){ const k=KOPRU(); try{ if(k) k.dur(); }catch(e){} }
@@ -12408,7 +12414,20 @@ const SesOyun = (function(){
     else if(d==='konusma'){ /* ses geldi */ }
     else if(d==='isliyor'){ dinliyor=false; if(!bekleyen) bar(tr()?'Çözümlüyorum…':'Working…'); }
     else if(d==='bitti'){ dinliyor=false; if(!bekleyen) bar(null); }
+    else if(d==='duraklatildi'){ dinliyor=false; belkiYenidenAc(500); }   // biz konuşuyoruz, bitince devam
+    else if(d==='oturum_bitti'){
+      dinliyor=false;
+      // Sıra sendeyken 15 dk hiç ses gelmediyse pil için dur; mikrofon düğmesi yeniden açar.
+      if(++bosOturum>=5){ bosOturum=0; bar(tr()?'Uzun süre ses gelmedi — mikrofona dokun':'No voice for a while — tap the mic',{sure:4000}); }
+      else belkiYenidenAc(250);
+    }
     dugmeDurum();
+  };
+  // Kesintisiz oturumda her sözce: oturum açık kalır.
+  window.sesBolum=function(liste){
+    if(!liste||!liste.length) return;
+    bosOturum=0;
+    try{ isle(liste); }catch(e){ bar(tr()?'Hata: '+e.message:'Error',{sure:2000}); }
   };
   window.sesSeviye=function(r){ if(dinliyor) dalga(r); };
   window.sesOnSonuc=function(liste){
@@ -12618,6 +12637,19 @@ const SesOyun = (function(){
     dugmeleriBagla();
     arayuzuTazele();
   }
+
+  /* Güvenlik ağı (eller serbest): sıra sendeyken mikrofon herhangi bir sebeple
+     kapalı kaldıysa (kaçan olay, istemci hatası, yarış) kendiliğinden yeniden aç.
+     Canlı denemede bir istemci hatasından sonra döngü kopmuştu. */
+  setInterval(()=>{
+    try{
+      if(!ayar.acik || ayar.mik!=='oto' || bekleyen || !oyunEkraniAcikMi() || !benimSiraMi()) return;
+      if(typeof oyunBitti!=='undefined' && oyunBitti) return;
+      const k=KOPRU(); if(!k || !k.dinliyorMu) return;
+      if(k.dinliyorMu() || (k.ttsKonusuyorMu && k.ttsKonusuyorMu())) return;
+      belkiYenidenAc(0);
+    }catch(e){}
+  }, 2500);
 
   // Sıra bize geçince otomatik dinle (oto mod)
   function siraDegisti(){

@@ -87,6 +87,57 @@ class MainActivity : AppCompatActivity() {
     private var sesOturum = 0                 // kacinci dinleme oturumu
     private var sonDil = "tr-TR"
     private var taniciYenilensin = false      // bir sonraki dinlemede sifirdan kur
+    /* KESINTISIZ OTURUM (eller serbest). Eski yontem her ~5 sn'de oturumu kapatip
+       yeniden aciyordu (telefonda olculdu: dakikada 11 oturum, aralarda ~0.7 sn
+       sagir bosluk, cogu cihazda her acilista bip). Android 13+ "segmented
+       session" ile tek oturum dakikalarca acik kalir, her sozce ayri sonuc verir. */
+    private var surekliOturum = false
+    private var surekliSure = 180000L
+    private var taniciCihazda = false   // mevcut tanici cihaz ustu mu
+    /* Eller serbest dongusu ANDROID tarafinda: oturum sessizlikle bitince JS'e
+       gitmeden ~50 ms'de yeniden acilir (JS uzerinden ~0.7 sn bosluk oluyordu).
+       surekliAktif: dongu acik; iptal() / TTS konusmasi / sure dolumu kapatir. */
+    private var surekliAktif = false
+    private var surekliBekleyen = false
+    private var surekliBaslangic = 0L
+    /* Google tanima servisi her oturum acilisinda "open", bos oturum sonunda
+       "failure" bipi calar (USAGE_NOTIFICATION_EVENT; logcat'te goruldu). Eller
+       serbestte bu ~10 sn'de bir bip demek. Dongu acikken bildirim kanali susturulur,
+       dongu bitince / arka plana gecince geri acilir. Cokme olursa bir sonraki
+       acilista acilir (tercihte iz tutulur). */
+    private var bildirimSusturuldu = false
+    private val bildirimAcIsi = Runnable { bildirimSesiAc() }
+
+    private fun bildirimSesiKapat() {
+        anaKuyruk.removeCallbacks(bildirimAcIsi)
+        if (bildirimSusturuldu) return
+        try {
+            val am = getSystemService(AUDIO_SERVICE) as android.media.AudioManager
+            if (am.isStreamMute(android.media.AudioManager.STREAM_NOTIFICATION)) return
+            am.adjustStreamVolume(android.media.AudioManager.STREAM_NOTIFICATION,
+                                  android.media.AudioManager.ADJUST_MUTE, 0)
+            bildirimSusturuldu = true
+            getSharedPreferences("ses", MODE_PRIVATE).edit().putBoolean("bildirimSustu", true).apply()
+        } catch (t: Throwable) { /* izin yok (Rahatsiz Etmeyin vb.): bip kalir */ }
+    }
+    private fun bildirimSesiAc() {
+        anaKuyruk.removeCallbacks(bildirimAcIsi)
+        if (!bildirimSusturuldu &&
+            !getSharedPreferences("ses", MODE_PRIVATE).getBoolean("bildirimSustu", false)) return
+        try {
+            val am = getSystemService(AUDIO_SERVICE) as android.media.AudioManager
+            am.adjustStreamVolume(android.media.AudioManager.STREAM_NOTIFICATION,
+                                  android.media.AudioManager.ADJUST_UNMUTE, 0)
+        } catch (t: Throwable) {}
+        bildirimSusturuldu = false
+        getSharedPreferences("ses", MODE_PRIVATE).edit().putBoolean("bildirimSustu", false).apply()
+    }
+    /** Son "failure" bipi de susturulsun diye kisa gecikmeyle ac. */
+    private fun bildirimSesiBirazSonraAc() {
+        anaKuyruk.removeCallbacks(bildirimAcIsi)
+        anaKuyruk.postDelayed(bildirimAcIsi, 700L)
+    }
+    private var cihazdaKullanilamaz = false  // cihaz ustu dil hatasi verdi: cevrimici yola don
     private var sonBaslatma = 0L
     private var hazirBekcisi: Runnable? = null
     private var otoTekrar = 0                 // ERROR_CLIENT sonrasi tek seferlik otomatik tekrar
@@ -384,6 +435,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        bildirimSesiAc()   // onceki oturum susturulmus halde coktuyse geri ac
 
         // Ekrani acik tut. Sistem navigasyon cubugu (alt tuslar) GORUNUR kalsin ki
         // kullanici oyundan cikabilsin; sadece ust durum cubugunu gizle, icerik altina kaymasin.
@@ -542,6 +594,15 @@ class MainActivity : AppCompatActivity() {
                 // sonsuza kadar bekliyordu. Artik her durumda haber verilir.
                 if (!ttsHazir) { konusmaBitti(id); return }
                 runOnUiThread {
+                    if (surekliAktif || (surekliOturum && dinliyor)) {
+                        dinliyor = false
+                        surekliOturum = false
+                        surekliAktif = false
+                        surekliBekleyen = false
+                        taniciYenilensin = true
+                        try { tanici?.cancel() } catch (t: Throwable) {}
+                        jsSes("if(window.sesDurum)window.sesDurum('duraklatildi');")
+                    }
                     val tr = !dil.startsWith("en")
                     if (tr) {
                         // Cinsiyete gore GERCEKTEN farkli ses sec
@@ -770,6 +831,58 @@ class MainActivity : AppCompatActivity() {
             @JavascriptInterface
             fun dinle(dilKodu: String) { runOnUiThread { dinlemeBaslat(dilKodu) } }
 
+            /** Eller serbest: sureMs boyunca tek oturumda dinler (Android 13+). */
+            @JavascriptInterface
+            fun dinleSurekli(dilKodu: String, sureMs: Int) {
+                runOnUiThread {
+                    // Dongu zaten aciksa JS'in her sonuc sonrasi istegini yok say.
+                    if (surekliAktif && (dinliyor || surekliBekleyen || hazirBekcisi != null)) return@runOnUiThread
+                    surekliAktif = true
+                    surekliBaslangic = android.os.SystemClock.uptimeMillis()
+                    bildirimSesiKapat()
+                    dinlemeBaslat(dilKodu, true, sureMs.toLong())
+                }
+            }
+
+            @JavascriptInterface
+            fun surekliDestek(): Boolean = Build.VERSION.SDK_INT >= 33
+
+            /** Tani: cihaz ustu tanima var mi, hangi diller kurulu/destekli. Sonuc window.sesTani(json). */
+            @JavascriptInterface
+            fun cihazdaTani(dilKodu: String) {
+                runOnUiThread {
+                    val o = JSONObject()
+                    o.put("sdk", Build.VERSION.SDK_INT)
+                    if (Build.VERSION.SDK_INT >= 31) {
+                        o.put("cihazUstu", try { SpeechRecognizer.isOnDeviceRecognitionAvailable(this@MainActivity) } catch (t: Throwable) { false })
+                    }
+                    if (Build.VERSION.SDK_INT >= 33) {
+                        try {
+                            val r = SpeechRecognizer.createOnDeviceSpeechRecognizer(this@MainActivity)
+                            val niyet = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                                .putExtra(RecognizerIntent.EXTRA_LANGUAGE, dilKodu)
+                            r.checkRecognitionSupport(niyet, mainExecutor, object : android.speech.RecognitionSupportCallback {
+                                override fun onSupportResult(d: android.speech.RecognitionSupport) {
+                                    o.put("kurulu", JSONArray(d.installedOnDeviceLanguages))
+                                    o.put("indirilebilir", JSONArray(d.supportedOnDeviceLanguages).length())
+                                    o.put("bekleyen", JSONArray(d.pendingOnDeviceLanguages))
+                                    o.put("cevrimici", JSONArray(d.onlineLanguages).length())
+                                    jsSes("if(window.sesTani)window.sesTani(" + JSONObject.quote(o.toString()) + ");")
+                                    try { r.destroy() } catch (t: Throwable) {}
+                                }
+                                override fun onError(hata: Int) {
+                                    o.put("destekHata", hata)
+                                    jsSes("if(window.sesTani)window.sesTani(" + JSONObject.quote(o.toString()) + ");")
+                                    try { r.destroy() } catch (t: Throwable) {}
+                                }
+                            })
+                            return@runOnUiThread
+                        } catch (t: Throwable) { o.put("istisna", t.toString()) }
+                    }
+                    jsSes("if(window.sesTani)window.sesTani(" + JSONObject.quote(o.toString()) + ");")
+                }
+            }
+
             /** Kullanici konusmayi bitirdi (bas-birak): sonucu isle. */
             @JavascriptInterface
             fun dur() { runOnUiThread { try { tanici?.stopListening() } catch (t: Throwable) {} } }
@@ -779,6 +892,10 @@ class MainActivity : AppCompatActivity() {
             fun iptal() {
                 runOnUiThread {
                     dinliyor = false
+                    surekliOturum = false
+                    surekliAktif = false
+                    surekliBekleyen = false
+                    bildirimSesiBirazSonraAc()
                     bekciIptal()
                     taniciYenilensin = true
                     try { tanici?.cancel() } catch (t: Throwable) {}
@@ -787,7 +904,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             @JavascriptInterface
-            fun dinliyorMu(): Boolean = dinliyor
+            fun dinliyorMu(): Boolean =
+                dinliyor || (surekliAktif && (surekliBekleyen || hazirBekcisi != null))  // acilis arasi da sayilir
 
             /** TTS su anda konusuyor mu — mikrofonu kendi sesimizle doldurmamak icin. */
             @JavascriptInterface
@@ -930,7 +1048,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     /** Dinlemeyi baslatir. SpeechRecognizer YALNIZCA ana is parcaciginda kullanilabilir. */
-    private fun dinlemeBaslat(dilKodu: String) {
+    private fun dinlemeBaslat(dilKodu: String, surekli: Boolean = false, sure: Long = 180000L) {
+
         // 1) Kendi TTS'imiz konusuyorsa mikrofonu acma: kendi sesini duyar.
         if (try { tts?.isSpeaking == true } catch (t: Throwable) { false }) {
             sesSonHata = "tts konusuyor"
@@ -957,15 +1076,25 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (dinliyor) { try { tanici?.cancel() } catch (t: Throwable) {} }
+        /* Bolumlu oturumu YALNIZ cihaz ustu tanici destekliyor: cevrimici Google
+           tanicisi istegi yok sayip 5 sn'de kapaniyordu (telefonda denendi). */
+        val bolumlu = surekli && Build.VERSION.SDK_INT >= 33 && !cihazdaKullanilamaz &&
+            (try { SpeechRecognizer.isOnDeviceRecognitionAvailable(this) } catch (t: Throwable) { false })
+        surekliOturum = false
+        surekliSure = sure
 
         /* SpeechRecognizer ORNEGI YENIDEN KULLANILAMAZ.
            Ayni ornekle birkac oturum sonra ERROR_CLIENT (kod 5) gelir ve bir daha
            duzelmez — Android'in bilinen davranisi. Bu yuzden her dinleme oturumu
            icin tanici sifirdan kurulur, oturum bitince yok edilir.
            Maliyeti ~50 ms; alternatifi birkac hamle sonra ozelligin olmesi. */
-        if (tanici == null || taniciYenilensin) {
+        if (tanici == null || taniciYenilensin || taniciCihazda != bolumlu) {
             taniciYok(true)
-            tanici = try { SpeechRecognizer.createSpeechRecognizer(this) } catch (t: Throwable) { null }
+            tanici = try {
+                if (bolumlu) SpeechRecognizer.createOnDeviceSpeechRecognizer(this)
+                else SpeechRecognizer.createSpeechRecognizer(this)
+            } catch (t: Throwable) { null }
+            taniciCihazda = bolumlu
             if (tanici == null) {
                 sesSonHata = "tanici olusturulamadi"
                 jsSes("if(window.sesHata)window.sesHata('servis_yok','');")
@@ -1007,10 +1136,27 @@ class MainActivity : AppCompatActivity() {
                          hata == SpeechRecognizer.ERROR_RECOGNIZER_BUSY) && otoTekrar < 1) {
                         otoTekrar++
                         taniciYok()
-                        anaKuyruk.postDelayed({ dinlemeBaslat(sonDil) }, 420L)
+                        // Eller serbest dongusu aciksa tekrar da o modda olsun; eskiden duz
+                        // oturum aciliyor, sonuc gelince dongu kopuyordu (telefonda goruldu).
+                        anaKuyruk.postDelayed({
+                            if (surekliAktif) dinlemeBaslat(sonDil, true, surekliSure) else dinlemeBaslat(sonDil)
+                        }, 420L)
                         return
                     }
                     otoTekrar = 0
+                    if (surekliAktif && (hata == SpeechRecognizer.ERROR_NO_MATCH ||
+                                         hata == SpeechRecognizer.ERROR_SPEECH_TIMEOUT)) {
+                        surekliYenidenAc(); return
+                    }
+                    // Cihaz ustu tanicida dil yok/indirilmemis: bu oturumda cevrimici yola don.
+                    if (taniciCihazda && (hata == 12 || hata == 13 || hata == 14)) {
+                        cihazdaKullanilamaz = true
+                        surekliOturum = false
+                        taniciYok()
+                        anaKuyruk.postDelayed({ dinlemeBaslat(sonDil) }, 300L)
+                        return
+                    }
+                    surekliOturum = false
                     jsSes("if(window.sesHata)window.sesHata(" + JSONObject.quote(et) + ",'');")
                 }
                 override fun onResults(sonuc: Bundle?) {
@@ -1018,12 +1164,26 @@ class MainActivity : AppCompatActivity() {
                     dinliyor = false
                     taniciYenilensin = true          // oturum bitti, sonraki icin yenile
                     otoTekrar = 0
-                    sonuclariGonder(sonuc, true)
+                    if (surekliAktif) {
+                        sonuclariGonder(sonuc, true, "sesBolum")   // JS icin oturum suruyor
+                        surekliYenidenAc()
+                    } else sonuclariGonder(sonuc, true)
                 }
                 override fun onPartialResults(sonuc: Bundle?) {
                     sonuclariGonder(sonuc, false)
                 }
                 override fun onEvent(tur: Int, p: Bundle?) {}
+                // Kesintisiz oturum: her sozce bitince (oturum acik kalir)
+                override fun onSegmentResults(bolum: Bundle) {
+                    sonuclariGonder(bolum, true, "sesBolum")
+                }
+                override fun onEndOfSegmentedSession() {
+                    bekciIptal()
+                    dinliyor = false
+                    surekliOturum = false
+                    taniciYenilensin = true
+                    jsSes("if(window.sesDurum)window.sesDurum('oturum_bitti');")
+                }
             })
         }
 
@@ -1045,7 +1205,14 @@ class MainActivity : AppCompatActivity() {
             if (sesCevrimdisiTercih && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
             }
+            if (bolumlu) {
+                // Oturum en az surekliSure acik kalir; sozceler sessizlikte bolunur.
+                putExtra(RecognizerIntent.EXTRA_SEGMENTED_SESSION,
+                         RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS)
+                putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, surekliSure)
+            }
         }
+        surekliOturum = bolumlu
         sonDil = dilKodu
         sonBaslatma = android.os.SystemClock.uptimeMillis()
         sesOturum++
@@ -1072,6 +1239,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** Eller serbest: oturumu yeni tanici ile hemen ac; sure dolduysa JS'e haber ver. */
+    private fun surekliYenidenAc() {
+        taniciYok()
+        if (android.os.SystemClock.uptimeMillis() - surekliBaslangic > surekliSure) {
+            surekliAktif = false
+            bildirimSesiBirazSonraAc()
+            jsSes("if(window.sesDurum)window.sesDurum('oturum_bitti');")
+            return
+        }
+        surekliBekleyen = true
+        anaKuyruk.postDelayed({
+            surekliBekleyen = false
+            if (surekliAktif) dinlemeBaslat(sonDil, true, surekliSure)
+        }, 50L)
+    }
+
     private fun bekciIptal() {
         hazirBekcisi?.let { try { anaKuyruk.removeCallbacks(it) } catch (t: Throwable) {} }
         hazirBekcisi = null
@@ -1093,10 +1276,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     /** n-best listesini ve varsa guven skorlarini JSON olarak JS'e verir. */
-    private fun sonuclariGonder(sonuc: Bundle?, kesin: Boolean) {
+    private fun sonuclariGonder(sonuc: Bundle?, kesin: Boolean, hedef: String = "") {
         val liste = sonuc?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
         if (liste == null || liste.isEmpty()) {
-            if (kesin) jsSes("if(window.sesHata)window.sesHata('anlasilmadi','');")
+            // Kesintisiz oturumda bos bolum normaldir (oksuruk, gurultu): sessiz gec.
+            if (kesin && hedef.isEmpty()) jsSes("if(window.sesHata)window.sesHata('anlasilmadi','');")
             return
         }
         val skorlar = try { sonuc.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES) } catch (t: Throwable) { null }
@@ -1109,7 +1293,7 @@ class MainActivity : AppCompatActivity() {
         }
         // JSON'u JS string literali olarak kacir, sonra JS tarafinda parse et.
         val yuk = JSONObject.quote(dizi.toString())
-        val fn = if (kesin) "sesSonuc" else "sesOnSonuc"
+        val fn = if (hedef.isNotEmpty()) hedef else if (kesin) "sesSonuc" else "sesOnSonuc"
         jsSes("if(window.$fn)window.$fn(JSON.parse($yuk));")
     }
 
@@ -1188,6 +1372,9 @@ class MainActivity : AppCompatActivity() {
         // Arka plana gecerken mikrofonu MUTLAKA birak: acik kalirsa hem pil yer
         // hem de kullanici "dinleniyorum" hissi yasar.
         bekciIptal()
+        surekliAktif = false
+        surekliBekleyen = false
+        bildirimSesiAc()
         if (dinliyor) {
             dinliyor = false
             taniciYok()
@@ -1209,6 +1396,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         // Once bayrak: bu andan sonra konusmaBitti() WebView'e dokunmaz.
         webViewYok = true
+        bildirimSesiAc()
         try { anaKuyruk.removeCallbacksAndMessages(null) } catch (t: Throwable) {}
         try { tts?.setOnUtteranceProgressListener(null) } catch (t: Throwable) {}
         try { tts?.stop() } catch (t: Throwable) {}

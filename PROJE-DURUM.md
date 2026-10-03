@@ -444,6 +444,34 @@ Hızlı Oyna kilitli ordu/arenayı açıyordu.
 Test araçları depoda değil: debug derlemede `setWebContentsDebuggingEnabled(true)`,
 `adb forward tcp:9222 localabstract:webview_devtools_remote_<pid>`.
 
+**8.9 — Eller serbest sesli oynama (3 Ekim 2026, YARIM KALDI).**
+Ölçülen sorunlar (telefonda, CDP + logcat):
+- Eski döngü her ~5 sn oturumu kapatıp JS üzerinden ~0.7 sn'de yeniden açıyordu
+  (dakikada 11 oturum); aradaki boşlukta sözün başı kayboluyor.
+- Google tanıma servisi (com.google.android.as) her açılışta "open", boş oturum
+  sonunda "failure" bipi çalıyor — USAGE_NOTIFICATION_EVENT (bildirim kanalı).
+- Segmented session (EXTRA_SEGMENTED_SESSION, API 33) ne çevrimiçi ne cihaz üstü
+  tanıyıcıda çalışmadı: oturum yine 5-10 sn'de NO_MATCH ile bitiyor.
+- Cihaz üstü tanıyıcı var, tr-TR paketi kurulu (`AndroidSes.cihazdaTani`).
+Yapılan (kodda, kısmen test edildi):
+- Kotlin: `dinleSurekli`/`surekliDestek`; döngü Android tarafında (`surekliAktif`,
+  `surekliYenidenAc`, ~50 ms + tanıyıcı açılışı ~0.6 sn); cihaz üstü tanıyıcı
+  (dil hatasında çevrimiçiye döner); TTS konuşunca oturum duraklar ('duraklatildi');
+  sonuçlar `sesBolum` ile gelir; döngü açıkken bildirim kanalı susturulur, kapanınca /
+  onPause / onCreate'te açılır (zaten kapalıysa dokunulmaz); ERROR_CLIENT tekrarı
+  eller serbest modu korur.
+- JS: `sesBolum`, 'oturum_bitti' (15 dk sessizlikte durur), 'duraklatildi';
+  sıra sendeyken mikrofon kapalıysa 2.5 sn'de açan güvenlik ağı (setInterval).
+Canlı deneme: "piyon e4", "piyon c3", "at f3'e" doğru anlaşılıp oynandı; ardından
+döngü koptu (ERROR_CLIENT sonrası düz oturum + sıra değişimi kaçtı). Düzeltme yazıldı
+ama DERLENMEDİ/DENENMEDİ; ikinci denemede de durdu (sebebi incelenmedi).
+SIRADAKİ: (1) Kotlin `dinleSurekli` korumasına ve `dinliyorMu()`'ya
+`hazirBekcisi != null` (açılış arası) eklenmeli — yoksa JS güvenlik ağı açılmakta olan
+oturumu ikinci kez başlatıp ERROR_CLIENT üretebilir; (2) derle, kur, logla canlı dene
+(`scratchpad/taslar/seslog.js` benzeri olay kaydı); (3) olmazsa seçenek: Vosk
+(çevrimdışı, sürekli, gramer kısıtlı; APK +~40 MB) — sahibin onayı gerekir.
+Test için: `adb shell pm grant com.emre.sahdustu android.permission.RECORD_AUDIO`.
+
 **8.6 — Dil kapsamı:** yeni sesli oynama arayüz metinlerinin bir kısmı için
 ru/ar karşılığı yok; sözlükte karşılığı olmayan metin Türkçe kalır.
 
