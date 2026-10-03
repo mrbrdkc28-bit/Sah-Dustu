@@ -1,0 +1,70 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+
+    <!-- DEVRILMIS SAH
+         Klasik satranc sahi (hac + tac + govde + taban) 62 derece devrilmis.
+         Adaptive icon guvenli alani: merkez 66x66. Figur bu alanda kaliyor. -->
+    <group
+        android:pivotX="54" android:pivotY="56"
+        android:rotation="62"
+        android:scaleX="1.15" android:scaleY="1.15">
+
+        <!-- Golge (derinlik) -->
+        <group android:translateX="1.5" android:translateY="2">
+            <path android:fillColor="#40000000"
+                android:pathData="M50,26 h8 v7 h7 v8 h-7 v6 h-8 v-6 h-7 v-8 h7 z"/>
+            <path android:fillColor="#40000000"
+                android:pathData="M42,47 h24 l-3,10 h-18 z"/>
+            <path android:fillColor="#40000000"
+                android:pathData="M45,57 h18 l3,20 h-24 z"/>
+            <path android:fillColor="#40000000"
+                android:pathData="M38,77 h32 v9 h-32 z"/>
+        </group>
+
+        <!-- HAC (tepe) -->
+        <path android:pathData="M50,26 h8 v7 h7 v8 h-7 v6 h-8 v-6 h-7 v-8 h7 z">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="linear"
+                    android:startX="43" android:startY="26" android:endX="65" android:endY="47">
+                    <item android:offset="0.0" android:color="#FFF3D98A"/>
+                    <item android:offset="1.0" android:color="#FFD89A32"/>
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- TAC (yaka) -->
+        <path android:pathData="M42,47 h24 l-3,10 h-18 z">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="linear"
+                    android:startX="42" android:startY="47" android:endX="66" android:endY="57">
+                    <item android:offset="0.0" android:color="#FFF3D98A"/>
+                    <item android:offset="1.0" android:color="#FFC98A28"/>
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- GOVDE (konik) -->
+        <path android:pathData="M45,57 h18 l3,20 h-24 z">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="linear"
+                    android:startX="42" android:startY="57" android:endX="66" android:endY="77">
+                    <item android:offset="0.0" android:color="#FFE8B64C"/>
+                    <item android:offset="1.0" android:color="#FFB87B22"/>
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- TABAN -->
+        <path android:pathData="M38,77 h32 v9 h-32 z">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="linear"
+                    android:startX="38" android:startY="77" android:endX="70" android:endY="86">
+                    <item android:offset="0.0" android:color="#FFF3D98A"/>
+                    <item android:offset="1.0" android:color="#FFC98A28"/>
+                </gradient>
+            </aapt:attr>
+        </path>
+    </group>
+</vector>

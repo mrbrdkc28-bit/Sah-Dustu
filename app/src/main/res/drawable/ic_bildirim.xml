@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bildirim ikonu: tek renk (beyaz) piyon. Android bildirim cubugunda
+     yalnizca saydamlik kullanilir, renkler yok sayilir. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,2.5a3.2,3.2 0,0 1,1.9 5.8c1.3,0.6 2.1,1.6 2.1,2.7h-2.3c0.3,2.3 1.3,4.4 2.8,6.1H7.5c1.5,-1.7 2.5,-3.8 2.8,-6.1H8c0,-1.1 0.8,-2.1 2.1,-2.7A3.2,3.2 0,0 1,12 2.5zM6,18.5h12a1,1 0,0 1,1 1v1.5H5v-1.5a1,1 0,0 1,1 -1z"/>
+</vector>

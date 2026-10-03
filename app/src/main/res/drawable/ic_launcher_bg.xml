@@ -1,0 +1,31 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+
+    <!-- Derin bordo taban: koyu lacivertten daha canli, kalabalikta ayrisir -->
+    <path android:fillColor="#2E1119" android:pathData="M0,0h108v108h-108z"/>
+
+    <!-- Satranc deseni: hafif kontrast (dokuyu belli eder, bogmaz) -->
+    <path android:fillColor="#3D1622" android:pathData="M0,0h27v27h-27z"/>
+    <path android:fillColor="#3D1622" android:pathData="M54,0h27v27h-27z"/>
+    <path android:fillColor="#3D1622" android:pathData="M27,27h27v27h-27z"/>
+    <path android:fillColor="#3D1622" android:pathData="M81,27h27v27h-27z"/>
+    <path android:fillColor="#3D1622" android:pathData="M0,54h27v27h-27z"/>
+    <path android:fillColor="#3D1622" android:pathData="M54,54h27v27h-27z"/>
+    <path android:fillColor="#3D1622" android:pathData="M27,81h27v27h-27z"/>
+    <path android:fillColor="#3D1622" android:pathData="M81,81h27v27h-27z"/>
+
+    <!-- Merkezi isik halesi: sahi one cikarir, derinlik katar -->
+    <path android:pathData="M54,54m-48,0a48,48 0,1 1,96 0a48,48 0,1 1,-96 0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="54" android:centerY="50" android:gradientRadius="48">
+                <item android:offset="0.0" android:color="#33E8B64C"/>
+                <item android:offset="0.6" android:color="#12E8B64C"/>
+                <item android:offset="1.0" android:color="#00000000"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

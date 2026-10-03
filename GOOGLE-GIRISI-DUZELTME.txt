@@ -1,0 +1,37 @@
+GOOGLE ILE GIRIS: "Bu alan adi Firebase'de yetkili degil" HATASI
+
+SEBEP
+Uygulama sayfayi su adresten sunuyor:
+    https://appassets.androidplatform.net/assets/index.html
+Firebase Authentication ise yalnizca "Authorized domains" listesindeki
+alan adlarindan gelen giris isteklerini kabul eder. Bu alan adi listede
+olmadigi icin Google girisi reddediliyor.
+
+Bu bir KOD hatasi degil, Firebase Console ayaridir.
+
+COZUM (2 dakika)
+1. Firebase Console > sol menu: Build > Authentication
+2. Ust sekmelerden "Settings" (Ayarlar)
+3. "Authorized domains" (Yetkili alan adlari) bolumu
+4. "Add domain" (Alan adi ekle) butonuna bas
+5. Su alan adini ekle:
+
+       appassets.androidplatform.net
+
+6. Kaydet. Degisiklik aninda etkili olur.
+
+PC TARAFI ICIN
+PC'de tarayicidan aciyorsan, oradaki alan adi da listede olmali:
+  - localhost              (yerel test icin, genelde hazir gelir)
+  - 127.0.0.1              (yerel test)
+  - kendi alan adin        (siteye koyduysan)
+
+NOT
+Listede zaten su ikisi hazir bulunur ve SILINMEMELIDIR:
+  chess64-c6ff1.firebaseapp.com
+  chess64-c6ff1.web.app
+
+KONTROL
+Ekledikten sonra uygulamayi kapatip ac, "Google ile Giris Yap" dene.
+Hala hata verirse hata metnini not al: artik kod hatanin tam kodunu
+yaziyor (ornek: auth/unauthorized-domain).

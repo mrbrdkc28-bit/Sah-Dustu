@@ -1,0 +1,461 @@
+# ŞAH DÜŞTÜ — Proje Durum Dosyası
+
+> **Bu dosya ne işe yarar:** Yeni bir sohbete başlarken bunu proje bilgi tabanına
+> (Project knowledge) yükle. Kod "ne olduğunu" anlatır; bu dosya **neden öyle
+> olduğunu, neyin denenip elendiğini ve neyin açık kaldığını** anlatır. Bu bilgi
+> hiçbir kaynak dosyada yazmıyor ve her yeni sohbette sıfırdan keşfedilmesi
+> gerekiyor — ya da bu dosya okunur.
+>
+> Son güncelleme: 29 Eylül 2026 · Doğrulama: aşağıdaki tüm sürüm/ayar değerleri
+> `C:\Users\Emre\Desktop\SahDustu` içindeki gerçek dosyalardan okunarak yazıldı.
+
+---
+
+## 1. Proje nedir
+
+Android için 3B satranç oyunu. Mimari alışılmadık: oyunun **tamamı tek bir dev
+`index.html`** içinde (Three.js + saf JS satranç motoru), Kotlin tarafı yalnızca
+bir WebView kabuğu ve yerli Android yeteneklerine köprü.
+
+| | |
+|---|---|
+| Paket adı | `com.emre.sahdustu` |
+| Depo (GPL yükümlülüğü) | https://github.com/mrbrdkc28-bit/Sah-Dustu |
+| Ana dosya | `app/src/main/assets/index.html` — **~1.25 MB, ~11.300 satır** |
+| Kabuk | `app/src/main/java/com/emre/sahdustu/MainActivity.kt` — ~56 KB |
+| Yayın durumu | **Henüz yayında değil.** Bölüm 9'daki engeller açık. |
+
+### Klasör haritası
+```
+SahDustu/
+├─ app/src/main/
+│  ├─ AndroidManifest.xml
+│  ├─ java/com/emre/sahdustu/MainActivity.kt
+│  └─ assets/
+│     ├─ index.html          ← oyunun tamamı
+│     ├─ KREDILER.txt        ← lisans/atıf metni (uygulama içinde gösterilir)
+│     ├─ engine/             ← Stockfish wasm
+│     ├─ models/             ← GLB taş setleri
+│     ├─ dokular/  onizleme/  sfx/
+├─ privacy_YENI.html         ← GİZLİLİK POLİTİKASI — HENÜZ YAYINLANMADI
+├─ VARLIK-REHBERI.md         ← ⚠ BAYAT, bkz. Bölüm 8
+├─ README.md · FIRESTORE-GUVENLIK-KURALLARI.txt · GOOGLE-GIRISI-DUZELTME.txt
+└─ keystore.properties.ORNEK ← gerçeği yok, oluşturulacak (Bölüm 9)
+```
+
+---
+
+## 2. Derleme yapılandırması — ve neden bu sürümler
+
+**Bu zincire dokunmadan önce Bölüm 7'yi oku.** Sürümler keyfî değil, ölçülerek seçildi.
+
+| Bileşen | Sürüm |
+|---|---|
+| compileSdk / targetSdk | 36 |
+| minSdk | 26 |
+| versionCode / versionName | 2 / "1.3" |
+| Java / Kotlin jvmTarget | 17 |
+| AGP | 8.5.2 |
+| Gradle | 8.7 |
+| Kotlin (KGP) | **2.1.21 — zorunlu, tercih değil** |
+| google-services | 4.4.2 |
+| play-services-ads | **24.0.0** |
+| firebase-bom | 33.1.2 (auth + firestore) |
+| androidx | core-ktx 1.13.1 · appcompat 1.7.0 · webkit 1.11.0 |
+
+### Sürüm zincirinin gerekçesi (ölçüldü)
+
+Reklam SDK'sı sürümleri şu Kotlin metadata'sını dayatıyor:
+
+```
+play-services-ads 23.6.0  →  Kotlin 1.9 metadata
+play-services-ads 24.0.0  →  Kotlin 2.1 metadata
+play-services-ads 25.4.0  →  Kotlin 2.3 metadata
+```
+
+- **23.6.0'da kalınamaz:** cihazda `Unable to obtain a JavascriptEngine` (kod 0)
+  hatası test reklamlarında bile geliyordu.
+- **25.4.0'a çıkılamaz:** Kotlin 2.3 gerekir, o da büyük olasılıkla Gradle ve
+  AGP'yi de oynatmayı gerektirir.
+- **Sonuç: Kotlin 2.1.21 + ads 24.0.0.** KGP 2.1.21 uyumluluk aralığı
+  Gradle 7.6.3–8.12.1 ve AGP 7.3.1–8.7.2; projenin Gradle 8.7 / AGP 8.5.2
+  ikilisi aralık içinde, bu yüzden **Gradle ve AGP'ye dokunulmadı**.
+
+`gradle.properties` içinde `android.suppressUnsupportedCompileSdk=36` var:
+AGP 8.5.2 resmen compileSdk 34'e kadar test edilmiş, 36 ile derliyor ama uyarıyor.
+**Yapılacak (ertelendi):** AGP 8.9+ — ayrı iş.
+
+### Reklam bayrağı
+`MainActivity.kt` içinde `private val REKLAM_TEST = BuildConfig.DEBUG`.
+Elle değiştirilen bayrak kaldırıldı; debug → test reklamı, release → gerçek reklam.
+`buildFeatures { buildConfig = true }` bu yüzden açık.
+**Güvenlik notu:** release derlemesinde kendi cihazında reklama tıklama —
+AdMob geçersiz trafik nedeniyle hesabı kapatabilir.
+
+---
+
+## 3. Mimari
+
+### 3.1 `index.html` — başlıca modüller
+
+| Modül / fonksiyon | İş |
+|---|---|
+| `Motor` (IIFE, ~1727. satır) | Satranç kuralları. `legal()`, `yap()`, `gerial()`, `notasyon()`, `durum()`, `fenYukle()`, `tasAl()` |
+| `Konus` | TTS sarmalayıcı — **nesil sayacı** ile zincir güvenliği (bkz. 7.2/7.3) |
+| `SesKomut` | Sesli komut ayrıştırıcı (yeni) |
+| `SesOyun` | Sesli oynama çalışma zamanı (yeni) |
+| `dokun(cx,cy)` | Tahtaya dokunma — tek giriş noktası |
+| `hamleBaslat(h)` → `hamleOnayAsamasi(h)` → `hamleOyna(h)` | Hamle uygulama zinciri (terfi + onay ayarı burada) |
+| `vurguGoster(kareler, seciliKare)` / `vurguTemizle()` | Kare vurgulama |
+| `hudGuncelle()` | Üst bar; her hamleden sonra çağrılır (sesli oynama kancası burada) |
+| `tasRenkleri()` / `malzeme(c)` | Taş rengi koşullandırma (bkz. 5.5) |
+| `winYuzde` / `hamleDogruluk` | Lichess doğruluk modeli (bkz. 5.1) |
+| `ACILISLAR` | ~306 giriş açılış kitabı |
+| `nesneyiSerbestBirak(kok, dokuDa)` | Three.js bellek boşaltma, paylaşılan geometriyi atlar |
+| `agacTara` / `dilGozcu` (MutationObserver) | Otomatik çeviri: TR metin düğümlerini sözlükten çevirir |
+
+**Global durum değişkenleri** (script kapsamında `let`):
+`mod` ('2p'/'ai'), `oyunBitti`, `kilit`, `secili`, `legalSet`, `gozdenGecir`,
+`aktifInsanRenk`, `cevrimiciAktif`, `bulmacaModu`, `yorumDil` ('tr'/'en'),
+`sesProfili` (`{dil, cinsiyet}`), `uygDil` ('tr'/'en'/'ru'/'ar').
+
+### 3.2 Kotlin köprüleri (`addJavascriptInterface`)
+
+| Köprü adı | İş |
+|---|---|
+| `AndroidKopru` | Ödüllü reklam, premium kontrolü, satın alma iskeleti |
+| `AndroidTTS` | Konuşma: `konus()`, `sustur()`, `hazirMi()`, ses listesi/seçimi |
+| `AndroidTani` | Tanılama: SDK durumu, adaptör raporu, reklamı yeniden dene |
+| `AndroidGuvenlik` | `FLAG_SECURE` — oyun ekranında ekran görüntüsü engelleme |
+| `AndroidBildirim` | "Sıra sende" bildirimi |
+| `AndroidSes` | **Konuşma tanıma** (yeni) — `dinle()`, `dur()`, `iptal()`, `izinIste()`, `rapor()` |
+
+JS'e geri çağrı: `window.ttsBitti`, `window.sesDurum`, `window.sesSonuc`,
+`window.sesOnSonuc`, `window.sesHata`, `window.sesSeviye`, `window.sesIzin`.
+
+### 3.3 Çalışma zamanı ayrıntıları
+
+- Asset'ler `WebViewAssetLoader` ile `https://appassets.androidplatform.net/assets/`
+  üzerinden sunulur. **Bu şart:** Stockfish Web Worker `file://` üzerinde çalışmaz.
+- Reklam SDK'sı `onPageFinished` + 2 sn sonra başlatılır (`reklamSdkBaslat()`),
+  WebView yükleme anında sıkışmasın diye.
+- Android 16 zorunlu edge-to-edge:
+  `WindowCompat.setDecorFitsSystemWindows(window,false)` +
+  `WindowInsetsControllerCompat(...).hide(systemBars())`.
+
+---
+
+## 4. Özellikler (mevcut durum)
+
+Tek/iki kişilik oyun · yapay zekâ rakip · çevrimiçi oyun (Firebase Firestore) ·
+arkadaş sistemi · sohbet · bulmacalar · başarımlar · liderlik tablosu ·
+oyun sonu analizi (Stockfish) · hamle hamle sesli anlatım · tahtada inceleme ·
+2B/3B görünüm · arenalar ve ordular (taş setleri) · 4 dil (tr/en/ru/ar) ·
+**sesle oynama (yeni)**.
+
+---
+
+## 5. Büyük çalışmalar ve alınan kararlar
+
+### 5.1 Doğruluk hesaplaması — Lichess modeli
+
+**Sorun:** çoban matını yiyen oyuncu %70+ doğruluk alıyordu.
+**Kök sebep:** kod önce hamle kayıplarını ortalayıp sonra eğriye sokuyordu
+(Jensen eşitsizliği — tek bir vahim hata ortalamada eriyordu).
+**Çözüm:** Lichess modeli. Önce **her hamle** ayrı puanlanır, sonra toplanır.
+
+```js
+function winYuzde(cp){ cp=Math.max(-1000,Math.min(1000,cp||0));
+  return 50 + 50*(2/(1+Math.exp(-0.00368208*cp))-1); }
+
+function hamleDogruluk(wpOnce,wpSonra){ if(wpSonra>=wpOnce) return 100;
+  const d=wpOnce-wpSonra;
+  return Math.max(0,Math.min(100,103.1668*Math.exp(-0.04354*d)-3.1669)); }
+```
+
+Toplama = (oynaklık ağırlıklı ortalama + harmonik ortalama) / 2.
+Eski `dogrulukEgri` tamamen kaldırıldı.
+**Doğrulama:** çoban matı kaybedeni %46 → **%23**.
+
+Analiz panelinde 3 kutu: **sen · rakip · hamle** (kullanıcı isteği).
+
+### 5.2 Açılış tanıma
+`ACILISLAR` 45 → **~306 giriş**. Hepsi oyunun kendi `Motor.notasyon()`
+çıktısıyla makine doğrulamalı üretildi (elle yazılmadı). Tarama derinliği
+6 → 12 yarım hamle.
+Ayrıca `sinifBelirle` içinde kitap hamlesi tuzağı düzeltildi:
+`if(o.kitapMi && o.kayipPuan<=0.05) return 'kitap';`
+
+### 5.3 TTS / seslendirme
+- **Nesil sayacı:** her konuşma isteği bir numara alır; yalnızca güncel neslin
+  callback'i çalışır. Zaman aşımı ağı var (motor hiç haber vermezse zincir devam eder).
+- `_bitti(id)`: **bayat kimlik gelirse `true` döner** — bu kritik, bkz. 7.3.
+- Türkçe notasyon okuma (`notasyonuSesleKurala`): `Nbd7` → "b sütunundaki At d yedi",
+  `Qxf7#` → "Vezir f yediyi aldı, şah mat". Belirsizlik çözümü + Türkçe ek tabloları
+  (`ACC_TR`, `LOC_TR`, `ORD_TR`).
+- **Ses cinsiyeti:** Android ses kodlarında cinsiyet **ORTA harfte**, son harfte değil.
+  `TR_ERKEK = setOf("ama","tmc")`, `TR_KADIN = setOf("cfs","efu","mfm")`.
+  Ayrıca elle ses seçme ekranı var (`sesListesi/sesDene/sesSabitle`).
+- `sesleriTara()` boş tarama sonucunu **önbelleğe almaz** (`if (hepsi.isEmpty()) return`).
+
+### 5.4 Motor doğruluğu
+Eklenenler: `yetersizMateryal()`, `ucTekrar()`, `konumAnahtari()`, `tekrarKaydet()`.
+`durum()` artık `'yetersiz' | '3tekrar' | '50hamle'` da döndürür.
+`fenYukle` en-passant ve yarım hamle sayacını ayrıştırır.
+Rok hamlelerine `+`/`#` eki eklenir. Belirsizlik çözümü iki aşamalı
+(önce ucuz sözde-legal tarama, aday varsa legallik kontrolü).
+
+**Terfi hatası (perft ile bulundu):** pozisyon 4'te 228 yerine 264 bekleniyordu.
+Terfi yalnızca vezir üretiyordu; 4 varyantın hepsi üretilecek şekilde düzeltildi
+(vezir ilk sırada kaldı ki insan davranışı bozulmasın). **perft 5/5 geçiyor.**
+
+### 5.5 Taş ayırt edilebilirliği (renk koşullandırma)
+
+**Kök sebep:** `malzeme()` yalnızca arena renklerini kullanıyor, `ORDULAR[].w/.b`
+değerlerini **tamamen yok sayıyordu**. Sonuç: Klasik, Mısır, Pers, Osmanlı, Sparta
+ve Napolyon herhangi bir arenada **birebir aynı** görünüyordu.
+
+`tasRenkleri()` eklendi. Ordunun renk kimliğini (ton/doygunluk) korur, yalnızca
+açıklığı kaydırır ve şunları garanti eder:
+
+- koyu taş ↔ koyu kare kontrastı **≥ 1.90**
+- ordu-ordu ayrımı **≥ 3.50**
+- **beyaz taş yalnızca açılır, asla koyulaşmaz** (bkz. 7.6)
+
+WCAG bağıl parlaklık / kontrast oranı kullanılır (`_lin`, `_isik`, `_oran`).
+Sonuç önbelleğe alınır (`_tasRenkOnbellek`, anahtar `ordu.id|arena.id`).
+
+Dokulu/GLB tahtalar için **ölçülmüş gerçek kare renkleri** `ARENALAR`'a
+`kareAcik`/`kareKoyu` olarak eklendi:
+`gercekci 0x8D2402/0x2A1508` · `ahsapmasa 0x683917/0x000000` ·
+`mermersalon 0xDBDEE5/0x14181B` · `oymamasa 0x74350C/0x0D0002` ·
+`ustamasa 0xCCCCCC/0x020202`.
+
+Taş altındaki temas halkası da tahta parlaklığına göre uyarlanır.
+
+**Doğrulama:** 72/72 ordu-arena kombinasyonu geçti; ilk 6 ordunun koyu rengi
+birbirinden ayrı (`Klasik 0x495062 · Mısır 0x5F4D3A · Pers 0x415075 ·
+Osmanlı 0x5E486A · Sparta 0x604E31 · Napolyon 0x425071`).
+
+### 5.6 Bellek ve sızıntılar
+`nesneyiSerbestBirak(kok, dokuDa)` — `userData.paylasilanGeo` ve
+`userData.paylasilanDoku` işaretli nesneleri **atlar** (GLB `model.clone()`
+geometriyi paylaşır; körlemesine dispose çökme üretir). Dispose çağrısı 11 → 15.
+Beraberlikte sonsuz `setInterval` ve çıkışta Firestore dinleyici sızıntısı kapatıldı.
+
+### 5.7 Sesle oynama (en yeni iş)
+
+**Mimari zorunluluk:** WebView'de `webkitSpeechRecognition` **yok**
+(Chromium bug 487255, hâlâ açık). Tanıma Kotlin'de `SpeechRecognizer` ile yapılır.
+
+**Ayrıştırma yaklaşımı — serbest metin ÇÖZÜLMEZ.** Türkçede b/c/d/e/g harfleri
+sürekli karışır. Bunun yerine her token için olasılık dağılımı çıkarılır ve
+**o anki yasal hamle listesine** karşı puanlanır. 30-40 yasal hamle varken
+bulanık duyum bile doğru hamleye oturur.
+
+Ayarlanabilir 3 onay modu (kareyi işaretle / sesli sor / direkt oyna) ve
+3 mikrofon modu (bas-konuş / sıra bendeyken / uyandırma kelimesi).
+Özellik ilk açılışta sihirbaz sorar. Fonetik alfabe ("fatsa dört") ve
+çevrimdışı tanıma anahtarları var.
+
+**Ayarlanmış sabitler** (hepsi ölçülerek seçildi):
+```
+ESIK        0.34   token eşleşme alt sınırı
+ESIK_MARJ   0.055  altındaki göreli marj → "hangisi?" diye sor
+ADAY_SONUM  0.45   n-best alt adaylarının oy ağırlığı (üstel)
+TAVAN       0.38   birebir harf eşleşmesi varken rakip harflerin tavanı
+GUVEN_OYNA  0.85   üstünde kullanıcının seçtiği moda göre davran
+GUVEN_SOR   0.60   altında hiç tahmin etme, tekrar iste
+puanlama    0.44*taş + 0.31*harf + 0.25*rakam + konum bonusu
+konum bonusu +0.085 bitişik-doğru sıra · +0.040 doğru sıra · −0.060 ters sıra
+```
+
+**Ölçülen sonuç** (gerçek yasal hamleler + Türkçe karışma örüntüsü, 900 deneme):
+
+| Gürültü | Doğru oynadı | **Yanlış oynadı** | Sordu | Reddetti |
+|---|---|---|---|---|
+| %20 | 45.3% | **2.0%** | 43.7% | 9.0% |
+| %40 | 44.7% | **2.9%** | 32.4% | 20.0% |
+
+Kazanım doğruluğun artmasından çok **emin olmadığında oynamamasından** geliyor.
+Güven ayrımı: doğru eşleşmelerin medyanı 0.94, yanlışların 0.63.
+
+**Manifest eklentileri:** `RECORD_AUDIO`, `uses-feature microphone required=false`,
+ve API 30+ paket görünürlüğü için
+`<queries><intent><action android:name="android.speech.RecognitionService"/></intent></queries>`
+— bu sonuncusu olmadan `isRecognitionAvailable()` her zaman `false` döner.
+
+### 5.8 Üst bar (HUD) yeniden düzeni
+Dikey modda 10 simge butonu tek satıra sığmıyordu. İkincil butonlar
+(2B, taş adı, sahne, yardım, yeni oyun) **Ayarlar modalındaki ızgaraya** taşındı
+(orijinal butonlara `.click()` ile vekâlet eder — mevcut mantık bozulmadı).
+Kalan 4 buton (Sesli · Ses · Ayarlar · Menü) metin etiketiyle gösteriliyor.
+Notasyon şeridi `top: 60px → 84px`.
+
+**Dikkat:** yeni arayüz metinleri `SOZLUK`'e eklenmezse TR kalır. Sayfa geneli
+`MutationObserver` + `TreeWalker` ile birebir metin eşleşmesinden çeviriyor.
+
+---
+
+## 6. Ölçüm ve doğrulama alışkanlığı
+
+Bu projede iddialar ölçülerek doğrulandı, göz kararı kabul edilmedi:
+
+- Doğruluk formülü: bağımsız Node testi, çoban matı senaryosu
+- Hamle üretimi: **perft 5/5**
+- Renk kontrastı: 72 kombinasyonun WCAG oranı hesaplandı
+- Sesli komut: 44/44 birim testi + 900'er denemelik simülasyon
+- Arayüz: headless Chromium'da **gerçek `index.html`** ile uçtan uca test
+  (hamle gerçekten oynandı mı, bar kapandı mı, 0 sayfa hatası)
+
+Yeni sohbette aynı yolu izlemek istersen: Three.js r128'i npm'den
+(`three@0.128.0`) indirip `cdnjs` yolunu yerel `/vendor/`'a çevirerek sayfa
+headless tarayıcıda tam çalışıyor.
+
+---
+
+## 7. DENENİP ELENEN YOLLAR (bunları tekrar deneme)
+
+> Bu bölüm en değerli kısım. Her biri zaman kaybı olarak öğrenildi.
+
+**7.1 — Doğrulukta "önce ortala, sonra eğri".** Jensen eşitsizliği yüzünden tek
+vahim hata eriyor. Her hamleyi ayrı puanla, sonra topla.
+
+**7.2 — Kotlin TTS'te sessiz `return`.** `if (!ttsHazir) return` yazıldığında
+JS'e hiç haber gitmiyor ve otomatik anlatım **sonsuza kadar** bekliyordu.
+Kotlin tarafı **her koşulda** `konusmaBitti()` çağırmalı.
+
+**7.3 — `onStop` override'ı hamleleri hızlı oynattı (benim regresyonum).**
+Bayat "bitti" bildirimleri `_bitti()`'den `false` dönünce eski otomatik-adım
+yoluna düşüyordu. Çözüm: **bayat kimlik için `true` dön.** Kullanıcı bunu
+"ses cinsiyetini değiştirince hamleleri hızlı hızlı oynatıyor" diye bildirdi.
+
+**7.4 — Ses cinsiyetini kodun SON harfinden okumak.** `mfm` "erkek" sanılıyordu.
+Doğru örüntü **orta harf**. Tahmin yerine açık tablo kullan.
+
+**7.5 — "ads 24.0.0 Kotlin içermiyor" iddiası.** Bağımlılık listesinde
+`kotlin-stdlib` görünmediği için böyle denildi — **yanlıştı**, protobuf-kotlin
+modülleri paketliyor. Ardından "Kotlin'i geri al, 24.0.0'da kal" planı denendi,
+**başarısız oldu**. Doğru çözüm Bölüm 2'deki ölçülmüş merdiven.
+
+**7.6 — Renk koşullandırmanın ilk hali beyazları koyulaştırdı.** Klasik fildişi
+`0xF0E6CC` → hardal `0xC29C39` oldu. Kimlik bozucu olduğu için reddedildi.
+Kural: **beyaz yalnızca açılır.**
+
+**7.7 — Bayat TODO'ya güvenmek.** `VARLIK-REHBERI.md` içindeki "EKLENECEK"
+notuna bakılıp lisansların eksik olduğu söylendi. Gerçekte 13 set CC-BY-4.0
+ile tam atıflıydı ve zaten uygulama içi kredilerde listeliydi (kanıt: gömülü
+GLB metadata'sı). **Bu dosya bayat, kanıt olarak kullanma.**
+
+**7.8 — Denetim alt-ajanının perft sonucunu doğrulamadan kabul etmek.**
+Ajan testlerin geçtiğini bildirdi; gerçekte terfi hatası vardı ve bu hata
+**benim değişikliklerimden önce de mevcuttu** (pristine zip ile doğrulandı).
+
+**7.9 — n-best adaylarında "en iyi adayı seç".** Her adayı ayrı puanlayıp
+en yükseği almak yanlış: bozuk bir aday yanlış bir hamlede tesadüfen yüksek
+puan alıp doğruyu geçiyor. **Ölçüldü: %70 → %46 doğruluk.** Doğrusu
+**oy biriktirme** — her aday oy verir, oylar hamle başına toplanır.
+
+**7.10 — Tek `SpeechRecognizer` örneğini yeniden kullanmak.** Birkaç oturum
+sonra `ERROR_CLIENT` (kod 5) gelir ve bir daha düzelmez. Kullanıcının
+"birkaç hamle sonra istemci hatası" şikâyeti buydu. Çözüm: **her oturumda
+tanıyıcıyı sıfırdan kur, oturum bitince yok et** (~50 ms maliyet).
+
+**7.11 — Birebir harf eşleşmesinde diğer harfleri tamamen elemek.** Net komutun
+güvenini yükseltiyor ama tanıyıcı "be" yerine "de" ürettiğinde doğru hamle hiç
+aday olamıyor. **Ölçüldü: duymama oranı %3.8 → %16.3.** Çözüm: elemek değil,
+**tavanlamak** (`TAVAN = 0.38`).
+
+**7.12 — Güveni "toplam oy içindeki pay" ile hesaplamak.** Yakın puanlı aday
+sayısı arttıkça net komutlar da düşük güven alıyordu ("e dört" → 0.68).
+Doğru sinyal **ikinciye göre göreli marj**.
+
+---
+
+## 8. Bilinen açık sorunlar ve riskler
+
+**8.1 — Reklamlar Xiaomi 21081111RG'de yüklenmiyor.** Adaptör durumu
+`NOT_READY: timeout`. **Aynı APK başka telefonda çalışıyor.** Sorun koddaki
+değil, o cihazın Play Services reklam dinamit modülünde. Kod tarafında
+yapılacak bir şey kalmadı; 6 denemeli üstel geri çekilme + `onResume` sıfırlama
++ tanılama ekranı zaten eklendi.
+
+**8.2 — Three.js ve Firebase CDN'den yükleniyor.** [Kesin]
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
+```
+Uygulama **internetsiz açılırsa `THREE is not defined` alır ve tahta hiç
+çizilmez.** Baştan beri böyle. `three.min.js` ~600 KB; assets'e gömmek yarım
+saatlik iş ve uygulamayı çevrimdışı çalışır hale getirir. **Önerilen sıradaki iş.**
+
+**8.3 — `VARLIK-REHBERI.md` bayat.** İçindeki "EKLENECEK" notları gerçeği
+yansıtmıyor (bkz. 7.7). Güncellenmeli ya da silinmeli.
+
+**8.4 — AGP 8.5.2 / compileSdk 36 uyumsuzluk uyarısı** susturuldu, kalıcı
+çözüm AGP 8.9+ (ertelendi).
+
+**8.5 — Ölü dosyalar:** `klasik_*.glb` (12 dosya, ~2.3 MB) hiç yüklenmiyor.
+Silinebilir.
+
+**8.6 — Dil kapsamı:** yeni sesli oynama arayüz metinlerinin bir kısmı için
+ru/ar karşılığı yok; sözlükte karşılığı olmayan metin Türkçe kalır.
+
+---
+
+## 9. YAYIN ENGELLERİ (hepsi kullanıcı tarafında)
+
+1. **GPL-3.0 kaynak yükümlülüğü.** Stockfish GPL-3.0 olduğu için uygulamanın
+   tamamı GPL-3.0'a tabi. `KREDILER.txt` kaynak kodu şu adreste vaat ediyor:
+   `github.com/mrbrdkc28-bit/Sah-Dustu`. **Şu an orada yalnızca web varlıkları
+   var ve yayınlanmış `index.html` bayat.** Tam Android kaynağı yüklenmeli.
+   ⚠ `.gitignore` şunları dışlıyor, **asla commit etme**:
+   `keystore.properties`, `*.jks`, `*.keystore`, `google-services.json`.
+2. **Gizlilik politikası yayınlanmalı.** `privacy_YENI.html` hazır (TR+EN,
+   AdMob ve **mikrofon** maddeleri dahil). GitHub Pages'te `privacy.html`
+   olarak yayınlanacak ve Play Console'a bu adres girilecek.
+3. **Keystore oluşturulmalı** (`keystore.properties.ORNEK` şablonu var).
+4. **Play Console Data Safety formu** — artık **"Ses / Audio"** satırı da
+   gerekiyor: toplanıyor **evet**, paylaşılıyor **evet** (Google'ın tanıma
+   servisi), amaç *App functionality*, isteğe bağlı. Bu atlanırsa yayın reddedilir.
+5. **Mağaza listeleme** (açıklama, ekran görüntüleri, grafikler).
+
+---
+
+## 10. Lisanslar
+
+Uygulama **GPL-3.0**'a tabidir (Stockfish nedeniyle). `KREDILER.txt` uygulama
+içinde gösterilir ve şunları kapsar:
+
+- **Stockfish** (stockfish.js, Nathan Rugg derlemesi) — GPL-3.0
+- **Cburnett 2B taş seti** — GPLv2+ (Lichess varsayılanı, değiştirilmedi)
+- **13 GLB taş seti** — CC-BY-4.0, tamamı atıflı (kanıt: gömülü GLB metadata'sı)
+- Kalan 2 set — **KayKit**, CC0, atıf gerekmiyor
+
+Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.**
+
+---
+
+## 11. Çalışma biçimi / kod kuralları
+
+- **Tanımlayıcılar ve yorumlar Türkçe.** (`hamleOyna`, `vurguTemizle`, `tasRenkleri`…)
+- Yorumlar **ne yaptığını değil, neden öyle yapıldığını** anlatır; özellikle
+  bir hatanın izini taşıyanlar korunmalı.
+- Kotlin dosyasında Türkçe karakter kullanılmıyor (`baslatildi`, `tanici`…).
+- `index.html` tek dosya; düzenleme betikle (Python `str.replace`) yapılıyor,
+  her değişiklikten sonra tüm `<script>` blokları `node --check` ile doğrulanıyor.
+- Değişiklik uygulamadan **önce sor** — kullanıcının açık talebi.
+  Kullanıcı ayrıca doğrudan, övgüsüz ve iddiaların güven etiketli
+  ([Kesin]/[Muhtemel]/[Tahmin]) olduğu yanıt istiyor.
+
+---
+
+## 12. Yeni sohbete başlarken
+
+1. Bu dosyayı proje bilgi tabanına yükle.
+2. Cowork kullanıyorsan zip yerine **klasörü bağla**:
+   `C:\Users\Emre\Desktop\SahDustu` — zip bayatlar, klasör bayatlamaz.
+3. Derleme, imzalama ve GitHub'a yükleme **sende**: asistan senin makinende
+   Gradle/keytool/git çalıştıramıyor.
+4. Sıradaki mantıklı iş: **8.2** (Three.js'i gömerek çevrimdışı çalışır hale
+   getirmek), ardından Bölüm 9'daki yayın engelleri.

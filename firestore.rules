@@ -1,0 +1,178 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function yol(p) { return path('/databases/' + database + '/documents/' + p); }
+
+    // Profil fotoğrafı: 64x64 JPEG ~3-5 KB. 40.000 karakterden büyüğü reddedilir.
+    function fotoGecerli(yeni) {
+      return !('avatarFoto' in yeni)
+          || yeni.avatarFoto == null
+          || (yeni.avatarFoto is string && yeni.avatarFoto.size() < 40000);
+    }
+
+    // Profilde değiştirilebilen alanlar. Listede olmayan bir alan (ör. elle
+    // uydurulmuş hp_ haftalık puanı) yazılamaz. Haftalık alanın adı 'haftaAlan'da gelir.
+    function izinliAlanlar() {
+      return ['kullaniciAdi', 'ulke', 'avatar', 'avatarFoto', 'olusturma', 'puan',
+              'basarimlar', 'enIyiDogruluk', 'toplamDogruluk', 'dogrulukSayi',
+              'oyun', 'galibiyet', 'beraberlik', 'maglubiyet',
+              'beyazOyun', 'beyazGalibiyet', 'beyazBeraberlik', 'beyazMaglubiyet',
+              'siyahOyun', 'siyahGalibiyet', 'siyahBeraberlik', 'siyahMaglubiyet',
+              'enIyiSeri', 'anlikSeri', 'sonOyunlar',
+              'haftaId', 'haftaBasPuan', 'haftaAlan', 'sayilanOda', 'acikOda'];
+    }
+
+    // PUAN: yalnızca bitmiş bir çevrimiçi oyunun sonucu olarak, oyun başına bir kez,
+    // en fazla 24 ve sonuçla aynı yönde değişebilir (uygulamada puanIsle()).
+    function puanGecerli(uid, yeni, eski) {
+      let once = eski.get('puan', 800);
+      let sonra = yeni.get('puan', 800);
+      return sonra == once
+          || (sonra is int && sonra >= 100 && math.abs(sonra - once) <= 24
+              && oyunSayimi(uid, yeni.get('sayilanOda', ''), sonra - once));
+    }
+    function oyunSayimi(uid, oda, fark) {
+      return oda is string && oda.size() > 0 && oda.size() < 100
+          // Bu toplu yazımda sayım kaydı oluşuyor ve daha önce yoktu: oyun bir kez sayılır.
+          && existsAfter(yol('oyunlar/' + oda + '/sayim/' + uid))
+          && !exists(yol('oyunlar/' + oda + '/sayim/' + uid))
+          && oyunSonucuUyar(uid, oda, get(yol('oyunlar/' + oda)).data, fark);
+    }
+    function oyunSonucuUyar(uid, oda, g, fark) {
+      return g.get('durum', '') == 'bitti'
+          && g.beyaz is string && g.siyah is string && g.beyaz != g.siyah
+          && (g.beyaz == uid || g.siyah == uid)
+          // İki oyuncu da oyuna gerçekten katılmış olmalı (uydurma rakip kimliği olmaz).
+          && exists(yol('oyunlar/' + oda + '/katilim/' + g.beyaz))
+          && exists(yol('oyunlar/' + oda + '/katilim/' + g.siyah))
+          && yonUyar(g.get('kazanan', null), g.beyaz == uid ? 'w' : 'b', fark);
+    }
+    function yonUyar(kazanan, renk, fark) {
+      return (kazanan == null && math.abs(fark) <= 12)
+          || (kazanan == renk && fark >= 0)
+          || (kazanan != null && kazanan != renk && fark <= 0);
+    }
+
+    // HAFTALIK PUAN (hp_YYYY_HH): artışı, aynı yazımdaki puan artışını geçemez.
+    function haftaGecerli(yeni, eski) {
+      let k = yeni.get('haftaAlan', '');
+      let degisen = yeni.diff(eski).affectedKeys();
+      return !degisen.hasAny([k])
+          || (k is string && k.matches('hp_[0-9]{4}_[0-9]{2}')
+              && yeni[k] is int && yeni[k] >= 0
+              && (yeni[k] <= eski.get(k, 0)
+                  || yeni[k] - eski.get(k, 0) <= yeni.get('puan', 800) - eski.get('puan', 800)));
+    }
+
+    // OYUNCULAR: Girişli herkes okur (rakip puanı, liderlik). Yalnız kendi profilini yazar.
+    match /oyuncular/{userId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == userId
+                    && request.resource.data.get('puan', 800) == 800
+                    && request.resource.data.keys().hasOnly(izinliAlanlar())
+                    && fotoGecerli(request.resource.data);
+      allow update: if request.auth != null && request.auth.uid == userId
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(izinliAlanlar().concat([request.resource.data.get('haftaAlan', 'puan')]))
+                    && puanGecerli(userId, request.resource.data, resource.data)
+                    && haftaGecerli(request.resource.data, resource.data)
+                    && fotoGecerli(request.resource.data);
+      // Hesap silme için.
+      allow delete: if request.auth != null && request.auth.uid == userId;
+
+      // ARKADAŞ İSTEKLERİ: gelen kutusu.
+      // Okuma/silme: yalnız kutunun sahibi. Oluşturma: yalnız gönderen, kendi adına.
+      match /istekler/{gonderenId} {
+        allow read, delete: if request.auth != null && request.auth.uid == userId;
+        allow create, update: if request.auth != null
+                              && request.auth.uid == gonderenId;
+      }
+
+      // ARKADAŞ LİSTESİ
+      // Sahibi kendi listesine yazar. Karşı taraf ancak sahibi ONA istek
+      // göndermişse (istek belgesi hâlâ duruyorsa) bu listeye kendini ekleyebilir.
+      // Silme: sahibi veya listeden çıkan kişi (arkadaşlıktan çıkarma iki tarafı da siler).
+      match /arkadaslar/{arkadasId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow create, update: if request.auth != null && (
+                      request.auth.uid == userId
+                      || (request.auth.uid == arkadasId
+                          && exists(/databases/$(database)/documents/oyuncular/$(arkadasId)/istekler/$(userId)))
+                    );
+        allow delete: if request.auth != null
+                      && (request.auth.uid == userId || request.auth.uid == arkadasId);
+      }
+    }
+
+    // OYUNLAR: Girişli herkes okur (eşleşme/izleme).
+    // Oluşturma: oluşturan kişi oyunculardan biri olmalı.
+    // Güncelleme: yalnız odadaki iki oyuncu; veya boş siyah koltuğa katılan.
+    //   Oyuncular sonradan değiştirilemez. Oda 'bitti' olunca sonuç kilitlenir:
+    //   ikinci bir sonuç bildirimi ya da sonradan 'terk'/'iptal' yazımı sayılan
+    //   sonucu değiştiremez.
+    // Silme: yalnız odadaki oyuncular.
+    match /oyunlar/{odaId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && (
+                      request.resource.data.beyaz == request.auth.uid ||
+                      request.resource.data.siyah == request.auth.uid
+                    );
+      allow update: if request.auth != null && (
+                      resource.data.beyaz == request.auth.uid ||
+                      resource.data.siyah == request.auth.uid ||
+                      (resource.data.siyah == null &&
+                       request.resource.data.siyah == request.auth.uid)
+                    )
+                    && request.resource.data.get('beyaz', null) == resource.data.get('beyaz', null)
+                    && (resource.data.get('siyah', null) == null
+                        || request.resource.data.get('siyah', null) == resource.data.get('siyah', null))
+                    && (resource.data.get('durum', '') != 'bitti'
+                        || !request.resource.data.diff(resource.data).affectedKeys()
+                              .hasAny(['durum', 'kazanan', 'sonucTip']));
+      allow delete: if request.auth != null && (
+                      resource.data.beyaz == request.auth.uid ||
+                      resource.data.siyah == request.auth.uid
+                    );
+
+      // KATILIM: "bu oyunda oynadım" kaydı. Yalnız odadaki oyuncu, kendi adına, bir kez.
+      match /katilim/{uid} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null && request.auth.uid == uid
+                      && (get(yol('oyunlar/' + odaId)).data.beyaz == uid
+                          || get(yol('oyunlar/' + odaId)).data.siyah == uid);
+      }
+      // SAYIM: bu oyunun puanı bu oyuncu için işlendi. Puan yazımıyla aynı
+      // toplu işlemde oluşturulur; değiştirilemez, silinemez.
+      match /sayim/{uid} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow create: if request.auth != null && request.auth.uid == uid
+                      && getAfter(yol('oyuncular/' + uid)).data.get('sayilanOda', '') == odaId;
+      }
+    }
+
+    // DAVETLER: Rövanş ve arkadaşa oyun daveti.
+    match /davetler/{davetId} {
+      allow read, delete: if request.auth != null
+                          && (resource.data.hedef == request.auth.uid
+                              || resource.data.gonderen == request.auth.uid);
+      allow create: if request.auth != null
+                    && request.resource.data.gonderen == request.auth.uid;
+    }
+
+    // BEKLEME: Eşleşme havuzu (geçici). Silme açık: eşleşmede karşının kaydı silinir.
+    match /bekleme/{docId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid;
+      allow delete: if request.auth != null;
+    }
+
+    // RAPORLAR: Kullanıcı şikayetleri. Yalnız kendi adına oluşturulur; kimse okuyamaz.
+    match /raporlar/{raporId} {
+      allow create: if request.auth != null
+                    && request.resource.data.raporlayan == request.auth.uid;
+      allow read, update, delete: if false;
+    }
+  }
+}

@@ -1,0 +1,27 @@
+# --- GİZLİ DOSYALAR (ASLA COMMIT ETME) ---
+keystore.properties
+*.jks
+*.keystore
+google-services.json
+
+# --- Build çıktıları ---
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+app/build/
+build/
+
+# --- Diğer ---
+*.apk
+*.aab
+*.log
+
+# --- Yerel yedekler ---
+_yedek_*/

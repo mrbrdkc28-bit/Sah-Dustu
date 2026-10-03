@@ -1,0 +1,9 @@
+Bu uygulama, oyun sonu analizinde Stockfish satranç motorunu kullanır.
+Stockfish, GNU General Public License v3.0 (GPL-3.0) altında dağıtılır.
+Kaynak: https://github.com/official-stockfish/Stockfish
+GPL-3.0 tam metni: https://www.gnu.org/licenses/gpl-3.0.txt
+
+GPL-3.0 gereği: Bu uygulamanın kaynak kodu, isteyen kullanıcılara GPL-3.0
+koşullarıyla sunulmalıdır. Dağıtımdan önce kaynak kod erişim yolunu (ör. bir
+genel kod deposu bağlantısı) buraya ekleyin:
+  Kaynak kod: https://github.com/mrbrdkc28-bit/Sah-Dustu

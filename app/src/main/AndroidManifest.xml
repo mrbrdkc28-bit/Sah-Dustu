@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Sesli oynama: mikrofon. Yalnizca kullanici sesli hamle ozelligini
+         acinca calisma aninda istenir; ozellik kapaliyken mikrofon hic acilmaz. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Mikrofon zorunlu degil: cihazda mikrofon yoksa da uygulama yuklenebilsin
+         (Play Store aksi halde bu cihazlari haric tutar). -->
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+
+    <!-- API 30+ paket gorunurlugu: bu olmadan SpeechRecognizer.isRecognitionAvailable()
+         her zaman false doner, cunku tanima servisi baska bir pakette yasar. -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:hardwareAccelerated="true"
+        android:theme="@style/Theme.SahDustu">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-9870524422405873~4167469540"/>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density"
+            android:screenOrientation="fullSensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

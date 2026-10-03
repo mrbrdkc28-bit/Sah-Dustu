@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.SahDustu" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">#06070B</item>
+        <item name="android:statusBarColor">#06070B</item>
+        <item name="android:navigationBarColor">#06070B</item>
+    </style>
+</resources>

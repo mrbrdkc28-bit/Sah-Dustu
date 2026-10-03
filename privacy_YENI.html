@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gizlilik Politikası — Şah Düştü</title>
+<style>
+  :root{
+    --ground:#F7F4ED; --surface:#FFFFFF; --ink:#1B1712; --ink-2:#585045;
+    --rule:#E3DCCC; --accent:#96682B;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ground:#15120C; --surface:#1D1913; --ink:#F1EBDE; --ink-2:#A79C89;
+      --rule:#332C1F; --accent:#D2A055;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.65; font-size:16px;
+  }
+  .kap{max-width:760px; margin:0 auto; padding:40px 22px 90px}
+  h1{font-size:29px; line-height:1.2; margin:0 0 6px}
+  .tarih{color:var(--ink-2); font-size:14px; margin:0 0 30px}
+  h2{font-size:20px; margin:38px 0 10px; padding-bottom:7px; border-bottom:1px solid var(--rule)}
+  h3{font-size:16px; margin:22px 0 6px}
+  p,li{color:var(--ink-2)}
+  li{margin-bottom:6px}
+  strong{color:var(--ink)}
+  a{color:var(--accent)}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:14.5px; display:block; overflow-x:auto}
+  th,td{border:1px solid var(--rule); padding:9px 11px; text-align:left; vertical-align:top}
+  th{background:var(--surface); color:var(--ink); font-weight:600}
+  .kutu{background:var(--surface); border:1px solid var(--rule); border-radius:6px; padding:16px 18px; margin:18px 0}
+  hr{border:none; border-top:2px solid var(--rule); margin:56px 0 40px}
+  code{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13.5px; background:var(--surface); padding:1px 5px; border:1px solid var(--rule); border-radius:3px}
+</style>
+</head>
+<body>
+<div class="kap">
+
+<h1>Gizlilik Politikası</h1>
+<p class="tarih"><strong>Şah Düştü</strong> (com.emre.sahdustu) · Son güncelleme: 29 Eylül 2026</p>
+
+<p>Bu politika, Şah Düştü uygulamasının hangi verileri topladığını, neden topladığını
+ve kimlerle paylaştığını açıklar. Uygulamayı <strong>hesap açmadan, misafir olarak</strong>
+oynayabilirsin; o durumda hiçbir kişisel verin sunucuya gönderilmez.</p>
+
+<h2>1. Toplanan veriler</h2>
+
+<h3>Hesap açarsan (isteğe bağlı)</h3>
+<table>
+  <tr><th>Veri</th><th>Neden</th></tr>
+  <tr><td>E-posta adresi</td><td>Giriş ve hesap kurtarma. Google ile giriş yaparsan e-postan Google tarafından iletilir.</td></tr>
+  <tr><td>Şifre</td><td>Firebase Authentication tarafından şifrelenmiş biçimde saklanır; uygulama şifreni göremez.</td></tr>
+  <tr><td>Kullanıcı adı (takma ad)</td><td>Diğer oyuncuların seni bulabilmesi ve liderlik tablosu.</td></tr>
+  <tr><td>Ülke</td><td>Liderlik tablosunda gösterilir. İsteğe bağlıdır.</td></tr>
+  <tr><td>Profil fotoğrafı</td><td>Yalnızca sen seçersen. Diğer oyunculara görünür.</td></tr>
+  <tr><td>Oyun istatistikleri</td><td>Puan (Elo), galibiyet/mağlubiyet/beraberlik sayısı, oyun doğruluğu.</td></tr>
+  <tr><td>Arkadaş listesi ve istekler</td><td>Arkadaş ekleme ve rövanş daveti gönderme.</td></tr>
+  <tr><td>Çevrimiçi oyun kayıtları</td><td>Eşleşme sırasında hamleler, süre ve rakip bilgisi geçici olarak sunucuda tutulur.</td></tr>
+  <tr><td>Sohbet mesajları</td><td>Çevrimiçi oyunda rakibine yazdığın mesajlar oyun kaydının içinde sunucuda saklanır. Rakibinin mesajlarını gizleyebilir, uygunsuz mesajları şikâyet edebilirsin.</td></tr>
+  <tr><td>Şikâyetler</td><td>Bir profili veya sohbeti şikâyet edersen; şikâyet edilen oyuncu, sen ve (sohbet şikâyetinde) rakibin son mesajları incelenmek üzere saklanır.</td></tr>
+</table>
+
+<h3>Reklamlar</h3>
+<p>Uygulama, bazı içerikleri açmak için <strong>Google AdMob ödüllü reklamları</strong> gösterir.
+Reklam izlemek her zaman <strong>isteğe bağlıdır</strong>; izlemezsen oyunun temel özellikleri
+çalışmaya devam eder.</p>
+<p>AdMob, reklamları sunmak ve ölçmek için cihazının <strong>reklam kimliğini
+(Advertising ID)</strong>, yaklaşık konum (IP tabanlı ülke/bölge) ve cihaz bilgilerini
+işleyebilir. Bu veriler Google tarafından kendi gizlilik şartları kapsamında toplanır:
+<a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">policies.google.com/technologies/ads</a>.
+Android ayarlarından reklam kimliğini sıfırlayabilir veya silebilirsin.</p>
+<p>Avrupa Ekonomik Alanı, Birleşik Krallık ve İsviçre'de ilk açılışta reklam onayı istenir;
+verdiğin onayı <strong>Profilim &gt; Reklam gizlilik ayarları</strong> bölümünden değiştirebilirsin.</p>
+
+<h3>Sesle oynama (isteğe bağlı)</h3>
+<p>Bu özelliği açarsan hamleni söyleyerek oynayabilirsin (&quot;at f4&quot; gibi).
+Mikrofon <strong>yalnızca</strong> sen dinlemeyi başlattığında (düğmeye basınca ya da
+seçtiğin mikrofon moduna göre sıra sana geldiğinde) açılır ve komut tanınır tanınmaz kapanır.</p>
+<ul>
+  <li>Uygulama <strong>ses kaydı tutmaz</strong>, hiçbir ses dosyasını cihazda saklamaz ve
+      Firebase dahil hiçbir sunucuya göndermez.</li>
+  <li>Sesi metne çeviren, <strong>cihazında kurulu olan Android konuşma tanıma servisidir</strong>
+      (çoğu cihazda Google uygulaması). Bu servis, kendi gizlilik politikası uyarınca
+      sesi işlemek için Google sunucularına gönderebilir.
+      Bkz. <a href="https://policies.google.com/privacy">policies.google.com/privacy</a>.</li>
+  <li>Ayarlardan <strong>&quot;Çevrimdışı Tanımayı Dene&quot;</strong> seçeneğini açarsan,
+      cihazında çevrimdışı Türkçe dil paketi kuruluysa ses cihazdan hiç çıkmaz.</li>
+  <li>Uygulamaya geri dönen tek şey <strong>tanınan metindir</strong> (örneğin &quot;at f4&quot;);
+      bu metin yalnızca hamleyi bulmak için kullanılır ve saklanmaz.</li>
+  <li>Özelliği istediğin an Seçenekler ekranından kapatabilir, izni cihaz ayarlarından geri alabilirsin.</li>
+</ul>
+
+<h3>Yalnızca cihazında kalanlar</h3>
+<p>Ses tercihi, dil seçimi, grafik kalitesi, çözülmüş bulmacalar ve hata kayıtları
+tarayıcı deposunda (localStorage) <strong>cihazının içinde</strong> tutulur; sunucuya gönderilmez.
+Uygulamayı silersen bunlar da silinir.</p>
+
+<h2>2. Üçüncü taraf hizmetler</h2>
+<ul>
+  <li><strong>Google Firebase Authentication ve Cloud Firestore</strong> — hesap ve
+      istatistiklerin saklandığı yer. Sağlayıcı: Google LLC.</li>
+  <li><strong>Google AdMob</strong> — ödüllü reklamlar.</li>
+  <li><strong>Android konuşma tanıma servisi</strong> — yalnızca sesle oynama açıksa;
+      söylediğin komutu metne çevirir.</li>
+  <li><strong>Google Play Hizmetleri</strong> — Google ile giriş.</li>
+  <li><strong>Yazı tipleri ve kütüphaneler</strong> — 3B kütüphanesi, Firebase SDK'sı ve yazı tipleri
+      uygulamanın içinde gelir; harici bir içerik dağıtım ağından yüklenmez.</li>
+  <li><strong>Cihazının metin okuma motoru</strong> — sesli anlatım cihazın kendi
+      TTS motoruyla üretilir; metin sunucuya gönderilmez.</li>
+</ul>
+<p>Verilerini <strong>satmıyoruz</strong> ve reklam hedefleme dışında üçüncü taraflarla paylaşmıyoruz.</p>
+
+<h2>3. Uygulama izinleri</h2>
+<table>
+  <tr><th>İzin</th><th>Kullanım amacı</th></tr>
+  <tr><td><code>INTERNET</code></td><td>Çevrimiçi oyun, giriş ve reklamlar.</td></tr>
+  <tr><td><code>POST_NOTIFICATIONS</code></td><td>Arkadaş isteği ve oyun daveti bildirimleri. Reddedebilirsin.</td></tr>
+  <tr><td><code>VIBRATE</code></td><td>Hamle geri bildirimi.</td></tr>
+  <tr><td><code>WAKE_LOCK</code></td><td>Oyun sırasında ekranın kapanmaması.</td></tr>
+  <tr><td><code>RECORD_AUDIO</code></td><td><strong>Sesle oynama</strong> özelliği için mikrofon.
+      Yalnızca bu özelliği kendin açtığında istenir; kapalıyken mikrofon hiç açılmaz.
+      Reddedebilirsin, oyunun geri kalanı normal çalışır.</td></tr>
+</table>
+
+<h2>4. Çocuklar</h2>
+<p>Uygulama 13 yaşın altındaki çocuklara yönelik değildir ve bilerek 13 yaş altından
+veri toplamaz. Çocuğunuzun bize veri gönderdiğini düşünüyorsanız aşağıdaki adresten
+ulaşın; hesabı ve verileri sileriz.</p>
+
+<h2 id="hesap-silme">5. Hesabının ve verilerinin silinmesi</h2>
+<p><strong>Uygulama içinden:</strong> Profilim &gt; <strong>Hesabımı Sil</strong>. Güvenlik gereği
+silmeden hemen önce yeniden giriş yapman istenebilir.</p>
+<p><strong>Uygulama olmadan:</strong> <a href="mailto:mrbrdkc28@gmail.com">mrbrdkc28@gmail.com</a>
+adresine, hesabında kayıtlı e-postadan &quot;Hesabımı sil&quot; konulu bir e-posta gönder.
+Talep en geç <strong>30 gün</strong> içinde yerine getirilir.</p>
+<p><strong>Silinenler:</strong> giriş hesabın, profilin (kullanıcı adı, ülke, profil fotoğrafı),
+puan ve istatistiklerin, arkadaş listen ve isteklerin, davetlerin ve çevrimiçi oyun kayıtların
+(sohbet mesajları dahil).<br>
+<strong>Saklananlar:</strong> kötüye kullanımı önlemek için gönderilmiş şikâyet kayıtları silinmez.<br>
+Misafir olarak oynadıysan sunucuda hiçbir verin yoktur.</p>
+
+<h2>6. Güvenlik</h2>
+<p>Veriler Google Firebase altyapısında saklanır ve cihazınla sunucu arasında
+şifreli (HTTPS/TLS) taşınır. Firestore güvenlik kuralları, bir oyuncunun yalnızca
+kendi verisini değiştirebilmesini sağlar.</p>
+
+<h2>7. Değişiklikler</h2>
+<p>Bu politika değişirse yukarıdaki tarih güncellenir. Önemli değişikliklerde
+uygulama içinde bilgilendirme yapılır.</p>
+
+<h2>8. İletişim</h2>
+<p>Emre — <a href="mailto:mrbrdkc28@gmail.com">mrbrdkc28@gmail.com</a></p>
+
+<hr>
+
+<h1 id="en">Privacy Policy</h1>
+<p class="tarih"><strong>Şah Düştü</strong> (com.emre.sahdustu) · Last updated: 29 September 2026</p>
+
+<p>This policy explains what data Şah Düştü collects, why, and who it is shared with.
+You can play <strong>as a guest without an account</strong>; in that case no personal
+data is sent to any server.</p>
+
+<h2>1. Data we collect</h2>
+
+<h3>If you create an account (optional)</h3>
+<table>
+  <tr><th>Data</th><th>Purpose</th></tr>
+  <tr><td>Email address</td><td>Sign-in and account recovery. If you use Google Sign-In, Google provides your email.</td></tr>
+  <tr><td>Password</td><td>Stored in hashed form by Firebase Authentication; the app never sees it.</td></tr>
+  <tr><td>Username</td><td>So other players can find you, and for the leaderboard.</td></tr>
+  <tr><td>Country</td><td>Shown on the leaderboard. Optional.</td></tr>
+  <tr><td>Profile photo</td><td>Only if you choose one. Visible to other players.</td></tr>
+  <tr><td>Game statistics</td><td>Rating (Elo), wins/losses/draws, game accuracy.</td></tr>
+  <tr><td>Friends and requests</td><td>Adding friends and sending rematch invitations.</td></tr>
+  <tr><td>Online game records</td><td>Moves, clock and opponent data held temporarily during a match.</td></tr>
+  <tr><td>Chat messages</td><td>Messages you send to your opponent in an online game are stored on the server as part of the game record. You can hide your opponent's messages and report inappropriate ones.</td></tr>
+  <tr><td>Reports</td><td>If you report a profile or a chat, the reported player, you and (for chat reports) the opponent's recent messages are stored for review.</td></tr>
+</table>
+
+<h3>Advertising</h3>
+<p>The app shows <strong>Google AdMob rewarded ads</strong> to unlock certain content.
+Watching an ad is always <strong>optional</strong>; core gameplay works without it.</p>
+<p>To serve and measure ads, AdMob may process your device's <strong>Advertising ID</strong>,
+approximate (IP-based) location and device information, under Google's own privacy terms:
+<a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">policies.google.com/technologies/ads</a>.
+You can reset or delete your Advertising ID in Android settings.</p>
+<p>In the European Economic Area, the United Kingdom and Switzerland you are asked for ad consent
+on first launch; you can change it any time under <strong>My Profile &gt; Ad privacy settings</strong>.</p>
+
+<h3>Voice play (optional)</h3>
+<p>If you enable this feature you can play by speaking your move (e.g. &quot;knight f4&quot;).
+The microphone opens <strong>only</strong> when you start listening — by pressing the button, or
+when it becomes your turn if you chose that microphone mode — and closes as soon as the command
+is recognised.</p>
+<ul>
+  <li>The app <strong>does not record audio</strong>, does not store any audio on the device and
+      does not send audio to any server, including Firebase.</li>
+  <li>Speech is converted to text by the <strong>Android speech recognition service installed on
+      your device</strong> (on most devices, the Google app). Under its own privacy policy that
+      service may send the audio to Google servers for processing. See
+      <a href="https://policies.google.com/privacy">policies.google.com/privacy</a>.</li>
+  <li>If you enable <strong>&quot;Try Offline Recognition&quot;</strong> in Settings and the offline
+      language pack is installed, the audio never leaves your device.</li>
+  <li>The only thing returned to the app is the <strong>recognised text</strong> (e.g. &quot;knight f4&quot;),
+      which is used solely to find the move and is not stored.</li>
+  <li>You can turn the feature off at any time in Options, and revoke the permission in system settings.</li>
+</ul>
+
+<h3>Stored only on your device</h3>
+<p>Sound preference, language, graphics quality, solved puzzles and error logs are kept
+in local browser storage <strong>on your device</strong> and are never uploaded.
+Uninstalling the app removes them.</p>
+
+<h2>2. Third-party services</h2>
+<ul>
+  <li><strong>Google Firebase Authentication and Cloud Firestore</strong> — where accounts
+      and statistics are stored. Provider: Google LLC.</li>
+  <li><strong>Google AdMob</strong> — rewarded ads.</li>
+  <li><strong>Android speech recognition service</strong> — only while voice play is enabled;
+      converts your spoken command to text.</li>
+  <li><strong>Google Play Services</strong> — Google Sign-In.</li>
+  <li><strong>Fonts and libraries</strong> — the 3D library, the Firebase SDK and fonts ship inside
+      the app; nothing is loaded from an external content delivery network.</li>
+  <li><strong>Your device's text-to-speech engine</strong> — narration is produced locally;
+      no text is sent to a server.</li>
+</ul>
+<p>We do <strong>not sell</strong> your data and do not share it with third parties beyond
+the advertising use described above.</p>
+
+<h2>3. Permissions</h2>
+<table>
+  <tr><th>Permission</th><th>Why</th></tr>
+  <tr><td><code>INTERNET</code></td><td>Online play, sign-in and ads.</td></tr>
+  <tr><td><code>POST_NOTIFICATIONS</code></td><td>Friend requests and game invitations. You may decline.</td></tr>
+  <tr><td><code>VIBRATE</code></td><td>Move feedback.</td></tr>
+  <tr><td><code>WAKE_LOCK</code></td><td>Keeps the screen on during a game.</td></tr>
+  <tr><td><code>RECORD_AUDIO</code></td><td>Microphone, for the optional <strong>voice play</strong>
+      feature. Requested only when you turn that feature on; the microphone is never opened while
+      it is off. You may decline — the rest of the game works normally.</td></tr>
+</table>
+
+<h2>4. Children</h2>
+<p>The app is not directed to children under 13 and does not knowingly collect data from
+anyone under 13. If you believe a child has provided us data, contact us and we will
+delete the account and its data.</p>
+
+<h2 id="account-deletion">5. Deleting your account and data</h2>
+<p><strong>In the app:</strong> My Profile &gt; <strong>Delete my account</strong>. For security you may be
+asked to sign in again right before deleting.</p>
+<p><strong>Without the app:</strong> email <a href="mailto:mrbrdkc28@gmail.com">mrbrdkc28@gmail.com</a>
+from your registered address with the subject &quot;Delete my account&quot;.
+Requests are completed within <strong>30 days</strong>.</p>
+<p><strong>Deleted:</strong> your sign-in account, profile (username, country, profile photo),
+rating and statistics, friends and requests, invitations and online game records
+(including chat messages).<br>
+<strong>Kept:</strong> reports submitted to prevent abuse are not deleted.<br>
+Guest players have no server-side data.</p>
+
+<h2>6. Security</h2>
+<p>Data is stored on Google Firebase and transmitted over encrypted connections (HTTPS/TLS).
+Firestore security rules ensure a player can only modify their own data.</p>
+
+<h2>7. Changes</h2>
+<p>If this policy changes, the date above is updated. Significant changes are announced
+inside the app.</p>
+
+<h2>8. Contact</h2>
+<p>Emre — <a href="mailto:mrbrdkc28@gmail.com">mrbrdkc28@gmail.com</a></p>
+
+</div>
+</body>
+</html>
