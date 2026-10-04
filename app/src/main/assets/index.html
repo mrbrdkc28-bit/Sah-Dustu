@@ -5655,6 +5655,7 @@ async function hamleOyna(h, ai=false, uzaktan=false){
       }
     }
   }catch(e){ _enIyiNot=''; }
+  const _fedaOnce=(!ai && analizAcik && !uzaktan) ? fedaHesapla(h) : null;
   Motor.yap(h); ist.hamle++;
   // ÇEVRİMİÇİ: hamleyi ANINDA gönder (kill-cam animasyonunu bekleme)
   if(cevrimiciAktif && !uzaktan){
@@ -5683,7 +5684,9 @@ async function hamleOyna(h, ai=false, uzaktan=false){
       const verilen=deger[saldTip]||0;
       const alinan=kurbTip?(deger[kurbTip]||0):0;
       // Değerli taşı (≥3) daha azına/hiçe feda ediyorsa ve sonuç en iyiyse → göz alıcı
-      if(verilen>=3 && verilen>alinan+1){ _kalite='gozAlici'; }
+      /* Eskiden "değerli taşla daha ucuzunu almak" göz alıcı sayılıyordu (korunmayan taşı almak
+         bile). Artık gerçek feda: rakip taşı kârlı alabiliyor mu (fedaHesapla). */
+      if(verilen>=3 && _fedaOnce && _fedaOnce.feda){ _kalite='gozAlici'; }
     }
   }
   try{
@@ -5897,6 +5900,43 @@ function beklenenPuan(cp){
 function puanKaybi(oncekiCp, sonrakiCp){
   return Math.max(0, beklenenPuan(oncekiCp) - beklenenPuan(sonrakiCp));
 }
+/* ================= FEDA TESPİTİ (4 Ekim 2026) =================
+   ESKİ HATA: "notasyonda x varsa feda" sayılıyordu → her geri alış (5.Vxf3, 13...Kxd7, 16...Axb8)
+   "Parlak", gerçek fedalar (16.Vb8+!!, 13.Kxd7!) ise sadece "En iyi" çıkıyordu (telefonda ölçüldü).
+   Doğrusu: hamleden sonra rakip, oynanan taşı KÂRLI biçimde alabiliyor mu? Rakibin en ucuz
+   alıcısıyla alıp bizim geri alıp alamadığımıza bakan bir adımlık değiş-tokuş hesabı (SEE).
+   Motor hamleden ÖNCEKİ konumda olmalı; sonunda geri alınır. */
+const TAS_DEGER={p:1,n:3,b:3,r:5,q:9,k:0};
+/* Bir karedeki değiş-tokuş zincirinin "taraf" için kazancı (klasik SEE): her seferinde en ucuz
+   alıcıyla alınır, taraf zararına devam etmek zorunda değildir (max 0). Motor durumu korunur. */
+function seeKare(sq, taraf, derin){
+  if((derin||0)>10) return 0;
+  const hedef=Motor.tasAl(sq); if(!hedef) return 0;
+  const alanlar=Motor.legal(taraf).filter(m=>m.to===sq); if(!alanlar.length) return 0;
+  let en=alanlar[0], enD=1e9;
+  for(const m of alanlar){ const t=Motor.tasAl(m.from); const v=t?(t.t==='k'?100:(TAS_DEGER[t.t]||0)):1e9; if(v<enD){ enD=v; en=m; } }
+  const hedefD = hedef.t==='k' ? 100 : (TAS_DEGER[hedef.t]||0);
+  const k=Motor.yap(en);
+  let sonra=0; try{ sonra=seeKare(sq, taraf==='w'?'b':'w', (derin||0)+1); }finally{ Motor.gerial(k); }
+  return Math.max(0, hedefD - sonra);
+}
+function fedaHesapla(h){
+  try{
+    const karsi=(Motor.turn==='w'?'b':'w');
+    const alinan = h.enpassant ? 1 : (Motor.tasAl(h.to) ? (TAS_DEGER[Motor.tasAl(h.to).t]||0) : 0);
+    const k1=Motor.yap(h);
+    let sonuc={feda:false, net:0, tas:null};
+    try{
+      const tas=Motor.tasAl(h.to); const deger=tas?(TAS_DEGER[tas.t]||0):0;
+      if(deger>=3){
+        const rakipKazanc=seeKare(h.to, karsi, 0);   // rakip bu karede ne kazanır
+        const net=rakipKazanc - alinan;
+        if(net>=2) sonuc={feda:true, net, tas:tas.t};
+      }
+    }finally{ Motor.gerial(k1); }
+    return sonuc;
+  }catch(e){ return {feda:false, net:0, tas:null}; }
+}
 /* Sınıflandırma: kazanma olasılığı düşüşüne göre (rakama değil, ANLAMA bakar) */
 function sinifBelirle(o){
   // o: {kayipPuan, enIyiMi, tekKurtaran, fedaVar, kitapMi, oncekiCp, sonrakiCp}
@@ -5904,7 +5944,10 @@ function sinifBelirle(o){
      açılış kitabındaki bir tuzak hattı (ör. çoban matına izin veren 3...Nf6)
      "Kitap" rozetiyle aklanıyor, oyuncu hatasını hiç göremiyordu. */
   if(o.kitapMi && o.kayipPuan<=0.05) return 'kitap';
-  if(o.enIyiMi && o.fedaVar && o.kayipPuan<=0.02) return 'parlak';
+  /* Parlak: gerçek feda (net >= 2 puan), en iyi ya da neredeyse en iyi, sonrasında konum kötü değil,
+     ve zaten ezici üstünlükte değilken (chess.com ölçütüne yakın). */
+  if(o.fedaVar && o.kayipPuan<=0.01 && o.sonrakiCp>=-50 && (o.oncekiCp<=600 || o.matYolu)) return 'parlak';
+  /* Harika: tek iyi hamle — ikinci en iyi hamle kazanma beklentisinden >=%15 kaybettiriyor. */
   if(o.enIyiMi && o.tekKurtaran)                  return 'harika';
   if(o.enIyiMi)                                   return 'enIyi';
   const k=o.kayipPuan;
@@ -6496,21 +6539,28 @@ const SF=(()=>{
       worker.onmessage=(e)=>{
         const sat=typeof e.data==='string'?e.data:(e.data&&e.data.data)||'';
         if(gunluk.length<12) gunluk.push(String(sat).slice(0,90));
-        if(sat==='uciok'){ worker.postMessage('isready'); }
+        if(sat==='uciok'){ worker.postMessage('setoption name MultiPV value 2'); worker.postMessage('isready'); }
         else if(sat==='readyok'){ hazir=true; mevcut=true; durum='hazir'; }
         else if(sat.startsWith('info') && sat.includes(' score ') && bekleyen){
+          /* MultiPV 2 (4 Ekim 2026): 1. satır en iyi hamle, 2. satır ikinci en iyi.
+             "Tek iyi hamle" (Harika) ancak ikincinin ne kadar kötü olduğu bilinirse ölçülebilir.
+             Mat skorunda mesafe de saklanır (açıklamalarda "N hamlede mat"). */
           const m=sat.match(/score (cp|mate) (-?\d+)/);
-          if(m){
-            let cp = m[1]==='cp' ? +m[2] : (m[2]>0?10000:-10000);
-            bekleyen._cp=cp;
+          const mpv=sat.match(/ multipv (\d+)/); const no=mpv?+mpv[1]:1;
+          if(m && !/ (lower|upper)bound/.test(sat)){
+            const deger=+m[2];
+            const cp = m[1]==='cp' ? deger : (deger>0?10000:-10000);
+            const mat = m[1]==='mate' ? deger : 0;
+            if(no===1){ bekleyen._cp=cp; bekleyen._mat=mat; } else { bekleyen._cp2=cp; bekleyen._mat2=mat; }
           }
           const pv=sat.match(/ pv ([a-h][1-8][a-h][1-8][qrbn]?)/);
-          if(pv) bekleyen._enIyi=pv[1];
+          if(pv){ if(no===1) bekleyen._enIyi=pv[1]; else bekleyen._ikinci=pv[1]; }
         }
         else if(sat.startsWith('bestmove') && bekleyen){
           const bm=sat.split(' ')[1];
           const cb=bekleyen.cb;
-          const sonuc={cp:bekleyen._cp||0, enIyi:bekleyen._enIyi||bm, bestmove:bm};
+          const sonuc={cp:bekleyen._cp||0, enIyi:bekleyen._enIyi||bm, bestmove:bm, mat:bekleyen._mat||0,
+                       cp2:(typeof bekleyen._cp2==='number'?bekleyen._cp2:null), ikinci:bekleyen._ikinci||null};
           bekleyen=null;
           cb(sonuc);
         }
@@ -6543,7 +6593,7 @@ const SF=(()=>{
   function analiz(fen, derinlik=12){
     return new Promise((res)=>{
       if(!hazir){ res(null); return; }
-      bekleyen={fen, cb:res, _cp:0, _enIyi:null};
+      bekleyen={fen, cb:res, _cp:0, _enIyi:null, _mat:0, _cp2:null, _ikinci:null};
       worker.postMessage('position fen '+fen);
       worker.postMessage('go depth '+derinlik);
     });
@@ -6559,7 +6609,7 @@ const SF=(()=>{
 /* ---- Akıllı yorum üreteci (chess24 tarzı kısa yorum, kendi metnimiz) ---- */
 const YORUM={
   tr:{
-    parlak:['Parlak hamle! Zor konumda en iyisini buldun.','Muhteşem! Bu hamle konumu kurtardı.','Ustaca. Tam da gereken hamle.'],
+    parlak:['Parlak hamle! Bunu görmek kolay değil.','Muhteşem! Cesur ve tam isabet.','Ustaca. Tam da gereken hamle.'],
     enIyi:['Kusursuz. Motorun ilk tercihi.','En iyi hamle. Tam isabet.','Bundan iyisi yoktu.'],
     iyi:['Sağlam hamle.','İyi seçim, konumu koruyor.','Doğru yönde.'],
     tutarli:['Mantıklı ama en keskini değil.','İdare eder, kayıp küçük.','Konum dengede kalıyor.'],
@@ -6569,9 +6619,12 @@ const YORUM={
     vahim:['Vahim hata! {sf} oynanmalıydı, bu hamle konumu yıktı.','Felaket hamle. {sf} zorunluydu.','Bu çok pahalıya patladı; {sf} gerekirdi.'],
     matKacti:['Mat fırsatı kaçtı!'],
     materyalKayip:['Bu hamleyle materyal kaybedildi.'],
+    harika:['Harika hamle!','Çok güçlü, tam zamanında.','Kritik anda doğru karar.'],
+    mukemmel:['Mükemmel, en iyiye çok yakın.','Çok iyi hamle.','Neredeyse kusursuz.'],
+    kitap:['Açılış kitabından bilinen hamle.','Teori hamlesi.','Bilinen açılış yolu.'],
   },
   en:{
-    parlak:['Brilliant! You found the best in a tough spot.','Superb move, it saved the position.','Masterful. Exactly what was needed.'],
+    parlak:['Brilliant! Not an easy one to see.','Superb! Bold and exactly right.','Masterful. Exactly what was needed.'],
     enIyi:['Perfect. The engine\'s top choice.','Best move. Spot on.','Nothing better existed.'],
     iyi:['Solid move.','Good choice, holds the position.','Right direction.'],
     tutarli:['Reasonable, though not sharpest.','Acceptable, small loss.','Position stays balanced.'],
@@ -6581,6 +6634,9 @@ const YORUM={
     vahim:['Disastrous! {sf} was required.','Catastrophic move. {sf} was forced.','This cost everything; {sf} was needed.'],
     matKacti:['Missed a mate!'],
     materyalKayip:['This move dropped material.'],
+    harika:['Great move!','Very strong, right on time.','The right call at a critical moment.'],
+    mukemmel:['Excellent, very close to best.','Very good move.','Almost perfect.'],
+    kitap:['A known opening book move.','Theory move.','Known opening path.'],
   }
 };
 let yorumDil='tr', sesProfili={dil:'tr-TR', cinsiyet:'kadin', ses:null};
@@ -6637,6 +6693,53 @@ function sinifRenk(s){ const b=SINIF_BILGI[s]; return b?b.renk:'#9FB4C7'; }
    Türkçe arayüzde oyun sonu çipleri "Mistake/Blunder" görünüyordu.
    dil verilirse (inceleme yorum kutusu) o dilde döner — yorum metniyle aynı dilde. */
 function sinifAd(s, dil){ const b=SINIF_BILGI[s]; if(!b) return ''; return dil ? (b.ad[dil]||b.ad.tr) : b.ad.tr; }
+/* AKILLI AÇIKLAMA (4 Ekim 2026): şablon yorumun yanına SOMUT neden. Stockfish'in kendi verisinden:
+   kaçırılan mat, rakibe verilen mat, rakibin en iyi cevabının taş alması, fedanın kendisi. */
+const TAS_ADI_DIL={ tr:{p:'piyonunu',n:'atını',b:'filini',r:'kaleni',q:'vezirini',k:'şahını'},
+                    en:{p:'pawn',n:'knight',b:'bishop',r:'rook',q:'queen',k:'king'} };
+const TAS_YALIN={ tr:{p:'Piyon',n:'At',b:'Fil',r:'Kale',q:'Vezir'}, en:{p:'Pawn',n:'Knight',b:'Bishop',r:'Rook',q:'Queen'} };
+/* Motorun önerdiği hamle bir taş kazanıyor muydu? (hamleden ÖNCEKİ konumda çağrılır)
+   Takas değil, net kazanç: karedeki değiş-tokuş >= 3 puan getirmeli. */
+function kacanKazanc(sfH){
+  try{
+    if(!sfH) return null;
+    const t=Motor.tasAl(sfH.to); if(!t || t.t==='p' || t.t==='k') return null;
+    const kazanc=seeKare(sfH.to, Motor.turn, 0);
+    return kazanc>=3 ? {tas:t.t, kazanc} : null;
+  }catch(e){ return null; }
+}
+function hamleAciklama(o){
+  try{
+    const tr=(o.dil||'tr')==='tr';
+    const kotu=['yanlislik','hata','vahim','kacirilan'].indexOf(o.sinif)>=0;
+    if(o.sinif==='parlak' && o.fd && o.fd.feda){
+      const ad=(TAS_YALIN[tr?'tr':'en'][o.fd.tas]||'');
+      return tr ? (ad+' feda edildi; karşılığında oyun senin lehine döndü.') : (ad+' sacrificed — and the game turned your way.');
+    }
+    if(o.sinif==='harika'){
+      const sk=o.enIyiSkor||0;
+      if(sk>=100) return tr ? 'Üstünlüğü korumanın tek yolu buydu.' : 'The only way to keep the advantage.';
+      if(sk>-100) return tr ? 'Dengeyi korumanın tek yolu buydu.' : 'The only move that kept the balance.';
+      return tr ? 'Direnmenin tek yolu buydu.' : 'The only way to keep fighting.';
+    }
+    if(!kotu) return '';
+    if(o.sonuc && o.sonuc.mat>0) return tr ? ('Burada '+o.sfNot+' ile '+o.sonuc.mat+' hamlede mat vardı.') : ('There was mate in '+o.sonuc.mat+' starting with '+o.sfNot+'.');
+    if(o.sonrasi && o.sonrasi.mat>0) return tr ? ('Bu hamleden sonra rakibin '+o.sonrasi.mat+' hamlede matı var.') : ('After this, your opponent has mate in '+o.sonrasi.mat+'.');
+    if(o.kacan && o.kacan.tas) return tr ? (o.sfNot+' ile rakibin '+({n:'atını',b:'filini',r:'kalesini',q:'vezirini'}[o.kacan.tas])+' kazanabilirdin.') : ('You could have won the '+TAS_ADI_DIL.en[o.kacan.tas]+' with '+o.sfNot+'.');
+    if(o.sonrasi && o.sonrasi.enIyi){
+      const kare=uciKare(o.sonrasi.enIyi.slice(2,4)), tas=Motor.tasAl(kare);   // Motor oynanan hamleden SONRAKİ konumda
+      /* Yalnızca gerçekten taş kaybı varsa: karedeki değiş-tokuş rakibe, bu hamlede aldığımızdan
+         en az 2 puan fazla kazandırmalı (Bxf3 Qxf3 gibi takaslar "taşını alabilir" sayılmaz). */
+      if(tas && (TAS_DEGER[tas.t]||0)>=3 && (seeKare(kare, Motor.turn, 0) - (o.alinanD||0))>=2){
+        const fr=uciKare(o.sonrasi.enIyi.slice(0,2)), to=kare;
+        const rh=Motor.legal(Motor.turn).find(m=>m.from===fr&&m.to===to);
+        const rn=rh?Motor.notasyon(rh):o.sonrasi.enIyi;
+        return tr ? ('Rakip '+rn+' ile '+TAS_ADI_DIL.tr[tas.t]+' alabilir.') : ('Your opponent can take your '+TAS_ADI_DIL.en[tas.t]+' with '+rn+'.');
+      }
+    }
+    return '';
+  }catch(e){ return ''; }
+}
 function yorumUret(kalite, sfNot, dil){
   const Y=YORUM[dil]||YORUM.tr;
   const grup = Y[kalite] || Y.iyi;
@@ -6912,58 +7015,74 @@ async function stockfishDegerlendir(){
     Motor.yap(bulunan);
   }
   Motor.reset();
+  /* TEK GEÇİŞ (4 Ekim 2026): bir hamleden SONRAKİ konum, bir sonraki hamleden ÖNCEKİ konumla aynı.
+     Eskiden her konum iki kez analiz ediliyordu (derinlik 10). Artık her konum bir kez, derinlik 14,
+     MultiPV 2 — aynı sürede çok daha isabetli. */
+  const DER=12;
+  const degerler=new Array(fenler.length+1).fill(undefined);
+  const degerAl=async(j)=>{
+    if(degerler[j]!==undefined) return degerler[j];
+    let fenJ=null;
+    if(j<fenler.length) fenJ=fenler[j];
+    else { Motor.reset(); for(const kk of oyunKaydi){ const hh=Motor.legal(Motor.turn).find(m=>Motor.notasyon(m)===kk.notasyon); if(!hh) break; Motor.yap(hh); }
+           try{ fenJ=(Motor.durum()==='devam')?Motor.fen():null; }catch(e){ fenJ=null; } }
+    degerler[j]= fenJ ? await SF.analiz(fenJ, DER) : null;
+    return degerler[j];
+  };
   for(let i=0;i<fenler.length;i++){
     const k=oyunKaydi[i];
-    const sonuc=await SF.analiz(fenler[i], 10);
-    let kSinif='tutarli', oneri='', kayip=0;
+    const sonuc=await degerAl(i);
+    let kSinif='tutarli', oneri='', kayip=0, ek='';
     if(sonuc){
       Motor.reset();
+      let sonTo=null;
       for(let j=0;j<i;j++){
         const hh=Motor.legal(Motor.turn).find(m=>Motor.notasyon(m)===oyunKaydi[j].notasyon);
-        if(hh) Motor.yap(hh);
+        if(hh){ Motor.yap(hh); sonTo=hh.to; }
       }
       const sfFrom=uciKare(sonuc.enIyi.slice(0,2)), sfTo=uciKare(sonuc.enIyi.slice(2,4));
       const sfH=Motor.legal(Motor.turn).find(m=>m.from===sfFrom&&m.to===sfTo);
       const sfNot=sfH?Motor.notasyon(sfH):sonuc.enIyi;
       const oyuncuH=Motor.legal(Motor.turn).find(m=>Motor.notasyon(m)===k.notasyon);
       if(oyuncuH){
+        const fd=fedaHesapla(oyuncuH);           // hamleden ÖNCEKİ konumda
+        const _al=Motor.tasAl(oyuncuH.to);
+        const alinanD = oyuncuH.enpassant ? 1 : (_al ? (TAS_DEGER[_al.t]||0) : 0);
+        const geriAlma = !!_al && oyuncuH.to===sonTo;   // rakibin az önce aldığı taşı geri almak: "tek hamle" sayılmaz
+        const kacan = kacanKazanc(sfH);
         Motor.yap(oyuncuH);
-        /* Bu hamle MAT ettiyse en iyi hamledir: ölçme, kaybı sıfır say.
-           (Stockfish mat konumunda ±10000 döndürüyor; bu değer kayıp
-           hesabına girince mat eden hamle "vahim" damgası yiyordu.) */
         let matEttiMi=false;
         try{ matEttiMi=(Motor.durum()==='mat'); }catch(e){}
         k._fen=Motor.fen();   // evre tespiti için konum saklanır
         if(matEttiMi){
           kayip=0; kSinif='enIyi';
           k._kayipPuan=0;      // mat = kusursuz hamle, kayıp yok
-          /* Lichess modeli için beyaz-POV değerlendirme: mat = tam üstünlük */
           k._cpBeyaz = (k.renk==='w') ? 1000 : -1000;
+          if(fd.feda) kSinif='parlak';             // fedayla gelen mat
         } else {
-          const sonrasi=await SF.analiz(Motor.fen(),10);
+          const sonrasi=await degerAl(i+1);
           const KIRP=(v)=>Math.max(-1000, Math.min(1000, (typeof v==='number'&&isFinite(v))?v:0));
           const enIyiSkor = KIRP(sonuc.cp);
           const oyuncuSkor = KIRP(sonrasi ? -sonrasi.cp : 0);
           kayip = Math.min(1000, Math.max(0, enIyiSkor - oyuncuSkor));
-          /* --- BEKLENEN PUAN MODELİ ile sınıflandır --- */
           const kayipPuan = puanKaybi(enIyiSkor, oyuncuSkor);
           const kitapMi   = (i < acilisKitapUzunluk());
-          /* Feda tespiti: hamle materyal veriyor ama konum korunuyorsa */
-          let fedaVar=false;
-          try{ fedaVar = k.notasyon.indexOf('x')>=0 && kayipPuan<=0.02 && enIyiSkor<300; }catch(e){}
-          /* Tek kurtaran hamle: alternatifler belirgin şekilde kötüyse */
-          const tekKurtaran = (sfNot===k.notasyon && enIyiSkor>=-50 && enIyiSkor<=250);
+          const enIyiMi   = (sfNot===k.notasyon);
+          /* Tek iyi hamle: ikinci en iyi hamle beklenen puanda >=%15 kaybettiriyor ve konum henüz
+             karar verilmemiş (ezici üstünlük/kayıpta "tek hamle" anlamsız). */
+          const ikinciSkor = (typeof sonuc.cp2==='number') ? KIRP(sonuc.cp2) : null;
+          const tekKurtaran = enIyiMi && !geriAlma && ikinciSkor!==null && enIyiSkor>-300 && enIyiSkor<500 &&
+                              puanKaybi(enIyiSkor, ikinciSkor)>=0.15;
           kSinif = sinifBelirle({
-            kayipPuan, enIyiMi:(sfNot===k.notasyon), tekKurtaran, fedaVar, kitapMi,
+            kayipPuan, enIyiMi, tekKurtaran, fedaVar:fd.feda, kitapMi, matYolu:(enIyiMi && sonuc.mat>0),
             oncekiCp:enIyiSkor, sonrakiCp:oyuncuSkor
           });
           k._kayipPuan=kayipPuan;
-          /* Lichess modeli için: hamleden SONRAKİ konumun beyaz-POV skoru.
-             oyuncuSkor hamleyi yapanın perspektifinde; beyaza çeviriyoruz. */
           k._cpBeyaz = (k.renk==='w') ? oyuncuSkor : -oyuncuSkor;
           if(kSinif==='yanlislik'||kSinif==='hata'||kSinif==='vahim'||kSinif==='kacirilan') oneri=sfNot;
+          ek = hamleAciklama({ sinif:kSinif, sonuc, sonrasi, sfNot, fd, alinanD, enIyiSkor, kacan, dil:yorumDil });
         }
-        k._yorum=yorumUret(kSinif, sfNot, yorumDil);
+        k._yorum=yorumUret(kSinif, sfNot, yorumDil) + (ek ? ' '+ek : '');
         k._kSinif=kSinif;
         k._kayip=Math.max(0,kayip);
         k._kaynak='sf';
@@ -9526,7 +9645,9 @@ function inceleOzetDoldur(hedefId){
   el.classList.add('acik');
 }
 async function inceleStockfishDoldur(ilerleCb){
-  // Her hamle için Stockfish değerlendirmesi yapıp oyunKaydi'na _yorum + _kSinif yaz
+  /* Her hamle için Stockfish değerlendirmesi yapıp oyunKaydi'na _yorum + _kSinif yazar.
+     Ölçüt stockfishDegerlendir() ile AYNI (4 Ekim 2026): her konum bir kez, derinlik 12, MultiPV 2;
+     gerçek feda (SEE), geri almalar "tek hamle" sayılmaz, somut açıklama (hamleAciklama). */
   Motor.reset();
   const fenler=[];
   for(let i=0;i<oyunKaydi.length;i++){
@@ -9534,67 +9655,70 @@ async function inceleStockfishDoldur(ilerleCb){
     const h=Motor.legal(Motor.turn).find(m=>Motor.notasyon(m)===oyunKaydi[i].notasyon);
     if(!h) break; Motor.yap(h);
   }
+  const sonFen=Motor.fen();
   Motor.reset();
+  const DER=12, onbellek={};
+  const degerAl=async(j)=>{
+    if(j in onbellek) return onbellek[j];
+    const fen = j<fenler.length ? fenler[j] : sonFen;
+    const r = await SF.analiz(fen, DER); onbellek[j]=r; return r;
+  };
+  const dil=(typeof yorumDil!=='undefined'?yorumDil:'tr');
   for(let i=0;i<fenler.length;i++){
     /* await sırasında yeni oyun başlamış olabilir; aşağıdaki blok paylaşılan
        Motor'u reset'leyip hamleleri tekrar oynuyor — önce iptali kontrol et. */
     if(typeof _analizIptal!=='undefined' && _analizIptal) return;
     const k=oyunKaydi[i];
     if(!k) return;                       // kayıt yeni oyunla silinmişse çık
-    const sonuc=await SF.analiz(fenler[i], 10);
+    const sonuc=await degerAl(i);
     if(typeof _analizIptal!=='undefined' && _analizIptal) return;
-    if(!sonuc){ continue; }
-    // SF en iyi hamlenin notasyonu
+    if(!sonuc || !sonuc.enIyi){ continue; }
     Motor.reset();
-    for(let j=0;j<i;j++){ const hh=Motor.legal(Motor.turn).find(m=>Motor.notasyon(m)===oyunKaydi[j].notasyon); if(hh) Motor.yap(hh); }
+    let sonTo=null;
+    for(let j=0;j<i;j++){ const hh=Motor.legal(Motor.turn).find(m=>Motor.notasyon(m)===oyunKaydi[j].notasyon); if(hh){ Motor.yap(hh); sonTo=hh.to; } }
     const sfFrom=uciKare(sonuc.enIyi.slice(0,2)), sfTo=uciKare(sonuc.enIyi.slice(2,4));
     const sfH=Motor.legal(Motor.turn).find(m=>m.from===sfFrom&&m.to===sfTo);
     const sfNot=sfH?Motor.notasyon(sfH):sonuc.enIyi;
     const oyuncuH=Motor.legal(Motor.turn).find(m=>Motor.notasyon(m)===k.notasyon);
-    let kayip=0, matEttiMi=false, kayipPuanBu=0;
+    let kayip=0, kSinif='iyi', ek='';
     if(oyuncuH){
+      const fd=fedaHesapla(oyuncuH);
+      const _al=Motor.tasAl(oyuncuH.to);
+      const alinanD = oyuncuH.enpassant ? 1 : (_al ? (TAS_DEGER[_al.t]||0) : 0);
+      const geriAlma = !!_al && oyuncuH.to===sonTo;
+      const kacan = kacanKazanc(sfH);
       Motor.yap(oyuncuH);
       k._fen=Motor.fen();
-      try{ matEttiMi=(Motor.durum()==='mat'); }catch(e){}
+      let matEttiMi=false; try{ matEttiMi=(Motor.durum()==='mat'); }catch(e){}
       if(matEttiMi){
-        kayip=0; kayipPuanBu=0;
-        k._cpBeyaz = (k.renk==='w') ? 1000 : -1000;   // Lichess modeli için
-      }
-      else {
-        const sonrasi=await SF.analiz(Motor.fen(),10);
+        k._kayipPuan=0; k._cpBeyaz=(k.renk==='w')?1000:-1000;   // Lichess modeli için
+        kSinif = fd.feda ? 'parlak' : 'enIyi';
+      } else {
+        const sonrasi=await degerAl(i+1);
         const KIRP=(v)=>Math.max(-1000, Math.min(1000, (typeof v==='number'&&isFinite(v))?v:0));
-        const oyuncuSkor=KIRP(sonrasi?-sonrasi.cp:0);
-        kayip=Math.max(0, KIRP(sonuc.cp)-oyuncuSkor);
-        kayipPuanBu=puanKaybi(KIRP(sonuc.cp), oyuncuSkor);
+        const enIyiSkor=KIRP(sonuc.cp), oyuncuSkor=KIRP(sonrasi?-sonrasi.cp:0);
+        kayip=Math.max(0, enIyiSkor-oyuncuSkor);
+        const kayipPuan=puanKaybi(enIyiSkor, oyuncuSkor);
+        k._kayipPuan=kayipPuan;
         /* Hamleden SONRAKİ konumun beyaz-POV skoru (doğruluk hesabı için) */
         k._cpBeyaz = (k.renk==='w') ? oyuncuSkor : -oyuncuSkor;
+        const enIyiMi=(sfNot===k.notasyon);
+        const ikinciSkor=(typeof sonuc.cp2==='number')?KIRP(sonuc.cp2):null;
+        const tekKurtaran = enIyiMi && !geriAlma && ikinciSkor!==null && enIyiSkor>-300 && enIyiSkor<500 &&
+                            puanKaybi(enIyiSkor, ikinciSkor)>=0.15;
+        kSinif = sinifBelirle({
+          kayipPuan, enIyiMi, tekKurtaran, fedaVar:fd.feda, kitapMi:(i<acilisKitapUzunluk()),
+          matYolu:(enIyiMi && sonuc.mat>0), oncekiCp:enIyiSkor, sonrakiCp:oyuncuSkor
+        });
+        if(kSinif==='kitap') k._kayipPuan=0;
+        ek = hamleAciklama({ sinif:kSinif, sonuc, sonrasi, sfNot, fd, alinanD, enIyiSkor, kacan, dil });
       }
-    }
-    k._kayipPuan=kayipPuanBu;
-    let kSinif;
-    // Oyuncunun hamlesinden ÖNCE pozisyon dengeli/iyi miydi? (kaçırılan fırsat tespiti)
-    const oncekiUstunluk=sonuc.cp; // oyuncu açısından, hamleden önceki en iyi skor
-    /* TUTARLILIK DÜZELTMESİ: burası eskiden HAM SANTİPİYON eşikleriyle
-       (30/100/250/450) sınıflandırıyordu; diğer Stockfish yolu ise beklenen-puan
-       modeliyle. Aynı hamle, hangi ekrandan bakıldığına göre farklı rozet
-       alıyordu. Artık her iki yol da sinifBelirle() ile AYNI ölçüte bakar. */
-    if(matEttiMi){ kSinif='enIyi'; }
-    else if(i < acilisKitapUzunluk() && kayipPuanBu<=0.05){ kSinif='kitap'; k._kayipPuan=0; }
-    else {
-      const oyuncuSkorSf = Math.max(-1000, Math.min(1000, oncekiUstunluk - kayip));
-      let fedaVar=false;
-      try{ fedaVar = k.notasyon.indexOf('x')>=0 && kayipPuanBu<=0.02 && oncekiUstunluk<300; }catch(e){}
-      const tekKurtaran = (sfNot===k.notasyon && oncekiUstunluk>=-50 && oncekiUstunluk<=250);
-      kSinif = sinifBelirle({
-        kayipPuan: kayipPuanBu, enIyiMi:(sfNot===k.notasyon), tekKurtaran, fedaVar,
-        kitapMi:false, oncekiCp:oncekiUstunluk, sonrakiCp:oyuncuSkorSf
-      });
     }
     k._kSinif=kSinif;
     k._kayip=Math.max(0,kayip);
     k._kaynak='sf';
     k._sfNot=sfNot;
-    k._yorum=yorumUret(kSinif, sfNot, (typeof yorumDil!=='undefined'?yorumDil:'tr'));
+    k._yorum=yorumUret(kSinif, sfNot, dil) + (ek ? ' '+ek : '');
     k._cp=sonuc.cp;
     if(typeof ilerleCb==='function'){ try{ ilerleCb((i+1)/fenler.length); }catch(e){} }
     /* Yeni oyun başladıysa DERHAL çık: bu döngü paylaşılan Motor'u reset'leyip
