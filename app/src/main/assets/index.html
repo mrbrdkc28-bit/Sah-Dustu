@@ -2344,6 +2344,11 @@ html[data-tema="fildisi"] #secimSayfa .tsPaket.secili{background:linear-gradient
     <p>"Chess Board - Low Poly" — <b>Bharad</b><br><span style="color:#7d7868;font-size:11px">skfb.ly/6FZIV</span></p>
     <p>"Chess Game" — <b>duck123acb</b><br><span style="color:#7d7868;font-size:11px">sketchfab.com/3d-models/chess-game-d511df1e8f044c18b20ea6c50075477e</span></p>
     <p>"Simplified Sci-Fi Chess Pieces" — <b>Dawnstar-Chronicles</b><br><span style="color:#7d7868;font-size:11px">sketchfab.com/3d-models/simplified-sci-fi-chess-pieces-0ffdbfe925014138b2a3ef12643c5885</span></p>
+    <p>"Replica Lewis Chess Pieces on Chessboard" — <b>nebulousflynn</b><br><span style="color:#7d7868;font-size:11px">sketchfab.com/3d-models/replica-lewis-chess-pieces-on-chessboard-95a5545c8cd34042af8579d0cf972373</span></p>
+    <p>"Samurai chess" — <b>3DWorkbench</b><br><span style="color:#7d7868;font-size:11px">sketchfab.com/3d-models/samurai-chess-42df7109df04494195b749dfb154542e</span></p>
+    <p>"Realistic Chess Set – Full Board with Pieces" — <b>BenAissa_Karim</b><br><span style="color:#7d7868;font-size:11px">sketchfab.com/3d-models/realistic-chess-set-full-board-with-pieces-4f5a651ec0c7405badbcf478ed1cab8f</span></p>
+    <p>"Chess set" — <b>brendanwood872</b><br><span style="color:#7d7868;font-size:11px">sketchfab.com/3d-models/chess-set-a2664ea4fcaa4a64ad077667d9d0c7fb</span></p>
+    <p>"Cartoon Chess Set" — <b>CYX1122</b><br><span style="color:#7d7868;font-size:11px">sketchfab.com/3d-models/cartoon-chess-set-daae6882d0354d6389491e24f887b649</span></p>
     <p>Deri tahta dokusu — <b>Glowbox</b> (Sketchfab, CC BY 4.0)</p>
     <p style="margin-top:14px">Klasik taş modelleri: <b>KayKit — Board Game Bits</b>, Kay Lousberg (kaylousberg.com). Lisans metni uygulama paketindeki KayKit-LICENSE.txt dosyasındadır.</p>
 
@@ -3886,6 +3891,18 @@ const ORDULAR=[
     w:0xB7B7B7, b:0x0C0C0C, glb:true},
   {id:'scifi', ad:'Bilim Kurgu', desc:'Beyaz-teal fütürizme karşı kızıl cam.',
     w:0xF2F2F5, b:0x511008, glb:true},
+  /* 5 Ekim 2026: Sketchfab CC-BY 4.0 setler (atıflar Lisanslar ekranında). Başlangıç dizilişindeki
+     sahneden taş taş ayrıldı (scratchpad setler/bol.mjs), dokular küçültüldü. */
+  {id:'lewis', ad:'Lewis', desc:'12. yüzyıl Lewis taşlarının replikası — gerçek tarama.',
+    w:0xE6D8BC, b:0x6A2E22, glb:true},
+  {id:'samuray', ad:'Samuray', desc:'Japon savaşçı ordusu — figürlü set.',
+    w:0xE8DFC8, b:0x2A2420, glb:true},
+  {id:'gercektam', ad:'Turnuva', desc:'Modern turnuva seti — yüksek detay.',
+    w:0xF0EEE8, b:0x161616, glb:true},
+  {id:'klasikset', ad:'Zarif Klasik', desc:'İnce işçilikli klasik set.',
+    w:0xEDE6D6, b:0x1A1612, glb:true},
+  {id:'cizgi', ad:'Çizgi Film', desc:'Sevimli, oyuncak gibi set.',
+    w:0xF4F0E6, b:0x2B2B33, glb:true},
 ];
 let aktifOrdu=ORDULAR[0];
 
@@ -4554,7 +4571,8 @@ function modelDene(g,t,c){
     // At yönü: SETE ÖZEL (her modelin doğal baş ekseni farklı — kütle analiziyle bulundu).
     // Hedef: beyaz at beyazın SOLUNA (-X) bakar (diyagram geleneği), siyah aynalı.
     if(t==='n'){
-      const A={gercek3:0, gercek4:Math.PI, gercek5:Math.PI/2, gercek6:-Math.PI/2, gercek7:-Math.PI/2, retropc:0, c2:-Math.PI/2, metal:Math.PI, lowpoly:-Math.PI/2, sade:-Math.PI/2, scifi:-Math.PI/2}[aktifOrdu.id];
+      const A={gercek3:0, gercek4:Math.PI, gercek5:Math.PI/2, gercek6:-Math.PI/2, gercek7:-Math.PI/2, retropc:0, c2:-Math.PI/2, metal:Math.PI, lowpoly:-Math.PI/2, sade:-Math.PI/2, scifi:-Math.PI/2,
+        lewis:Math.PI/2, samuray:Math.PI, gercektam:Math.PI/2, klasikset:-Math.PI/2, cizgi:Math.PI}[aktifOrdu.id];
       const taban=(A!==undefined)?A:Math.PI/2;
       m.rotation.y = c==='w' ? taban : taban+Math.PI;
     }

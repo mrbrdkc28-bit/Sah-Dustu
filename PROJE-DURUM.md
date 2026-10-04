@@ -786,3 +786,15 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Ahşap: `ah_<an>_<t>` sentez, taşa göre ton (AH_OLCEK). Ordu: `sfx/ordu/<t>_<an>.ogg` (Kenney RPG Audio + Impact Sounds, BigSoundBank;
   hepsi CC0, kaynak listesi sfx/ordu/KAYNAK.txt), oyunda kırpılır (`kirp`). Lisanslar ekranına teşekkür eklendi. Fildişi tema renkleri ayrı.
 - Varsayılan paket Klasik.
+
+### 8.35 Beş yeni 3B ordu (Sketchfab CC-BY 4.0) (5 Ekim 2026)
+- Lewis (nebulousflynn), Samuray (3DWorkbench), Turnuva = gercektam (BenAissa_Karim), Zarif Klasik = klasikset (brendanwood872),
+  Çizgi Film = cizgi (CYX1122). Premium (BEDAVA_ORDU'da değil). Atıflar Lisanslar ekranında + KREDILER.txt + GLB asset.extras.
+- Hepsi başlangıç dizilişindeki tek sahneydi. Ayırma aracı: scratchpad `setler/bol.mjs` (gltf-transform): kare kümeleme, sıra/sütun
+  ekseni, beyaz taraf (malzeme adı/parlaklık, gerekirse elle: samuray `-z`), d=vezir e=şah; taş xz merkez + taban y=0'a alınır;
+  siyah taşlar kaynakta beyaza dönük olduğu için 180° çevrilip kaydedilir (yoksa at yönü kuralı bozuluyordu). Dokular 1024 (Lewis 512).
+- Kaynakta şah/vezir yeri ters olanlar elle takaslandı: klasikset w+b, cizgi b. At yönü (A tablosu): lewis PI/2, samuray PI,
+  gercektam PI/2, klasikset -PI/2, cizgi PI — telefonda gözle doğrulandı.
+- Önizlemeler 8.15'teki tarifle çekildi (416x256 webp). Modeller toplam ~29 MB eklendi (APK ~60 MB). Kasarsa ağırlar (Lewis, Turnuva,
+  Zarif) çıkarılabilir — sahibin kararı.
+- Bekleyen: Cam taşlar (tek parça, geometri ayrıştırma gerek) ve Cam tahta (şah yerinden oynamış) indirildi, henüz eklenmedi.

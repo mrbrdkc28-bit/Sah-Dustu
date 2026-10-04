@@ -49,6 +49,18 @@ CC0:     http://creativecommons.org/publicdomain/zero/1.0/
 
 (Atıf zorunlu değildir; teşekkür olarak belirtilmiştir.)
 
+Ayrıca aşağıdaki setler Sketchfab'dan Creative Commons Attribution 4.0
+(CC BY 4.0) lisansıyla alınmıştır; sanatçı adları ve kaynaklar uygulama
+içindeki "Lisanslar & Atıflar" ekranında ve her modelin dosya bilgisinde
+(glTF asset.extras) yer alır. Eklenenler (5 Ekim 2026):
+  - "Replica Lewis Chess Pieces on Chessboard" — nebulousflynn
+  - "Samurai chess" — 3DWorkbench
+  - "Realistic Chess Set – Full Board with Pieces" — BenAissa_Karim
+  - "Chess set" — brendanwood872
+  - "Cartoon Chess Set" — CYX1122
+Modeller taş taş ayrılmış, ölçeklenmiş ve dokuları küçültülmüştür.
+CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
+
 
 ────────────────────────────────────────────────────────────
 4) SES EFEKTLERİ — CC0 / Telifsiz
