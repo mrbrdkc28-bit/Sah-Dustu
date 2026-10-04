@@ -2035,18 +2035,8 @@ body:has(#son.acik) #hud,body:has(#son.acik) #notSeritUst,body:has(#son.acik) #n
    gizlenmişti. Tahta ile alt şerit arasındaki boşluğa, üst çubuktaki "SES / AYARLAR" diliyle etiketli
    simgelerden bir raf kondu. Yüzen çevirme düğmesi de rafa taşındı. Alt panelin boş liste alanı kalktı,
    gezinme düğmeleri yuvarlak/hap biçiminde (inceleme paneliyle aynı dil). */
-#aracRafi{display:none}
-body.dikeyAktif #hud.acik ~ #aracRafi{display:flex}
-/* Raf ÜSTTE (sahibin isteği): üst çubuğun hemen altında, sağa hizalı ikinci sıra; düğmeler üst çubuktaki
-   hbtn-simge ile birebir aynı (sınıfları paylaşır). Konum JS ile Ayarlar düğmesinin altına oturtulur. */
-#aracRafi{position:fixed;right:10px;top:calc(env(safe-area-inset-top,0px) + 64px);z-index:21;gap:5px;
-  align-items:flex-start;justify-content:flex-end}
-#aracRafi button i{white-space:nowrap}
-#aracRafi button.gizli{display:none}
-#aracRafi button.kapali{opacity:.5}
-body:has(#son.acik) #aracRafi,body.incelemede #aracRafi,body:has(#bulmacaSerit.acik) #aracRafi{display:none!important}
-/* Döndür artık rafta: dikey oyun sırasında yüzen düğme gizli (incelemede yine görünür) */
-body.dikeyAktif:not(.incelemede) #yonBtn{display:none!important}
+/* Döndür üst sırada: dikey oyun sırasında yüzen düğme gizli (incelemede yine görünür) */
+
 /* Alt panel: yalnız gezinme (hamleler zaten şeritlerde) */
 #notPanel.dikey{background:none!important;border:none!important;padding:0!important;bottom:calc(52px + env(safe-area-inset-bottom))!important}
 #notPanel.dikey #notListe,#notPanel.dikey #notBilgi{display:none!important}
@@ -2066,6 +2056,26 @@ body.dikeyAktif .notSerit.alt{bottom:calc(104px + env(safe-area-inset-bottom))}
 /* Mikrofon kapalıyken: sönük, üstü çizili (4 Ekim 2026) */
 #btnSesKomut.kapali{opacity:.6}
 #btnSesKomut.kapali .sg{color:var(--dim)}
+
+/* ===== DİKEY ÜST ÇUBUK + ALT GEZİNME (4 Ekim 2026, sahibin tarifi) =====
+   Üst: tek sıra, tam genişlik: Sesli · Ses · Döndür · 2B · Taş adı · Sahne · Yardım (eşit pay).
+   Altında: sıra göstergesi (BEYAZ/SİYAH); süre dikeyde zaten şeritlerde. Menü ve Ayarlar alttaki
+   Geri/İleri sırasının iki ucunda. Yatay düzen değişmez. */
+body.dikeyAktif #hud{flex-direction:column;align-items:stretch;gap:8px;padding:8px 8px}
+body.dikeyAktif #hud .hud-sag{order:1;width:100%;justify-content:space-between;gap:4px;align-items:stretch}
+body.dikeyAktif #hud .hud-sol{order:2;max-width:100%;flex:0 0 auto}
+body.dikeyAktif #hud .hud-sag .ikincil:not([style*="display: none"]):not(#btnYeni){display:flex!important}
+body.dikeyAktif #hud #btnYeni,body.dikeyAktif #hud #btnMenu,body.dikeyAktif #hud #btnSecenekler{display:none!important}
+body.dikeyAktif #hud .hud-sag .hbtn-simge{flex:1 1 0;min-width:0;padding:6px 1px 5px;margin:0}
+body.dikeyAktif #hud .hud-sag .hbtn-simge i{max-width:100%;overflow:hidden;text-overflow:ellipsis;font-size:8px;letter-spacing:.03em}
+/* Döndür her iki yönde de üst çubukta; yüzen yön düğmesi yalnız incelemede */
+body:not(.incelemede) #yonBtn{display:none!important}
+/* Alt gezinme: Menü (sol) · Geri · İleri · Son · Ayarlar (sağ) */
+#nMenu,#nAyar{display:none}
+#notPanel.dikey #nMenu,#notPanel.dikey #nAyar{display:inline-flex}
+#notPanel.dikey #nMenu,#notPanel.dikey #nAyar{width:44px;padding:0!important}
+#notPanel.dikey #nGeri,#notPanel.dikey #nIleri{padding:0 13px!important}
+#notPanel.dikey #notKontrol{gap:8px!important}
 </style>
 </head>
 <body>
@@ -2705,7 +2715,6 @@ body.dikeyAktif .notSerit.alt{bottom:calc(104px + env(safe-area-inset-bottom))}
   </div>
 </div>
 
-<div id="aracRafi" aria-label="Araçlar"></div>
 <div id="notSeritUst" class="notSerit ust"><div class="notAkis" id="notAkisUst"></div><span class="seritSaat" id="saatUst">--:--</span></div>
 <div id="notSeritAlt" class="notSerit alt"><div class="notAkis" id="notAkisAlt"></div><span class="seritSaat" id="saatAlt">--:--</span></div>
 <div class="serit" id="seritUst"></div>
@@ -15752,60 +15761,46 @@ function devPanelAc(){
 </script>
 <script src="bulmacalar.js"></script>
 
+
 <script>
-/* ===== ARAÇ RAFI (dikey) — vekil düğmeler =====
-   Asıl düğmeler (#hud içindeki .ikincil'ler ve #yonBtn) yerinde kalır; raf onlara tıklar ve
-   görünürlük / açık-kapalı durumunu (opacity) / etiketini (çeviri dahil) aynalar. */
+/* Dikey düzen vekilleri (4 Ekim 2026): Döndür üst sırada (#yonBtn'a tıklar), Menü ve Ayarlar alt gezinme
+   sırasının uçlarında (#btnMenu / #btnSecenekler'e tıklar). Asıllar yerinde kalır, görünürlükleri aynalanır. */
 (function(){
-  const raf=document.getElementById('aracRafi'); if(!raf) return;
-  const YON_IKON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="9" width="13" height="9" rx="2"/><path d="M14 4.5a6 6 0 0 1 6 6M20 10.5l-1.6-1.7M20 10.5l1.7-1.6"/></svg>';
-  const liste=[
-    {id:'yonBtn', et:'Döndür'},
-    {id:'btnDuz'}, {id:'btnTasAd'}, {id:'btnSahne'}, {id:'btnYardim'}
-  ];
-  const cift=[];
-  for(const o of liste){
-    const asil=document.getElementById(o.id); if(!asil) continue;
-    const b=document.createElement('button'); b.type='button'; b.dataset.asil=o.id; b.className='hbtn hbtn-simge';
-    b.onclick=(e)=>{ e.stopPropagation(); asil.click(); setTimeout(esle,50); };
-    raf.appendChild(b); cift.push([asil,b,o]);
-  }
-  function esle(){
-    for(const [asil,b,o] of cift){
-      const sg=asil.querySelector('.sg'), i=asil.querySelector('i');
-      const ikon = o.id==='yonBtn' ? (asil.querySelector('svg')?asil.querySelector('svg').outerHTML:YON_IKON) : (sg?sg.innerHTML:'');
-      const et = o.et ? ((typeof metniCevir==='function')?metniCevir(o.et):o.et) : (i?i.textContent:'');
-      const html='<span class="sg">'+ikon+'</span><i>'+et+'</i>';
-      if(b._html!==html){ b.innerHTML=html; b._html=html; }
-      b.title=asil.title||et;
-      const gizli = o.id==='yonBtn' ? false : (asil.style.display==='none');
-      b.classList.toggle('gizli', gizli);
-      const op=parseFloat(asil.style.opacity||'1');
-      b.classList.toggle('kapali', o.id!=='yonBtn' && op<0.9);
-    }
-  }
-  esle();
-  const mo=new MutationObserver(()=>{ clearTimeout(mo._z); mo._z=setTimeout(esle,30); });
-  for(const [asil] of cift) mo.observe(asil,{attributes:true,attributeFilter:['style','title','class'],childList:true,subtree:true,characterData:true});
-  window.aracRafiEsle=esle;
-  /* Konum: üst çubuğun altına; rakip şeridi de rafın altına iner (dikeyde) */
+  const sag=document.querySelector('#hud .hud-sag'), kont=document.getElementById('notKontrol');
+  if(!sag || !kont) return;
+  const yonIkon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="9" width="13" height="8" rx="1.6"/><path d="M5 13h.01"/><path d="M12.5 3.5a8 8 0 0 1 8 8"/><path d="M20.5 8.4v3.1h-3.1"/></svg>';
+  const yb=document.createElement('button'); yb.id='btnYonDikey'; yb.type='button'; yb.className='hbtn hbtn-simge';
+  yb.innerHTML='<span class="sg">'+yonIkon+'</span><i>Döndür</i>'; yb.title='Döndür';
+  yb.onclick=()=>{ const y=document.getElementById('yonBtn'); if(y) y.click(); };
+  const duz=document.getElementById('btnDuz'); sag.insertBefore(yb, duz||null);
+  const SV='viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+  const vekil=(id,asilId,ikon,et,basa)=>{
+    const asil=document.getElementById(asilId); if(!asil) return;
+    const b=document.createElement('button'); b.id=id; b.type='button'; b.className='nbtn'; b.title=et; b.setAttribute('aria-label',et);
+    b.innerHTML=ikon; b.onclick=()=>asil.click();
+    if(basa) kont.insertBefore(b, kont.firstChild); else kont.appendChild(b);
+    const esle=()=>{ b.style.visibility = (asil.style.display==='none') ? 'hidden' : ''; };
+    new MutationObserver(esle).observe(asil,{attributes:true,attributeFilter:['style']}); esle();
+  };
+  vekil('nMenu','btnMenu','<svg '+SV+'><path d="M4.5 7h15M4.5 12h15M4.5 17h15"/></svg>','Menü',true);
+  const ay=document.querySelector('#btnSecenekler .sg svg');
+  vekil('nAyar','btnSecenekler', ay?ay.outerHTML:'<svg '+SV+'><circle cx="12" cy="12" r="3"/></svg>','Ayarlar',false);
+  /* Rakip şeridi üst çubuğun (iki sıra) altına */
   function konumla(){
     try{
-      const serit=document.getElementById('notSeritUst');
-      const dik=document.body.classList.contains('dikeyAktif');
-      const ref=document.getElementById('btnMenu');
-      if(!dik || !ref || getComputedStyle(raf).display==='none'){ if(serit) serit.style.top=''; return; }
-      const alt=ref.getBoundingClientRect().bottom;
-      if(alt>0) raf.style.top=(alt+6)+'px';
-      const rafAlt=raf.getBoundingClientRect().bottom;
-      if(serit && rafAlt>0) serit.style.top=(rafAlt+8)+'px';
+      const serit=document.getElementById('notSeritUst'), hud=document.getElementById('hud');
+      if(!serit) return;
+      if(!document.body.classList.contains('dikeyAktif') || !hud.classList.contains('acik')){ serit.style.top=''; return; }
+      const sira=document.getElementById('sira');
+      const alt=(sira||hud.querySelector('.hud-sol')).getBoundingClientRect().bottom;
+      const mt=parseFloat(getComputedStyle(serit).marginTop)||0;   // güvenli alan payı (kenar boşluğu) düşülür
+      if(alt>0) serit.style.top=Math.max(0,alt+8-mt)+'px';
     }catch(e){}
   }
-  window.aracRafiKonumla=konumla;
-  addEventListener('resize',()=>setTimeout(konumla,300));
   const hud=document.getElementById('hud');
-  if(hud) new MutationObserver(()=>setTimeout(konumla,50)).observe(hud,{attributes:true,attributeFilter:['class']});
-  new MutationObserver(()=>setTimeout(konumla,50)).observe(document.body,{attributes:true,attributeFilter:['class']});
+  new MutationObserver(()=>setTimeout(konumla,60)).observe(hud,{attributes:true,attributeFilter:['class']});
+  new MutationObserver(()=>setTimeout(konumla,60)).observe(document.body,{attributes:true,attributeFilter:['class']});
+  addEventListener('resize',()=>setTimeout(konumla,300));
   setTimeout(konumla,500);
 })();
 </script>

@@ -754,3 +754,10 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   Telefonda doğrulandı: kapatınca ve menüde tanıyıcı bir daha açılmıyor; bildirim/zil sesi kısık kalmıyor.
 - Araç rafı dikeyde artık üst çubuğun altında ikinci sıra (hbtn-simge sınıfları, konum JS ile Menü düğmesinin altına; rakip şeridi de
   rafın altına iner).
+
+### 8.31 Dikey üst çubuk tek sıra, Menü/Ayarlar altta (4 Ekim 2026, sahibin tarifi)
+- Ayrı araç rafı kaldırıldı. Dikeyde #hud iki satır: üstte tam genişlik eşit paylı Sesli · Ses · Döndür · 2B · Taş adı · Sahne · Yardım
+  (.ikincil'ler dikeyde de görünür; bulmacanın inline display:none'u korunur), altında sıra göstergesi (BEYAZ/SİYAH).
+- Menü ve Ayarlar dikeyde alt gezinme sırasının uçlarında (#nMenu / #nAyar vekilleri); üst çubuktaki asıllar dikeyde gizli.
+- Döndür (#btnYonDikey) her iki yönde üst çubukta; yüzen #yonBtn yalnız incelemede. Rakip şeridi sıra göstergesinin altına
+  JS ile oturur (şeridin güvenli alan kenar boşluğu düşülür).
