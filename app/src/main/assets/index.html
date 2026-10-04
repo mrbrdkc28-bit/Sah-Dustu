@@ -12599,6 +12599,7 @@ function pmPencereAc(tur){
   const btnV=document.createElement('button'); btnV.textContent='Vazgeç'; btnV.className='pmVazgec';
   btnV.onclick=()=>{ pmBekleyen=null; pmPencereKapat(); };
   kut.append(b1,b2,b3,btnP,btnR,btnV);
+  setTimeout(()=>{ try{ pmFiyatYaz(); }catch(e){} }, 0);
   try{ if(typeof agacTara==='function') agacTara(kut); }catch(e){}
   p.appendChild(kut);
   document.body.appendChild(p);
@@ -12683,6 +12684,19 @@ window.reklamSonucu=function(etiket,durum){
   setInterval(dinle, 5000);
   setTimeout(dinle, 2500);
 })();
+/* Açılışta Google Play'den geri yüklenen Premium: mesajsız, kilitler ve rozetler tazelenir */
+window.premiumGeriYuklendi=function(){
+  premiumAktif=true; pSakla('c64_prem','1');
+  try{ rozetGuncelle(); }catch(e){}
+};
+/* Fiyat Google'dan gelince açık Premium penceresindeki etiketi güncelle */
+window.premiumFiyatGeldi=function(){ try{ pmFiyatYaz(); }catch(e){} };
+function pmFiyatYaz(){
+  const el=document.querySelector('#premiumModal .pmPAd small'); if(!el) return;
+  let f=''; try{ f=(kopruVar() && AndroidKopru.premiumFiyat) ? String(AndroidKopru.premiumFiyat()||'') : ''; }catch(e){}
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  el.textContent = c('reklamsız, hepsi açık') + (f ? ' · ' + f : '');
+}
 window.satinAlmaSonucu=function(basarili){
   if(String(basarili)==='1' || basarili===true){
     premiumAktif=true; pSakla('c64_prem','1');

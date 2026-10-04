@@ -613,6 +613,14 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
   İkisi de aynı pencereyi açar (savaş animasyonu + grafik). `grafikAyarla()` / `sahneAyarla()` her yeri eşitler,
   grafik seçimi `localStorage.grafikKademe`.
 
+### 8.22 Google Play Faturalandırma (4 Ekim 2026)
+- billing-ktx 7.1.1. Ürün: **`chess64_premium`** (uygulama içi, tek seferlik, tüketilmez) — Play Console'da AYNI
+  kimlikle oluşturulmalı. Açılışta sahip olunanlar sorgulanır (silip kuran Premium'u geri alır, mesajsız:
+  `premiumGeriYuklendi`); yeni alımda `satinAlmaSonucu('1')`. PURCHASED alımlar onaylanır (3 gün kuralı).
+  Premium penceresinde Google'dan gelen yerel fiyat gösterilir (`premiumFiyat`). Ürün yokken "yakında" mesajı.
+- versionCode 3 / versionName 1.4.
+- Kalan: Console'da ödeme profili kontrolü, AAB'nin bir test kanalına yüklenmesi, ürünün oluşturulması ve fiyatı.
+
 ## 9. YAYIN ENGELLERİ (hepsi kullanıcı tarafında)
 
 1. ✅ **GPL-3.0 kaynak yükümlülüğü** (3 Ekim 2026). Proje artık git deposu;

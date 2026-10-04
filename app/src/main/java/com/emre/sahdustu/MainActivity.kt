@@ -44,6 +44,16 @@ import com.google.android.ump.UserMessagingPlatform
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Locale
+import com.android.billingclient.api.AcknowledgePurchaseParams
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingClientStateListener
+import com.android.billingclient.api.BillingFlowParams
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.PendingPurchasesParams
+import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.QueryPurchasesParams
 
 class MainActivity : AppCompatActivity() {
 
@@ -619,13 +629,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             @JavascriptInterface
-            fun premiumMu(): String = "0"  // Play Billing eklenince gercek kontrole baglanacak
+            fun premiumMu(): String = if (premiumVar) "1" else "0"
+            /* Google Play'den gelen yerel fiyat ("₺XX,XX"); urun henuz yuklenmediyse bos */
+            @JavascriptInterface
+            fun premiumFiyat(): String = premiumUrun?.oneTimePurchaseOfferDetails?.formattedPrice ?: ""
             @JavascriptInterface
             fun satinAlBaslat() {
-                runOnUiThread {
-                    Toast.makeText(this@MainActivity,
-                        getString(R.string.satin_alma_yakinda), Toast.LENGTH_SHORT).show()
-                }
+                runOnUiThread { satinAlmaBaslat() }
             }
         }, "AndroidKopru")
 
@@ -1102,6 +1112,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         webView.loadUrl("https://appassets.androidplatform.net/assets/index.html")
+        faturaBaslat()
 
         // Android 13+ bildirim izni iste
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -1550,9 +1561,110 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /* ===================== GOOGLE PLAY FATURALANDIRMA (4 Ekim 2026) =====================
+       Tek seferlik, kalici Premium (uygulama ici urun, tuketilmez). Urun kimligi Play
+       Console'da AYNEN bu olmali. Acilista sahip olunan satin almalar sorgulanir:
+       uygulamayi silip yeniden kuran da Premium'u geri alir. Satin alma 3 gun icinde
+       onaylanmazsa Google iade eder: PURCHASED olan her satin alma onaylanir. */
+    private val PREMIUM_URUN = "chess64_premium"
+    @Volatile private var premiumVar = false
+    private var premiumUrun: ProductDetails? = null
+    private var fatura: BillingClient? = null
+
+    private fun faturaBaslat() {
+        try {
+            val f = BillingClient.newBuilder(this)
+                .setListener { sonuc, alimlar -> alimlarGeldi(sonuc, alimlar) }
+                .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+                .build()
+            fatura = f
+            f.startConnection(object : BillingClientStateListener {
+                override fun onBillingSetupFinished(sonuc: BillingResult) {
+                    if (sonuc.responseCode == BillingClient.BillingResponseCode.OK) {
+                        sahipOlunanlariSorgula(); urunuGetir(null)
+                    } else hataKaydet("Fatura baglantisi: " + sonuc.debugMessage)
+                }
+                override fun onBillingServiceDisconnected() { /* bir sonraki satin almada yeniden baglanilir */ }
+            })
+        } catch (t: Throwable) { hataKaydet("Fatura baslatilamadi: " + (t.message ?: "?")) }
+    }
+    private fun sahipOlunanlariSorgula() {
+        val f = fatura ?: return
+        f.queryPurchasesAsync(QueryPurchasesParams.newBuilder()
+            .setProductType(BillingClient.ProductType.INAPP).build()) { sonuc, alimlar ->
+            if (sonuc.responseCode == BillingClient.BillingResponseCode.OK) {
+                alimlar.forEach { alimIsle(it, sessiz = true) }
+            }
+        }
+    }
+    private fun urunuGetir(sonra: (() -> Unit)?) {
+        val f = fatura ?: return
+        val p = QueryProductDetailsParams.newBuilder().setProductList(listOf(
+            QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(PREMIUM_URUN).setProductType(BillingClient.ProductType.INAPP).build()
+        )).build()
+        f.queryProductDetailsAsync(p) { sonuc, liste ->
+            if (sonuc.responseCode == BillingClient.BillingResponseCode.OK && liste.isNotEmpty()) {
+                premiumUrun = liste[0]
+                runOnUiThread { if (!webViewYok) webView.evaluateJavascript("window.premiumFiyatGeldi&&premiumFiyatGeldi()", null) }
+            }
+            sonra?.let { runOnUiThread(it) }
+        }
+    }
+    private fun satinAlmaBaslat() {
+        val f = fatura
+        if (f == null || !f.isReady) {
+            faturaBaslat()
+            Toast.makeText(this, getString(R.string.satin_alma_yakinda), Toast.LENGTH_SHORT).show()
+            return
+        }
+        val urun = premiumUrun
+        if (urun == null) {
+            urunuGetir {
+                if (premiumUrun != null) satinAlmaBaslat()
+                else Toast.makeText(this, getString(R.string.satin_alma_yakinda), Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+        val params = BillingFlowParams.newBuilder().setProductDetailsParamsList(listOf(
+            BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(urun).build()
+        )).build()
+        f.launchBillingFlow(this, params)
+    }
+    private fun alimlarGeldi(sonuc: BillingResult, alimlar: List<Purchase>?) {
+        when (sonuc.responseCode) {
+            BillingClient.BillingResponseCode.OK -> alimlar?.forEach { alimIsle(it, sessiz = false) }
+            BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> { sahipOlunanlariSorgula(); premiumBildir(false) }
+            BillingClient.BillingResponseCode.USER_CANCELED -> {}
+            else -> hataKaydet("Satin alma: " + sonuc.responseCode + " " + sonuc.debugMessage)
+        }
+    }
+    private fun alimIsle(alim: Purchase, sessiz: Boolean) {
+        if (!alim.products.contains(PREMIUM_URUN)) return
+        if (alim.purchaseState != Purchase.PurchaseState.PURCHASED) return   // beklemede (ör. nakit): onaylanınca yeniden gelir
+        if (!alim.isAcknowledged) {
+            fatura?.acknowledgePurchase(AcknowledgePurchaseParams.newBuilder()
+                .setPurchaseToken(alim.purchaseToken).build()) { r ->
+                if (r.responseCode != BillingClient.BillingResponseCode.OK) hataKaydet("Onay: " + r.debugMessage)
+            }
+        }
+        premiumBildir(sessiz)
+    }
+    private fun premiumBildir(sessiz: Boolean) {
+        premiumVar = true
+        runOnUiThread {
+            if (webViewYok) return@runOnUiThread
+            // Acilista geri yukleme sessiz; yeni satin almada tesekkur mesaji
+            webView.evaluateJavascript(
+                if (sessiz) "window.premiumGeriYuklendi&&premiumGeriYuklendi()"
+                else "window.satinAlmaSonucu&&satinAlmaSonucu('1')", null)
+        }
+    }
+
     override fun onDestroy() {
         // Once bayrak: bu andan sonra konusmaBitti() WebView'e dokunmaz.
         webViewYok = true
+        try { fatura?.endConnection() } catch (t: Throwable) {}
         bildirimSesiAc()
         try { anaKuyruk.removeCallbacksAndMessages(null) } catch (t: Throwable) {}
         try { tts?.setOnUtteranceProgressListener(null) } catch (t: Throwable) {}
