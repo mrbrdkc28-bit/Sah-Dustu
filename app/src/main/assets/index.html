@@ -1779,6 +1779,40 @@ html[data-tema="fildisi"] #secimSayfa .ssSec .ssUyari{color:#B0561E}
 #secimSayfa .ssAcikla{font:500 13px/1.5 Manrope,sans-serif;color:#b9b2a2;text-align:center;margin:-4px 6px 14px}
 html[data-tema="fildisi"] #secimSayfa .ssAcikla{color:#6f685b}
 #secimSayfa .ssTamam:disabled{opacity:.38;cursor:default}
+
+/* ===== CANLI ÖNİZLEME (4 Ekim 2026) ===== */
+.arena .onzGoz{position:absolute;top:7px;left:7px;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(10,12,18,.62);border:1px solid rgba(255,255,255,.22);color:#F0E9D8;cursor:pointer;z-index:2;padding:0}
+.arena .onzGoz svg{width:18px;height:18px;display:block}
+body.onizlemede #kurulumEkran,body.onizlemede #cevrimiciEkran,body.onizlemede #menu{visibility:hidden!important}
+body.onizlemede #anlatim{z-index:45;bottom:auto;top:calc(190px + env(safe-area-inset-top))}
+#onizlemeEkran{position:fixed;inset:0;z-index:40;display:none;flex-direction:column;justify-content:space-between;pointer-events:none}
+#onizlemeEkran.acik{display:flex}
+#onizlemeEkran .onzUst,#onizlemeEkran .onzAlt{pointer-events:auto}
+.onzUst{padding:calc(22px + env(safe-area-inset-top)) 22px 40px;text-align:center;
+  background:linear-gradient(180deg,rgba(6,7,11,.86),rgba(6,7,11,.55) 60%,transparent)}
+.onzTur{display:inline-flex;align-items:center;gap:6px;font:700 10.5px Manrope,sans-serif;letter-spacing:.24em;color:#E8B64C}
+.onzTur svg{width:13px;height:13px}
+.onzAd{font-family:'Cinzel',serif;font-weight:700;font-size:26px;letter-spacing:.08em;color:#F0E9D8;margin-top:6px}
+.onzDesc{font:500 13px/1.45 Manrope,sans-serif;color:#c9c2b2;margin:6px auto 0;max-width:330px}
+.onzAlt{padding:30px 0 calc(16px + env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(6,7,11,.92),rgba(6,7,11,.7) 70%,transparent)}
+.onzSerit{display:flex;gap:10px;overflow-x:auto;padding:4px 18px 12px;scrollbar-width:none}
+.onzSerit::-webkit-scrollbar{display:none}
+.onzKucuk{flex:0 0 auto;width:78px;position:relative;border:1.5px solid rgba(255,255,255,.14);border-radius:12px;overflow:hidden;
+  background:#0d0f16;padding:0;cursor:pointer;opacity:.72}
+.onzKucuk.secili{border-color:#E8B64C;opacity:1;box-shadow:0 0 0 2px rgba(232,182,76,.25)}
+.onzKucuk img{width:100%;height:52px;object-fit:cover;display:block}
+.onzKucuk span{display:block;font:600 9.5px/1.2 Manrope,sans-serif;color:#e6e1d6;padding:4px 4px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.onzKucuk i{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:rgba(10,12,18,.75);color:#E8B64C;
+  display:flex;align-items:center;justify-content:center}
+.onzKucuk i svg{width:11px;height:11px}
+.onzBtn{display:flex;gap:10px;padding:4px 18px 0}
+.onzBtn button{flex:1;padding:13px;border-radius:14px;font:700 14px 'Cinzel',serif;letter-spacing:.08em;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.onzBtn button svg{width:16px;height:16px}
+.onzGeri{flex:0 0 34%!important;background:transparent;border:1px solid rgba(255,255,255,.25);color:#e6e1d6}
+.onzSec{border:none;background:linear-gradient(180deg,#F2CC6E,#D69F33);color:#1a1408}
+.onzSec.kilitli{background:linear-gradient(180deg,#2a2d38,#12151f);border:1px solid #E8B64C;color:#E8B64C}
 </style>
 </head>
 <body>
@@ -12021,6 +12055,13 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Yüksek, telefonun ısınmasına ve şarjın daha hızlı bitmesine sebep olabilir.']=CEVM['Yüksek, telefonun ısınmasına ve şarjın daha hızlı bitmesine sebep olabilir.']||{en:'High may make your phone warm and drain the battery faster.',ru:'Высокое может нагревать телефон и быстрее расходовать заряд.',ar:'قد يسبب الإعداد العالي سخونة الهاتف ونفاد البطارية أسرع.',fr:'Élevé peut faire chauffer le téléphone et vider la batterie plus vite.',de:'Hoch kann das Handy erwärmen und den Akku schneller leeren.',it:'Alta può scaldare il telefono e scaricare prima la batteria.',zh:'高画质可能导致手机发热、耗电更快。'};
   CEVM['En akıcı']=CEVM['En akıcı']||{en:'Smoothest',ru:'Максимально плавно',ar:'الأكثر سلاسة',fr:'Le plus fluide',de:'Am flüssigsten',it:'Il più fluido',zh:'最流畅'};
   CEVM['Devam']=CEVM['Devam']||{en:'Continue',ru:'Продолжить',ar:'متابعة',fr:'Continuer',de:'Weiter',it:'Continua',zh:'继续'};
+  CEVM['Önizle']=CEVM['Önizle']||{en:'Preview',ru:'Предпросмотр',ar:'معاينة',fr:'Aperçu',de:'Vorschau',it:'Anteprima',zh:'预览'};
+  CEVM['Bunu seç']=CEVM['Bunu seç']||{en:'Choose this',ru:'Выбрать',ar:'اختر هذا',fr:'Choisir',de:'Auswählen',it:'Scegli',zh:'选择此项'};
+  CEVM['Kilidi aç']=CEVM['Kilidi aç']||{en:'Unlock',ru:'Открыть',ar:'افتح القفل',fr:'Débloquer',de:'Freischalten',it:'Sblocca',zh:'解锁'};
+  CEVM['Geri']=CEVM['Geri']||{en:'Back',ru:'Назад',ar:'رجوع',fr:'Retour',de:'Zurück',it:'Indietro',zh:'返回'};
+  CEVM['ARENA']=CEVM['ARENA']||{en:'ARENA',ru:'АРЕНА',ar:'الساحة',fr:'ARÈNE',de:'ARENA',it:'ARENA',zh:'场地'};
+  CEVM['ORDU']=CEVM['ORDU']||{en:'ARMY',ru:'АРМИЯ',ar:'الجيش',fr:'ARMÉE',de:'ARMEE',it:'ESERCITO',zh:'棋子'};
+  CEVM['Önizleme oyun sürerken kullanılamaz']=CEVM['Önizleme oyun sürerken kullanılamaz']||{en:'Preview is not available during a game',ru:'Предпросмотр недоступен во время игры',ar:'المعاينة غير متاحة أثناء اللعب',fr:'Aperçu indisponible pendant une partie',de:'Vorschau während einer Partie nicht verfügbar',it:'Anteprima non disponibile durante una partita',zh:'对局进行中无法预览'};
   CEVM['Tema']={en:'Theme',ru:'Тема',ar:'المظهر',fr:'Thème',de:'Design',it:'Tema',zh:'主题'};
   CEVM['Dil']={en:'Language',ru:'Язык',ar:'اللغة',fr:'Langue',de:'Sprache',it:'Lingua',zh:'语言'};
   CEVM['Fildişi']={en:'Ivory',ru:'Слоновая кость',ar:'عاجي',fr:'Ivoire',de:'Elfenbein',it:'Avorio',zh:'象牙白'};
@@ -14061,16 +14102,17 @@ else { try{ SesOyun.kur(); }catch(e){} }
     const tahtada=hud.classList.contains('acik') && !az;
     const goster=!acilista && !tahtada;
     let tema='klasik'; try{ tema=document.documentElement.getAttribute('data-tema')||'klasik'; }catch(e){}
-    let renk = az ? '#0b0d14' : (ALT_RENK[tema]||'#06070b');
+    const onzde=document.body.classList.contains('onizlemede');
+    let renk = (az||onzde) ? '#0b0d14' : (ALT_RENK[tema]||'#06070b');
     /* Buzlu Cam: menünün altında 3B sahne görünüyor ve rengi arenaya göre değişiyor.
        Sahnenin en alt-orta pikseli okunur (telefonda ölçüldü: ekrandaki renkle birebir). */
-    if(!az && tema==='cam' && goster){
+    if(!az && !onzde && tema==='cam' && goster){
       try{ renderer.render(scene,camera); const gl=renderer.getContext(), c=renderer.domElement, px=new Uint8Array(4);
            gl.readPixels(Math.floor(c.width/2), 2, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
            renk='#'+[px[0],px[1],px[2]].map(v=>v.toString(16).padStart(2,'0')).join(''); }catch(e){}
     }
     const _h=parseInt(renk.slice(1),16), _l=(0.299*(_h>>16&255)+0.587*(_h>>8&255)+0.114*(_h&255))/255;
-    const acikZemin = !az && _l>0.62;   // açık zemin: tuşlar koyu çizilsin
+    const acikZemin = !az && !onzde && _l>0.62;   // açık zemin: tuşlar koyu çizilsin
     const k=goster+renk+acikZemin; if(k===sonGezinme) return; sonGezinme=k;
     try{ AndroidEkran.gezinme(goster, renk, acikZemin); }catch(e){}
   }
@@ -14079,6 +14121,7 @@ else { try{ SesOyun.kur(); }catch(e){} }
   [inceleHUD, analizEk].forEach(e=>{ if(e) new MutationObserver(()=>{ kontrol(); gezinmeGuncelle(); }).observe(e, {attributes:true, attributeFilter:['class']}); });
   if(perde) new MutationObserver(gezinmeGuncelle).observe(perde, {attributes:true, attributeFilter:['class','style']});
   new MutationObserver(gezinmeGuncelle).observe(document.documentElement, {attributes:true, attributeFilter:['data-tema']});
+  new MutationObserver(gezinmeGuncelle).observe(document.body, {attributes:true, attributeFilter:['class']});
   kontrol(); gezinmeGuncelle();
 })();
 
@@ -14625,6 +14668,193 @@ function devPanelAc(){
   // Tema değişince o anki renk yeni paletten gelsin
   new MutationObserver(()=>el.style.setProperty('--sloganRenk', renk()))
     .observe(document.documentElement,{attributes:true,attributeFilter:['data-tema']});
+})();
+</script>
+
+<script>
+/* =====================================================================
+   CANLI ÖNİZLEME (4 Ekim 2026): arena ve ordu kartlarında "Önizle".
+   Oyunun kendi 3B motoru kullanılır (ikinci WebGL yok). Kamera tahtanın
+   etrafında döner, taşlar dizilir, kısa bir açılış ve savaş animasyonu
+   oynar. Arena önizlenirken seçili ordu, ordu önizlenirken seçili arena.
+   İstatistik/oyun kaydı tutan hamleOyna KULLANILMAZ: hafif oynatıcı.
+   "Bunu seç" kartın kendi tıklamasını tetikler → Premium kilidi ve seçim
+   mantığı aynen çalışır. Kilitli içerik önizlenebilir ("Kilidi aç").
+   ===================================================================== */
+(function(){
+  const GOZ='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>';
+  const KILIT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9.5" rx="2.2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  const c=t=>(typeof metniCevir==='function')?metniCevir(t):t;
+  // Kısa açılış: İspanyol değişim varyantı — iki alım (iki savaş sahnesi)
+  const SENARYO='e2e4 e7e5 g1f3 b8c6 f1b5 a7a6 b5c6 d7c6 f3e5'.split(' ');
+  const kare=s=>(s.charCodeAt(0)-97)+(8-(+s[1]))*8;
+  let ekran=null, acik=false, nesil=0, onceki=null, kaynakListe=null, tur='arena', secId=null, sinema=false, donSon=0;
+
+  function ekranKur(){
+    if(ekran) return ekran;
+    ekran=document.createElement('div'); ekran.id='onizlemeEkran';
+    ekran.innerHTML=
+      '<div class="onzUst"><div class="onzTur"></div><div class="onzAd"></div><div class="onzDesc"></div></div>'+
+      '<div class="onzAlt"><div class="onzSerit"></div>'+
+      '<div class="onzBtn"><button type="button" class="onzGeri"></button><button type="button" class="onzSec"></button></div></div>';
+    document.body.appendChild(ekran);
+    ekran.querySelector('.onzGeri').onclick=()=>kapat(false);
+    ekran.querySelector('.onzSec').onclick=sec;
+    return ekran;
+  }
+  function liste(){ return tur==='arena' ? ARENALAR : ORDULAR; }
+  function bilgiYaz(){
+    const o=liste().find(x=>x.id===secId); if(!o) return;
+    const kil=(typeof kilitli==='function') && kilitli(tur, secId);
+    ekran.querySelector('.onzTur').innerHTML=(kil?KILIT:'')+'<span></span>';
+    ekran.querySelector('.onzTur span').textContent=c(tur==='arena'?'ARENA':'ORDU')+(kil?' · PREMIUM':'');
+    ekran.querySelector('.onzAd').textContent=o.ad;
+    ekran.querySelector('.onzDesc').textContent=o.desc||'';
+    ekran.querySelector('.onzGeri').textContent=c('Geri');
+    const b=ekran.querySelector('.onzSec');
+    b.innerHTML=(kil?KILIT:'')+'<span></span>'; b.querySelector('span').textContent=c(kil?'Kilidi aç':'Bunu seç');
+    b.classList.toggle('kilitli', !!kil);
+    ekran.querySelectorAll('.onzKucuk').forEach(k=>k.classList.toggle('secili', k.dataset.id===secId));
+    const aktif=ekran.querySelector('.onzKucuk.secili'); if(aktif) try{ aktif.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'}); }catch(e){}
+  }
+  function seritKur(){
+    const sr=ekran.querySelector('.onzSerit'); sr.innerHTML='';
+    liste().forEach(o=>{
+      const k=document.createElement('button'); k.type='button'; k.className='onzKucuk'; k.dataset.id=o.id;
+      const kil=(typeof kilitli==='function') && kilitli(tur,o.id);
+      k.innerHTML='<img loading="lazy" src="onizleme/'+tur+'_'+o.id+'.webp" alt="">'+(kil?'<i>'+KILIT+'</i>':'')+'<span></span>';
+      k.querySelector('span').textContent=o.ad;
+      k.onclick=()=>{ if(secId===o.id) return; secId=o.id; bilgiYaz(); sahneKur(); };
+      sr.appendChild(k);
+    });
+  }
+
+  /* Hafif hamle oynatıcı: Motor'u ilerletir, taşı kaydırır, alımda savaş sahnesi */
+  async function hamle(uci, n){
+    const f=kare(uci.slice(0,2)), t=kare(uci.slice(2,4));
+    const h=Motor.legal(Motor.turn).find(m=>m.from===f && m.to===t); if(!h) return false;
+    const sald=tasMesh[f], kurb=tasMesh[t]; if(!sald) return false;
+    const sT=Motor.tasAl(f).t, kT=kurb && Motor.tasAl(t) ? Motor.tasAl(t).t : null;
+    Motor.yap(h);
+    if(kurb){
+      if(sahneAyari){
+        sinema=true;
+        try{ await Promise.race([killCam(sald,kurb,sT,kT,f,t), bekle(6000)]); }catch(e){}
+        sinema=false;
+      } else { try{ Ses.yeme(sT,kT); }catch(e){} tasGrup.remove(kurb); nesneyiSerbestBirak(kurb,false); }
+      tasMesh[t]=null;
+    }
+    if(n!==nesil) return false;
+    const hedef=kareKonum(t);
+    if(sald.position.distanceTo(hedef)>.05){
+      try{ Ses.cal('hamle'); }catch(e){}
+      const bas=sald.position.clone();
+      await tween(.42,e=>{ sald.position.lerpVectors(bas,hedef,e); sald.position.y=Math.sin(e*Math.PI)*.25; });
+    }
+    sald.position.copy(hedef); tasMesh[f]=null; tasMesh[t]=sald;
+    return n===nesil;
+  }
+  async function senaryo(n){
+    while(acik && n===nesil){
+      await bekle(1700); if(n!==nesil) return;
+      for(const u of SENARYO){
+        if(!acik || n!==nesil) return;
+        if(!(await hamle(u,n))) return;
+        await bekle(650);
+      }
+      await bekle(2200); if(n!==nesil) return;
+      Motor.reset(); taslariDiz(true);
+    }
+  }
+  function sahneKur(){
+    const n=++nesil;
+    try{ if(typeof tweenleriIptalEt==='function') tweenleriIptalEt(); }catch(e){}
+    try{ document.body.classList.remove('sinema'); const an=document.getElementById('anlatim'); if(an) an.classList.remove('acik'); }catch(e){}
+    if(tur==='arena') aktifArena=ARENALAR.find(a=>a.id===secId)||aktifArena;
+    else aktifOrdu=ORDULAR.find(o=>o.id===secId)||aktifOrdu;
+    try{ arenaKur(aktifArena); }catch(e){}
+    Motor.reset(); taslariDiz(true);
+    kamHedef.set(0,0,0); kamYaw=0.35; kamPitch=dikeyMi()?0.82:0.6; kamUzak=uygunUzaklik()*(dikeyMi()?1.04:0.98);
+    cizimIste();
+    senaryo(n);
+  }
+  function don(zaman){
+    if(!acik) return;
+    const dt=Math.min(0.05,(zaman-(donSon||zaman))/1000); donSon=zaman;
+    if(!sinema){ kamYaw+=dt*0.16; }
+    cizimIste();
+    requestAnimationFrame(don);
+  }
+  function ac(t, id, kaynak){
+    if((typeof oyunAktif!=='undefined' && oyunAktif) || (typeof cevrimiciArkaplanda!=='undefined' && cevrimiciArkaplanda)){
+      if(typeof kisaBilgi==='function') kisaBilgi('Önizleme oyun sürerken kullanılamaz'); return;
+    }
+    ekranKur(); tur=t; secId=id; kaynakListe=kaynak;
+    onceki={arena:aktifArena, ordu:aktifOrdu};
+    seritKur(); bilgiYaz();
+    acik=true; document.body.classList.add('onizlemede'); ekran.classList.add('acik');
+    sahneKur(); donSon=0; requestAnimationFrame(don);
+    try{ if(typeof agacTara==='function') agacTara(ekran); }catch(e){}
+  }
+  function kapat(){
+    if(!acik) return;
+    acik=false; nesil++; sinema=false;
+    try{ if(typeof tweenleriIptalEt==='function') tweenleriIptalEt(); }catch(e){}
+    document.body.classList.remove('onizlemede','sinema');
+    try{ const an=document.getElementById('anlatim'); if(an) an.classList.remove('acik'); }catch(e){}
+    ekran.classList.remove('acik');
+    if(onceki){ aktifArena=onceki.arena; aktifOrdu=onceki.ordu; }
+    try{ arenaKur(aktifArena); }catch(e){}
+    Motor.reset(); taslariDiz(false);
+    if(typeof menuSahnesiniSifirla==='function') menuSahnesiniSifirla();
+  }
+  function sec(){
+    const kart=kaynakListe && [...kaynakListe.querySelectorAll('.arena')].find(k=>k.dataset.kId===secId);
+    const kil=(typeof kilitli==='function') && kilitli(tur, secId);
+    if(kil){ if(kart) kart.click(); return; }   // Premium penceresi önizlemenin üstünde açılır
+    kapat();
+    if(kart){ kart.click(); try{ kart.scrollIntoView({inline:'center',block:'nearest'}); }catch(e){} }
+  }
+  /* Kilit önizlemedeyken açılırsa (Premium/ödüllü reklam) Premium penceresi kartın seçimini zaten
+     yaptı: önizlemeyi o içerikle kapat (Geri'ye basılırsa kart ile gerçek seçim farklı kalmasın). */
+  let kilitliIdi=false;
+  setInterval(()=>{
+    if(!acik) return;
+    try{
+      const simdi=(typeof kilitli==='function') && kilitli(tur, secId);
+      if(kilitliIdi && !simdi && !document.getElementById('premiumModal')){ kilitliIdi=false; sec(); return; }
+      kilitliIdi=simdi; bilgiYaz(); seritKilitTazele();
+    }catch(e){}
+  }, 1000);
+  function seritKilitTazele(){
+    ekran.querySelectorAll('.onzKucuk').forEach(k=>{
+      const kil=(typeof kilitli==='function') && kilitli(tur,k.dataset.id), i=k.querySelector('i');
+      if(!kil && i) i.remove();
+    });
+  }
+
+  /* Kartlara göz düğmesi: kart listesi değişince (kurulum, çevrimiçi) eklenir */
+  function dugmeleriEkle(){
+    document.querySelectorAll('#arenaListe .arena, #orduListe .arena, #cvArenalar .arena, #cvOrdular .arena').forEach(kart=>{
+      if(kart.querySelector('.onzGoz')) return;
+      const pano=kart.querySelector('.pano'); if(!pano) return;
+      const b=document.createElement('button'); b.type='button'; b.className='onzGoz'; b.innerHTML=GOZ;
+      b.setAttribute('aria-label', c('Önizle'));
+      b.onclick=e=>{ e.stopPropagation(); ac(kart.dataset.kTur, kart.dataset.kId, kart.parentElement); };
+      pano.style.position='relative'; pano.appendChild(b);
+    });
+  }
+  // Android geri tuşu önizlemeyi kapatsın
+  const _eskiGeri=window.geriTusu;
+  window.geriTusu=function(){ if(acik){ kapat(); return true; } return _eskiGeri ? _eskiGeri.apply(this, arguments) : false; };
+  window.onizlemeDugmeleriEkle=dugmeleriEkle;
+  window.onizlemeKapat=kapat;
+  window.onizlemeAcikMi=()=>acik;
+  ['kurulumEkran','cevrimiciEkran'].forEach(id=>{
+    const e=document.getElementById(id);
+    if(e) new MutationObserver(()=>{ if(e.classList.contains('acik')) dugmeleriEkle(); }).observe(e,{attributes:true,attributeFilter:['class']});
+  });
+  setTimeout(dugmeleriEkle, 0);
 })();
 </script>
 </body>

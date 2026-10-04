@@ -584,6 +584,16 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
   parçası olduğu için orada sürekli çizim yok, parçacıklar 30/sn.
 - Ayrıca taş parçaları aynı malzemeye göre birleştiriliyor (`tasParcaBirlestir`, 421→337 çağrı; asıl sebep değildi).
 
+### 8.20 İlk girişte akıcılık seçimi + canlı arena/ordu önizlemesi (4 Ekim 2026)
+- İlk girişte "Oyun ekranı akıcılığı" zorunlu seçilir (`ilkAkicilikSor`, `localStorage.grafikSecildi`);
+  Yüksek'te ısınma/şarj uyarısı (ayar penceresi ve Oyun Kur'da da).
+- Arena/ordu kartlarında göz düğmesi (Oyun Kur + çevrimiçi). Tam ekran canlı önizleme aynı 3B motorla:
+  dönen kamera, dizilme, İspanyol değişim açılışı, iki alımda savaş sahnesi (sahne ayarı açıksa), döngü.
+  Arena önizlenirken seçili ordu, ordu önizlenirken seçili arena. Alt şeritten diğerlerine geçiş.
+  "Bunu seç" kartın kendi tıklamasını tetikler (premiumKapi aynen); kilitliyse "Kilidi aç" → Premium penceresi
+  önizlemenin üstünde. Kilit önizlemedeyken açılırsa otomatik seçilip kapanır. Geri/Android geri: önceki seçim
+  ve menü sahnesi geri yüklenir. Oyun sürerken önizleme kapalı. hamleOyna kullanılmaz (istatistik/kayıt yok).
+
 ### 8.18 Yenileme hızı, ısınma koruması, Oyun Ayarları penceresi (4 Ekim 2026)
 - 3 Ekim ısınma düzeltmesi çizimi her kademede ~60 Hz'e sabitlemişti → 120 Hz ekranda akıcılık düştü (sahibin
   denemesi). Artık `KADEME[..].hz`: **Yüksek = 0 (ekranın en yükseği; 120/90)**, Orta/Düşük = 60.
