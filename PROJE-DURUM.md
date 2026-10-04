@@ -730,3 +730,12 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Analiz: SF istekleri sıralı (kuyruk), her aramadan önce `ucinewgame` (aynı oyun = aynı karne).
   Motor Stockfish 18 *Lite*: 12 derinlikte bazı fedaları görmüyor (15.Fxd7+ sahte "vahim"). `skorTutarla`: hata/vahim adayında
   rakibin en iyi iki cevabı oynanıp torun konumlar aranır, hamlenin değeri bunların bize en kötüsü. Opera ≈ 22 sn.
+
+### 8.28 Dikey oyun ekranı: araç rafı, mikrofon aç/kapa, oyun sonu hep dikey (4 Ekim 2026)
+- Dikeyde gizli olan 2B / Taş adı / Sahne / Yardım + Döndür, tahta ile alt şerit arasında etiketli simge rafında (`#aracRafi`,
+  asıl düğmelerin vekilleri; durum/görünürlük MutationObserver ile aynalanır). Yüzen yön düğmesi dikey oyunda gizli (incelemede görünür).
+- Alt panel: boş liste kalktı, Geri/İleri/Son hap-yuvarlak. Şerit başlığı (RAKİP/SEN) kayan alanın dışında.
+- Mikrofon (`#btnSesKomut`) cihaz destekliyorsa hep görünür; kapalıyken üstü çizili. Kapalı→dokun: açılır (daha önce kurulduysa
+  sihirbazsız). Eller serbest/uyandırma: dokun = kapat. Bas-konuş: basılı tut = dinle, kısa dokunuş = "kapat" seçeneği.
+  Kapatınca geç gelen "dinliyor" olayı mikrofonu yeniden kapatır.
+- Oyun sonu ekranı (`#son`) da analiz gibi hep dikey; kapatınca oyunun yönüne dönülür (telefonda doğrulandı).

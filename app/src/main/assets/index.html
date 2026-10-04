@@ -2029,6 +2029,49 @@ body:has(#son.acik) #hud,body:has(#son.acik) #notSeritUst,body:has(#son.acik) #n
 .sonIkili button,#son .btnlar .sbtn{border-radius:14px!important}
 .sonIkili button{background:rgba(255,255,255,.04)!important;border-color:rgba(255,255,255,.12)!important}
 #sonKapat{background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.14)!important}
+
+/* ===== DİKEY OYUN EKRANI: ARAÇ RAFI + ALT DÜZEN (4 Ekim 2026) =====
+   Yatayda üst çubukta duran ikincil düğmeler (2B, Taş adı, Yardım, Sahne) dikeyde yer yokluğundan
+   gizlenmişti. Tahta ile alt şerit arasındaki boşluğa, üst çubuktaki "SES / AYARLAR" diliyle etiketli
+   simgelerden bir raf kondu. Yüzen çevirme düğmesi de rafa taşındı. Alt panelin boş liste alanı kalktı,
+   gezinme düğmeleri yuvarlak/hap biçiminde (inceleme paneliyle aynı dil). */
+#aracRafi{display:none}
+body.dikeyAktif #hud.acik ~ #aracRafi{display:flex}
+#aracRafi{position:fixed;left:50%;transform:translateX(-50%);z-index:19;gap:6px;padding:6px;
+  bottom:calc(160px + env(safe-area-inset-bottom));border-radius:22px;
+  background:rgba(12,14,22,.62);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 8px 24px rgba(0,0,0,.25)}
+#aracRafi button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  width:58px;height:50px;border:none;border-radius:16px;background:transparent;color:var(--bone);cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:background .15s,opacity .2s,transform .12s;padding:0}
+#aracRafi button:active{transform:scale(.93);background:rgba(255,255,255,.07)}
+#aracRafi button svg{width:20px;height:20px;display:block}
+#aracRafi button .sg{display:flex}
+#aracRafi button i{font-style:normal;font:700 8.5px Manrope,sans-serif;letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(232,226,210,.62);white-space:nowrap}
+#aracRafi button.kapali{opacity:.45}
+#aracRafi button.gizli{display:none}
+body:has(#son.acik) #aracRafi,body.incelemede #aracRafi,body:has(#bulmacaSerit.acik) #aracRafi{display:none!important}
+/* Döndür artık rafta: dikey oyun sırasında yüzen düğme gizli (incelemede yine görünür) */
+body.dikeyAktif:not(.incelemede) #yonBtn{display:none!important}
+/* Alt panel: yalnız gezinme (hamleler zaten şeritlerde) */
+#notPanel.dikey{background:none!important;border:none!important;padding:0!important;bottom:calc(52px + env(safe-area-inset-bottom))!important}
+#notPanel.dikey #notListe,#notPanel.dikey #notBilgi{display:none!important}
+#notPanel.dikey #notKontrol{border-top:none!important;gap:10px!important;padding:0!important;align-items:center}
+#notPanel.dikey .nbtn{flex:0 0 auto!important;max-width:none!important;min-height:0!important;height:44px;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 16px!important;border-radius:22px;
+  background:rgba(12,14,22,.66);border:1px solid rgba(255,255,255,.1);color:var(--bone);
+  font:700 13px Manrope,sans-serif!important;letter-spacing:.02em}
+#notPanel.dikey .nbtn svg{width:17px;height:17px;vertical-align:0}
+#notPanel.dikey #nSona{width:44px;padding:0!important}
+#notPanel.dikey .nbtn:active{transform:scale(.95)}
+body.dikeyAktif .notSerit.alt{bottom:calc(104px + env(safe-area-inset-bottom))}
+/* Şerit başlığı (SEN / RAKİP) kaydırınca kesik görünmesin: başlık sabit, hamleler kayar */
+.notSerit .baslikK{padding-right:2px}
+.notSerit .notAkis{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 16px);mask-image:linear-gradient(90deg,transparent 0,#000 16px)}
+
+/* Mikrofon kapalıyken: sönük, üstü çizili (4 Ekim 2026) */
+#btnSesKomut.kapali{opacity:.6}
+#btnSesKomut.kapali .sg{color:var(--dim)}
 </style>
 </head>
 <body>
@@ -2662,12 +2705,13 @@ body:has(#son.acik) #hud,body:has(#son.acik) #notSeritUst,body:has(#son.acik) #n
   <div id="notListe"></div>
   <div id="notBilgi"></div>
   <div id="notKontrol">
-    <button class="nbtn" id="nGeri">◀ Geri</button>
-    <button class="nbtn" id="nIleri">İleri ▶</button>
+    <button class="nbtn" id="nGeri" aria-label="Geri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"/></svg><span>Geri</span></button>
+    <button class="nbtn" id="nIleri" aria-label="İleri"><span>İleri</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg></button>
     <button class="nbtn" id="nSona" title="Son hamleye dön"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 5.5v13M6 6l8.5 6L6 18z"/></svg></button>
   </div>
 </div>
 
+<div id="aracRafi" aria-label="Araçlar"></div>
 <div id="notSeritUst" class="notSerit ust"><div class="notAkis" id="notAkisUst"></div><span class="seritSaat" id="saatUst">--:--</span></div>
 <div id="notSeritAlt" class="notSerit alt"><div class="notAkis" id="notAkisAlt"></div><span class="seritSaat" id="saatAlt">--:--</span></div>
 <div class="serit" id="seritUst"></div>
@@ -9533,7 +9577,11 @@ function notasyonPaneliYaz(){
     const seritDoldur=(renk, hedefId, etiket)=>{
       const el=document.getElementById(hedefId); if(!el) return;
       const idx=[]; oyunKaydi.forEach((k,i)=>{ if(k.renk===renk) idx.push(i); });
-      let h='<span class="baslikK">'+etiket+'</span>';
+      /* Başlık (RAKİP/SEN) kayan alanın DIŞINDA: hamleler kayınca kesik "İP"/"N" görünmüyordu */
+      let bk=el.previousElementSibling;
+      if(!bk || !bk.classList.contains('baslikK')){ bk=document.createElement('span'); bk.className='baslikK'; el.parentNode.insertBefore(bk, el); }
+      if(bk.textContent!==etiket) bk.textContent=etiket;
+      let h='';
       idx.slice(-8).forEach(i=>{
         const k=oyunKaydi[i];
         h+='<span class="shm'+(gozdenGecir===i?' bakilan':'')+'" data-i="'+i+'">'+
@@ -14191,11 +14239,32 @@ const SesOyun = (function(){
       c[i].style.height = t.toFixed(0)+'px';
     }
   }
+  /* Tahtadaki mikrofon (4 Ekim 2026): cihaz destekliyorsa HER ZAMAN görünür. Kapalıyken üstü çizili
+     mikrofon; dokununca sesli oynama açılır. Açıkken: eller serbest/uyandırma modunda dokunuş kapatır;
+     bas-konuş modunda basılı tutunca dinler, kısa dokunuş "kapat" seçeneğini gösterir. */
+  let sesDestek=false;
+  const MIK_ACIK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5M9 20.5h6"/></svg>';
+  const MIK_KAPALI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5M9 20.5h6"/><path d="M4 4l16 16"/></svg>';
   function dugmeDurum(){
     const b=document.getElementById('btnSesKomut'); if(!b) return;
-    b.style.display = ayar.acik ? '' : 'none';
+    b.style.display = sesDestek ? '' : 'none';
+    const sg=b.querySelector('.sg'); const ik=ayar.acik?MIK_ACIK:MIK_KAPALI;
+    if(sg && sg._ik!==ik){ sg.innerHTML=ik; sg._ik=ik; }
+    b.classList.toggle('kapali', !ayar.acik);
+    b.title = ayar.acik ? (tr()?'Sesli oynama: açık':'Voice play: on') : (tr()?'Sesli oynama: kapalı':'Voice play: off');
     b.classList.toggle('dinliyor', dinliyor);
     b.classList.toggle('bekliyor', !!bekleyen);
+  }
+  function sesliKapat(){
+    ayar.acik=false; kaydet(); iptalDinleme(); dinliyor=false; bekleyen=null; arayuzuTazele();
+    bar(tr()?'Sesli oynama kapandı':'Voice play off',{sure:1600});
+  }
+  function sesliAc(){
+    /* Daha önce sesli oynamayı kurmuş biri (ayar kaydı var) sihirbazı tekrar görmez */
+    let kuruldu=false; try{ kuruldu=localStorage.getItem('sesKuruldu')==='1' || !!localStorage.getItem('sesOynaAyar'); }catch(e){}
+    const k=KOPRU(); let izin=false; try{ izin=!!(k && k.izinVarMi && k.izinVarMi()); }catch(e){}
+    if(kuruldu && izin){ window.sesIzin(true,false); return; }   // ilk kurulum yapılmış: doğrudan aç
+    kurSihirbaziAc();
   }
 
   // ---------- oyun bağlamı ----------
@@ -14509,6 +14578,8 @@ const SesOyun = (function(){
 
   // ---------- Kotlin -> JS geri çağrıları ----------
   window.sesDurum=function(d){
+    /* Kapatıldıktan sonra geç gelen "dinliyorum" haberi: mikrofonu yeniden kapat, düğmeyi kapalı tut */
+    if(d==='dinliyor' && !ayar.acik){ iptalDinleme(); bar(null); return; }
     if(d==='dinliyor'){ dinliyor=true; ustUsteHata=0;
       if(!bekleyen && Date.now()>=uyariBitis) bar(tr()?'Dinliyorum…':'Listening…'); }
     else if(d==='konusma'){ /* ses geldi */ }
@@ -14657,6 +14728,7 @@ const SesOyun = (function(){
     yukle();
     const k=KOPRU();
     const destek = !!k && (function(){ try{ return !!k.destekVarMi(); }catch(e){ return false; } })();
+    sesDestek=destek;
 
     // Köprü yoksa (tarayıcı) özelliği tamamen gizle — yalan söylemeyelim
     const blok=document.getElementById('secSesBlok');
@@ -14698,7 +14770,7 @@ const SesOyun = (function(){
 
     // --- sihirbaz ---
     const kt=document.getElementById('sesKurTamam');
-    if(kt) kt.onclick=()=>{ kurSihirbaziKapat(); kaydet(); izinAkisi(); };
+    if(kt) kt.onclick=()=>{ kurSihirbaziKapat(); kaydet(); try{ localStorage.setItem('sesKuruldu','1'); }catch(e){} izinAkisi(); };
     const kv=document.getElementById('sesKurVazgec');
     if(kv) kv.onclick=()=>{ kurSihirbaziKapat(); };
 
@@ -14725,15 +14797,24 @@ const SesOyun = (function(){
         // Çok kısa dokunuşta hemen kesme: kullanıcı konuşmaya fırsat bulamaz
         const gecen=Date.now()-basiliBaslangic;
         setTimeout(durdurDinleme, gecen<450 ? 900 : 0);
+        /* Kısa dokunuş: konuşma ipucu + "kapat" seçeneği (bas-konuş modunda kapatmanın yolu) */
+        if(gecen<300){
+          setTimeout(()=>{
+            if(dinliyor) return;
+            bar(tr()?'Konuşmak için basılı tut':'Hold to speak',{sure:3200, alt:(tr()?'Sesli oynamayı kapat':'Turn voice off')});
+            const a=document.getElementById('sesAltBtn');
+            if(a) a.onclick=()=>{ sesliKapat(); dugmeleriBagla(); };
+          }, 1000);
+        }
       };
       b.addEventListener('pointerdown', bas);
       b.addEventListener('pointerup', birak);
       b.addEventListener('pointercancel', ()=>{ if(ayar.mik==='bas') iptalDinleme(); });
       b.addEventListener('click', (e)=>{
         e.preventDefault();
-        if(!ayar.acik) { kurSihirbaziAc(); return; }
+        if(!ayar.acik) { sesliAc(); return; }
         if(ayar.mik==='bas') return;          // pointer olayları hallediyor
-        if(dinliyor){ iptalDinleme(); bar(null); } else baslatDinleme();
+        sesliKapat();                          // eller serbest / uyandırma: dokunuş = kapat
       });
     }
     dugmeleriBagla();
@@ -14802,8 +14883,12 @@ else { try{ SesOyun.kur(); }catch(e){} }
      kayıtlı yönünü değiştirmez, analizden çıkınca oyun yönüne dönülür. */
   const inceleHUD=document.getElementById('inceleHUD'), analizEk=document.getElementById('analizEkran');
   const analizde=()=>!!((inceleHUD&&inceleHUD.classList.contains('acik'))||(analizEk&&analizEk.classList.contains('acik')));
+  /* Oyun sonu (şah mat + Stockfish karnesi) da HEP dikey (4 Ekim 2026, sahibin isteği). Kapatıp
+     tahtaya dönünce oyunun kayıtlı yönüne geçilir. Gezinme çubuğu kuralı değişmez (analizde() ayrı). */
+  const sonEk=document.getElementById('son');
+  const dikZorunlu=()=>analizde() || !!(sonEk && sonEk.classList.contains('acik'));
   let analizYon='dikey';
-  const simdiki=()=>analizde()?analizYon:kayitli();
+  const simdiki=()=>dikZorunlu()?analizYon:kayitli();
   function etiket(){
     const yatay=simdiki()==='yatay';
     const tr=(typeof uygDil==='undefined'||uygDil==='tr');
@@ -14813,7 +14898,7 @@ else { try{ SesOyun.kur(); }catch(e){} }
   }
   btn.onclick=()=>{
     const yeni = simdiki()==='yatay' ? 'dikey' : 'yatay';
-    if(analizde()) analizYon=yeni;
+    if(dikZorunlu()) analizYon=yeni;
     else { try{ localStorage.setItem(ANAHTAR, yeni); }catch(e){} }
     uygula(yeni); etiket();
   };
@@ -14821,7 +14906,7 @@ else { try{ SesOyun.kur(); }catch(e){} }
   let oyunda=null, analizOnce=false;
   function kontrol(){
     const acik=hud.classList.contains('acik');
-    const az=analizde();
+    const az=dikZorunlu();
     if(az!==analizOnce){
       analizOnce=az; analizYon='dikey';     // analize her girişte dikey
       if(acik===oyunda){ etiket(); uygula(acik ? simdiki() : 'dikey'); return; }
@@ -14864,7 +14949,7 @@ else { try{ SesOyun.kur(); }catch(e){} }
   }
   window.gezinmeGuncelle=gezinmeGuncelle;
   new MutationObserver(()=>{ kontrol(); gezinmeGuncelle(); }).observe(hud, {attributes:true, attributeFilter:['class']});
-  [inceleHUD, analizEk].forEach(e=>{ if(e) new MutationObserver(()=>{ kontrol(); gezinmeGuncelle(); }).observe(e, {attributes:true, attributeFilter:['class']}); });
+  [inceleHUD, analizEk, sonEk].forEach(e=>{ if(e) new MutationObserver(()=>{ kontrol(); gezinmeGuncelle(); }).observe(e, {attributes:true, attributeFilter:['class']}); });
   if(perde) new MutationObserver(gezinmeGuncelle).observe(perde, {attributes:true, attributeFilter:['class','style']});
   new MutationObserver(gezinmeGuncelle).observe(document.documentElement, {attributes:true, attributeFilter:['data-tema']});
   new MutationObserver(gezinmeGuncelle).observe(document.body, {attributes:true, attributeFilter:['class']});
@@ -15636,5 +15721,44 @@ function devPanelAc(){
 })();
 </script>
 <script src="bulmacalar.js"></script>
+
+<script>
+/* ===== ARAÇ RAFI (dikey) — vekil düğmeler =====
+   Asıl düğmeler (#hud içindeki .ikincil'ler ve #yonBtn) yerinde kalır; raf onlara tıklar ve
+   görünürlük / açık-kapalı durumunu (opacity) / etiketini (çeviri dahil) aynalar. */
+(function(){
+  const raf=document.getElementById('aracRafi'); if(!raf) return;
+  const YON_IKON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="9" width="13" height="9" rx="2"/><path d="M14 4.5a6 6 0 0 1 6 6M20 10.5l-1.6-1.7M20 10.5l1.7-1.6"/></svg>';
+  const liste=[
+    {id:'yonBtn', et:'Döndür'},
+    {id:'btnDuz'}, {id:'btnTasAd'}, {id:'btnSahne'}, {id:'btnYardim'}
+  ];
+  const cift=[];
+  for(const o of liste){
+    const asil=document.getElementById(o.id); if(!asil) continue;
+    const b=document.createElement('button'); b.type='button'; b.dataset.asil=o.id;
+    b.onclick=(e)=>{ e.stopPropagation(); asil.click(); setTimeout(esle,50); };
+    raf.appendChild(b); cift.push([asil,b,o]);
+  }
+  function esle(){
+    for(const [asil,b,o] of cift){
+      const sg=asil.querySelector('.sg'), i=asil.querySelector('i');
+      const ikon = o.id==='yonBtn' ? (asil.querySelector('svg')?asil.querySelector('svg').outerHTML:YON_IKON) : (sg?sg.innerHTML:'');
+      const et = o.et ? ((typeof metniCevir==='function')?metniCevir(o.et):o.et) : (i?i.textContent:'');
+      const html='<span class="sg">'+ikon+'</span><i>'+et+'</i>';
+      if(b._html!==html){ b.innerHTML=html; b._html=html; }
+      b.title=asil.title||et;
+      const gizli = o.id==='yonBtn' ? false : (asil.style.display==='none');
+      b.classList.toggle('gizli', gizli);
+      const op=parseFloat(asil.style.opacity||'1');
+      b.classList.toggle('kapali', o.id!=='yonBtn' && op<0.9);
+    }
+  }
+  esle();
+  const mo=new MutationObserver(()=>{ clearTimeout(mo._z); mo._z=setTimeout(esle,30); });
+  for(const [asil] of cift) mo.observe(asil,{attributes:true,attributeFilter:['style','title','class'],childList:true,subtree:true,characterData:true});
+  window.aracRafiEsle=esle;
+})();
+</script>
 </body>
 </html>
