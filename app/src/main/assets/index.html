@@ -1943,7 +1943,7 @@ body.onizlemede #anlatim{z-index:45;bottom:auto;top:calc(190px + env(safe-area-i
 
 #inceleKontrol{gap:10px;align-items:center;padding-top:1px}
 body.incelemede #notSeritUst{opacity:0;pointer-events:none;transition:opacity .25s}
-body.incelemede #yonBtn{transform:translateY(-62px);transition:transform .3s}
+body.incelemede #yonBtn{transform:translateY(-98px) scale(.86);transition:transform .3s}
 #inceleKontrol .ibtn{flex:0 0 46px;max-width:none;height:46px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;
   background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--bone)}
 #inceleKontrol .ibtn svg{width:19px;height:19px;vertical-align:0}
@@ -1952,6 +1952,83 @@ body.incelemede #yonBtn{transform:translateY(-62px);transition:transform .3s}
   box-shadow:0 8px 20px rgba(201,145,42,.32),inset 0 1px 0 rgba(255,255,255,.35)}
 #inceleKontrol .ibtn.dolu svg{width:15px;height:15px}
 #inceleKontrol .ibtn:active{transform:scale(.94);opacity:1}
+
+/* ===== OYUN SONU — premium karne (4 Ekim 2026) =====
+   Opak katmanlı arka plan (oyun arayüzü arkadan sızmaz), iki doğruluk halkası, karo sınıf ızgarası,
+   Manrope gövde + Cinzel rakam/başlık; inceleme paneliyle aynı dil. */
+#son{background:radial-gradient(120% 55% at 50% 0%,rgba(232,182,76,.12),transparent 62%),
+  linear-gradient(180deg,rgba(7,8,12,.985) 0%,rgba(7,8,12,.93) 46%,rgba(7,8,12,.985) 100%)!important}
+#sonUst .tac{margin:4px auto 2px}
+#son h2{text-shadow:0 6px 30px rgba(232,182,76,.22)}
+#son .alt{color:rgba(232,226,210,.78);font-family:Manrope,sans-serif;font-weight:500;font-size:14px;letter-spacing:.04em}
+.karne{font-family:Manrope,sans-serif;background:linear-gradient(180deg,#14161d,#0e1015)!important;
+  border:1px solid rgba(232,182,76,.22)!important;border-radius:24px!important;padding:6px 0 4px;
+  box-shadow:0 18px 44px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05)}
+.krDog{justify-content:center;gap:26px;padding:18px 16px 6px}
+.krDogYan{flex:0 0 auto}
+.krDogEt{font:700 10.5px Manrope,sans-serif;letter-spacing:.22em;color:rgba(232,226,210,.6);margin-bottom:8px}
+.krHalka{position:relative;width:112px;height:112px;margin:0 auto}
+.krHalka svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.krHalka circle{fill:none;stroke-width:6.5}
+.krHalka .hz{stroke:rgba(255,255,255,.07)}
+.krHalka .hd{stroke:#E8B64C;stroke-linecap:round;stroke-dasharray:263.9;
+  stroke-dashoffset:calc(263.9 * (1 - var(--p) / 100));transition:stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)}
+.krHalka::before{content:"";position:absolute;inset:4px;border-radius:50%;box-shadow:0 0 22px rgba(232,182,76,.28),inset 0 0 18px rgba(232,182,76,.10)}
+.krHalka.gri::before{box-shadow:none}
+.krHalka.gri .hd{stroke:#AEB4C0}
+.krHalka .krDogPuan{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:30px!important;letter-spacing:.01em}
+.krDogAlt{font:700 9.5px Manrope,sans-serif;letter-spacing:.2em;color:rgba(232,226,210,.42);margin-top:8px}
+.krBilgi{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 16px 2px;
+  font:600 12px Manrope,sans-serif;color:rgba(232,226,210,.6);letter-spacing:.03em}
+.krBilgi i{width:4px;height:4px;border-radius:50%;background:rgba(232,182,76,.6)}
+.krDogNot{font-family:Manrope,sans-serif;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;opacity:.55}
+.krKoc{margin:12px 14px 12px!important;padding:13px 14px!important;border-radius:16px!important;
+  background:linear-gradient(135deg,rgba(232,182,76,.10),rgba(232,182,76,.02))!important;
+  border:1px solid rgba(232,182,76,.2)!important;align-items:center!important}
+.krKocIkon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(232,182,76,.12);box-shadow:inset 0 0 0 1px rgba(232,182,76,.3);font-size:20px!important}
+.krKocMetin{font-family:Manrope,sans-serif;font-size:13.5px!important;line-height:1.55!important;color:rgba(240,233,216,.88)!important}
+.krReyting{margin:0 14px 12px!important;border-radius:16px!important;padding:12px 16px!important}
+.krReyEt{font-family:Manrope,sans-serif;font-weight:700}
+.krEvreler{margin:0 14px 12px!important;gap:8px}
+.krEvre{border-radius:16px!important;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015))!important;
+  padding:11px 4px 10px!important}
+.krEvreAd{font-family:Manrope,sans-serif;font-weight:700;font-size:9.5px!important;letter-spacing:.16em!important}
+.krEvreYuz{font-family:Manrope,sans-serif}
+.krIzgara{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.krKutu{display:flex;flex-direction:column;align-items:center;gap:3px;padding:11px 4px 10px;border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.krKutu.bos{opacity:.45}
+.krKRoz{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:var(--rk);color:#fff;font:900 12px Manrope,sans-serif;box-shadow:0 0 0 3px rgba(255,255,255,.04),0 4px 12px rgba(0,0,0,.35)}
+.krKRoz svg{width:14px;height:14px}
+.krKutu b{font-family:'Cinzel',serif;font-weight:900;font-size:21px;line-height:1.1;color:var(--rk);margin-top:3px}
+.krKAd{font:600 11px Manrope,sans-serif;color:rgba(232,226,210,.62);letter-spacing:.02em}
+#son.acik .krKutu{animation:sonEvreGel .42s cubic-bezier(.2,1.3,.4,1) backwards}
+#son.acik .krKutu:nth-child(2){animation-delay:.06s}#son.acik .krKutu:nth-child(3){animation-delay:.12s}
+#son.acik .krKutu:nth-child(4){animation-delay:.18s}#son.acik .krKutu:nth-child(5){animation-delay:.24s}
+#son.acik .krKutu:nth-child(n+6){animation-delay:.3s}
+.krListe{padding:2px 14px 12px!important}
+.krSatir{font-family:Manrope,sans-serif}
+.krEt{font-family:Manrope,sans-serif!important;font-size:14px!important}
+.kaBlok{margin:2px 14px 12px!important;border-radius:16px!important;padding:12px 12px 10px!important}
+.kaBas{font-family:Manrope,sans-serif;font-weight:800}
+.kaSatir{border-radius:12px!important;padding:9px 10px!important}
+.kaRoz{width:26px!important;height:26px!important;font-size:12px!important}
+.kaNot{font-family:Manrope,sans-serif!important;font-weight:800!important;font-size:15px!important;letter-spacing:.01em}
+.kaNot em{font-style:normal;font-weight:600;color:rgba(232,226,210,.5);font-size:13px}
+.kaOneri{font-family:Manrope,sans-serif!important;font-weight:800;font-size:13px!important}
+.kaAlt{font-family:Manrope,sans-serif}
+.krAcilis{font-family:Manrope,sans-serif;font-style:normal!important;margin:0 14px!important;padding:10px 0 8px!important;font-size:12px!important}
+.krAcilis b{display:block;color:rgba(232,226,210,.75);font-weight:700;letter-spacing:.02em}
+#sonIst:has(.krIzgara) ~ #sonOzet{display:none!important}
+body:has(#son.acik) #hud,body:has(#son.acik) #notSeritUst,body:has(#son.acik) #notSeritAlt,body:has(#son.acik) #yonBtn{visibility:hidden}
+#tahtadaIncele{border-radius:18px!important;border:none!important;padding:16px 20px!important}
+.sonIkili button,#son .btnlar .sbtn{border-radius:14px!important}
+.sonIkili button{background:rgba(255,255,255,.04)!important;border-color:rgba(255,255,255,.12)!important}
+#sonKapat{background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.14)!important}
 </style>
 </head>
 <body>
@@ -6203,10 +6280,18 @@ function karneSatirlari(renk){
   for(const [sn,ikon,rk,ad] of KR_SINIF){
     const n=say[sn]||0;
     if(n<=0 && sn!=='enIyi' && sn!=='iyi') continue;
-    html+='<div class="krSatir"><span class="krEt"><span class="krIkon" style="color:'+rk+'">'+ikon+'</span>'+ad+'</span>'+
-          '<span class="krSay" style="color:'+rk+'">'+n+'</span></div>';
+    html+='<div class="krKutu'+(n<=0?' bos':'')+'" style="--rk:'+rk+'"><span class="krKRoz">'+ikon+'</span>'+
+          '<b>'+n+'</b><span class="krKAd">'+ad.replace(/ hamlesi$| hamle$/,'')+'</span></div>';
   }
-  return html;
+  return html ? '<div class="krIzgara">'+html+'</div>' : '';
+}
+/* Doğruluk halkasını doldurur (CSS geçişiyle, sayaçla aynı sürede). */
+function halkaYaz(id, v){
+  try{
+    const el=document.getElementById(id); const h=el&&el.closest('.krHalka'); if(!h) return;
+    const p=(v===null||v===undefined||!isFinite(v))?0:Math.max(0,Math.min(100,v));
+    requestAnimationFrame(()=>requestAnimationFrame(()=>h.style.setProperty('--p', p)));
+  }catch(e){}
 }
 /* Yüzde sıfırdan hedefe sayarak çıkar — sonucun "hesaplandığı" hissi verir. */
 function sayacAnimasyon(el, hedef, sure){
@@ -6232,9 +6317,9 @@ function dogrulukYaz(){
     const dBen=dogrulukHesapla(ben), dRak=dogrulukHesapla(rak);
     /* Tek ölçüm kaynağı (Stockfish) olduğu için "yaklaşık" işareti kalktı. */
     const eBen=document.getElementById('krDogBen');
-    if(eBen){ if(dBen===null) eBen.textContent='—'; else sayacAnimasyon(eBen,dBen,950); }
+    if(eBen){ if(dBen===null) eBen.textContent='—'; else sayacAnimasyon(eBen,dBen,950); halkaYaz('krDogBen', dBen); }
     const eRak=document.getElementById('krDogRakip');
-    if(eRak){ if(dRak===null) eRak.textContent='—'; else sayacAnimasyon(eRak,dRak,950); }
+    if(eRak){ if(dRak===null) eRak.textContent='—'; else sayacAnimasyon(eRak,dRak,950); halkaYaz('krDogRakip', dRak); }
     const nt=document.getElementById('krDogNot');
     if(nt) nt.textContent = (dBen===null) ? 'Doğruluk ölçülemedi' : 'Stockfish ölçümü';
     const lk=document.getElementById('krListeKutu');
@@ -6412,13 +6497,14 @@ function oyunSonu(d, terkKazanan){
       const analizBekliyor = oyunKaydi.length && !oyunKaydi.some(k=>k._kSinif);
       const yaz = (v)=> (analizBekliyor || v===null) ? '—' : yzYaz(v);
       let kr='<div class="karne">';
-      kr+='<div class="krDog">';
-      kr+='<div class="krDogYan"><div class="krDogEt">SEN</div><div class="krDogPuan" id="krDogBen">'+yaz(benimDog)+'</div><div class="krDogAlt">DOĞRULUK</div></div>';
-      kr+='<div class="krDogCizgi"></div>';
-      kr+='<div class="krDogYan"><div class="krDogEt">RAKİP</div><div class="krDogPuan krGri" id="krDogRakip">'+yaz(rakipDog)+'</div><div class="krDogAlt">DOĞRULUK</div></div>';
-      kr+='<div class="krDogCizgi"></div>';
-      kr+='<div class="krDogYan"><div class="krDogEt">HAMLE</div><div class="krDogPuan krGri">'+ist.hamle+'</div><div class="krDogAlt">TOPLAM</div></div>';
-      kr+='</div>';
+      /* Doğruluk iki halkada (4 Ekim 2026): SEN altın, RAKİP gümüş; halka analiz bitince dolar. */
+      const halka=(id,et,v,gri)=>'<div class="krDogYan"><div class="krDogEt">'+et+'</div>'+
+        '<div class="krHalka'+(gri?' gri':'')+'" style="--p:0"><svg viewBox="0 0 100 100" aria-hidden="true">'+
+        '<circle class="hz" cx="50" cy="50" r="42"/><circle class="hd" cx="50" cy="50" r="42"/></svg>'+
+        '<div class="krDogPuan'+(gri?' krGri':'')+'" id="'+id+'">'+yaz(v)+'</div></div>'+
+        '<div class="krDogAlt">DOĞRULUK</div></div>';
+      kr+='<div class="krDog">'+halka('krDogBen','SEN',benimDog,false)+halka('krDogRakip','RAKİP',rakipDog,true)+'</div>';
+      kr+='<div class="krBilgi"><span>'+ist.hamle+' hamle</span>'+(acilis?'<i></i><span>'+acilis+'</span>':'')+'</div>';
       const sfVar = (typeof SF!=='undefined' && SF.mevcut);
       const sfSebep = (typeof SF!=='undefined' && SF.hataSebep) ? SF.hataSebep : '';
       kr+='<div id="krDogNot" class="krDogNot">'+
@@ -6475,10 +6561,11 @@ function oyunSonu(d, terkKazanan){
       /* Açılış adı + kısa stratejik not (kendi içeriğimiz) */
       if(acilis){
         const nt=(typeof ACILIS_NOT!=='undefined' && ACILIS_NOT[acilis])||'';
-        kr+='<div class="krAcilis">'+acilis+(nt?'<span class="krAcNot">'+nt+'</span>':'')+'</div>';
+        if(nt) kr+='<div class="krAcilis"><b>'+acilis+'</b><span class="krAcNot">'+nt+'</span></div>';
       }
       kr+='</div>';
       document.getElementById('sonIst').innerHTML=kr;
+      if(!analizBekliyor){ halkaYaz('krDogBen', benimDog); halkaYaz('krDogRakip', rakipDog); }
       /* Kilit ana dokununca o hamleyi tahtada göster */
       try{
         document.querySelectorAll('#sonIst .kaSatir').forEach(el=>{
@@ -6816,7 +6903,7 @@ function hamleUci(h){ const a=i=>'abcdefgh'[i%8]+(8-Math.floor(i/8)); return a(h
 async function skorTutarla(fen, h, enIyiMi, sonuc, sonrasi, enIyiSkor, oyuncuSkor, KIRP, derin){
   try{
     const uci=hamleUci(h);
-    if(enIyiMi) return {enIyiSkor, oyuncuSkor:Math.max(oyuncuSkor, enIyiSkor)};
+    if(enIyiMi) return {enIyiSkor, oyuncuSkor};   // sınıf zaten "en iyi"; doğruluk ham ölçümle kalır
     if(sonuc && sonuc.ikinci===uci && typeof sonuc.cp2==='number')
       oyuncuSkor=Math.max(oyuncuSkor, KIRP(sonuc.cp2));
     if(puanKaybi(enIyiSkor, oyuncuSkor) <= 0.10 || !sonrasi) return {enIyiSkor, oyuncuSkor};
@@ -9586,6 +9673,21 @@ window.geriTusu=function(){
   }catch(e){ /* hata olursa çıkışa izin ver */ }
   return false; // ana menüdeyiz: uygulamadan çık
 };
+/* Kare vurgu dokusu: yuvarlatılmış kare, içten dışa koyulaşan renk + ince iç kenar. Önbellekli. */
+const _kareDokuOnb={};
+function kareVurguDokusu(renk, guclu){
+  const anahtar=renk+'_'+(guclu?1:0);
+  if(_kareDokuOnb[anahtar]) return _kareDokuOnb[anahtar];
+  const c=document.createElement('canvas'); c.width=c.height=128; const x=c.getContext('2d');
+  const R=(renk>>16)&255, G=(renk>>8)&255, B=renk&255, rgb=(a)=>'rgba('+R+','+G+','+B+','+a+')';
+  const yol=(p,rr)=>{ x.beginPath(); x.moveTo(p+rr,p); x.arcTo(128-p,p,128-p,128-p,rr); x.arcTo(128-p,128-p,p,128-p,rr);
+    x.arcTo(p,128-p,p,p,rr); x.arcTo(p,p,128-p,p,rr); x.closePath(); };
+  const g=x.createRadialGradient(64,64,10,64,64,90);
+  g.addColorStop(0, rgb(guclu?.30:.16)); g.addColorStop(1, rgb(guclu?.58:.30));
+  yol(5,12); x.fillStyle=g; x.fill();
+  x.lineWidth=guclu?6:4; x.strokeStyle=rgb(guclu?.95:.6); yol(guclu?8:7,10); x.stroke();
+  const t=new THREE.CanvasTexture(c); t.anisotropy=4; t.encoding=THREE.sRGBEncoding; _kareDokuOnb[anahtar]=t; return t;
+}
 function hamleVurgula(idx){
   // o hamlenin from/to karelerini bul (oyunu baştan oynatarak)
   Motor.reset();
@@ -9606,14 +9708,16 @@ function hamleVurgula(idx){
             : k.kalite==='subheli' ? 0xE8C54A
             : k.kalite==='hatali' ? 0xE0813F : 0x9FB4C7;
   vurguGrup=new THREE.Group();
-  // from: içi boş halka, to: dolu disk
+  /* Kare boyaması (4 Ekim 2026): eskiden kalkış karesinde ince halka, varışta yarı saydam disk vardı;
+     taşın altında kaybolup ucuz görünüyordu. Artık iki kare de sınıf rengiyle boyanır (chess.com dili):
+     kalkış hafif, varış belirgin + iç kenar ışıması. Renkler ton eşlemesinden geçmez (yıkanmaz). */
   const fv=kareKonum(fromK), tv=kareKonum(toK);
-  const halka=new THREE.Mesh(new THREE.TorusGeometry(.4,.04,8,26),
-    new THREE.MeshBasicMaterial({color:renk,transparent:true,opacity:.7}));
-  halka.position.set(fv.x,.07,fv.z); halka.rotation.x=Math.PI/2; vurguGrup.add(halka);
-  const disk=new THREE.Mesh(new THREE.CircleGeometry(.32,20),
-    new THREE.MeshBasicMaterial({color:renk,transparent:true,opacity:.55,depthWrite:false}));
-  disk.position.set(tv.x,.06,tv.z); disk.rotation.x=-Math.PI/2; vurguGrup.add(disk);
+  const kareMesh=(v,guclu)=>{
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1),
+      new THREE.MeshBasicMaterial({map:kareVurguDokusu(renk,guclu),transparent:true,depthWrite:false,toneMapped:false}));
+    m.position.set(v.x,.055,v.z); m.rotation.x=-Math.PI/2; m.renderOrder=2; return m;
+  };
+  vurguGrup.add(kareMesh(fv,false)); vurguGrup.add(kareMesh(tv,true));
   scene.add(vurguGrup);
   // Motor'u CANLI son konuma geri getir (reset'te bırakma — yoksa canlıya dönünce tahta başa döner)
   Motor.reset();
@@ -9929,20 +10033,22 @@ function dahaIyiOkGoster(idx){
   if(!sfH) return;
   const fv=kareKonum(sfH.from), tv=kareKonum(sfH.to);
   dahaIyiOkGrup=new THREE.Group();
-  // Yeşil ok: from'dan to'ya silindir + koni uç
-  const dx=tv.x-fv.x, dz=tv.z-fv.z; const uzun=Math.hypot(dx,dz);
-  const govde=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,uzun*.8,8),
-    new THREE.MeshBasicMaterial({color:0x5FBF6A,transparent:true,opacity:.85}));
-  govde.position.set(fv.x+dx*.4, .5, fv.z+dz*.4);
-  govde.rotation.order='YXZ';
-  govde.rotation.y=Math.atan2(dx,dz);
-  govde.rotation.x=Math.PI/2;
-  dahaIyiOkGrup.add(govde);
-  const uc=new THREE.Mesh(new THREE.ConeGeometry(.13,.28,10),
-    new THREE.MeshBasicMaterial({color:0x5FBF6A,transparent:true,opacity:.9}));
-  uc.position.set(tv.x-dx*.12, .5, tv.z-dz*.12);
-  uc.rotation.y=Math.atan2(dx,dz); uc.rotation.x=Math.PI/2;
-  dahaIyiOkGrup.add(uc);
+  /* Düz ok (4 Ekim 2026): eskiden havada ince silindir + koni vardı, soluk ve zor görünüyordu.
+     Artık tahtaya yatık, kalın gövdeli, geniş uçlu yeşil ok; altında yumuşak koyu gölge. */
+  const dx=tv.x-fv.x, dz=tv.z-fv.z, uzun=Math.hypot(dx,dz);
+  const bas=.22, son=uzun-.08, G=.075, UG=.24, UL=.40;
+  const sekil=new THREE.Shape();
+  sekil.moveTo(bas,-G); sekil.lineTo(son-UL,-G); sekil.lineTo(son-UL,-UG); sekil.lineTo(son,0);
+  sekil.lineTo(son-UL,UG); sekil.lineTo(son-UL,G); sekil.lineTo(bas,G); sekil.closePath();
+  const geo=new THREE.ShapeGeometry(sekil);
+  const aci=Math.atan2(-dz,dx);
+  const katman=(renk,op,y,olcek)=>{
+    const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:new THREE.Color(renk).convertSRGBToLinear(),transparent:true,opacity:op,depthWrite:false,toneMapped:false}));
+    m.rotation.x=-Math.PI/2; m.position.y=y; m.scale.set(1,olcek,1);
+    const g=new THREE.Group(); g.add(m); g.position.set(fv.x,0,fv.z); g.rotation.y=aci; g.renderOrder=3; m.renderOrder=3; return g;
+  };
+  dahaIyiOkGrup.add(katman(0x000000,.28,.062,1.35));
+  dahaIyiOkGrup.add(katman(0x4FB35C,.92,.07,1));
   scene.add(dahaIyiOkGrup);
 }
 /* Gidişat grafiği: her hamleden sonraki beyaz kazanma olasılığı (Lichess eğrisi). Açık alan = beyaz.
@@ -13001,7 +13107,7 @@ function kilitAnlarHtml(renk){
     const yuzde=Math.round(a.kayipPuan*100);
     h+='<div class="kaSatir" data-idx="'+a.i+'">'+
        '<span class="kaRoz" style="background:'+b.renk+'">'+(b.sembol||'?')+'</span>'+
-       '<span class="kaNot">'+tur+' '+a.notasyon+'</span>'+
+       '<span class="kaNot"><em>'+tur+'</em> '+a.notasyon+'</span>'+
        (a.oneri?'<span class="kaOneri">→ '+a.oneri+'</span>':'')+
        '<span class="kaKayip">−%'+yuzde+'</span></div>';
   }
@@ -13294,7 +13400,7 @@ rozetGuncelle();
 <script>
 /* ---- İnceleme: hamle kalitesi rozeti (taşın üzerinde) ---- */
 let kaliteRozetGrup=null, sonVurguTo=-1;
-function kaliteRozetTemizle(){ if(kaliteRozetGrup){ try{scene.remove(kaliteRozetGrup);}catch(e){} kaliteRozetGrup=null; } }
+function kaliteRozetTemizle(){ if(kaliteRozetGrup){ try{scene.remove(kaliteRozetGrup); nesneyiSerbestBirak(kaliteRozetGrup,true);}catch(e){} kaliteRozetGrup=null; } }
 function kaliteRozetGoster(idx){
   kaliteRozetTemizle();
   if(typeof oyunKaydi==='undefined'||!oyunKaydi[idx]||sonVurguTo<0) return;
@@ -13306,37 +13412,54 @@ function kaliteRozetGoster(idx){
     const m=M[k.kalite]; if(m){ sem=m[0]; renk=m[1]; }
   }
   if(!sem) return;
-  /* chess.com tarzı: dolgun renkli disk üstünde BEYAZ kalın sembol,
-     hafif dış gölge, ince koyu kenar. Kare köşesine oturur. */
-  const c=document.createElement('canvas'); c.width=160; c.height=160;
-  const x=c.getContext('2d');
-  x.shadowColor='rgba(0,0,0,.55)'; x.shadowBlur=12; x.shadowOffsetY=5;
-  x.beginPath(); x.arc(80,78,58,0,7); x.fillStyle=renk; x.fill();
+  /* Rozet (4 Ekim 2026): 256 px keskin doku, üstten ışık alan disk, ince beyaz iç halka, Manrope sembol.
+     Ton eşlemesi kapalı (eskiden ACES yüzünden soluk görünüyordu), biraz büyük ve "belirerek" gelir. */
+  const N=256, c=document.createElement('canvas'); c.width=c.height=N;
+  const x=c.getContext('2d'), M=N/2, R=N*0.38;
+  x.shadowColor='rgba(0,0,0,.55)'; x.shadowBlur=22; x.shadowOffsetY=8;
+  x.beginPath(); x.arc(M,M-4,R,0,7); x.fillStyle=renk; x.fill();
   x.shadowColor='transparent';
-  const gr=x.createRadialGradient(64,58,8,80,78,58);
-  gr.addColorStop(0,'rgba(255,255,255,.28)'); gr.addColorStop(.55,'rgba(255,255,255,0)');
-  x.beginPath(); x.arc(80,78,58,0,7); x.fillStyle=gr; x.fill();
-  x.lineWidth=5; x.strokeStyle='rgba(10,12,18,.85)';
-  x.beginPath(); x.arc(80,78,58,0,7); x.stroke();
+  const gr=x.createLinearGradient(0,M-R,0,M+R);
+  gr.addColorStop(0,'rgba(255,255,255,.34)'); gr.addColorStop(.5,'rgba(255,255,255,.04)'); gr.addColorStop(1,'rgba(0,0,0,.18)');
+  x.beginPath(); x.arc(M,M-4,R,0,7); x.fillStyle=gr; x.fill();
+  x.lineWidth=5; x.strokeStyle='rgba(255,255,255,.55)';
+  x.beginPath(); x.arc(M,M-4,R-7,0,7); x.stroke();
+  x.lineWidth=6; x.strokeStyle='rgba(8,10,16,.9)';
+  x.beginPath(); x.arc(M,M-4,R+2,0,7); x.stroke();
+  x.fillStyle='#FFFFFF'; x.strokeStyle='#FFFFFF';
+  x.shadowColor='rgba(0,0,0,.35)'; x.shadowBlur=6; x.shadowOffsetY=3;
   if(sem.indexOf('<svg')===0){
-    // Kitap: açık kitap çizimi (beyaz)
-    x.strokeStyle='#FFFFFF'; x.lineWidth=8; x.lineJoin='round'; x.lineCap='round';
-    x.beginPath(); x.moveTo(80,56); x.quadraticCurveTo(64,46,40,48); x.lineTo(40,104); x.quadraticCurveTo(64,102,80,112);
-    x.quadraticCurveTo(96,102,120,104); x.lineTo(120,48); x.quadraticCurveTo(96,46,80,56); x.closePath(); x.stroke();
-    x.beginPath(); x.moveTo(80,56); x.lineTo(80,112); x.stroke();
+    const s_=N/160, ox=M-80*s_, oy=M-4-80*s_;
+    x.lineWidth=11; x.lineJoin='round'; x.lineCap='round';
+    x.beginPath(); x.moveTo(ox+80*s_,oy+58*s_); x.quadraticCurveTo(ox+64*s_,oy+48*s_,ox+42*s_,oy+50*s_); x.lineTo(ox+42*s_,oy+104*s_);
+    x.quadraticCurveTo(ox+64*s_,oy+102*s_,ox+80*s_,oy+112*s_); x.quadraticCurveTo(ox+96*s_,oy+102*s_,ox+118*s_,oy+104*s_);
+    x.lineTo(ox+118*s_,oy+50*s_); x.quadraticCurveTo(ox+96*s_,oy+48*s_,ox+80*s_,oy+58*s_); x.closePath(); x.stroke();
+    x.beginPath(); x.moveTo(ox+80*s_,oy+58*s_); x.lineTo(ox+80*s_,oy+112*s_); x.stroke();
   } else {
-    x.font='900 '+(sem.length>1?60:76)+'px Arial,Helvetica,sans-serif';
+    x.font='800 '+(sem.length>1?92:116)+'px Manrope,Arial,sans-serif';
     x.textAlign='center'; x.textBaseline='middle';
-    x.fillStyle='#FFFFFF'; x.fillText(sem,80,84);
+    x.fillText(sem,M,M+2);
   }
-  const tex=new THREE.CanvasTexture(c); tex.minFilter=THREE.LinearFilter;
-  const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false,depthWrite:false}));
+  const tex=new THREE.CanvasTexture(c); tex.minFilter=THREE.LinearMipmapLinearFilter; tex.anisotropy=4;
+  tex.encoding=THREE.sRGBEncoding;   // çıktı sRGB: doku da sRGB sayılmazsa renkler açılıp soluyordu
+  const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false,depthWrite:false,toneMapped:false}));
   const pv=kareKonum(sonVurguTo);
   const duz=(typeof duzGorunum!=='undefined'&&duzGorunum);
-  spr.position.set(pv.x+.40, duz? .90 : 1.35, pv.z-.40);
-  spr.scale.set(.52,.52,1);
+  spr.position.set(pv.x+.42, duz? .95 : 1.45, pv.z-.42);
+  spr.renderOrder=5;
   kaliteRozetGrup=new THREE.Group(); kaliteRozetGrup.add(spr);
   scene.add(kaliteRozetGrup);
+  /* Belirme: 0 → 1.12 → 1 (yaklaşık 0.32 sn) */
+  const HED=.80, t0=performance.now(), grup=kaliteRozetGrup;
+  const azH=document.body.classList.contains('azHareket');
+  (function adim(){
+    if(kaliteRozetGrup!==grup) return;
+    const o=azH?1:Math.min(1,(performance.now()-t0)/320);
+    const e=o<.7 ? (o/.7)*1.12 : 1.12-(o-.7)/.3*.12;
+    spr.scale.set(HED*e,HED*e,1);
+    if(typeof cizimIste==='function') cizimIste();
+    if(o<1) requestAnimationFrame(adim);
+  })();
 }
 /* ---- Misafir → Giriş yolu (çevrimiçi engeline takılınca) ---- */
 function misafirGirisYolu(){

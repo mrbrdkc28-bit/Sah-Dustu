@@ -722,3 +722,11 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Yorum kartı sınıf rengine bürünür (rozet, çerçeve, hafif ışıma), hamle değişince kısa giriş animasyonu.
 - Panel tahtayı örtmesin diye kamera `setViewOffset` ile yukarı kaydırılır (`inceleGorunumAyarla`, yalnızca artar); rakip şeridi gizlenir, çevirme düğmesi yukarı alınır.
 - TR/EN değiştirince somut açıklama (`k._ekDil`) artık kaybolmuyor.
+
+### 8.27 Oyun sonu karnesi + tahta simgeleri + analiz tutarlılığı (4 Ekim 2026)
+- Oyun sonu: opak katmanlı arka plan (oyun arayüzü gizlenir), SEN/RAKİP doğruluk halkaları, "33 hamle · açılış" satırı,
+  sınıf sayıları karo ızgara, koç/seviye/evre/kilit anlar aynı dilde (Manrope gövde, Cinzel rakam). Kilit anlarda notasyon artık büyük harfe dönmüyor.
+- Tahta: kare vurgusu renkli kare boyaması; sınıf rozeti 256 px, sRGB, ton eşlemesiz, belirme animasyonu; "daha iyisi" düz kalın yeşil ok.
+- Analiz: SF istekleri sıralı (kuyruk), her aramadan önce `ucinewgame` (aynı oyun = aynı karne).
+  Motor Stockfish 18 *Lite*: 12 derinlikte bazı fedaları görmüyor (15.Fxd7+ sahte "vahim"). `skorTutarla`: hata/vahim adayında
+  rakibin en iyi iki cevabı oynanıp torun konumlar aranır, hamlenin değeri bunların bize en kötüsü. Opera ≈ 22 sn.
