@@ -1849,6 +1849,24 @@ body.onizlemede #anlatim{z-index:45;bottom:auto;top:calc(190px + env(safe-area-i
 #cvRakipYok button{display:block;width:100%;padding:12px;border-radius:14px;font:700 14px 'Cinzel',serif;letter-spacing:.06em;cursor:pointer}
 #cvRakipYok .ryBirincil{border:none;background:linear-gradient(180deg,#F2CC6E,#D69F33);color:#1a1408;margin-bottom:8px}
 #cvRakipYok .ryIkincil{background:transparent;border:1px solid var(--line);color:var(--bone)}
+
+/* ===== ÇEVRİMİÇİ: eylem düğmeleri altta sabit (4 Ekim 2026) =====
+   Rastgele Eşleş / Oda Oluştur / Katıl kayan içeriğin en dibindeydi (süre + ordu + arena altında);
+   sahibi "başla düğmesi yok" sandı. Oyun Kur'daki SAVAŞ BAŞLASIN gibi kayan alanın dışına alındı. */
+#cvEylem{flex-shrink:0;width:100%;max-width:440px;margin:0 auto;padding:10px 20px calc(14px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;gap:9px;border-top:1px solid var(--line)}
+#cvEylem .cvBtn.cvAna{padding-top:12px;padding-bottom:12px}
+#cvEylem .cvAltSatir{display:flex;gap:8px;align-items:stretch}
+#cvEylem .cvAltSatir #cvOdaOlustur{flex:1 1 46%;width:auto;padding:10px 12px;gap:10px}
+#cvEylem .cvAltSatir #cvOdaOlustur .cvAlt{display:none}
+#cvEylem .cvAltSatir #cvOdaOlustur .cvIkon{width:30px;height:30px}
+#cvEylem .cvAltSatir #cvKatilKutu{flex:1 1 54%;margin:0;width:auto}
+#cvEylem #cvKodGiris{min-width:0;padding:10px 10px;font-size:13px}
+#cvEylem .cvAltSatir #cvOdaOlustur .cvAd{font-size:13px;letter-spacing:.04em;white-space:nowrap}
+#cvEylem .cvAltSatir #cvOdaOlustur .cvIkon{width:26px;height:26px}
+#cvEylem .cvAltSatir #cvOdaOlustur .cvIkon svg{width:16px;height:16px}
+#cvEylem .cvAltSatir{min-height:46px}
+#cvEylem .cvBtn.cvKatil{padding:10px 14px}
 </style>
 </head>
 <body>
@@ -2217,12 +2235,15 @@ body.onizlemede #anlatim{z-index:45;bottom:auto;top:calc(190px + env(safe-area-i
       <div id="cvArenalar" class="arenalar"></div>
     </div>
 
+  </div>
+  <div id="cvEylem">
     <button class="cvBtn cvAna" id="cvRastgele">
       <div class="cvIkon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.2 3.5 5.8 13.2h5.4l-1 7.3 7.5-9.8h-5.4z"/></svg></div>
       <div class="cvMetin"><div class="cvAd">Rastgele Eşleş</div>
         <div class="cvAlt">Hazır bir rakiple hemen başla</div></div>
     </button>
 
+    <div class="cvAltSatir">
     <button class="cvBtn" id="cvOdaOlustur">
       <div class="cvIkon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg></div>
       <div class="cvMetin"><div class="cvAd">Oda Oluştur</div>
@@ -2232,6 +2253,7 @@ body.onizlemede #anlatim{z-index:45;bottom:auto;top:calc(190px + env(safe-area-i
     <div id="cvKatilKutu">
       <input type="text" id="cvKodGiris" placeholder="ODA KODU" maxlength="6" autocomplete="off">
       <button class="cvBtn cvKatil" id="cvOdayaKatil">Katıl</button>
+    </div>
     </div>
   </div>
 
