@@ -1772,6 +1772,13 @@ html[data-tema="fildisi"] #secimSayfa .ssTamam{background:linear-gradient(135deg
 #son{background:rgba(6,7,11,.8);backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .karne{background:rgba(14,17,26,.72);backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 #kisaBilgi{background:rgba(12,14,22,.92);backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+/* ===== İLK GİRİŞ AKICILIK SEÇİMİ + UYARI (4 Ekim 2026) ===== */
+#secimSayfa .ssSec .ssUyari{display:block;font-style:normal;font-size:11.5px;line-height:1.35;margin-top:5px;color:#E0904F}
+html[data-tema="fildisi"] #secimSayfa .ssSec .ssUyari{color:#B0561E}
+#secimSayfa .ssAcikla{font:500 13px/1.5 Manrope,sans-serif;color:#b9b2a2;text-align:center;margin:-4px 6px 14px}
+html[data-tema="fildisi"] #secimSayfa .ssAcikla{color:#6f685b}
+#secimSayfa .ssTamam:disabled{opacity:.38;cursor:default}
 </style>
 </head>
 <body>
@@ -8316,7 +8323,8 @@ function ayarOzetYaz(){
   if(r) r.innerHTML=(window.IKON&&IKON.ayar?'<span class="caIk">'+IKON.ayar+'</span>':'')+
     '<span>'+c('Animasyon')+': <b>'+c(sahneAyari?'Açık':'Kapalı')+'</b> · '+c('Grafik')+': <b>'+c(ad)+'</b> ('+hz+' Hz)</span>';
   const g=document.getElementById('grafikIpucu');
-  if(g) g.textContent=c('Yüksek')+': '+maksHz()+' Hz · '+c('Orta')+' / '+c('Düşük')+': 60 Hz, '+c('daha az ısınma');
+  if(g) g.textContent=c('Yüksek')+': '+maksHz()+' Hz · '+c('Orta')+' / '+c('Düşük')+': 60 Hz, '+c('daha az ısınma')+'. '+
+    c('Yüksek, telefonun ısınmasına ve şarjın daha hızlı bitmesine sebep olabilir.');
 }
 function cvAnimNotYaz(){
   ayarOzetYaz();
@@ -12007,6 +12015,12 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Tamam']=CEVM['Tamam']||{en:'Done',ru:'Готово',ar:'تم',fr:'OK',de:'Fertig',it:'Fatto',zh:'完成'};
   CEVM['Telefon ısındı: efektler azaltıldı']=CEVM['Telefon ısındı: efektler azaltıldı']||{en:'Phone is warm: effects reduced',ru:'Телефон нагрелся: эффекты уменьшены',ar:'الهاتف ساخن: تم تقليل المؤثرات',fr:'Téléphone chaud : effets réduits',de:'Handy warm: Effekte reduziert',it:'Telefono caldo: effetti ridotti',zh:'手机发热：已减少特效'};
   CEVM['Telefon soğudu: efektler geri açıldı']=CEVM['Telefon soğudu: efektler geri açıldı']||{en:'Phone cooled down: effects restored',ru:'Телефон остыл: эффекты возвращены',ar:'برد الهاتف: أُعيدت المؤثرات',fr:'Téléphone refroidi : effets rétablis',de:'Handy abgekühlt: Effekte wieder an',it:'Telefono raffreddato: effetti ripristinati',zh:'手机已降温：特效已恢复'};
+  CEVM['Oyun ekranı akıcılığı']=CEVM['Oyun ekranı akıcılığı']||{en:'Game screen smoothness',ru:'Плавность игрового экрана',ar:'سلاسة شاشة اللعب',fr:'Fluidité de l’écran de jeu',de:'Flüssigkeit des Spielbildschirms',it:'Fluidità della schermata di gioco',zh:'游戏画面流畅度'};
+  CEVM["Oyun tahtasının saniyede kaç kez çizileceğini seç. Sonra Ayarlar'dan değiştirebilirsin."]=CEVM["Oyun tahtasının saniyede kaç kez çizileceğini seç. Sonra Ayarlar'dan değiştirebilirsin."]||{en:'Choose how many times per second the board is drawn. You can change it later in Settings.',ru:'Выберите, сколько раз в секунду рисуется доска. Позже можно изменить в настройках.',ar:'اختر عدد مرات رسم الرقعة في الثانية. يمكنك تغييره لاحقًا من الإعدادات.',fr:'Choisissez combien de fois par seconde le plateau est dessiné. Modifiable ensuite dans les paramètres.',de:'Wähle, wie oft pro Sekunde das Brett gezeichnet wird. Später in den Einstellungen änderbar.',it:'Scegli quante volte al secondo viene disegnata la scacchiera. Puoi cambiarlo nelle impostazioni.',zh:'选择棋盘每秒绘制的次数。之后可在设置中更改。'};
+  CEVM['Telefonun ısınmasına ve şarjın daha hızlı bitmesine sebep olabilir.']=CEVM['Telefonun ısınmasına ve şarjın daha hızlı bitmesine sebep olabilir.']||{en:'May make your phone warm and drain the battery faster.',ru:'Может нагревать телефон и быстрее расходовать заряд.',ar:'قد يسبب سخونة الهاتف ونفاد البطارية أسرع.',fr:'Peut faire chauffer le téléphone et vider la batterie plus vite.',de:'Kann das Handy erwärmen und den Akku schneller leeren.',it:'Può scaldare il telefono e scaricare prima la batteria.',zh:'可能导致手机发热、耗电更快。'};
+  CEVM['Yüksek, telefonun ısınmasına ve şarjın daha hızlı bitmesine sebep olabilir.']=CEVM['Yüksek, telefonun ısınmasına ve şarjın daha hızlı bitmesine sebep olabilir.']||{en:'High may make your phone warm and drain the battery faster.',ru:'Высокое может нагревать телефон и быстрее расходовать заряд.',ar:'قد يسبب الإعداد العالي سخونة الهاتف ونفاد البطارية أسرع.',fr:'Élevé peut faire chauffer le téléphone et vider la batterie plus vite.',de:'Hoch kann das Handy erwärmen und den Akku schneller leeren.',it:'Alta può scaldare il telefono e scaricare prima la batteria.',zh:'高画质可能导致手机发热、耗电更快。'};
+  CEVM['En akıcı']=CEVM['En akıcı']||{en:'Smoothest',ru:'Максимально плавно',ar:'الأكثر سلاسة',fr:'Le plus fluide',de:'Am flüssigsten',it:'Il più fluido',zh:'最流畅'};
+  CEVM['Devam']=CEVM['Devam']||{en:'Continue',ru:'Продолжить',ar:'متابعة',fr:'Continuer',de:'Weiter',it:'Continua',zh:'继续'};
   CEVM['Tema']={en:'Theme',ru:'Тема',ar:'المظهر',fr:'Thème',de:'Design',it:'Tema',zh:'主题'};
   CEVM['Dil']={en:'Language',ru:'Язык',ar:'اللغة',fr:'Langue',de:'Sprache',it:'Lingua',zh:'语言'};
   CEVM['Fildişi']={en:'Ivory',ru:'Слоновая кость',ar:'عاجي',fr:'Ivoire',de:'Elfenbein',it:'Avorio',zh:'象牙白'};
@@ -14463,7 +14477,7 @@ function devPanelAc(){
        if(u) h.style.setProperty('--menuFoto', u); }catch(e){}
   const sayfa=document.createElement('div'); sayfa.id='secimSayfa';
   sayfa.innerHTML='<div class="ssKutu"><div class="ssBaslik"></div><div class="ssListe"></div></div>';
-  sayfa.onclick=e=>{ if(e.target===sayfa) sayfa.classList.remove('acik'); };
+  sayfa.onclick=e=>{ if(e.target===sayfa && !sayfa.classList.contains('zorunlu')) sayfa.classList.remove('acik'); };
   document.body.appendChild(sayfa);
   function ac(baslik, secenekler, secili, sec){
     sayfa.querySelector('.ssBaslik').textContent=baslik;
@@ -14497,8 +14511,9 @@ function devPanelAc(){
       const dugmeler=[];
       secenekler.forEach(o=>{
         const b=document.createElement('button'); b.type='button'; b.className='ssSec'+(o.id===secili?' secili':'');
-        b.innerHTML='<span class="ssAd"><span></span><small></small></span><span class="ssTik">✓</span>';
+        b.innerHTML='<span class="ssAd"><span></span><small></small>'+(o.uyari?'<em class="ssUyari"></em>':'')+'</span><span class="ssTik">✓</span>';
         b.querySelector('.ssAd span').textContent=c(o.ad); b.querySelector('.ssAd small').textContent=o.alt;
+        if(o.uyari) b.querySelector('.ssUyari').textContent=o.uyari;
         b.onclick=()=>{ dugmeler.forEach(x=>x.classList.toggle('secili', x===b)); sec(o.id); };
         dugmeler.push(b); l.appendChild(b);
       });
@@ -14509,7 +14524,7 @@ function devPanelAc(){
       {id:0, ad:'Kapalı', alt:c('Hamleler hızlı geçer')}
     ], sahneAyari?1:0, v=>{ if(typeof sahneAyarla==='function') sahneAyarla(v===1); });
     grup('Grafik', [
-      {id:'yuksek', ad:'Yüksek', alt:c('En iyi görüntü')+' · '+hz+' Hz'},
+      {id:'yuksek', ad:'Yüksek', alt:c('En iyi görüntü')+' · '+hz+' Hz', uyari:c('Telefonun ısınmasına ve şarjın daha hızlı bitmesine sebep olabilir.')},
       {id:'orta',   ad:'Orta',   alt:c('Dengeli')+' · 60 Hz'},
       {id:'dusuk',  ad:'Düşük',  alt:c('Efektler kapalı, en az ısınma')+' · 60 Hz'}
     ], grafikKademe, k=>grafikAyarla(k));
@@ -14518,6 +14533,56 @@ function devPanelAc(){
     sayfa.classList.add('acik');
   }
   window.oyunAyarlariAc=ayarAc;
+  /* İLK GİRİŞ: oyun ekranı akıcılığı zorla seçtirilir (4 Ekim 2026, sahibin isteği).
+     Seçim yapılmadan kapanmaz; Devam seçimden sonra açılır. Bir kez sorulur ('grafikSecildi'). */
+  function ilkAkicilikSor(){
+    const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+    sayfa.classList.add('zorunlu');
+    sayfa.querySelector('.ssBaslik').textContent=c('Oyun ekranı akıcılığı');
+    const l=sayfa.querySelector('.ssListe'); l.innerHTML='';
+    const ac=document.createElement('div'); ac.className='ssAcikla';
+    ac.textContent=c('Oyun tahtasının saniyede kaç kez çizileceğini seç. Sonra Ayarlar\'dan değiştirebilirsin.');
+    l.appendChild(ac);
+    const hz=maksHz(); let secim=null; const dugmeler=[];
+    const devam=document.createElement('button'); devam.type='button'; devam.className='ssTamam'; devam.disabled=true;
+    devam.textContent=c('Devam');
+    [
+      {id:'yuksek', ad:'Yüksek', alt:c('En akıcı')+' · '+hz+' Hz', uyari:c('Telefonun ısınmasına ve şarjın daha hızlı bitmesine sebep olabilir.')},
+      {id:'orta',   ad:'Orta',   alt:c('Dengeli')+' · 60 Hz'},
+      {id:'dusuk',  ad:'Düşük',  alt:c('Efektler kapalı, en az ısınma')+' · 60 Hz'}
+    ].forEach(o=>{
+      const b=document.createElement('button'); b.type='button'; b.className='ssSec';
+      b.innerHTML='<span class="ssAd"><span></span><small></small>'+(o.uyari?'<em class="ssUyari"></em>':'')+'</span><span class="ssTik">✓</span>';
+      b.querySelector('.ssAd span').textContent=c(o.ad); b.querySelector('.ssAd small').textContent=o.alt;
+      if(o.uyari) b.querySelector('.ssUyari').textContent=o.uyari;
+      b.onclick=()=>{ secim=o.id; dugmeler.forEach(x=>x.classList.toggle('secili', x===b)); devam.disabled=false; };
+      dugmeler.push(b); l.appendChild(b);
+    });
+    devam.onclick=()=>{
+      if(!secim) return;
+      grafikAyarla(secim);
+      try{ localStorage.setItem('grafikSecildi','1'); }catch(e){}
+      sayfa.classList.remove('zorunlu'); sayfa.classList.remove('acik');
+    };
+    l.appendChild(devam);
+    sayfa.classList.add('acik');
+  }
+  window.ilkAkicilikSor=ilkAkicilikSor;
+  /* Menü ilk kez gerçekten görününce (açılış perdesi ve giriş ekranı kapalıyken) sor */
+  (function(){
+    let soruldu=false;
+    try{ if(localStorage.getItem('grafikSecildi')) return; }catch(e){ return; }
+    const menu=document.getElementById('menu'), giris=document.getElementById('girisEkran'), perde=document.getElementById('acilisPerde');
+    const bak=()=>{
+      if(soruldu || !menu) return;
+      const menuAcik=!menu.classList.contains('gizli');
+      const girisKapali=!giris || giris.classList.contains('gizli');
+      const perdeBitti=!perde || perde.classList.contains('bitti');
+      if(menuAcik && girisKapali && perdeBitti){ soruldu=true; setTimeout(ilkAkicilikSor, 450); }
+    };
+    [menu, giris, perde].forEach(e=>{ if(e) new MutationObserver(bak).observe(e,{attributes:true, attributeFilter:['class']}); });
+    bak();
+  })();
   aB.onclick=ayarAc;
   const ds=document.getElementById('dilSecici');
   if(ds && ds.parentNode) ds.parentNode.insertBefore(alt, ds.nextSibling);
