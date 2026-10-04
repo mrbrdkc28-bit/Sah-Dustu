@@ -2064,7 +2064,7 @@ body.dikeyAktif .notSerit.alt{bottom:calc(104px + env(safe-area-inset-bottom))}
 body.dikeyAktif #hud{flex-direction:column;align-items:stretch;gap:8px;padding:8px 8px}
 body.dikeyAktif #hud .hud-sag{order:1;width:100%;justify-content:space-between;gap:4px;align-items:stretch}
 body.dikeyAktif #hud .hud-sol{order:2;max-width:100%;flex:0 0 auto}
-body.dikeyAktif #hud .hud-sag .ikincil:not([style*="display: none"]):not(#btnYeni){display:flex!important}
+body.dikeyAktif #hud .hud-sag .ikincil:not([style*="display: none"]):not([style*="display:none"]):not(#btnYeni){display:flex!important}
 body.dikeyAktif #hud #btnYeni,body.dikeyAktif #hud #btnMenu,body.dikeyAktif #hud #btnSecenekler{display:none!important}
 body.dikeyAktif #hud .hud-sag .hbtn-simge{flex:1 1 0;min-width:0;padding:6px 1px 5px;margin:0}
 body.dikeyAktif #hud .hud-sag .hbtn-simge i{max-width:100%;overflow:hidden;text-overflow:ellipsis;font-size:8px;letter-spacing:.03em}
@@ -2076,6 +2076,39 @@ body:not(.incelemede) #yonBtn{display:none!important}
 #notPanel.dikey #nMenu,#notPanel.dikey #nAyar{width:44px;padding:0!important}
 #notPanel.dikey #nGeri,#notPanel.dikey #nIleri{padding:0 13px!important}
 #notPanel.dikey #notKontrol{gap:8px!important}
+
+/* ===== GİZLE / AÇ hapı + gizli araçlar (4 Ekim 2026) ===== */
+#gizleBtn{position:fixed;z-index:22;display:none;align-items:center;gap:5px;height:28px;padding:0 11px 0 9px;
+  border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(12,14,22,.66);color:var(--bone);
+  font:700 11px Manrope,sans-serif;letter-spacing:.06em;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#gizleBtn svg{width:15px;height:15px}
+#gizleBtn:active{transform:scale(.94)}
+body:has(#hud.acik) #gizleBtn{display:inline-flex}
+body.incelemede #gizleBtn,body:has(#son.acik) #gizleBtn,body:has(#bulmacaSerit.acik) #gizleBtn,body:has(#menu:not(.gizli)) #gizleBtn{display:none!important}
+body.araclarGizli #gizleBtn{background:rgba(232,182,76,.16);border-color:rgba(232,182,76,.45);color:#F2D79A}
+body.araclarGizli:not(.incelemede) #hud,body.araclarGizli:not(.incelemede) #esirler,
+body.araclarGizli:not(.incelemede) #notKontrol{visibility:hidden!important}
+/* Sesli/Ses/Döndür de ortalı sütun düzeninde (dikey üst çubukta kaymıştı) */
+body.dikeyAktif #hud .hud-sag .hbtn-simge:not([style*="display: none"]):not([style*="display:none"]){display:flex!important}
+/* Yeni Oyun üst çubukta yok: iki yön aynı, yeni oyun Menü'den (sahibin kararı) */
+#hud #btnYeni{display:none!important}
+/* ===== KARNE: sınıflar halkaların altında + analiz bekleme animasyonu ===== */
+#sonIst .krListe.krUst{padding:12px 14px 4px!important}
+.krBekleme{display:flex;flex-direction:column;align-items:center;gap:12px;padding:22px 16px 10px}
+.kbTahta{position:relative;display:grid;grid-template-columns:repeat(5,34px);grid-template-rows:repeat(3,34px);
+  border-radius:10px;overflow:hidden;box-shadow:0 0 0 1px rgba(232,182,76,.28),0 10px 26px rgba(0,0,0,.4)}
+.kbTahta i{display:block}
+.kbTahta i.a{background:#2a2620}.kbTahta i.k{background:#1a1712}
+.kbTahta b{position:absolute;left:0;top:0;width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  font:400 25px "Noto Sans Symbols 2","Segoe UI Symbol","DejaVu Sans",serif;color:#E8B64C;
+  text-shadow:0 2px 6px rgba(0,0,0,.6),0 0 12px rgba(232,182,76,.35);
+  transition:transform .62s cubic-bezier(.45,.05,.25,1)}
+.kbTahta b.oyna{animation:kbZipla .62s ease}
+@keyframes kbZipla{40%{scale:1.14}100%{scale:1}}
+.kbYazi{font:700 11px Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:rgba(232,226,210,.7)}
+.kbCubuk{width:180px;height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+.kbCubuk i{display:block;height:100%;width:3%;border-radius:2px;background:linear-gradient(90deg,#C9912A,#F2C765);transition:width .4s ease}
+body.azHareket .kbTahta b{transition:none}
 </style>
 </head>
 <body>
@@ -6586,36 +6619,37 @@ function oyunSonu(d, terkKazanan){
         '<circle class="hz" cx="50" cy="50" r="42"/><circle class="hd" cx="50" cy="50" r="42"/></svg>'+
         '<div class="krDogPuan'+(gri?' krGri':'')+'" id="'+id+'">'+yaz(v)+'</div></div>'+
         '<div class="krDogAlt">DOĞRULUK</div></div>';
-      kr+='<div class="krDog">'+halka('krDogBen','SEN',benimDog,false)+halka('krDogRakip','RAKİP',rakipDog,true)+'</div>';
-      kr+='<div class="krBilgi"><span>'+ist.hamle+' hamle</span>'+(acilis?'<i></i><span>'+acilis+'</span>':'')+'</div>';
+      const bilgiHtml='<div class="krBilgi"><span>'+ist.hamle+' hamle</span>'+(acilis?'<i></i><span>'+acilis+'</span>':'')+'</div>';
       const sfVar = (typeof SF!=='undefined' && SF.mevcut);
       const sfSebep = (typeof SF!=='undefined' && SF.hataSebep) ? SF.hataSebep : '';
-      kr+='<div id="krDogNot" class="krDogNot">'+
-          (benimDog===null
-            ? (sfVar ? 'Doğruluk için ANALİZ ET'
-                     : ('Motor yüklenemedi'+(sfSebep?' — '+sfSebep:'')))
-            : 'Stockfish ölçümü')+'</div>';
-      /* --- KOÇ YORUMU: tek cümlelik değerlendirme --- */
       if(analizBekliyor){
+        /* Analiz sürerken (4 Ekim 2026): halkaların yerinde mini tahtada kayan taşlar + ilerleme */
+        kr+='<div class="krBekleme"><div class="kbTahta" id="kbTahta"></div>'+
+            '<div id="krDogNot" class="kbYazi">'+(sfVar?'Stockfish inceliyor…':('Motor yüklenemedi'+(sfSebep?' — '+sfSebep:'')))+'</div>'+
+            '<div class="kbCubuk"><i id="kbCubuk"></i></div></div>';
+        kr+=bilgiHtml;
         kr+='<div class="krKoc"><span class="krKocIkon">♞</span>'+
             '<span class="krKocMetin">Oyunu çözümlerken bir an bekle… '+
             'İstersen kapatıp devam edebilirsin, çözümleme arka planda sürer.</span></div>';
-      }
-      if(!analizBekliyor){
+      } else {
+        kr+='<div class="krDog">'+halka('krDogBen','SEN',benimDog,false)+halka('krDogRakip','RAKİP',rakipDog,true)+'</div>';
+        kr+=bilgiHtml;
+        /* Hamle sınıfları halkaların hemen altında (sahibin seçimi: B) */
+        kr+='<div class="krListe krUst" id="krListeKutu">'+karneSatirlari(benimRenk)+'</div>';
+        kr+='<div id="krDogNot" class="krDogNot">'+
+            (benimDog===null
+              ? (sfVar ? 'Doğruluk için ANALİZ ET' : ('Motor yüklenemedi'+(sfSebep?' — '+sfSebep:'')))
+              : 'Stockfish ölçümü')+'</div>';
         const kz=(kazanan==='Beyaz'&&benimRenk==='w')||(kazanan==='Siyah'&&benimRenk==='b');
         const ky=kocYorumu(benimRenk, d, kz);
         if(ky) kr+='<div class="krKoc"><span class="krKocIkon">♞</span>'+
                    '<span class="krKocMetin">'+ky+'</span></div>';
-      }
-      /* --- OYUN REYTİNGİ: doğruluk kurgusal Elo'ya çevrilir --- */
-      if(!analizBekliyor && benimDog!==null){
-        const hs=oyunKaydi.filter(k=>k.renk===benimRenk).length;
-        const ry=oyunReytingi(benimDog, hs);
-        if(ry) kr+='<div class="krReyting"><span class="krReyEt">BU OYUNDAKİ SEVİYEN</span>'+
-                   '<span class="krReySay">'+ry+'</span></div>';
-      }
-      /* --- EVRE NOTLARI: açılış / orta oyun / oyun sonu --- */
-      if(!analizBekliyor){
+        if(benimDog!==null){
+          const hs=oyunKaydi.filter(k=>k.renk===benimRenk).length;
+          const ry=oyunReytingi(benimDog, hs);
+          if(ry) kr+='<div class="krReyting"><span class="krReyEt">BU OYUNDAKİ SEVİYEN</span>'+
+                     '<span class="krReySay">'+ry+'</span></div>';
+        }
         let ev='';
         for(const e of ['acilis','ortaOyun','oyunSonu']){
           const d2=evreDogruluk(benimRenk, e);
@@ -6627,19 +6661,6 @@ function oyunSonu(d, terkKazanan){
         }
         if(ev) kr+='<div class="krEvreler">'+ev+'</div>';
       }
-      kr+='<div class="krListe" id="krListeKutu">';
-      if(analizBekliyor){
-        /* Boş rozet iskeleti: analiz bitince yerlerine gerçek sayılar oturur.
-           Kullanıcı ne geleceğini görür, ekran boş kalmaz. */
-        kr+='<div class="krIskelet">'+
-            '<div class="krIsk"><span class="krIskRoz"></span><span class="krIskCizgi"></span></div>'+
-            '<div class="krIsk"><span class="krIskRoz"></span><span class="krIskCizgi"></span></div>'+
-            '<div class="krIsk"><span class="krIskRoz"></span><span class="krIskCizgi"></span></div>'+
-            '</div>';
-      } else {
-        kr+=karneSatirlari(benimRenk);
-      }
-      kr+='</div>';
       if(!analizBekliyor) kr+=kilitAnlarHtml(benimRenk);
       /* Açılış adı + kısa stratejik not (kendi içeriğimiz) */
       if(acilis){
@@ -6649,6 +6670,7 @@ function oyunSonu(d, terkKazanan){
       kr+='</div>';
       document.getElementById('sonIst').innerHTML=kr;
       if(!analizBekliyor){ halkaYaz('krDogBen', benimDog); halkaYaz('krDogRakip', rakipDog); }
+      else analizTahtasiBaslat();
       /* Kilit ana dokununca o hamleyi tahtada göster */
       try{
         document.querySelectorAll('#sonIst .kaSatir').forEach(el=>{
@@ -6740,6 +6762,42 @@ async function analizBeklet(){
 function otoAnalizNotYaz(metin){
   const nt=document.getElementById('krDogNot');
   if(nt) nt.textContent=metin;
+  const m=/%(\d+)/.exec(metin||''), c=document.getElementById('kbCubuk');
+  if(c && m) c.style.width=Math.min(100,+m[1])+'%';
+}
+/* Analiz bekleme animasyonu (4 Ekim 2026, chess24 esinli): 5×3 mini tahtada altın at, fil ve kale
+   kendi hareket kurallarına göre boş karelere yumuşakça kayar. Eleman sayfadan kalkınca durur. */
+function analizTahtasiBaslat(){
+  const tb=document.getElementById('kbTahta'); if(!tb || tb._calisiyor) return;
+  tb._calisiyor=true;
+  const S=5, R=3;
+  let h=''; for(let y=0;y<R;y++) for(let x=0;x<S;x++) h+='<i class="'+((x+y)%2?'k':'a')+'"></i>';
+  tb.innerHTML=h;
+  const taslar=[{t:'n',g:'\u265E',x:0,y:1},{t:'b',g:'\u265D',x:2,y:0},{t:'r',g:'\u265C',x:4,y:2}];
+  taslar.forEach(o=>{ const e=document.createElement('b'); e.textContent=o.g+'\uFE0E'; tb.appendChild(e); o.el=e; });
+  const yerles=o=>{ o.el.style.transform='translate('+(o.x*100)+'%,'+(o.y*100)+'%)'; };
+  taslar.forEach(yerles);
+  const dolu=(x,y)=>taslar.some(o=>o.x===x&&o.y===y);
+  const hedefler=o=>{
+    const L=[];
+    const ekle=(x,y)=>{ if(x>=0&&x<S&&y>=0&&y<R&&!dolu(x,y)) L.push([x,y]); };
+    if(o.t==='n') [[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]].forEach(([dx,dy])=>ekle(o.x+dx,o.y+dy));
+    else{
+      const yon=o.t==='b'?[[1,1],[1,-1],[-1,1],[-1,-1]]:[[1,0],[-1,0],[0,1],[0,-1]];
+      yon.forEach(([dx,dy])=>{ for(let k=1;k<S;k++){ const x=o.x+dx*k,y=o.y+dy*k; if(x<0||x>=S||y<0||y>=R||dolu(x,y)) break; L.push([x,y]); } });
+    }
+    return L;
+  };
+  let sira=0;
+  (function adim(){
+    if(!document.body.contains(tb)) return;
+    for(let d=0; d<3; d++){
+      const o=taslar[(sira++)%taslar.length], L=hedefler(o);
+      if(L.length){ const [x,y]=L[Math.floor(Math.random()*L.length)]; o.x=x; o.y=y; yerles(o);
+        o.el.classList.remove('oyna'); void o.el.offsetWidth; o.el.classList.add('oyna'); break; }
+    }
+    setTimeout(adim, 760);
+  })();
 }
 async function otoAnalizBaslat(){
   if(_otoAnalizYapildi || _analizSuruyor) return;
@@ -12864,6 +12922,9 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Bulmaca']=CEVM['Bulmaca']||{en:'Puzzle',ru:'Задача',ar:'لغز',fr:'Problème',de:'Rätsel',it:'Problema',zh:'谜题'};
   CEVM['Gidişat']=CEVM['Gidişat']||{en:'Game flow',ru:'Ход партии',ar:'مسار المباراة',fr:'Déroulement',de:'Spielverlauf',it:'Andamento',zh:'走势'};
   CEVM['Daha iyisi']=CEVM['Daha iyisi']||{en:'Better',ru:'Лучше',ar:'الأفضل',fr:'Mieux',de:'Besser',it:'Meglio',zh:'更好'};
+  CEVM['Gizle']=CEVM['Gizle']||{en:'Hide',ru:'Скрыть',ar:'إخفاء',fr:'Masquer',de:'Ausblenden',it:'Nascondi',zh:'隐藏'};
+  CEVM['Aç']=CEVM['Aç']||{en:'Show',ru:'Показать',ar:'إظهار',fr:'Afficher',de:'Einblenden',it:'Mostra',zh:'显示'};
+  CEVM['Stockfish inceliyor…']=CEVM['Stockfish inceliyor…']||{en:'Stockfish is analysing…',ru:'Stockfish анализирует…',ar:'Stockfish يحلل…',fr:'Stockfish analyse…',de:'Stockfish analysiert…',it:'Stockfish analizza…',zh:'Stockfish 分析中…'};
   CEVM['Tema']={en:'Theme',ru:'Тема',ar:'المظهر',fr:'Thème',de:'Design',it:'Tema',zh:'主题'};
   CEVM['Dil']={en:'Language',ru:'Язык',ar:'اللغة',fr:'Langue',de:'Sprache',it:'Lingua',zh:'语言'};
   CEVM['Fildişi']={en:'Ivory',ru:'Слоновая кость',ar:'عاجي',fr:'Ivoire',de:'Elfenbein',it:'Avorio',zh:'象牙白'};
@@ -15802,6 +15863,43 @@ function devPanelAc(){
   new MutationObserver(()=>setTimeout(konumla,60)).observe(document.body,{attributes:true,attributeFilter:['class']});
   addEventListener('resize',()=>setTimeout(konumla,300));
   setTimeout(konumla,500);
+})();
+</script>
+
+<script>
+/* GİZLE / AÇ (4 Ekim 2026): Sahne düğmesinin altında küçük hap. Basınca tahtadaki tüm araç çubukları
+   (üst çubuk, sıra göstergesi, alt gezinme, esir şeridi) gizlenir; notasyon (RAKİP/SEN şeritleri, yatayda
+   yan hamle listeleri) kalır. Gizliyken "Aç" yazar. visibility ile gizlenir: yerleşim kaymaz, hap yerinde kalır.
+   Tercih cihazda hatırlanır. */
+(function(){
+  const hud=document.getElementById('hud'); if(!hud) return;
+  const b=document.createElement('button'); b.id='gizleBtn'; b.type='button';
+  document.body.appendChild(b);
+  const GOZ='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>';
+  const GOZK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/><path d="M4 4l16 16"/></svg>';
+  let gizli=false; try{ gizli=localStorage.getItem('araclarGizli')==='1'; }catch(e){}
+  const cev=t=>(typeof metniCevir==='function')?metniCevir(t):t;
+  function uygula(){
+    document.body.classList.toggle('araclarGizli', gizli);
+    b.innerHTML=(gizli?GOZ:GOZK)+'<span>'+cev(gizli?'Aç':'Gizle')+'</span>';
+    b.title=cev(gizli?'Araçları göster':'Araçları gizle');
+    konumla();
+  }
+  function konumla(){
+    try{
+      const sah=document.getElementById('btnSahne');
+      if(!sah || !hud.classList.contains('acik')) return;
+      const r=sah.getBoundingClientRect(); if(!r.width) return;
+      const w=b.offsetWidth||64;
+      b.style.top=(r.bottom+6)+'px';
+      b.style.left=Math.max(6, Math.min(innerWidth-w-6, r.left+r.width/2-w/2))+'px';
+    }catch(e){}
+  }
+  b.onclick=(e)=>{ e.stopPropagation(); gizli=!gizli; try{ localStorage.setItem('araclarGizli', gizli?'1':'0'); }catch(x){} uygula(); };
+  new MutationObserver(()=>setTimeout(konumla,60)).observe(hud,{attributes:true,attributeFilter:['class']});
+  new MutationObserver(()=>setTimeout(konumla,60)).observe(document.body,{attributes:true,attributeFilter:['class']});
+  addEventListener('resize',()=>{ setTimeout(konumla,300); setTimeout(konumla,800); });
+  uygula(); setTimeout(konumla,600);
 })();
 </script>
 </body>

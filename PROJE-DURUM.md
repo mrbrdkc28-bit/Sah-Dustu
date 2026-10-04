@@ -761,3 +761,12 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Menü ve Ayarlar dikeyde alt gezinme sırasının uçlarında (#nMenu / #nAyar vekilleri); üst çubuktaki asıllar dikeyde gizli.
 - Döndür (#btnYonDikey) her iki yönde üst çubukta; yüzen #yonBtn yalnız incelemede. Rakip şeridi sıra göstergesinin altına
   JS ile oturur (şeridin güvenli alan kenar boşluğu düşülür).
+
+### 8.32 Gizle/Aç, karne B yerleşimi, analiz animasyonu (4 Ekim 2026)
+- `#gizleBtn`: Sahne düğmesinin altında hap (iki yön). Basınca #hud, alt gezinme (#notKontrol) ve esir şeridi visibility ile gizlenir;
+  notasyon (şeritler, yatay yan listeler) kalır. Gizliyken "Aç". `localStorage.araclarGizli`.
+- Dikey üst çubukta Sesli/Ses/Döndür hizası düzeldi (flex). Sohbet/Berabere yalnız çevrimiçi (iki yön). Yeni Oyun üst çubuktan kalktı (iki yön).
+- Karne (sahibin seçimi B): sınıf kutuları halkaların hemen altında; sonra not, koç, seviye, evreler, kilit anlar.
+- Analiz sürerken halkaların yerinde 5×3 mini tahtada altın at/fil/kale kendi kurallarıyla kayar (`analizTahtasiBaslat`),
+  "Stockfish inceliyor… %N" + ilerleme çubuğu (`otoAnalizNotYaz` yüzdeyi okur).
+- Not: çevrimiçi dikeyde 9 düğme sığıyor ama "Berabere"/"Döndür" etiketleri kısalıyor (BERAB…).
