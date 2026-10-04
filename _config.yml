@@ -1,0 +1,17 @@
+# GitHub Pages (Jekyll) — 4 Ekim 2026
+# Sitede yalnızca tanıtım sayfası (index.html) ve gizlilik politikası (privacy.html) yayınlanır.
+# Oyun dosyaları (app/) web'den kaldırıldı: tarayıcıda Android köprüsü olmadığı için kilitler
+# devre dışı kalıyor, Premium içerik bedava açılıyordu. Kaynak kod depoda kalır (GPL-3.0).
+exclude:
+  - app
+  - araclar
+  - magaza
+  - gradle
+  - build.gradle.kts
+  - settings.gradle.kts
+  - gradle.properties
+  - keystore.properties.ORNEK
+  - firebase.json
+  - firestore.rules
+  - "*.md"
+  - "*.txt"
