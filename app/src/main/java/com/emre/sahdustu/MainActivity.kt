@@ -26,6 +26,7 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -47,6 +48,13 @@ import java.util.Locale
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
+    /* GEZINME CUBUGU (3 Ekim 2026): menulerde Geri/Ana ekran tuslari gorunur, tahta
+       ekraninda gizli (tam ekran). Cubuk gorundugunde WebView kapsayicinin icinde
+       cubugun yuksekligi kadar yukari itilir; altta kalan bosluk temaya gore boyanir. */
+    private lateinit var kok: android.widget.FrameLayout
+    private var gezinmeGoster = false  // acilis animasyonu tam ekran; JS menude acar
+    private var gezinmeRenk = 0xFF06070B.toInt()
+    private var gezinmeAcik = false   // acik renkli zemin: tuslar koyu cizilsin
     private var tts: TextToSpeech? = null
     private var ttsHazir = false
     private var trDilVar = true        // cihazda Turkce TTS verisi kurulu mu
@@ -514,7 +522,20 @@ class MainActivity : AppCompatActivity() {
         // Yalniz debug derlemede: chrome://inspect ile cihazda olcum/hata ayiklama.
         if (BuildConfig.DEBUG) WebView.setWebContentsDebuggingEnabled(true)
         webView = WebView(this)
-        setContentView(webView)
+        kok = android.widget.FrameLayout(this)
+        kok.setBackgroundColor(gezinmeRenk)
+        kok.addView(webView, android.widget.FrameLayout.LayoutParams(
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT))
+        setContentView(kok)
+        // Gizli cubuk 0 inset verir; kaydirinca gecici cikan cubuk da inset dagitmaz
+        // (ustune biner), yani bu bosluk yalniz cubuk kalici gorunurken olusur.
+        ViewCompat.setOnApplyWindowInsetsListener(kok) { v, ins ->
+            val n = ins.getInsets(WindowInsetsCompat.Type.navigationBars())
+            v.setPadding(n.left, 0, n.right, n.bottom)
+            ins
+        }
+        gezinmeUygula()
 
         webView.settings.apply {
             javaScriptEnabled = true
@@ -821,6 +842,17 @@ class MainActivity : AppCompatActivity() {
                     requestedOrientation = if (tip == "yatay")
                         android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                     else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            }
+            /* Menulerde goster, tahtada gizle. renk: altta cubugun arkasinda kalan
+               seridin rengi (#rrggbb); acik=true ise tuslar koyu cizilir. */
+            @JavascriptInterface
+            fun gezinme(goster: Boolean, renk: String, acik: Boolean) {
+                runOnUiThread {
+                    gezinmeGoster = goster
+                    try { gezinmeRenk = android.graphics.Color.parseColor(renk) } catch (t: Throwable) {}
+                    gezinmeAcik = acik
+                    gezinmeUygula()
                 }
             }
             @JavascriptInterface
@@ -1443,8 +1475,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun gezinmeUygula() {
+        if (!::kok.isInitialized) return
+        kok.setBackgroundColor(gezinmeRenk)
+        /* Android 14 ve oncesi cubugu temadaki opak navigationBarColor (#06070B) ile
+           boyuyor; kapsayicinin rengi gorunmuyordu. 15+ bu ayari yok sayar (kenardan
+           kenara), orada kapsayici rengi gorunur. Ikisinde de ayni renk. */
+        @Suppress("DEPRECATION")
+        window.navigationBarColor = gezinmeRenk
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) window.isNavigationBarContrastEnforced = false
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            hide(WindowInsetsCompat.Type.statusBars())
+            if (gezinmeGoster) show(WindowInsetsCompat.Type.navigationBars())
+            else hide(WindowInsetsCompat.Type.navigationBars())
+            isAppearanceLightNavigationBars = gezinmeAcik
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+    }
+
     override fun onResume() {
         super.onResume()
+        gezinmeUygula()   // arka plandan donunce sistem cubuklari eski haline donebiliyor
         /* Uygulama one geldiginde reklam denemelerini sifirla: gecici bir ag
            veya WebView sorunu yuzunden "pes edilmis" durumda kalmasin. */
         if (reklamSdkHazir && odulluReklam == null) {

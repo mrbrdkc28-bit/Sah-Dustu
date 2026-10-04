@@ -1717,6 +1717,20 @@ html[data-tema="fildisi"] #girisForm input{background:#fffdf8;border-color:rgba(
 #cvKodGoster{padding:10px 18px 8px 26px;border-radius:16px;border:1px dashed rgba(232,182,76,.55);background:rgba(232,182,76,.06)}
 #cvBilgi{position:static;transform:none;margin-top:10px;border-radius:16px;width:100%}
 #cvIptal{margin-top:6px;border-radius:22px!important;padding:10px 28px!important}
+
+/* ===== KISA BİLGİ BALONU (3 Ekim 2026) ===== */
+#kisaBilgi{position:fixed;left:50%;top:calc(172px + env(safe-area-inset-top));z-index:80;pointer-events:none;
+  transform:translate(-50%,-6px);opacity:0;transition:opacity .22s ease,transform .22s ease;
+  padding:8px 16px;border-radius:999px;font:600 13px/1.2 Manrope,sans-serif;letter-spacing:.02em;white-space:nowrap;
+  color:#F0E9D8;background:rgba(12,14,22,.86);border:1px solid rgba(232,182,76,.45);
+  box-shadow:0 8px 22px rgba(0,0,0,.35);backdrop-filter:blur(8px)}
+#kisaBilgi.goster{opacity:1;transform:translate(-50%,0)}
+@media (orientation:landscape){#kisaBilgi{top:calc(66px + env(safe-area-inset-top))}}
+
+/* ===== ÇEVRİMİÇİ SÜRESİZ + ANİMASYONA GÖRE EŞLEŞME (4 Ekim 2026) ===== */
+.cvSure.cvSuresiz{grid-column:1/-1;flex-direction:row;justify-content:center;gap:10px}
+.cvSure.cvSuresiz small{margin:0}
+#cvAnimNot{margin:10px auto 0;max-width:320px}
 </style>
 </head>
 <body>
@@ -2066,7 +2080,9 @@ html[data-tema="fildisi"] #girisForm input{background:#fffdf8;border-color:rgba(
         <button class="cvSure" data-dk="5" data-inc="0">5+0<small>Blitz</small></button>
         <button class="cvSure" data-dk="10" data-inc="0">10+0<small>Rapid</small></button>
         <button class="cvSure" data-dk="15" data-inc="10">15+10<small>Rapid</small></button>
+        <button class="cvSure cvSuresiz" data-dk="0" data-inc="0">∞<small>Süresiz · herkesle eşleşir</small></button>
       </div>
+      <div class="blok-ipucu" id="cvAnimNot"></div>
     </div>
 
     <div id="cvOrduBlok">
@@ -4834,6 +4850,8 @@ let aktifInsanRenk='w'; // o anki oyunda insanın gerçek rengi (rastgele çöz�
 let muzikAyari=true; // arka plan müziği açık/kapalı
 let sahneAyari=true; // taş yeme sinematik sahnesi açık/kapalı
 let cvSahneUyarisi=false; // cevrimici: sahne farki uyarisi bir kez gosterilsin
+let cvSahneSabit=null; // süreli çevrimiçi maçta eşleşmenin animasyon ayarı (null: oyuncunun kendi ayarı)
+function sahneAcik(){ return (cevrimiciAktif && cvSahneSabit!==null) ? cvSahneSabit : sahneAyari; }
 /* Rakip kimliği: oyun boyunca ve oyun sonu ekranında geçerli kalır.
    Yeni oyun başlarken temizlenir, oyun bitince DEĞİL. */
 let sonRakipUid=null, sonRakipAd='';
@@ -5418,7 +5436,8 @@ async function hamleOyna(h, ai=false, uzaktan=false){
   // ÇEVRİMİÇİ: hamleyi ANINDA gönder (kill-cam animasyonunu bekleme)
   if(cevrimiciAktif && !uzaktan){
     if(!ilkHamleYapildi){ ilkHamleYapildi=true; }
-    Cevrimici.hamleGonder({from:h.from, to:h.to, terfi:h.terfi||null, sahne:(sahneAyari?1:0)});
+    Cevrimici.hamleGonder({from:h.from, to:h.to, terfi:h.terfi||null, sahne:(sahneAcik()?1:0),
+      kalan:(sureSecim>0 ? Math.max(0,Math.round(saatler[_renk]*1000)/1000) : null)});
   }
   if(!ai && analizAcik){
     _oyuncuSkor=Motor.skorla();
@@ -5458,7 +5477,7 @@ async function hamleOyna(h, ai=false, uzaktan=false){
 
   if(kurb){
     (saldRenk==='w'?ist.esirB:ist.esirS).push(kurbTip);
-    if(sahneAyari){
+    if(sahneAcik()){
       // Düz moddaysak 3D taşları geçici göster (sahne için), 2D katmanı gizle
       const duzdaydi = duzGorunum;
       if(duzdaydi){
@@ -7386,12 +7405,16 @@ function menuKur(){
   }
   const bSahne=document.getElementById('btnSahne');
   if(bSahne) bSahne.onclick=()=>{
+    if(cevrimiciAktif && cvSahneSabit!==null){
+      kisaBilgi('Süreli maçta animasyon eşleşmeye göre sabit'); return;
+    }
     sahneAyari=!sahneAyari;
     // Kurulumdaki butonları da senkronla
     document.querySelectorAll('#sahneler .mod').forEach(x=>{
       x.classList.toggle('secili', (x.dataset.sahne==='1')===sahneAyari);
     });
     sahneSimgeGuncelle();
+    kisaBilgi(sahneAyari ? 'Animasyon açık' : 'Animasyon kapalı');
   };
   const bYardim=document.getElementById('btnYardim'); if(bYardim) bYardim.onclick=yardimGoster;
   const ykK=document.getElementById('ykKapat'); if(ykK) ykK.onclick=yardimKapat;
@@ -7911,11 +7934,20 @@ function duzSimgeGuncelle(){
   if(b){ b.style.opacity=duzGorunum?'1':'.55'; b.title=duzGorunum?'3B görünüme dön':'Düz (2B) görünüm'; }
 }
 
+/* Küçük bilgi balonu (3 Ekim 2026): simgesi tek başına anlaşılmayan düğmelere
+   basınca ne olduğunu kısa süre yazar. Örn. savaş sahnesi düğmesi. */
+function kisaBilgi(metin){
+  let el=document.getElementById('kisaBilgi');
+  if(!el){ el=document.createElement('div'); el.id='kisaBilgi'; document.body.appendChild(el); }
+  el.textContent=(typeof metniCevir==='function') ? metniCevir(metin) : metin;
+  el.classList.remove('goster'); void el.offsetWidth; el.classList.add('goster');
+  clearTimeout(el._z); el._z=setTimeout(()=>el.classList.remove('goster'), 1600);
+}
 function sahneSimgeGuncelle(){
   const b=document.getElementById('btnSahne');
   if(!b) return;
-  b.style.opacity = sahneAyari ? '1' : '0.4';
-  b.title = sahneAyari ? 'Savaş sahnesi: Açık' : 'Savaş sahnesi: Kapalı';
+  b.style.opacity = sahneAcik() ? '1' : '0.4';
+  b.title = sahneAcik() ? 'Savaş sahnesi: Açık' : 'Savaş sahnesi: Kapalı';
 }
 let cevrimiciAktif=false; // çevrimiçi oyun modunda mıyız
 let cevrimiciArkaplanda=false; // çevrimiçi oyun menüde duraklatıldı (oyuna dön ile geri gelinebilir)
@@ -7970,8 +8002,13 @@ function cevrimiciOyunBaslat(rakipAd){
   mod='2p'; // motor AI çağırmasın; hamleler iki insandan
   // Süreyi oda verisinden al
   const v=Cevrimici.veri||{};
-  sureSecim=(v.sureDk||3)*60;
+  sureSecim=(v.sureDk!=null?v.sureDk:3)*60;
   sureArtis=(v.sureInc||0);
+  /* Süreli maçta animasyon eşleşmeye göre SABİT: iki taraf da aynı ayarla oynar,
+     saatler iki telefonda aynı yerde durur. Süresizde herkes kendi ayarıyla. */
+  cvSahneSabit = (sureSecim>0 && v.sahne!=null) ? (v.sahne===1) : null;
+  if(cvSahneSabit!==null) setTimeout(()=>kisaBilgi(cvSahneSabit?'Süreli maç: animasyon açık':'Süreli maç: animasyon kapalı'),900);
+  sahneSimgeGuncelle();
   Ses.sesAc();
   setTimeout(()=>Ses.cal('basla'),60);
   document.getElementById('menu').classList.add('gizli');
@@ -8133,7 +8170,14 @@ function cevrimiciBilgiGoster(rakipAd){
   }catch(e){}
 }
 
+function cvAnimNotYaz(){
+  const el=document.getElementById('cvAnimNot'); if(!el) return;
+  const m = sahneAyari ? 'Süreli maçta animasyonu açık oyuncularla eşleşirsin.'
+                       : 'Süreli maçta animasyonu kapalı oyuncularla eşleşirsin.';
+  el.textContent=(typeof metniCevir==='function') ? metniCevir(m) : m;
+}
 function cevrimiciAc(){
+  cvAnimNotYaz();
   cevrimiciHata('');
   // İnternet kontrolü — bağlantı yoksa çevrimiçi mod anlamsız
   if(!navigator.onLine){
@@ -8222,16 +8266,13 @@ function cevrimiciGuncelle(veri){
     const sh=veri.sonHamle;
     if(sh.oynayan!==Cevrimici.benimRenk && sh.sayac && sh.sayac!==sonIslenenHamleSayac){
       sonIslenenHamleSayac=sh.sayac;
-      /* Rakip savas sahnesini kapali oynuyorsa bir kez haber ver:
-         onun tarafinda sure animasyon icin durmuyor, temposu farkli olacak. */
-      if(sh.sahne===0 && !cvSahneUyarisi){
-        cvSahneUyarisi=true;
-        if(typeof anlatimGoster==='function')
-          anlatimGoster('Rakibin savaş sahneleri kapalı — onun tarafında hamleler anında oynanıyor.');
-      } else if(sh.sahne===1 && !cvSahneUyarisi && !sahneAyari){
-        cvSahneUyarisi=true;
-        if(typeof anlatimGoster==='function')
-          anlatimGoster('Rakibin savaş sahneleri açık — hamleleri sana biraz gecikmeli gelebilir.');
+      /* SAAT EŞİTLEME (4 Ekim 2026): saatler iki telefonda ayrı işliyor; ağ gecikmesi
+         ve animasyon duraklamaları yüzünden zamanla kayıyordu. Hamleyi yapanın kendi
+         saatindeki kalan süre hamleyle gelir; bizdeki kopyası ona eşitlenir. Süre
+         artışını hamleOyna her iki tarafta aynı şekilde ekler. (Eski "rakibin sahneleri
+         açık/kapalı" uyarıları kaldırıldı: süreli maçta ayar artık iki tarafta aynı.) */
+      if(sureSecim>0 && typeof sh.kalan==='number' && (sh.oynayan==='w'||sh.oynayan==='b')){
+        saatler[sh.oynayan]=Math.max(0, sh.kalan); saatYaz();
       }
       cevrimiciHamleUygula(sh);
     }
@@ -10654,6 +10695,7 @@ function girisDurumGuncelle(){
   const cubuk=document.getElementById('profilCubuk');
   if(!cubuk) return;
   cubuk.style.cursor='pointer';
+  cubuk.style.padding='';
   cubuk.onclick=(e)=>{ if(e.target.classList.contains('cikis'))return; if(typeof istEkraniAc==='function') istEkraniAc(); };
   if(fbKullanici && !misafirMod){
     const ad=bulutIst.kullaniciAdi || (fbKullanici.email ? fbKullanici.email.split('@')[0] : 'Oyuncu');
@@ -10661,7 +10703,19 @@ function girisDurumGuncelle(){
       '<span class="cikis" onclick="cikisYap()">Çıkış</span>';
   } else if(misafirMod){
     cubuk.innerHTML='<span>Misafir</span><span class="cikis" onclick="cikisYap()">Giriş yap</span>';
-  } else { cubuk.innerHTML=''; }
+  } else {
+    /* Çıkış yapıp giriş ekranından geri dönülünce bu alan boş kalıyordu ve
+       menüde giriş yapmanın hiçbir yolu yoktu (3 Ekim 2026). */
+    cubuk.innerHTML='<span class="cikis">Giriş yap</span>';
+    cubuk.style.padding='5px';   // yalnız düğme var: kenar boşlukları eşit
+    cubuk.onclick=()=>girisEkraniAc();
+  }
+  try{ if(typeof agacTara==='function') agacTara(cubuk); }catch(e){}
+}
+function girisEkraniAc(){
+  document.getElementById('menu').classList.add('gizli');
+  document.getElementById('girisEkran').classList.remove('gizli');
+  if(typeof girisYukleniyorGoster==='function') girisYukleniyorGoster(false);
 }
 
 // Mobil tarayıcı ses kilidini ilk temasta aç
@@ -10744,6 +10798,8 @@ const Cevrimici=(()=>{
         hamleSayi:0,
         sureDk: (typeof cvSecilenSure!=='undefined'?cvSecilenSure.dk:3),
         sureInc: (typeof cvSecilenSure!=='undefined'?cvSecilenSure.inc:0),
+        // Süreli odada kurucunun animasyon ayarı iki taraf için geçerli
+        sahne: ((typeof cvSecilenSure!=='undefined'?cvSecilenSure.dk:3)>0) ? (sahneAyari?1:0) : null,
         olusturmaZamani: firebase.firestore.FieldValue.serverTimestamp(),
       });
       odaId=kod; benimRenk='w'; durum='oda_bekliyor';
@@ -10791,11 +10847,21 @@ const Cevrimici=(()=>{
         for(const e of eskiOda.docs){ try{ await e.ref.delete(); }catch(x){} }
       }catch(e){ /* temizlik hatası önemsiz */ }
       // Bekleyenleri çek (!= ve orderBy kullanma; kendini elle filtrele)
-      const havuz=await fbDb.collection('bekleme').limit(10).get();
+      const havuz=await fbDb.collection('bekleme').limit(30).get();
       let eslesti=false;
+      /* EŞLEŞME KURALI (4 Ekim 2026): süre aynı olmalı (eskiden bakılmıyordu; 3+0
+         arayan 10+0 bekleyenle eşleşip onun süresiyle oynuyordu). Süreli maçta
+         animasyonlular animasyonlularla, animasyonsuzlar animasyonsuzlarla eşleşir;
+         süresizde herkes birbiriyle. */
+      const benDk=(typeof cvSecilenSure!=='undefined'?cvSecilenSure.dk:3);
+      const benInc=(typeof cvSecilenSure!=='undefined'?cvSecilenSure.inc:0);
+      const benSahne=sahneAyari?1:0;
       for(const doc of havuz.docs){
         const d=doc.data();
         if(!d || d.uid===ben) continue; // kendi kaydım — atla
+        const dDk=(d.sureDk!=null?d.sureDk:3), dInc=(d.sureInc||0);
+        if(dDk!==benDk || dInc!==benInc) continue;
+        if(benDk>0 && (d.sahne===1?1:0)!==benSahne) continue;
         try{
           const sonuc=await fbDb.runTransaction(async (tx)=>{
             const s=await tx.get(doc.ref);
@@ -10810,7 +10876,8 @@ const Cevrimici=(()=>{
               beyaz:dd.uid, beyazAd:dd.ad||'Oyuncu', beyazPuan:dd.puan||800, beyazUlke:dd.ulke||'',
               siyah:ben, siyahAd:benAd, siyahPuan:(typeof bulutIst!=='undefined'&&bulutIst.puan)?bulutIst.puan:800, siyahUlke:(typeof bulutIst!=='undefined'&&bulutIst.ulke)?bulutIst.ulke:'',
               sira:'w', sonHamle:null, hamleSayi:0,
-              sureDk: dd.sureDk||3, sureInc: dd.sureInc||0,
+              sureDk: (dd.sureDk!=null?dd.sureDk:3), sureInc: dd.sureInc||0,
+              sahne: (dd.sureDk>0) ? (dd.sahne===1?1:0) : null,
               olusturmaZamani: firebase.firestore.FieldValue.serverTimestamp(),
             });
             tx.delete(doc.ref);                 // bekleme kaydını sil
@@ -10827,6 +10894,7 @@ const Cevrimici=(()=>{
           puan:(typeof bulutIst!=='undefined'&&bulutIst.puan)?bulutIst.puan:800,
           sureDk:(typeof cvSecilenSure!=='undefined'?cvSecilenSure.dk:3),
           sureInc:(typeof cvSecilenSure!=='undefined'?cvSecilenSure.inc:0),
+          sahne: sahneAyari?1:0,
           zaman: firebase.firestore.FieldValue.serverTimestamp()
         });
         beklemeRef=ref;
@@ -10946,7 +11014,7 @@ const Cevrimici=(()=>{
     try{ guncelFen = (typeof Motor!=='undefined' && Motor.fen) ? Motor.fen() : null; }catch(e){}
     try{
       const guncelleme={
-        sonHamle: { from:h.from, to:h.to, terfi:h.terfi||null, oynayan:benimRenk, sayac: Date.now(), sahne:(h.sahne===undefined?1:h.sahne) },
+        sonHamle: { from:h.from, to:h.to, terfi:h.terfi||null, oynayan:benimRenk, sayac: Date.now(), sahne:(h.sahne===undefined?1:h.sahne), kalan:(typeof h.kalan==='number'?h.kalan:null) },
         sira: benimRenk==='w'?'b':'w',
         hamleSayi: firebase.firestore.FieldValue.increment(1),
       };
@@ -11709,6 +11777,15 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   (function(){ const E={"\"at f4\" de, taş oraya gitsin": {"ru": "Скажите «конь f4» — и фигура пойдёт", "ar": "قل «حصان f4» فتتحرك القطعة"}, "TANIYINCA NE YAPSIN": {"ar": "بعد التعرّف"}, "MİKROFON NE ZAMAN AÇIK": {"ar": "متى يعمل الميكروفون"}, "Kareyi işaretle": {"ar": "تمييز المربع"}, "dokununca oyna": {"ar": "المس للعب"}, "Sesli sor": {"ar": "اسأل صوتيًا"}, "\"evet\" de": {"ar": "قل «نعم»"}, "Direkt oyna": {"ar": "العب مباشرة"}, "sormadan oynar": {"ar": "يلعب دون سؤال"}, "Bas-konuş": {"ar": "اضغط وتحدث"}, "düğmeyi basılı tut": {"ar": "استمر بالضغط على الزر"}, "Sıra bendeyken": {"ar": "عندما يحين دوري"}, "eller serbest": {"ar": "دون استخدام اليدين"}, "Uyandırma": {"ar": "كلمة التنبيه"}, "\"fatsa dört\" = f4. b/d/e karışıyorsa aç.": {"ru": "«фокстрот четыре» = f4. Включите, если буквы путаются.", "ar": "«فوكستروت أربعة» = f4. فعّله إذا اختلطت الحروف."}, "Çevrimdışı Tanımayı Dene": {"ar": "جرّب التعرّف دون اتصال"}, "İnternete çıkmaz. Türkçe dil paketi kuruluysa çalışır.": {"ru": "Без интернета. Нужен установленный офлайн-языковой пакет.", "ar": "لا يستخدم الإنترنت. يتطلب تثبيت حزمة اللغة دون اتصال."}, "Sesli Geri Bildirim": {"ar": "ردّ صوتي"}, "Anladığı hamleyi sesle tekrarlar": {"ru": "Повторяет вслух понятый ход", "ar": "يكرّر صوتيًا النقلة التي فهمها"}, "🎤 Mikrofonu Dene": {"ar": "🎤 اختبر الميكروفون"}, "Aç ve İzin Ver": {"ar": "تفعيل والسماح"}, "1 · Tanıyınca ne yapsın?": {"ru": "1 · Что делать после распознавания?", "ar": "1 · ماذا يفعل بعد التعرّف؟"}, "2 · Mikrofon ne zaman açık olsun?": {"ru": "2 · Когда включать микрофон?", "ar": "2 · متى يكون الميكروفون مفتوحًا؟"}, "Satranç yaklaşık 1500 yıl önce Hindistan'da \"Çaturanga\" adıyla doğdu; adı ordunun dört sınıfını (piyade, süvari, fil, savaş arabası) anlatır.": {"ru": "Шахматы появились около 1500 лет назад в Индии под названием «чатуранга» — оно означает четыре рода войск: пехоту, конницу, слонов и колесницы.", "ar": "وُلد الشطرنج قبل نحو 1500 عام في الهند باسم «تشاتورانغا»؛ ويصف الاسم أقسام الجيش الأربعة: المشاة والفرسان والفيلة والعربات الحربية."}, "Oyun Hindistan'dan Pers'e geçince \"Şatranç\" adını aldı. \"Şah Mat\" — yani \"şah çaresiz/öldü\" — buradan gelir ve bugün \"mat\" dediğimiz şeydir.": {"ru": "Попав из Индии в Персию, игра получила название «шатрандж». Выражение «шах мат» — «король беспомощен» — дало слово «мат».", "ar": "عندما انتقلت اللعبة من الهند إلى فارس سُمّيت «شطرنج». ومن عبارة «شاه مات» — أي «الملك عاجز» — جاءت كلمة «مات» التي نستخدمها اليوم."}, "Vezir başlangıçta en zayıf taşlardan biriydi; sadece bir kare çapraz giderdi. Bugünkü güçlü haline ancak 15. yüzyıl Avrupa'sında kavuştu.": {"ru": "Ферзь когда-то был одной из самых слабых фигур и ходил лишь на одно поле по диагонали. Нынешнюю силу он обрёл только в Европе XV века.", "ar": "كان الوزير في البداية من أضعف القطع، يتحرك مربعًا واحدًا قطريًا فقط، ولم يكتسب قوته الحالية إلا في أوروبا القرن الخامس عشر."}, "Vezirin bu ani güçlenmesi o kadar çarpıcıydı ki dönemin İtalyanları yeni oyuna \"çılgın vezir satrancı\" adını taktı.": {"ru": "Внезапное усиление ферзя было настолько поразительным, что итальянцы того времени назвали новую игру «шахматами бешеного ферзя».", "ar": "كان التعزيز المفاجئ لقوة الوزير لافتًا لدرجة أن الإيطاليين في ذلك العصر سمّوا اللعبة الجديدة «شطرنج الوزير المجنون»."}, "Mümkün satranç oyunlarının sayısı (Shannon Sayısı) yaklaşık 10'un 120. kuvvetidir — evrendeki atom sayısından (yaklaşık 10'un 80. kuvveti) kat kat fazla.": {"ru": "Число возможных шахматных партий (число Шеннона) — около 10 в 120-й степени, что несравнимо больше числа атомов во Вселенной (около 10 в 80-й).", "ar": "يبلغ عدد مباريات الشطرنج الممكنة (عدد شانون) نحو 10 أُس 120 — أي أكثر بكثير من عدد الذرات في الكون (نحو 10 أُس 80)."}, "Sadece ilk iki hamleden sonra bile tahtada yüzlerce farklı pozisyon oluşur; dört hamle sonra bu sayı 197.000'i aşar.": {"ru": "Уже после первых двух ходов на доске возможны сотни разных позиций, а после четырёх — более 197 000.", "ar": "بعد أول نقلتين فقط تنشأ مئات الأوضاع المختلفة على الرقعة، وبعد أربع نقلات يتجاوز العدد 197,000."}, "Tarihteki en uzun resmî turnuva oyunu 1989'da Belgrad'da oynandı: Nikolić ile Arsović arasında 269 hamle, yaklaşık 20 saat sürdü.": {"ru": "Самая длинная официальная турнирная партия была сыграна в Белграде в 1989 году: Николич — Арсович, 269 ходов, около 20 часов.", "ar": "أطول مباراة رسمية في بطولة لُعبت في بلغراد عام 1989: نيكوليتش ضد أرسوفيتش، 269 نقلة استمرت نحو 20 ساعة."}, "Tarihin en genç büyükustası, 2021'de 12 yaş 4 aylıkken bu unvanı kazanan Abhimanyu Mishra'dır.": {"ru": "Самый молодой гроссмейстер в истории — Абхиманью Мишра, получивший звание в 2021 году в 12 лет и 4 месяца.", "ar": "أصغر أستاذ كبير في التاريخ هو أبهيمانيو ميشرا، الذي نال اللقب عام 2021 وعمره 12 عامًا و4 أشهر."}, "En yüksek resmî Elo puanına (2882) ulaşan oyuncu Magnus Carlsen'dir.": {"ru": "Наивысший официальный рейтинг Эло (2882) был у Магнуса Карлсена.", "ar": "أعلى تصنيف إيلو رسمي (2882) بلغه ماغنوس كارلسن."}, "\"Büyükusta\" (GM) unvanı ilk kez 1950'de Dünya Satranç Federasyonu (FIDE) tarafından resmen verildi.": {"ru": "Звание гроссмейстера (GM) впервые официально присвоила ФИДЕ в 1950 году.", "ar": "منح الاتحاد الدولي للشطرنج (FIDE) لقب «الأستاذ الكبير» رسميًا لأول مرة عام 1950."}, "1997'de IBM'in \"Deep Blue\" bilgisayarı, dünya şampiyonu Garry Kasparov'u bir maçta yenerek tarihe geçti.": {"ru": "В 1997 году компьютер IBM Deep Blue вошёл в историю, победив в матче чемпиона мира Гарри Каспарова.", "ar": "في عام 1997 دخل حاسوب «ديب بلو» من IBM التاريخ بفوزه في مباراة على بطل العالم غاري كاسباروف."}, "Satranç Avrupa'ya 9.-10. yüzyıllarda, büyük ölçüde Endülüs (Müslüman İspanya) yoluyla ulaştı.": {"ru": "Шахматы пришли в Европу в IX–X веках, во многом через аль-Андалус (мусульманскую Испанию).", "ar": "وصل الشطرنج إلى أوروبا في القرنين التاسع والعاشر، إلى حد كبير عبر الأندلس."}, "Fil taşı Pers'te \"fil\", Batı'da ise \"piskopos\" (bishop) oldu; her kültür taşları kendi dünyasına göre adlandırdı.": {"ru": "Фигура «слон» осталась «слоном» в Персии, а на Западе стала «епископом» (bishop) — каждая культура называла фигуры по-своему.", "ar": "بقيت قطعة «الفيل» فيلًا في فارس، لكنها أصبحت «الأسقف» (bishop) في الغرب — فكل ثقافة سمّت القطع بحسب عالمها."}};
     for(const k in E){ CEVM[k]=Object.assign(CEVM[k]||{}, E[k]); }
     CEVM["En ünlü ortaçağ satranç taşları, İskoçya'nın Lewis Adası'nda bulunan, mors dişinden oyulmuş 12. yüzyıl \"Lewis Satranç Taşları\"dır."]={"en": "The most famous medieval chess pieces are the 12th-century Lewis Chessmen, carved from walrus ivory and found on the Isle of Lewis, Scotland.", "ru": "Самые знаменитые средневековые шахматные фигуры — «Шахматы с острова Льюис» XII века, вырезанные из моржового клыка и найденные на острове Льюис в Шотландии.", "ar": "أشهر قطع شطرنج من العصور الوسطى هي «قطع شطرنج لويس» من القرن الثاني عشر، المنحوتة من عاج الفظ والتي عُثر عليها في جزيرة لويس في اسكتلندا.", "fr": "Les pièces d’échecs médiévales les plus célèbres sont les échecs de Lewis (XIIᵉ siècle), sculptés dans l’ivoire de morse et découverts sur l’île de Lewis, en Écosse.", "de": "Die berühmtesten mittelalterlichen Schachfiguren sind die Lewis-Schachfiguren aus dem 12. Jahrhundert, aus Walrosselfenbein geschnitzt und auf der Isle of Lewis in Schottland gefunden.", "it": "I pezzi degli scacchi medievali più famosi sono gli scacchi di Lewis del XII secolo, intagliati nell’avorio di tricheco e ritrovati sull’isola di Lewis, in Scozia.", "zh": "最著名的中世纪棋子是12世纪的“刘易斯棋子”，由海象牙雕刻而成，发现于苏格兰的刘易斯岛。"}; })();
+  CEVM['Animasyon açık']={en:'Animation on',ru:'Анимация включена',ar:'الرسوم المتحركة مفعّلة',fr:'Animation activée',de:'Animation an',it:'Animazione attiva',zh:'动画已开启'};
+  CEVM['Animasyon kapalı']={en:'Animation off',ru:'Анимация выключена',ar:'الرسوم المتحركة متوقفة',fr:'Animation désactivée',de:'Animation aus',it:'Animazione disattivata',zh:'动画已关闭'};
+  CEVM['Giriş yap']=CEVM['Giriş yap']||{en:'Sign in',ru:'Войти',ar:'تسجيل الدخول',fr:'Se connecter',de:'Anmelden',it:'Accedi',zh:'登录'};
+  CEVM['Süreli maç: animasyon açık']={en:'Timed game: animation on',ru:'Игра на время: анимация включена',ar:'مباراة بوقت: الرسوم المتحركة مفعّلة',fr:'Partie chronométrée : animation activée',de:'Partie mit Zeit: Animation an',it:'Partita a tempo: animazione attiva',zh:'计时对局：动画开启'};
+  CEVM['Süreli maç: animasyon kapalı']={en:'Timed game: animation off',ru:'Игра на время: анимация выключена',ar:'مباراة بوقت: الرسوم المتحركة متوقفة',fr:'Partie chronométrée : animation désactivée',de:'Partie mit Zeit: Animation aus',it:'Partita a tempo: animazione disattivata',zh:'计时对局：动画关闭'};
+  CEVM['Süreli maçta animasyon eşleşmeye göre sabit']={en:'In timed games animation is fixed by the match',ru:'В игре на время анимация задана подбором',ar:'في المباريات بوقت تُحدَّد الرسوم المتحركة حسب المطابقة',fr:'En partie chronométrée, l’animation est fixée par l’appariement',de:'Bei Partien mit Zeit ist die Animation durch die Paarung festgelegt',it:'Nelle partite a tempo l’animazione è fissata dall’abbinamento',zh:'计时对局中动画由匹配决定'};
+  CEVM['Süresiz · herkesle eşleşir']={en:'Untimed · matches anyone',ru:'Без времени · с любым соперником',ar:'بلا وقت · يطابق الجميع',fr:'Sans limite · tout le monde',de:'Ohne Zeit · mit allen',it:'Senza tempo · con chiunque',zh:'不限时 · 与任何人匹配'};
+  CEVM['Süreli maçta animasyonu açık oyuncularla eşleşirsin.']={en:'In timed games you are matched with players who have animation on.',ru:'В играх на время вы играете с теми, у кого анимация включена.',ar:'في المباريات بوقت تُطابَق مع لاعبين الرسوم المتحركة لديهم مفعّلة.',fr:'En partie chronométrée, vous affrontez des joueurs avec l’animation activée.',de:'Bei Partien mit Zeit spielst du gegen Spieler mit eingeschalteter Animation.',it:'Nelle partite a tempo giochi contro chi ha l’animazione attiva.',zh:'计时对局中，你将与开启动画的玩家匹配。'};
+  CEVM['Süreli maçta animasyonu kapalı oyuncularla eşleşirsin.']={en:'In timed games you are matched with players who have animation off.',ru:'В играх на время вы играете с теми, у кого анимация выключена.',ar:'في المباريات بوقت تُطابَق مع لاعبين الرسوم المتحركة لديهم متوقفة.',fr:'En partie chronométrée, vous affrontez des joueurs avec l’animation désactivée.',de:'Bei Partien mit Zeit spielst du gegen Spieler mit ausgeschalteter Animation.',it:'Nelle partite a tempo giochi contro chi ha l’animazione disattivata.',zh:'计时对局中，你将与关闭动画的玩家匹配。'};
   CEVM['Tema']={en:'Theme',ru:'Тема',ar:'المظهر',fr:'Thème',de:'Design',it:'Tema',zh:'主题'};
   CEVM['Dil']={en:'Language',ru:'Язык',ar:'اللغة',fr:'Langue',de:'Sprache',it:'Lingua',zh:'语言'};
   CEVM['Fildişi']={en:'Ivory',ru:'Слоновая кость',ar:'عاجي',fr:'Ivoire',de:'Elfenbein',it:'Avorio',zh:'象牙白'};
@@ -13736,9 +13813,39 @@ else { try{ SesOyun.kur(); }catch(e){} }
     // Ekran yalnız oyun sırasında açık kalsın (menülerde normal süresinde kararır)
     try{ if(window.AndroidEkran && AndroidEkran.acikTut) AndroidEkran.acikTut(acik); }catch(e){}
   }
-  new MutationObserver(kontrol).observe(hud, {attributes:true, attributeFilter:['class']});
-  [inceleHUD, analizEk].forEach(e=>{ if(e) new MutationObserver(kontrol).observe(e, {attributes:true, attributeFilter:['class']}); });
-  kontrol();
+  /* GEZİNME ÇUBUĞU (3 Ekim 2026, sahibin isteği): menülerde ve analiz listesinde
+     telefonun Geri/Ana ekran tuşları görünsün; tahta ekranında ve açılış
+     animasyonunda gizli kalsın (tam ekran). Çubuğun arkasındaki şerit, o anki
+     ekranın alt rengine boyanır; Fildişi'de açık zemin + koyu tuşlar. */
+  const perde=document.getElementById('acilisPerde');
+  const ALT_RENK={fildisi:'#e8dfcf',gece:'#0f121c',obsidyen:'#050506',zumrut:'#05110c',bordo:'#0c0407',cam:'#0d0b18',klasik:'#06070b'};
+  let sonGezinme='';
+  function gezinmeGuncelle(){
+    if(!(window.AndroidEkran && AndroidEkran.gezinme)) return;
+    const az=analizde();
+    const acilista=!!(perde && !perde.classList.contains('bitti') && getComputedStyle(perde).display!=='none');
+    const tahtada=hud.classList.contains('acik') && !az;
+    const goster=!acilista && !tahtada;
+    let tema='klasik'; try{ tema=document.documentElement.getAttribute('data-tema')||'klasik'; }catch(e){}
+    let renk = az ? '#0b0d14' : (ALT_RENK[tema]||'#06070b');
+    /* Buzlu Cam: menünün altında 3B sahne görünüyor ve rengi arenaya göre değişiyor.
+       Sahnenin en alt-orta pikseli okunur (telefonda ölçüldü: ekrandaki renkle birebir). */
+    if(!az && tema==='cam' && goster){
+      try{ renderer.render(scene,camera); const gl=renderer.getContext(), c=renderer.domElement, px=new Uint8Array(4);
+           gl.readPixels(Math.floor(c.width/2), 2, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+           renk='#'+[px[0],px[1],px[2]].map(v=>v.toString(16).padStart(2,'0')).join(''); }catch(e){}
+    }
+    const _h=parseInt(renk.slice(1),16), _l=(0.299*(_h>>16&255)+0.587*(_h>>8&255)+0.114*(_h&255))/255;
+    const acikZemin = !az && _l>0.62;   // açık zemin: tuşlar koyu çizilsin
+    const k=goster+renk+acikZemin; if(k===sonGezinme) return; sonGezinme=k;
+    try{ AndroidEkran.gezinme(goster, renk, acikZemin); }catch(e){}
+  }
+  window.gezinmeGuncelle=gezinmeGuncelle;
+  new MutationObserver(()=>{ kontrol(); gezinmeGuncelle(); }).observe(hud, {attributes:true, attributeFilter:['class']});
+  [inceleHUD, analizEk].forEach(e=>{ if(e) new MutationObserver(()=>{ kontrol(); gezinmeGuncelle(); }).observe(e, {attributes:true, attributeFilter:['class']}); });
+  if(perde) new MutationObserver(gezinmeGuncelle).observe(perde, {attributes:true, attributeFilter:['class','style']});
+  new MutationObserver(gezinmeGuncelle).observe(document.documentElement, {attributes:true, attributeFilter:['data-tema']});
+  kontrol(); gezinmeGuncelle();
 })();
 
 // Ayarlar modalındaki vekil butonlar: dikey modda üst bardan kaldırılan

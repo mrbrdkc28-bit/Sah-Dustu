@@ -554,6 +554,18 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
 
 ---
 
+### 8.17 Gezinme çubuğu, giriş düğmesi, çevrimiçi eşleşme (4 Ekim 2026)
+- **Gezinme çubuğu:** menülerde/analizde telefonun Geri/Ana ekran tuşları görünür, tahtada ve açılışta gizli
+  (`AndroidEkran.gezinme(goster, renk, acik)`; WebView `kok` FrameLayout içinde, alt boşluk inset kadar).
+  Android 14'te temadaki opak `navigationBarColor` çiziliyordu → `window.navigationBarColor` da ayarlanır.
+  Şerit rengi temaya göre (telefonda ölçüldü); Buzlu Cam'de 3B sahnenin alt pikseli okunur.
+- **Giriş yap:** çıkış sonrası profil alanı boş kalıyordu → "Giriş yap" düğmesi (`girisEkraniAc`).
+- **Sahne düğmesi:** basınca `kisaBilgi()` balonu "Animasyon açık/kapalı".
+- **Çevrimiçi:** "Süresiz" seçeneği eklendi (herkes eşleşir). Eşleşmede süre AYNI olmalı (eskiden bakılmıyordu).
+  Süreli maçta yalnız aynı animasyon ayarındakiler eşleşir; maç boyunca ayar `cvSahneSabit` ile sabit
+  (`sahneAcik()`). Oda/davet: kurucunun ayarı. Her hamle `kalan` süreyi taşır, karşı saat eşitlenir.
+  İki cihazlı gerçek eşleşme testi henüz YAPILMADI.
+
 ## 9. YAYIN ENGELLERİ (hepsi kullanıcı tarafında)
 
 1. ✅ **GPL-3.0 kaynak yükümlülüğü** (3 Ekim 2026). Proje artık git deposu;
