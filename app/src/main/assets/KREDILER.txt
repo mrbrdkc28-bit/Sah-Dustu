@@ -58,6 +58,7 @@ içindeki "Lisanslar & Atıflar" ekranında ve her modelin dosya bilgisinde
   - "Realistic Chess Set – Full Board with Pieces" — BenAissa_Karim
   - "Chess set" — brendanwood872
   - "Cartoon Chess Set" — CYX1122
+  - "Glass Chess Pieces" — Yanez-Designs
 Modeller taş taş ayrılmış, ölçeklenmiş ve dokuları küçültülmüştür.
 CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
 

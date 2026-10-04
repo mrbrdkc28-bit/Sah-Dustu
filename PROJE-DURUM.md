@@ -798,3 +798,7 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Önizlemeler 8.15'teki tarifle çekildi (416x256 webp). Modeller toplam ~29 MB eklendi (APK ~60 MB). Kasarsa ağırlar (Lewis, Turnuva,
   Zarif) çıkarılabilir — sahibin kararı.
 - Bekleyen: Cam taşlar (tek parça, geometri ayrıştırma gerek) ve Cam tahta (şah yerinden oynamış) indirildi, henüz eklenmedi.
+- (8.35 ek) Kristal = camtas (Yanez-Designs "Glass Chess Pieces", CC-BY): kaynak 6 taş tek ağdı; `setler/camtas_bol.mjs` bağlı
+  bileşenlere ayırıp z konumuna göre grupladı (p r n b k q), siyah = aynı şekil füme cam. ~650 KB. At yönü -PI/2.
+- Altın & Cam (camtahta) denendi ve ÇIKARILDI: altın malzeme r128'de beyaz görünüyor, şah kaynakta yerinden oynamış; en ağır set.
+  `bol.mjs`'e ELLE (elle eşleme) ve meshoptimizer sadeleştirme (UCGEN_MAKS, SADE_HATA) eklendi.
