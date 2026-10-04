@@ -1867,6 +1867,18 @@ body.onizlemede #anlatim{z-index:45;bottom:auto;top:calc(190px + env(safe-area-i
 #cvEylem .cvAltSatir #cvOdaOlustur .cvIkon svg{width:16px;height:16px}
 #cvEylem .cvAltSatir{min-height:46px}
 #cvEylem .cvBtn.cvKatil{padding:10px 14px}
+
+/* ===== BULMACALAR ekranı (4 Ekim 2026): Günün Bulmacası + uygulamanın tasarım dili ===== */
+#bulmacaZorluk .bzKart{border-radius:24px;padding:24px 20px 18px;max-width:360px;width:calc(100% - 32px)}
+#bulmacaZorluk h2{letter-spacing:.12em;text-align:center}
+#bulmacaZorluk .bzGunluk{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;margin:0 0 14px;padding:16px 18px;
+  border:none;border-radius:18px;cursor:pointer;text-align:left;color:#F0E9D8;
+  background:linear-gradient(135deg,#232838,#12151f);box-shadow:0 10px 24px rgba(10,12,20,.28),inset 0 0 0 1px rgba(232,182,76,.35)}
+#bulmacaZorluk .bzGunluk .bzgUst{font:700 10.5px Manrope,sans-serif;letter-spacing:.2em;color:#E8B64C}
+#bulmacaZorluk .bzGunluk b{font-family:'Cinzel',serif;font-size:19px;letter-spacing:.04em}
+#bulmacaZorluk .bzGunluk .bzgAlt{font:500 12px Manrope,sans-serif;color:#b9b2a2}
+#bulmacaZorluk .bzGunluk.cozuldu .bzgAlt{color:#5FBF6A;font-weight:700}
+#bulmacaZorluk .bzSec{border-radius:16px;font-family:'Cinzel',serif;letter-spacing:.03em}
 </style>
 </head>
 <body>
@@ -2067,6 +2079,9 @@ body.onizlemede #anlatim{z-index:45;bottom:auto;top:calc(190px + env(safe-area-i
     <h3 style="font-family:'Cinzel',Georgia,serif;color:#E8E2D2;margin:26px 0 10px;letter-spacing:.06em;font-size:15px">Yazı Tipleri</h3>
     <p>Aşağıdaki yazı tipleri <b>SIL Open Font License 1.1</b> ile kullanılmıştır; lisans metinleri uygulama paketinde (lib/fonts) yer alır.</p>
     <p><b>Cinzel</b> — © 2020 The Cinzel Project Authors<br><b>Manrope</b> — © 2019 The Manrope Project Authors<br><b>Great Vibes</b> — © 2015 The Great Vibes Pro Project Authors<br><b>Aref Ruqaa</b> — © 2015-2020 The Aref Ruqaa Project Authors<br><b>Ma Shan Zheng</b> — © 2018 The Ma Shan Zheng Project Authors</p>
+
+    <h3 style="font-family:'Cinzel',Georgia,serif;color:#E8E2D2;margin:26px 0 10px;letter-spacing:.06em;font-size:15px">Bulmacalar</h3>
+    <p>Bulmacaların çoğu <b>Lichess</b> açık bulmaca veritabanından seçilmiştir (CC0 kamu malı, database.lichess.org). Lichess topluluğuna teşekkürler.</p>
 
     <h3 style="font-family:'Cinzel',Georgia,serif;color:#E8E2D2;margin:26px 0 10px;letter-spacing:.06em;font-size:15px">Satranç Motoru</h3>
     <p>Bu uygulama, oyun sonu analizinde <b>Stockfish</b> satranç motorunu kullanır.</p>
@@ -5576,9 +5591,10 @@ async function hamleOyna(h, ai=false, uzaktan=false){
     const beklenen=b.h[bulmacaAdim]; // beklenen oyuncu hamlesi (UCI)
     const oynanan=String.fromCharCode(97+(h.from%8))+(8-Math.floor(h.from/8))+
                   String.fromCharCode(97+(h.to%8))+(8-Math.floor(h.to/8));
-    // mat-1'de birden çok mat olabilir: çözüm hamlesi VEYA mat eden herhangi bir hamle kabul
+    // Birden çok mat olabilir: çözüm hamlesi VEYA hemen mat eden herhangi bir hamle kabul
+    // (4 Ekim 2026: yalnız mat-1'de değil her adımda — Lichess de son hamlede her matı kabul eder)
     let dogru = (oynanan===beklenen);
-    if(!dogru && b.t===1){
+    if(!dogru){
       const k1=Motor.yap(h);
       if(Motor.durum()==='mat') dogru=true;
       Motor.gerial(k1);
@@ -10461,12 +10477,19 @@ function bulmacaBaslat(){
   try{ cozulen=JSON.parse(localStorage.getItem('bulmacaCozulen')||'[]'); }catch(e){}
   const cozSay=t=>BULMACALAR.filter(b=>b.t===t && cozulen.includes(b.f)).length;
   const rozet=t=>'<span class="bzRozet">'+cozSay(t)+' / '+say(t)+' çözüldü</span>';
-  z.innerHTML='<div class="bzKart"><h2>Bulmaca Seç</h2>'+
+  const gb=gunlukBulmaca(), gCoz=gunlukCozulduMu();
+  const tarih=new Date().toLocaleDateString((typeof uygDil!=='undefined'&&uygDil)||'tr',{day:'numeric',month:'long'});
+  z.innerHTML='<div class="bzKart"><h2>Bulmacalar</h2>'+
+    '<button class="bzGunluk'+(gCoz?' cozuldu':'')+'" id="bzGunluk"><span class="bzgUst">GÜNÜN BULMACASI · '+tarih+'</span>'+
+      '<b>'+({1:'Tek Hamlede Mat',2:'İki Hamlede Mat',3:'Üç Hamlede Mat'}[gb.t])+'</b>'+
+      '<span class="bzgAlt">'+(gCoz?'✓ Bugün çözdün':'Herkese aynı bulmaca, her gün yenisi')+'</span></button>'+
     '<button class="bzSec" data-t="1">Tek Hamlede Mat '+rozet(1)+'</button>'+
     '<button class="bzSec" data-t="2">İki Hamlede Mat '+rozet(2)+'</button>'+
     '<button class="bzSec" data-t="3">Üç Hamlede Mat '+rozet(3)+'</button>'+
     '<button id="bzKapat" class="ikincil">Menüye Dön</button></div>';
   z.classList.add('acik');
+  try{ if(typeof agacTara==='function') agacTara(z); }catch(e){}
+  document.getElementById('bzGunluk').onclick=()=>{ z.classList.remove('acik'); bulmacaGunlukBaslat(); };
   z.querySelectorAll('.bzSec').forEach(b=>{
     b.onclick=()=>{ z.classList.remove('acik'); bulmacaTipBaslat(parseInt(b.dataset.t)); };
   });
@@ -10474,12 +10497,36 @@ function bulmacaBaslat(){
 }
 
 // Seçilen tipte bulmaca dizisi başlat
+/* GÜNÜN BULMACASI (4 Ekim 2026): herkese aynı gün aynı bulmaca. Havuz: Lichess'ten eklenen,
+   orta zorlukta (900-1900) bulmacalar; sabit tohumlu karıştırma + gün sayısı ile seçilir. */
+let bulmacaGunlukMod=false;
+function gunAnahtari(){ const t=new Date(); return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate(); }
+function gunlukBulmaca(){
+  const havuz=[]; BULMACALAR.forEach((b,i)=>{ if(b.p && b.p>=900 && b.p<=1900) havuz.push(i); });
+  if(!havuz.length) return BULMACALAR[0];
+  let x=64; const kar=havuz.slice();                       // sabit tohumlu karıştırma (her cihazda aynı)
+  for(let i=kar.length-1;i>0;i--){ x=(x*1103515245+12345)&0x7fffffff; const j=x%(i+1); [kar[i],kar[j]]=[kar[j],kar[i]]; }
+  const t=new Date(); const gun=Math.floor(Date.UTC(t.getFullYear(),t.getMonth(),t.getDate())/86400000);
+  const idx=kar[gun%kar.length]; const b=BULMACALAR[idx]; b._idx=idx; return b;
+}
+function gunlukCozulduMu(){ try{ return localStorage.getItem('gunlukCozulen')===gunAnahtari(); }catch(e){ return false; } }
+function bulmacaGunlukBaslat(){
+  const b=gunlukBulmaca();
+  bulmacaTipBaslat(b.t);
+  bulmacaGunlukMod=true;
+  bulmacaListe=[b._idx]; bulmacaListePos=0; bulmacaIndex=b._idx;
+  bulmacaGoster();
+}
 function bulmacaTipBaslat(tip){
   bulmacaListe=[];
   BULMACALAR.forEach((b,i)=>{ if(b.t===tip) bulmacaListe.push(i); });
   if(bulmacaListe.length===0) return;
-  bulmacaListePos=0;
-  bulmacaIndex=bulmacaListe[0];
+  /* İlk ÇÖZÜLMEMİŞ bulmacadan başla (eskiden hep 1'den başlıyordu; 200 bulmacada can sıkardı) */
+  bulmacaGunlukMod=false;
+  let _coz=[]; try{ _coz=JSON.parse(localStorage.getItem('bulmacaCozulen')||'[]'); }catch(e){}
+  const _ilk=bulmacaListe.findIndex(i=>!_coz.includes(BULMACALAR[i].f));
+  bulmacaListePos=_ilk>=0?_ilk:0;
+  bulmacaIndex=bulmacaListe[bulmacaListePos];
   bulmacaModu=true;
   bulmacaOncekiOrdu=aktifOrdu;
   const nap=ORDULAR.find(o=>o.id==='napolyon');
@@ -10519,7 +10566,7 @@ function bulmacaGoster(){
   const renkAd=(b.r==='w')?'Beyaz':'Siyah';
   let s=document.getElementById('bulmacaSerit');
   if(!s){ s=document.createElement('div'); s.id='bulmacaSerit'; document.body.appendChild(s); }
-  s.innerHTML='<div class="bsBaslik">BULMACA '+(bulmacaListePos+1)+' / '+bulmacaListe.length+'</div>'+
+  s.innerHTML='<div class="bsBaslik">'+(bulmacaGunlukMod?'GÜNÜN BULMACASI':'BULMACA '+(bulmacaListePos+1)+' / '+bulmacaListe.length)+'</div>'+
     '<div class="bsMetin">'+renkAd+' oynar. '+tipAd+'.</div>'+
     '<button id="bulmacaCik">Menüye Dön</button>';
   s.classList.add('acik');
@@ -10537,9 +10584,10 @@ function bulmacaSonuc(dogru){
         /* Sınırsız büyüyen FEN listesiydi; yıllar içinde localStorage kotasını
            doldurup DİĞER kayıtların (premium, istatistik) yazılmasını
            engelleyebilirdi. Son 400 çözüm yeterli. */
-        while(cozulenler.length>400) cozulenler.shift();
+        while(cozulenler.length>2000) cozulenler.shift();
         localStorage.setItem('bulmacaCozulen',JSON.stringify(cozulenler));
       }
+      if(bulmacaGunlukMod) localStorage.setItem('gunlukCozulen', gunAnahtari());
     }catch(e){}
     s.innerHTML='<div class="bsBaslik" style="color:#5FBF6A">✓ ÇÖZDÜN!</div>'+
       '<div class="bsMetin">'+((typeof uygDil!=='undefined'&&uygDil!=='tr')?metniCevir('Harika bir mat! Gözün keskin.'):b.n)+'</div>'+
@@ -12253,6 +12301,11 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Beklemeye devam et']=CEVM['Beklemeye devam et']||{en:'Keep waiting',ru:'Продолжить ожидание',ar:'استمر في الانتظار',fr:'Continuer d’attendre',de:'Weiter warten',it:'Continua ad aspettare',zh:'继续等待'};
   CEVM['çevrimiçi puanı etkilemez']=CEVM['çevrimiçi puanı etkilemez']||{en:'does not affect online rating',ru:'не влияет на онлайн-рейтинг',ar:'لا يؤثر على التصنيف',fr:'n’affecte pas le classement',de:'ohne Einfluss auf die Online-Wertung',it:'non influisce sul punteggio',zh:'不影响在线积分'};
   CEVM['Rakibin']=CEVM['Rakibin']||{en:'Your opponent',ru:'Ваш соперник',ar:'خصمك',fr:'Votre adversaire',de:'Dein Gegner',it:'Il tuo avversario',zh:'你的对手'};
+  CEVM['Bulmacalar']=CEVM['Bulmacalar']||{en:'Puzzles',ru:'Задачи',ar:'الألغاز',fr:'Problèmes',de:'Rätsel',it:'Problemi',zh:'谜题'};
+  CEVM['GÜNÜN BULMACASI']=CEVM['GÜNÜN BULMACASI']||{en:'PUZZLE OF THE DAY',ru:'ЗАДАЧА ДНЯ',ar:'لغز اليوم',fr:'PROBLÈME DU JOUR',de:'RÄTSEL DES TAGES',it:'PROBLEMA DEL GIORNO',zh:'每日谜题'};
+  CEVM['✓ Bugün çözdün']=CEVM['✓ Bugün çözdün']||{en:'✓ Solved today',ru:'✓ Решено сегодня',ar:'✓ حُلَّ اليوم',fr:'✓ Résolu aujourd’hui',de:'✓ Heute gelöst',it:'✓ Risolto oggi',zh:'✓ 今日已解'};
+  CEVM['Herkese aynı bulmaca, her gün yenisi']=CEVM['Herkese aynı bulmaca, her gün yenisi']||{en:'Same puzzle for everyone, a new one every day',ru:'Одна задача для всех, каждый день новая',ar:'لغز واحد للجميع، وجديد كل يوم',fr:'Le même pour tous, un nouveau chaque jour',de:'Für alle gleich, jeden Tag neu',it:'Uguale per tutti, nuovo ogni giorno',zh:'人人相同，每天一题'};
+  CEVM['Bulmaca']=CEVM['Bulmaca']||{en:'Puzzle',ru:'Задача',ar:'لغز',fr:'Problème',de:'Rätsel',it:'Problema',zh:'谜题'};
   CEVM['Tema']={en:'Theme',ru:'Тема',ar:'المظهر',fr:'Thème',de:'Design',it:'Tema',zh:'主题'};
   CEVM['Dil']={en:'Language',ru:'Язык',ar:'اللغة',fr:'Langue',de:'Sprache',it:'Lingua',zh:'语言'};
   CEVM['Fildişi']={en:'Ivory',ru:'Слоновая кость',ar:'عاجي',fr:'Ivoire',de:'Elfenbein',it:'Avorio',zh:'象牙白'};
@@ -15094,5 +15147,6 @@ function devPanelAc(){
   setTimeout(dugmeleriEkle, 0);
 })();
 </script>
+<script src="bulmacalar.js"></script>
 </body>
 </html>

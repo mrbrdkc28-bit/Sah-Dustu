@@ -628,6 +628,17 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
   YOK — mağaza "aldatıcı davranış" riski ve liderlik tablosu yüzünden sahibiyle bilerek böyle kararlaştırıldı.
 - Emülatörde: sayaç, kural, panel ve bot maçı (havuzdan çıkış, zorluk, süre) doğrulandı; canlıda sayaç 1.
 
+### 8.24 Bulmacalar: 589 bulmaca + Günün Bulmacası; çevrimiçi düğmeler; web (4 Ekim 2026)
+- Lichess açık bulmaca veritabanından (CC0) 550 mat bulmacası (200/200/150), ≥500 oynanma, ≥%85 beğeni,
+  sapma ≤80; zorluğa eşit yayılım; her çözüm python-chess ile mat doğrulandı. `assets/bulmacalar.js`
+  (eski 39 korunur, FEN ile birleşir). Seçim aracı `araclar/bulmaca-sec.py`. Lisanslar ekranında teşekkür.
+- "Günün Bulmacası": herkese aynı, havuz p 900-1900, sabit tohumlu karıştırma + UTC gün; çözülünce
+  `localStorage.gunlukCozulen`. Kategoride ilk çözülmemişten başlanır; çözülen listesi sınırı 2000.
+- Mat getiren her hamle her adımda doğru sayılır (eskiden yalnız mat-1'de).
+- Çevrimiçi: Rastgele Eşleş / Oda Oluştur / Katıl altta sabit (`#cvEylem`), içeriğin dibinde kalıyordu.
+- GitHub Pages: `_config.yml` ile app/ vb. yayından çıkarıldı (tarayıcıda kilitler devre dışıydı, Premium
+  bedavaydı); kökte tanıtım sayfası, gizlilik aynı adreste. Doğrulandı: oyun 404, privacy 200.
+
 ## 9. YAYIN ENGELLERİ (hepsi kullanıcı tarafında)
 
 1. ✅ **GPL-3.0 kaynak yükümlülüğü** (3 Ekim 2026). Proje artık git deposu;
