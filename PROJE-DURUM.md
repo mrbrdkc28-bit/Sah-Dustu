@@ -739,3 +739,10 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   sihirbazsız). Eller serbest/uyandırma: dokun = kapat. Bas-konuş: basılı tut = dinle, kısa dokunuş = "kapat" seçeneği.
   Kapatınca geç gelen "dinliyor" olayı mikrofonu yeniden kapatır.
 - Oyun sonu ekranı (`#son`) da analiz gibi hep dikey; kapatınca oyunun yönüne dönülür (telefonda doğrulandı).
+
+### 8.29 Eller serbest sesli oynamada taş sesleri (4 Ekim 2026)
+- Sebep: efektler `new Audio().play()` (medya oynatıcı) ile çalıyordu; Android ses odağına tabi. Eller serbestte hamleden hemen sonra
+  tanıyıcı odağı "özel" (TRANSIENT_EXCLUSIVE) alıyor, WebView kısa sesi duraklatıyordu.
+- Çözüm: `Ses.cal` aynı `sfx/*.mp3` dosyalarını bir kez çözüp WebAudio tamponuyla çalar (`tamponYukle`/`tamponCal`); dosya yoksa eski
+  zincir (gömülü veri → sentez). `sesAc` askıdaki ses bağlamını her seferinde uyandırır.
+- Telefonda ölçüldü: dinleme sırasında uygulama artık ses odağı istemiyor, ses izi normal seviyede aktif.
