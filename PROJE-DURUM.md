@@ -584,6 +584,11 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
   parçası olduğu için orada sürekli çizim yok, parçacıklar 30/sn.
 - Ayrıca taş parçaları aynı malzemeye göre birleştiriliyor (`tasParcaBirlestir`, 421→337 çağrı; asıl sebep değildi).
 
+### 8.21 Ayarlar: ses, titreşim; Oyun Kur ayar satırı (4 Ekim 2026)
+- Oyun Ayarları penceresi: Savaş animasyonu, **Ses** (Ses.sesAcKapa; oyun içi ses düğmesiyle eşit, `sesAyarla`),
+  **Titreşim** (genel; `navigator.vibrate` sarılır, tüm titreşimler `titresimAcik`'a uyar, `localStorage.titresim`),
+  Grafik. Oyun Kur'da süre seçeneklerinin altında çevrimiçindeki gibi "Animasyon · Grafik (Hz)" satırı (`#kurAyarSatir`).
+
 ### 8.20 İlk girişte akıcılık seçimi + canlı arena/ordu önizlemesi (4 Ekim 2026)
 - İlk girişte "Oyun ekranı akıcılığı" zorunlu seçilir (`ilkAkicilikSor`, `localStorage.grafikSecildi`);
   Yüksek'te ısınma/şarj uyarısı (ayar penceresi ve Oyun Kur'da da).
