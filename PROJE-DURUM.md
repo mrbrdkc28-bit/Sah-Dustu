@@ -772,3 +772,8 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Not: çevrimiçi dikeyde 9 düğme sığıyor ama "Berabere"/"Döndür" etiketleri kısalıyor (BERAB…).
 - (8.32 ek) Dikeyde Sohbet ve Döndür ikinci satırın ortasında hap olarak (#hudOrta; JS ile taşınır, yatayda yerine döner).
   Üst sırada yazılar artık kesilmiyor (çevrimiçi 7 düğme).
+
+### 8.33 Hamle sesi: ahşap taş (sentez) (4 Ekim 2026)
+- Eski `sfx/hamle.mp3` çok tiz/metalikti (sıfır geçişi ~14.800/sn). Sahibin 3 aday arasından seçtiği "ahşap taş" (B) artık oyunun içinde
+  sentezleniyor: `SENTEZ.hamle` → `ahsapTok` (tarif: scratchpad ses/uret.py). `tamponYukle` önce SENTEZ'e bakar; dosya kullanılmaz.
+- Sıradaki: Ayarlar › Sesler — ses paketi (Klasik/Ahşap/Ordu) + taş başına seçim (seçme, hamle, yeme), ▶ dinle.

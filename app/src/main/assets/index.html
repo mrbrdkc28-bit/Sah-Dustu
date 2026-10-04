@@ -4873,8 +4873,32 @@ const Ses=(()=>{
   const ON_YUKLE=['hamle','rok','sah','basla','sure1dk','sec_p','sec_n','sec_b','sec_r','sec_q','sec_k',
     'yeme_p_piyon','yeme_p_diger','yeme_n','yeme_b','yeme_r','yeme_q','yeme_k'];
   const TAMPON={}, YUKLENIYOR={};
+  /* SENTEZ SESLER (4 Ekim 2026): dosya yerine oyunun içinde üretilen sesler. İlk olarak hamle sesi:
+     eski hamle.mp3 çok tiz/metalikti (saniyede ~14.800 sıfır geçişi). Yerine sahibin dinleyip seçtiği
+     "ahşap taş" tarifi (scratchpad ses/uret.py, aday B): kısa tok gürültü + 220/530/100 Hz sönümlü gövde,
+     2.5 kHz alçak geçiren. İleride ses paketleri de buraya eklenir. */
+  function sentezTampon(c, sure, uret, tepe){
+    const SR=c.sampleRate, n=Math.floor(SR*sure), d=new Float32Array(n);
+    uret(d, SR);
+    let m=0; for(let i=0;i<n;i++){ const v=Math.abs(d[i]); if(v>m) m=v; }
+    const k=Math.floor(.02*SR), g=(tepe||.55)/(m||1);
+    for(let i=0;i<n;i++){ d[i]*=g; if(i>n-k) d[i]*=(n-i)/k; }
+    const t=c.createBuffer(1,n,SR); t.getChannelData(0).set(d); return t;
+  }
+  function ahsapTok(d, SR){
+    const ton=(f0,f1,sonum,atak,g)=>{ let ph=0; for(let i=0;i<d.length;i++){ const t=i/SR, f=f1+(f0-f1)*Math.exp(-t/.04);
+      ph+=2*Math.PI*f/SR; const e=Math.min(1,t/atak)*Math.exp(-t/sonum); d[i]+=Math.sin(ph)*e*g; } };
+    // kısa tok gürültü (tek kutuplu alçak geçiren, 3 kHz)
+    const a1=Math.exp(-2*Math.PI*3000/SR); let y=0;
+    for(let i=0;i<Math.floor(.02*SR);i++){ const t=i/SR; y=(1-a1)*(Math.random()*2-1)+a1*y; d[i]+=y*Math.min(1,t/.0005)*Math.exp(-t/.004)*.5; }
+    ton(230,210,.045,.001,.8); ton(540,520,.022,.001,.35); ton(110,90,.05,.002,.6);
+    // genel alçak geçiren 2.5 kHz (sıcaklık)
+    const a2=Math.exp(-2*Math.PI*2500/SR); y=0; for(let i=0;i<d.length;i++){ y=(1-a2)*d[i]+a2*y; d[i]=y; }
+  }
+  const SENTEZ={ hamle:(c)=>sentezTampon(c,.25,ahsapTok,.55) };
   function tamponYukle(ad){
     if(TAMPON[ad]!==undefined) return Promise.resolve(TAMPON[ad]);
+    if(SENTEZ[ad]){ const c=ac(); if(c){ try{ TAMPON[ad]=SENTEZ[ad](c); return Promise.resolve(TAMPON[ad]); }catch(e){} } }
     if(YUKLENIYOR[ad]) return YUKLENIYOR[ad];
     const c=ac(); if(!c || !window.fetch) return null;
     const veri=()=> (typeof SES_VERI!=='undefined' && SES_VERI[ad]) ? fetch(SES_VERI[ad]).then(r=>r.arrayBuffer()) : Promise.reject(0);
