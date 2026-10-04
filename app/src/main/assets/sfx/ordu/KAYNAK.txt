@@ -1,0 +1,7 @@
+Ordu ses paketi — hepsi CC0 (kamu malı).
+Kenney.nl "RPG Audio" ve "Impact Sounds" (CC0): p_sec=cloth1, p_hamle=footstep_concrete_000, p_yeme=knifeSlice,
+  n_yeme=chop, b_sec=beltHandle1, b_hamle=footstep_wood_000, b_yeme=drawKnife2, r_sec=creak1, r_hamle=impactMining_000,
+  r_yeme=impactWood_heavy_000, q_sec=drawKnife1, q_hamle=clothBelt, k_sec=metalLatch, k_hamle=impactPlate_medium_000,
+  k_yeme=impactPlate_heavy_000.
+BigSoundBank.com (CC0): n_sec=1543 "Breath Horse #4", n_hamle=0496 "Horse steps on concrete", q_yeme=0129 "Sword".
+Oyun içinde kırpılır (baştaki sessizlik atılır, en fazla 0.6/0.75/0.9 sn) ve seviyesi eşitlenir.

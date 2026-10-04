@@ -777,3 +777,12 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Eski `sfx/hamle.mp3` çok tiz/metalikti (sıfır geçişi ~14.800/sn). Sahibin 3 aday arasından seçtiği "ahşap taş" (B) artık oyunun içinde
   sentezleniyor: `SENTEZ.hamle` → `ahsapTok` (tarif: scratchpad ses/uret.py). `tamponYukle` önce SENTEZ'e bakar; dosya kullanılmaz.
 - Sıradaki: Ayarlar › Sesler — ses paketi (Klasik/Ahşap/Ordu) + taş başına seçim (seçme, hamle, yeme), ▶ dinle.
+
+### 8.34 Taş sesleri: Klasik / Ahşap / Ordu paketleri + taş taş seçim (4 Ekim 2026)
+- Yer: Oyun Ayarları › Ses grubunun altında "Taş sesleri ›" (ana menü dişlisi ve oyun içi Ayarlar'dan). Sahibin "sen karar ver" demesiyle seçildi.
+- Sayfa: paket hapları (Klasik/Ahşap/Ordu; paket değişince özel seçimler sıfırlanır) + 6 taş × (Seçme, Hamle, Yeme) hücreleri;
+  hücreye dokun = sıradaki pakete geç ve dinle; "Varsayılana dön". localStorage `tasSesleri` {paket, ozel}.
+- Ses API: `Ses.sec(t)`, `Ses.hamle(t)`, `Ses.yeme(t,kurban)`, `Ses.dinle(t,an,paket)`. Klasik = eski mp3'ler (hamle ahşap sentez).
+- Ahşap: `ah_<an>_<t>` sentez, taşa göre ton (AH_OLCEK). Ordu: `sfx/ordu/<t>_<an>.ogg` (Kenney RPG Audio + Impact Sounds, BigSoundBank;
+  hepsi CC0, kaynak listesi sfx/ordu/KAYNAK.txt), oyunda kırpılır (`kirp`). Lisanslar ekranına teşekkür eklendi. Fildişi tema renkleri ayrı.
+- Varsayılan paket Klasik.
