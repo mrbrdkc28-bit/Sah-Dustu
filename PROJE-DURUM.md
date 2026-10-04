@@ -707,3 +707,11 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
    Gradle/keytool/git çalıştıramıyor.
 4. Sıradaki mantıklı iş: **8.2** (Three.js'i gömerek çevrimdışı çalışır hale
    getirmek), ardından Bölüm 9'daki yayın engelleri.
+
+### 8.25 Değerlendirme düzeltmesi (4 Ekim 2026)
+- Doğruluk formülü Lichess ile aynı; dokunulmadı.
+- "Parlak" artık yalnızca gerçek fedada verilir: `seeKare`/`fedaHesapla` (değiş-tokuş hesabı) net ≥2 puan kayıp arar. Geri almalar (5.Qxf3, Nxb8) artık parlak değil; Opera oyununda 13.Rxd7 ve 16.Qb8+ parlak.
+- Stockfish MultiPV 2, derinlik 12, her konum bir kez. "Harika" = ikinci en iyi hamle ≥%15 beklenen puan kaybettiriyor; geri alma sayılmaz.
+- `hamleAciklama` hamleye özel cümle ekler: kaçırılan mat, izin verilen mat, kaçırılan taş kazancı, asılı bırakılan taş (takaslar hariç), "tek yol" (üstünlük/denge/direnme).
+- İnceleme ekranı (`inceleStockfishDoldur`) aynı ölçüte bağlandı. Oyun içi "göz alıcı" da gerçek fedaya bakıyor.
+- Süre: 33 yarım hamle ≈14 sn (eskisi 2 sn, ama yanlış sonuçlu).
