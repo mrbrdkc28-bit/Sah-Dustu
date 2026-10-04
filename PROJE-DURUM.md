@@ -570,6 +570,17 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
   Yerel emülatörde iki oyuncuyla 6 senaryo test edildi, hepsi geçti (`araclar/cevrimici-test/OKU.txt`).
   Gerçek sunucuda iki gerçek cihazla deneme kapalı testte yapılacak.
 
+### 8.18 Yenileme hızı, ısınma koruması, Oyun Ayarları penceresi (4 Ekim 2026)
+- 3 Ekim ısınma düzeltmesi çizimi her kademede ~60 Hz'e sabitlemişti → 120 Hz ekranda akıcılık düştü (sahibin
+  denemesi). Artık `KADEME[..].hz`: **Yüksek = 0 (ekranın en yükseği; 120/90)**, Orta/Düşük = 60.
+  Yüksek'te Kotlin `AndroidEkran.yenileme(true)` en hızlı ekran modunu ister (`preferredDisplayModeId`).
+  Telefonda ölçüldü: Yüksek'te rAF 121/sn, ekran 120 Hz modu.
+- **Isınma koruması:** `PowerManager` sıcaklık durumu ≥2 (orta) → parçacıklar kapalı, çizim 60, ekran modu
+  sisteme; soğuyunca geri (`window.isiDurumu`, `isiKoruma`, `kareMs()`). Kullanıcıya kısa bilgi balonu.
+- **Oyun Ayarları:** ana menüde dil/tema yanında dişli; çevrimiçi ekranda "Animasyon · Grafik (Hz)" satırı.
+  İkisi de aynı pencereyi açar (savaş animasyonu + grafik). `grafikAyarla()` / `sahneAyarla()` her yeri eşitler,
+  grafik seçimi `localStorage.grafikKademe`.
+
 ## 9. YAYIN ENGELLERİ (hepsi kullanıcı tarafında)
 
 1. ✅ **GPL-3.0 kaynak yükümlülüğü** (3 Ekim 2026). Proje artık git deposu;

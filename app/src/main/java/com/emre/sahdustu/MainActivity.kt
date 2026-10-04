@@ -536,6 +536,7 @@ class MainActivity : AppCompatActivity() {
             ins
         }
         gezinmeUygula()
+        isiDinle()
 
         webView.settings.apply {
             javaScriptEnabled = true
@@ -855,6 +856,17 @@ class MainActivity : AppCompatActivity() {
                     gezinmeUygula()
                 }
             }
+            /* YENILEME HIZI (4 Ekim 2026): grafik Yuksek iken ekranin en hizli modunu iste
+               (120 Hz ekranda 120, 90'da 90). Kapaliyken sistem varsayilanina birak. */
+            @JavascriptInterface
+            fun yenileme(maks: Boolean) {
+                runOnUiThread { yenilemeUygula(maks) }
+            }
+            @JavascriptInterface
+            fun maksHz(): Float = enYuksekMod()?.refreshRate ?: 60f
+            @JavascriptInterface
+            fun isi(): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                (getSystemService(POWER_SERVICE) as android.os.PowerManager).currentThermalStatus else 0
             @JavascriptInterface
             fun acikTut(acik: Boolean) {
                 runOnUiThread {
@@ -1473,6 +1485,39 @@ class MainActivity : AppCompatActivity() {
             taniciYok()
             jsSes("if(window.sesDurum)window.sesDurum('bitti');")
         }
+    }
+
+    /* Su anki cozunurlukteki en yuksek yenileme hizli ekran modu */
+    private fun enYuksekMod(): android.view.Display.Mode? {
+        return try {
+            val ekran = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) display else
+                @Suppress("DEPRECATION") windowManager.defaultDisplay
+            val su = ekran?.mode ?: return null
+            ekran.supportedModes
+                .filter { it.physicalWidth == su.physicalWidth && it.physicalHeight == su.physicalHeight }
+                .maxByOrNull { it.refreshRate }
+        } catch (t: Throwable) { null }
+    }
+    private fun yenilemeUygula(maks: Boolean) {
+        try {
+            val mod = if (maks) enYuksekMod() else null
+            window.attributes = window.attributes.apply { preferredDisplayModeId = mod?.modeId ?: 0 }
+        } catch (t: Throwable) {}
+    }
+
+    /* ISINMA KORUMASI: Android'in sicaklik durumunu JS'e bildir. JS orta (2) ve uzeri
+       durumda parcaciklari kapatir, 60 Hz'e iner; soguyunca geri acar. */
+    private var isiDinleyici: Any? = null
+    private fun isiDinle() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
+        try {
+            val pm = getSystemService(POWER_SERVICE) as android.os.PowerManager
+            val l = android.os.PowerManager.OnThermalStatusChangedListener { durum ->
+                if (!webViewYok) webView.evaluateJavascript("window.isiDurumu&&window.isiDurumu($durum)", null)
+            }
+            pm.addThermalStatusListener(l)
+            isiDinleyici = l
+        } catch (t: Throwable) {}
     }
 
     private fun gezinmeUygula() {

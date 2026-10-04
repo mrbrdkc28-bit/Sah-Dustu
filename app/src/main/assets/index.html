@@ -1740,6 +1740,22 @@ html[data-tema="fildisi"] #girisForm input{background:#fffdf8;border-color:rgba(
 #cvAyarPop .caBtnlar{display:flex;flex-direction:column;gap:9px}
 #cvAyarPop .caBtnlar .sbtn{width:100%}
 #cvOdaAyar{color:var(--dim);font-size:13px;letter-spacing:.06em;margin-top:-8px}
+
+/* ===== OYUN AYARLARI PENCERESİ + DİŞLİ (4 Ekim 2026) ===== */
+#altSecim #ayarAcBtn{padding:8px 11px}
+#altSecim #ayarAcBtn svg{width:16px;height:16px;display:block}
+#secimSayfa .ssGrup{font:700 10.5px Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#9a937f;margin:16px 4px 8px}
+#secimSayfa .ssGrup:first-child{margin-top:0}
+#secimSayfa .ssSec .ssAd{display:flex;flex-direction:column;gap:2px}
+#secimSayfa .ssSec .ssAd small{font-size:11.5px;opacity:.62;font-weight:500}
+#secimSayfa .ssTamam{display:block;width:100%;margin-top:12px;padding:12px;border-radius:13px;border:1px solid #E8B64C;
+  background:linear-gradient(180deg,#F2CC6E,#D69F33);color:#1a1408;font:700 14px 'Cinzel',serif;letter-spacing:.1em;cursor:pointer}
+html[data-tema="fildisi"] #secimSayfa .ssGrup{color:#8a7f6a}
+html[data-tema="fildisi"] #secimSayfa .ssTamam{background:linear-gradient(135deg,#232838,#12151f);border-color:#232838;color:#E8B64C}
+#cvAyarSatir{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px auto 0;padding:9px 16px;border-radius:999px;
+  border:1px solid var(--line);background:transparent;color:var(--dim);font:500 12.5px Manrope,sans-serif;cursor:pointer}
+#cvAyarSatir b{color:var(--bone);font-weight:700}
+#cvAyarSatir .caIk svg{width:15px;height:15px;display:block}
 </style>
 </head>
 <body>
@@ -2023,6 +2039,7 @@ html[data-tema="fildisi"] #girisForm input{background:#fffdf8;border-color:rgba(
         <button class="mod" data-grafik="orta">Orta</button>
         <button class="mod" data-grafik="yuksek">Yüksek</button>
       </div>
+      <div class="blok-ipucu" id="grafikIpucu"></div>
     </div>
     </details>
   </div>
@@ -2092,6 +2109,7 @@ html[data-tema="fildisi"] #girisForm input{background:#fffdf8;border-color:rgba(
         <button class="cvSure cvSuresiz" data-dk="0" data-inc="0">∞<small>Süresiz · herkesle eşleşir</small></button>
       </div>
       <div class="blok-ipucu" id="cvAnimNot"></div>
+      <button type="button" id="cvAyarSatir" onclick="oyunAyarlariAc()"></button>
     </div>
 
     <div id="cvOrduBlok">
@@ -3087,9 +3105,13 @@ let grafikKademe = (()=>{
   }catch(e){ return 'orta'; }
 })();
 const KADEME={
-  dusuk:{ pixelRatio:1,   golge:true,  golgeBoyut:512,  bloom:false, yansima:false, doku:true, parcacikMs:0 },
-  orta: {  pixelRatio:1.5, golge:true,  golgeBoyut:1024, bloom:true,  yansima:false, doku:true, parcacikMs:66 },
-  yuksek:{ pixelRatio:2,   golge:true,  golgeBoyut:2048, bloom:true,  yansima:true,  doku:true, parcacikMs:33 },
+  dusuk:{ pixelRatio:1,   golge:true,  golgeBoyut:512,  bloom:false, yansima:false, doku:true, parcacikMs:0,  hz:60 },
+  orta: {  pixelRatio:1.5, golge:true,  golgeBoyut:1024, bloom:true,  yansima:false, doku:true, parcacikMs:66, hz:60 },
+  yuksek:{ pixelRatio:2,   golge:true,  golgeBoyut:2048, bloom:true,  yansima:true,  doku:true, parcacikMs:33, hz:0 },
+  /* hz: çizim üst sınırı. 0 = ekranın en yüksek yenileme hızı (120 Hz ekranda 120, 90'da 90;
+     Android'den en hızlı ekran modu da istenir). 60 = en çok ~60 çizim/sn (az ısınma).
+     4 Ekim 2026: 3 Ekim'deki ısınma düzeltmesi her kademeyi 60'a sabitlemişti; 120 Hz
+     ekranda akıcılık gözle görülür düştü (sahibin denemesi). Yüksek yeniden tam hız. */
   /* parcacikMs: kül/kar/kum güncelleme aralığı. Telefonda ölçüldü (3 Ekim 2026): oyun ekranındaki
      işlemci yükünün çoğu parçacıklardan (parçacıkla ~%160-200, parçacıksız ~%78; çizim 28/sn → 2/sn).
      Yüksek aynı kalır; Orta yarı hızda; Düşük kapalı. */
@@ -7266,9 +7288,7 @@ function menuKur(){
   document.querySelectorAll('#grafikler .mod').forEach(b=>{
     if(b.dataset.grafik===grafikKademe) b.classList.add('secili');
     b.onclick=()=>{
-      document.querySelectorAll('#grafikler .mod').forEach(x=>x.classList.remove('secili'));
-      b.classList.add('secili'); grafikKademe=b.dataset.grafik;
-      grafikYenidenKur();
+      grafikAyarla(b.dataset.grafik);
     };
   });
   // Giriş ekranı butonları
@@ -8220,7 +8240,19 @@ function odaAyarSor(r, katil){
   hy.onclick=()=>{ pop.classList.remove('acik'); cevrimiciHata(c('Odaya katılmadın: animasyon ayarı farklı.')); };
   pop.classList.add('acik');
 }
+/* Ayar özetleri: çevrimiçi satırı + kurulumdaki grafik ipucu */
+function ayarOzetYaz(){
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  const hz=(grafikKademe==='yuksek') ? maksHz() : 60;
+  const ad={dusuk:'Düşük',orta:'Orta',yuksek:'Yüksek'}[grafikKademe]||'Orta';
+  const r=document.getElementById('cvAyarSatir');
+  if(r) r.innerHTML=(window.IKON&&IKON.ayar?'<span class="caIk">'+IKON.ayar+'</span>':'')+
+    '<span>'+c('Animasyon')+': <b>'+c(sahneAyari?'Açık':'Kapalı')+'</b> · '+c('Grafik')+': <b>'+c(ad)+'</b> ('+hz+' Hz)</span>';
+  const g=document.getElementById('grafikIpucu');
+  if(g) g.textContent=c('Yüksek')+': '+maksHz()+' Hz · '+c('Orta')+' / '+c('Düşük')+': 60 Hz, '+c('daha az ısınma');
+}
 function cvAnimNotYaz(){
+  ayarOzetYaz();
   const el=document.getElementById('cvAnimNot'); if(!el) return;
   const m = sahneAyari ? 'Süreli maçta animasyonu açık oyuncularla eşleşirsin.'
                        : 'Süreli maçta animasyonu kapalı oyuncularla eşleşirsin.';
@@ -9861,6 +9893,29 @@ let _parcacikBirikim=0, _parcacikSon=0;
 ['pointerdown','pointermove','pointerup','touchstart','touchmove','touchend'].forEach(t=>
   addEventListener(t, ()=>{ cizimGerek=true; }, {passive:true, capture:true}));
 function cizimIste(){ cizimGerek=true; }
+/* ISINMA KORUMASI + YENİLEME HIZI (4 Ekim 2026)
+   Android sıcaklık durumu "orta" (2) ve üstüne çıkınca parçacıklar kapanır, çizim
+   60'a iner ve ekran modu sisteme bırakılır; soğuyunca (0-1) seçili kademeye dönülür. */
+let isiKoruma=false;
+function kareMs(){ return (isiKoruma || (KADEME[grafikKademe] && KADEME[grafikKademe].hz)) ? 15.5 : 0; }
+function maksHz(){ try{ if(window.AndroidEkran && AndroidEkran.maksHz) return Math.round(AndroidEkran.maksHz()); }catch(e){} return 60; }
+function yenilemeUygula(){ try{ if(window.AndroidEkran && AndroidEkran.yenileme) AndroidEkran.yenileme(grafikKademe==='yuksek' && !isiKoruma); }catch(e){} }
+window.isiDurumu=function(durum){
+  const yeni=(+durum)>=2; if(yeni===isiKoruma) return;
+  isiKoruma=yeni; yenilemeUygula(); cizimIste();
+  if(typeof kisaBilgi==='function') kisaBilgi(yeni ? 'Telefon ısındı: efektler azaltıldı' : 'Telefon soğudu: efektler geri açıldı');
+};
+/* Grafik kademesini her yerde birlikte değiştir (kurulum, ayar penceresi) ve sakla */
+function grafikAyarla(k){
+  if(!KADEME[k]) return;
+  grafikKademe=k;
+  try{ localStorage.setItem('grafikKademe', k); }catch(e){}
+  document.querySelectorAll('#grafikler .mod').forEach(x=>x.classList.toggle('secili', x.dataset.grafik===k));
+  try{ document.body.classList.toggle('azHareket', k==='dusuk'); }catch(e){}
+  try{ if(typeof renderer!=='undefined' && renderer) grafikYenidenKur(); }catch(e){}
+  yenilemeUygula(); cizimIste();
+  if(typeof ayarOzetYaz==='function') ayarOzetYaz();
+}
 /* Sürekli hareket eden mücevherler her karede taranmasın diye bir kez toplanır */
 let mucevherler=[], mucevherNesil=-1;
 function mucevherleriTopla(){
@@ -9887,7 +9942,7 @@ function dongu(){
      gözle fark edilmez, ama 120 Hz ekranda her karede çizim istemeleri tahtayı
      sürekli tam yükte tutuyordu. Geçen süre biriktirilir; hız değişmez. */
   const _simdi = (typeof performance!=='undefined'?performance.now():Date.now());
-  const _pms = (KADEME[grafikKademe] && KADEME[grafikKademe].parcacikMs!==undefined) ? KADEME[grafikKademe].parcacikMs : 33;
+  const _pms = isiKoruma ? 0 : ((KADEME[grafikKademe] && KADEME[grafikKademe].parcacikMs!==undefined) ? KADEME[grafikKademe].parcacikMs : 33);
   if(parcacikVar && _pms){
     if(!parcacikSys.visible){ parcacikSys.visible=true; cizimIste(); }
     _parcacikBirikim += dt;
@@ -9929,7 +9984,7 @@ function dongu(){
   if(!cizimGerek && (simdiMs - sonCizim) < 500) return;
   /* En çok ~60 Hz çiz: 120 Hz ekranlarda iki kat iş yapılıyordu. İstek bekler,
      bir sonraki uygun karede çizilir (animasyonlar akıcı kalır). */
-  if(simdiMs - sonCizim < 15.5) return;
+  const _km=kareMs(); if(_km && simdiMs - sonCizim < _km) return;
   cizimGerek=false; sonCizim=simdiMs;
   if(bloomKatman) bloomKatman.render();
   else renderer.render(scene,camera);
@@ -10795,6 +10850,8 @@ window.addEventListener('load',()=>{
     try{ cburnettYukle(); }catch(e){}
     menuKur();
     dongu();
+    yenilemeUygula(); ayarOzetYaz();
+    try{ if(window.AndroidEkran && AndroidEkran.isi) window.isiDurumu(AndroidEkran.isi()); }catch(e){}
     document.getElementById('yukleniyor').classList.add('gizli');
     document.getElementById('menu').classList.remove('gizli');
   };
@@ -11857,6 +11914,19 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Animasyonu aç ve katıl']={en:'Turn on animation and join',ru:'Включить анимацию и войти',ar:'شغّل الرسوم المتحركة وانضم',fr:'Activer l\u2019animation et rejoindre',de:'Animation an und beitreten',it:'Attiva l\u2019animazione ed entra',zh:'开启动画并加入'};
   CEVM['Animasyonu kapat ve katıl']={en:'Turn off animation and join',ru:'Выключить анимацию и войти',ar:'أوقف الرسوم المتحركة وانضم',fr:'Désactiver l\u2019animation et rejoindre',de:'Animation aus und beitreten',it:'Disattiva l\u2019animazione ed entra',zh:'关闭动画并加入'};
   CEVM['Odaya katılmadın: animasyon ayarı farklı.']={en:'You did not join: animation setting differs.',ru:'Вы не вошли: настройка анимации отличается.',ar:'لم تنضم: إعداد الرسوم المتحركة مختلف.',fr:'Vous n\u2019avez pas rejoint : réglage d\u2019animation différent.',de:'Nicht beigetreten: Animationseinstellung unterschiedlich.',it:'Non sei entrato: impostazione animazione diversa.',zh:'未加入：动画设置不同。'};
+  CEVM['Oyun Ayarları']=CEVM['Oyun Ayarları']||{en:'Game Settings',ru:'Настройки игры',ar:'إعدادات اللعبة',fr:'Paramètres du jeu',de:'Spieleinstellungen',it:'Impostazioni di gioco',zh:'游戏设置'};
+  CEVM['Savaş animasyonu']=CEVM['Savaş animasyonu']||{en:'Battle animation',ru:'Анимация боя',ar:'رسوم المعركة المتحركة',fr:'Animation de combat',de:'Kampfanimation',it:'Animazione di battaglia',zh:'战斗动画'};
+  CEVM['Grafik']=CEVM['Grafik']||{en:'Graphics',ru:'Графика',ar:'الرسومات',fr:'Graphismes',de:'Grafik',it:'Grafica',zh:'画质'};
+  CEVM['Animasyon']=CEVM['Animasyon']||{en:'Animation',ru:'Анимация',ar:'الرسوم المتحركة',fr:'Animation',de:'Animation',it:'Animazione',zh:'动画'};
+  CEVM['Taş alınınca kamera savaşa iner']=CEVM['Taş alınınca kamera savaşa iner']||{en:'The camera dives in when a piece is captured',ru:'При взятии камера показывает бой',ar:'تنزل الكاميرا إلى المعركة عند الأسر',fr:'La caméra plonge lors d’une prise',de:'Bei Schlagzügen fährt die Kamera ins Geschehen',it:'La telecamera si avvicina quando si cattura',zh:'吃子时镜头切入战斗'};
+  CEVM['Hamleler hızlı geçer']=CEVM['Hamleler hızlı geçer']||{en:'Moves play instantly',ru:'Ходы проходят быстро',ar:'تمر النقلات بسرعة',fr:'Les coups passent vite',de:'Züge laufen schnell',it:'Le mosse sono rapide',zh:'走子快速完成'};
+  CEVM['En iyi görüntü']=CEVM['En iyi görüntü']||{en:'Best visuals',ru:'Лучшее качество',ar:'أفضل صورة',fr:'Meilleur rendu',de:'Beste Darstellung',it:'Massima qualità',zh:'最佳画面'};
+  CEVM['Dengeli']=CEVM['Dengeli']||{en:'Balanced',ru:'Сбалансировано',ar:'متوازن',fr:'Équilibré',de:'Ausgewogen',it:'Bilanciato',zh:'均衡'};
+  CEVM['Efektler kapalı, en az ısınma']=CEVM['Efektler kapalı, en az ısınma']||{en:'Effects off, least heat',ru:'Без эффектов, меньше нагрев',ar:'بلا مؤثرات، أقل سخونة',fr:'Effets coupés, moins de chauffe',de:'Effekte aus, am wenigsten Wärme',it:'Effetti disattivati, meno calore',zh:'关闭特效，发热最少'};
+  CEVM['daha az ısınma']=CEVM['daha az ısınma']||{en:'less heat',ru:'меньше нагрев',ar:'سخونة أقل',fr:'moins de chauffe',de:'weniger Wärme',it:'meno calore',zh:'发热更少'};
+  CEVM['Tamam']=CEVM['Tamam']||{en:'Done',ru:'Готово',ar:'تم',fr:'OK',de:'Fertig',it:'Fatto',zh:'完成'};
+  CEVM['Telefon ısındı: efektler azaltıldı']=CEVM['Telefon ısındı: efektler azaltıldı']||{en:'Phone is warm: effects reduced',ru:'Телефон нагрелся: эффекты уменьшены',ar:'الهاتف ساخن: تم تقليل المؤثرات',fr:'Téléphone chaud : effets réduits',de:'Handy warm: Effekte reduziert',it:'Telefono caldo: effetti ridotti',zh:'手机发热：已减少特效'};
+  CEVM['Telefon soğudu: efektler geri açıldı']=CEVM['Telefon soğudu: efektler geri açıldı']||{en:'Phone cooled down: effects restored',ru:'Телефон остыл: эффекты возвращены',ar:'برد الهاتف: أُعيدت المؤثرات',fr:'Téléphone refroidi : effets rétablis',de:'Handy abgekühlt: Effekte wieder an',it:'Telefono raffreddato: effetti ripristinati',zh:'手机已降温：特效已恢复'};
   CEVM['Tema']={en:'Theme',ru:'Тема',ar:'المظهر',fr:'Thème',de:'Design',it:'Tema',zh:'主题'};
   CEVM['Dil']={en:'Language',ru:'Язык',ar:'اللغة',fr:'Langue',de:'Sprache',it:'Lingua',zh:'语言'};
   CEVM['Fildişi']={en:'Ivory',ru:'Слоновая кость',ar:'عاجي',fr:'Ivoire',de:'Elfenbein',it:'Avorio',zh:'象牙白'};
@@ -14331,7 +14401,44 @@ function devPanelAc(){
   const alt=document.createElement('div'); alt.id='altSecim';
   const dB=document.createElement('button'); dB.type='button'; dB.id='dilAcBtn';
   const tB=document.createElement('button'); tB.type='button'; tB.id='temaAcBtn';
-  alt.appendChild(dB); alt.appendChild(tB);
+  const aB=document.createElement('button'); aB.type='button'; aB.id='ayarAcBtn';
+  aB.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>';
+  if(window.IKON && IKON.ayar) aB.innerHTML=IKON.ayar;
+  aB.setAttribute('aria-label','Ayarlar');
+  alt.appendChild(dB); alt.appendChild(tB); alt.appendChild(aB);
+  /* OYUN AYARLARI (4 Ekim 2026): savaş animasyonu + grafik/yenileme hızı. Menüden ve
+     çevrimiçi ekrandan açılır; seçimler kapanmadan uygulanır. */
+  function ayarAc(){
+    const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+    sayfa.querySelector('.ssBaslik').textContent=c('Oyun Ayarları');
+    const l=sayfa.querySelector('.ssListe'); l.innerHTML='';
+    const grup=(baslik, secenekler, secili, sec)=>{
+      const h=document.createElement('div'); h.className='ssGrup'; h.textContent=c(baslik); l.appendChild(h);
+      const dugmeler=[];
+      secenekler.forEach(o=>{
+        const b=document.createElement('button'); b.type='button'; b.className='ssSec'+(o.id===secili?' secili':'');
+        b.innerHTML='<span class="ssAd"><span></span><small></small></span><span class="ssTik">✓</span>';
+        b.querySelector('.ssAd span').textContent=c(o.ad); b.querySelector('.ssAd small').textContent=o.alt;
+        b.onclick=()=>{ dugmeler.forEach(x=>x.classList.toggle('secili', x===b)); sec(o.id); };
+        dugmeler.push(b); l.appendChild(b);
+      });
+    };
+    const hz=maksHz();
+    grup('Savaş animasyonu', [
+      {id:1, ad:'Açık',   alt:c('Taş alınınca kamera savaşa iner')},
+      {id:0, ad:'Kapalı', alt:c('Hamleler hızlı geçer')}
+    ], sahneAyari?1:0, v=>{ if(typeof sahneAyarla==='function') sahneAyarla(v===1); });
+    grup('Grafik', [
+      {id:'yuksek', ad:'Yüksek', alt:c('En iyi görüntü')+' · '+hz+' Hz'},
+      {id:'orta',   ad:'Orta',   alt:c('Dengeli')+' · 60 Hz'},
+      {id:'dusuk',  ad:'Düşük',  alt:c('Efektler kapalı, en az ısınma')+' · 60 Hz'}
+    ], grafikKademe, k=>grafikAyarla(k));
+    const t=document.createElement('button'); t.type='button'; t.className='ssTamam'; t.textContent=c('Tamam');
+    t.onclick=()=>sayfa.classList.remove('acik'); l.appendChild(t);
+    sayfa.classList.add('acik');
+  }
+  window.oyunAyarlariAc=ayarAc;
+  aB.onclick=ayarAc;
   const ds=document.getElementById('dilSecici');
   if(ds && ds.parentNode) ds.parentNode.insertBefore(alt, ds.nextSibling);
   function etiketle(){
