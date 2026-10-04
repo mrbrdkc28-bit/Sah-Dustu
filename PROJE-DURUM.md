@@ -802,3 +802,7 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   bileşenlere ayırıp z konumuna göre grupladı (p r n b k q), siyah = aynı şekil füme cam. ~650 KB. At yönü -PI/2.
 - Altın & Cam (camtahta) denendi ve ÇIKARILDI: altın malzeme r128'de beyaz görünüyor, şah kaynakta yerinden oynamış; en ağır set.
   `bol.mjs`'e ELLE (elle eşleme) ve meshoptimizer sadeleştirme (UCGEN_MAKS, SADE_HATA) eklendi.
+- (8.35 ek) İki yeni arena: Lewis Tahtası (lewismasa, tahta_lewis.glb) ve Zarif Masa (zarifmasa, tahta_klasikset.glb), premium.
+  `bol.mjs` TAHTA modu: taş olmayan parçalar, kare=1 birim, merkez, üst yüzey y=0; tahtaDon PI/2 (a1 koyu). Samuray ve Turnuva
+  tahtaları denendi, ÇIKARILDI: kendi basılı koordinatları kare renkleri doğru yönde hiç tutmuyor, uygulamanınkiyle çakışıyor.
+  Arena önizlemeleri 8.15 tarifiyle (pitch .40 yaw .75 uzak 11).

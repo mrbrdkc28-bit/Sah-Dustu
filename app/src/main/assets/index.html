@@ -3480,6 +3480,21 @@ const ARENALAR = [
     aksan:'#C89A4A', parcacik:'yildiz', acikTas:0xE8E8E4, koyuTas:0x3D3D3D,
     tahtaGLB:'models/tahta_usta.glb', tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#33270F,#0E0A05 72%)',
     kareAcik:0xCCCCCC, kareKoyu:0x020202   /* GLB malzemesinden okundu */},
+  /* 5 Ekim 2026: yeni orduların kendi tahtaları (Sketchfab CC-BY; setler/bol.mjs TAHTA modu:
+     kare=1 birim, merkez, üst yüzey y=0). tahtaDon telefonda h1 açık kare olacak şekilde seçildi. Samuray ve Turnuva tahtaları
+     kendi basılı koordinatları standart dışı olduğu için alınmadı. */
+  { id:'lewismasa', ad:'Lewis Tahtası', desc:'Ortaçağ Lewis taşlarının sade ahşap tahtası.',
+    gok:0x13100B, sis:0x1B160E, sisYog:0.012, zemin:0x17120B,
+    acikKare:0xC9B48C, koyuKare:0x3A2A1A, isik:0xFFEFD6, ortam:0x8A7A5E,
+    aksan:'#B89A62', parcacik:'yildiz', acikTas:0xE6D8BC, koyuTas:0x5A3A2A,
+    tahtaGLB:'models/tahta_lewis.glb', tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#3A2C18,#120D06 72%)',
+    kareAcik:0xC9B48C, kareKoyu:0x3A2A1A},
+  { id:'zarifmasa', ad:'Zarif Masa', desc:'Kademeli çerçeveli ince işçilik tahta.',
+    gok:0x100E0B, sis:0x18140F, sisYog:0.012, zemin:0x14110C,
+    acikKare:0xD8CDB8, koyuKare:0x2B241C, isik:0xFFF2DE, ortam:0x857862,
+    aksan:'#C2A06A', parcacik:'yildiz', acikTas:0xEDE6D6, koyuTas:0x3A322A,
+    tahtaGLB:'models/tahta_klasikset.glb', tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#3A2E1E,#110D08 72%)',
+    kareAcik:0xD8CDB8, kareKoyu:0x2B241C},
 ];
 
 let scene, camera, renderer, saat;
