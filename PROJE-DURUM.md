@@ -392,14 +392,8 @@ değil, o cihazın Play Services reklam dinamit modülünde. Kod tarafında
 yapılacak bir şey kalmadı; 6 denemeli üstel geri çekilme + `onResume` sıfırlama
 + tanılama ekranı zaten eklendi.
 
-**8.2 — Three.js ve Firebase CDN'den yükleniyor.** [Kesin]
-```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
-```
-Uygulama **internetsiz açılırsa `THREE is not defined` alır ve tahta hiç
-çizilmez.** Baştan beri böyle. `three.min.js` ~600 KB; assets'e gömmek yarım
-saatlik iş ve uygulamayı çevrimdışı çalışır hale getirir. **Önerilen sıradaki iş.**
+**8.2 — ✅ Three.js ve Firebase artık uygulamanın içinden yükleniyor** (`assets/lib/three`, `assets/lib/firebase`;
+4 Ekim 2026 kontrolü: kodda hiçbir CDN bağlantısı yok). İnternetsiz açılışta tahta çizilir.
 
 **8.3 — `VARLIK-REHBERI.md` bayat.** İçindeki "EKLENECEK" notları gerçeği
 yansıtmıyor (bkz. 7.7). Güncellenmeli ya da silinmeli.
@@ -620,6 +614,9 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
   Premium penceresinde Google'dan gelen yerel fiyat gösterilir (`premiumFiyat`). Ürün yokken "yakında" mesajı.
 - versionCode 3 / versionName 1.4.
 - Kalan: Console'da ödeme profili kontrolü, AAB'nin bir test kanalına yüklenmesi, ürünün oluşturulması ve fiyatı.
+- 4 Ekim 2026 genel tur: 8 ana ekran + oyun içi (HUD, seçenekler, yardım, oyun sonu, lisanslar) telefonda
+  kontrol edildi, sorun yok. İmzalı `bundleRelease` derleniyor (yükleme anahtarı CN=Emre, O=Sah Dustu).
+  Mağaza görselleri 8'e çıktı (8. = canlı önizleme), menü görüntüleri dişli düğmeli hâliyle yenilendi.
 
 ## 9. YAYIN ENGELLERİ (hepsi kullanıcı tarafında)
 

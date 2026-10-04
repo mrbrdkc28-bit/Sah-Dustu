@@ -39,7 +39,8 @@ const S={
  4:['mor','Sana uyan <span>tema</span>','Fildişi, Buzlu Cam, Gece ve daha fazlası','menu_cam'],
  5:['koyu','Bulmacalarla <span>geliş</span>','Bir, iki ve üç hamlede mat','bul3'],
  6:['acik','Oyununu <span>kur</span>','Arenanı ve ordunu seç, savaş başlasın','kur1'],
- 7:['acik','Çevrimiçi <span>oyna</span>','Gerçek rakipler, arkadaşlar, liderlik','menu_f']
+ 7:['acik','Çevrimiçi <span>oyna</span>','Gerçek rakipler, arkadaşlar, liderlik','menu_f'],
+ 8:['mor','Önce <span>dene</span>, sonra seç','Her arena ve orduyu canlı önizle','onizleme']
 };
 const n=new URLSearchParams(location.search).get('n')||'1'; const s=S[n];
 document.body.className=s[0]; document.getElementById('b').innerHTML=s[1]; document.getElementById('a').textContent=s[2];
