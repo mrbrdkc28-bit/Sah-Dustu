@@ -715,3 +715,10 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - `hamleAciklama` hamleye özel cümle ekler: kaçırılan mat, izin verilen mat, kaçırılan taş kazancı, asılı bırakılan taş (takaslar hariç), "tek yol" (üstünlük/denge/direnme).
 - İnceleme ekranı (`inceleStockfishDoldur`) aynı ölçüte bağlandı. Oyun içi "göz alıcı" da gerçek fedaya bakıyor.
 - Süre: 33 yarım hamle ≈14 sn (eskisi 2 sn, ama yanlış sonuçlu).
+
+### 8.26 Tahtada inceleme paneli yenilendi (4 Ekim 2026)
+- Alt sayfa (yuvarlak üst köşe, opak), yuvarlak kontroller, altın Oynat.
+- "Gidişat" grafiği: beyazın kazanma olasılığı; parlak/harika/hata/vahim/kaçırılan noktaları; dokun/sürükle = o hamleye git.
+- Yorum kartı sınıf rengine bürünür (rozet, çerçeve, hafif ışıma), hamle değişince kısa giriş animasyonu.
+- Panel tahtayı örtmesin diye kamera `setViewOffset` ile yukarı kaydırılır (`inceleGorunumAyarla`, yalnızca artar); rakip şeridi gizlenir, çevirme düğmesi yukarı alınır.
+- TR/EN değiştirince somut açıklama (`k._ekDil`) artık kaybolmuyor.
