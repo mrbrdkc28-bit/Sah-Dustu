@@ -618,6 +618,16 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
   kontrol edildi, sorun yok. İmzalı `bundleRelease` derleniyor (yükleme anahtarı CN=Emre, O=Sah Dustu).
   Mağaza görselleri 8'e çıktı (8. = canlı önizleme), menü görüntüleri dişli düğmeli hâliyle yenilendi.
 
+### 8.23 Çevrimiçi sayacı + "Uygun rakip bulunamadı" (4 Ekim 2026)
+- Giriş yapmış oyuncu uygulama açıkken 2 dk'da bir `cevrimici/{uid}` = {ts: sunucu saati} yazar (girişte ve
+  çevrimiçi ekranı açılınca da). Bekleme ekranında "N oyuncu çevrimiçi" (son 5 dk, en çok 100+).
+  Kural canlıda (yalnız kendi belgesi, yalnız `ts`, `ts == request.time`). Okuma maliyeti: sayım başına ≤100.
+- Rastgele eşleşmede 60 sn rakip yoksa "Uygun rakip bulunamadı": puana uygun, açıkça **BOT** rozetli rakip
+  (Çaylak Piyon ~800 kolay / Bilge At ~1200 orta / Usta Vezir ~1600 zor) ya da "Beklemeye devam et".
+  Bot maçı yerel yapay zekâ oyunu (aynı süre), çevrimiçi puanı etkilemez. Gerçek oyuncu gibi gösterilen bot
+  YOK — mağaza "aldatıcı davranış" riski ve liderlik tablosu yüzünden sahibiyle bilerek böyle kararlaştırıldı.
+- Emülatörde: sayaç, kural, panel ve bot maçı (havuzdan çıkış, zorluk, süre) doğrulandı; canlıda sayaç 1.
+
 ## 9. YAYIN ENGELLERİ (hepsi kullanıcı tarafında)
 
 1. ✅ **GPL-3.0 kaynak yükümlülüğü** (3 Ekim 2026). Proje artık git deposu;

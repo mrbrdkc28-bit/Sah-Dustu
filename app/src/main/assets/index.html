@@ -1832,6 +1832,23 @@ body.onizlemede #anlatim{z-index:45;bottom:auto;top:calc(190px + env(safe-area-i
   border:1px solid var(--line);background:transparent;color:var(--dim);font:500 12.5px Manrope,sans-serif;cursor:pointer}
 #kurAyarSatir b{color:var(--bone);font-weight:700}
 #kurAyarSatir .caIk svg{width:15px;height:15px;display:block}
+
+/* ===== ÇEVRİMİÇİ SAYACI + RAKİP YOK (4 Ekim 2026) ===== */
+#cvSayac{display:inline-flex;align-items:center;gap:7px;font:600 12.5px Manrope,sans-serif;color:var(--dim);min-height:16px}
+#cvSayac i{width:8px;height:8px;border-radius:50%;background:#3fbf6a;box-shadow:0 0 0 3px rgba(63,191,106,.18)}
+#cvSayac:empty{display:none}
+#cvRakipYok{display:none;width:100%;max-width:340px;padding:18px 16px;border-radius:18px;border:1px solid rgba(232,182,76,.45);
+  background:rgba(232,182,76,.07);text-align:center}
+#cvRakipYok.acik{display:block}
+#cvRakipYok .ryBaslik{font-family:'Cinzel',serif;font-weight:700;font-size:16px;letter-spacing:.06em;color:var(--bone)}
+#cvRakipYok .ryMetin{font:500 13px/1.5 Manrope,sans-serif;color:var(--dim);margin:6px 0 12px}
+#cvRakipYok .ryBot{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+#cvRakipYok .ryBot b{font:700 15px Manrope,sans-serif;color:var(--bone)}
+#cvRakipYok .ryBot small{width:100%;font:500 12px Manrope,sans-serif;color:var(--dim)}
+#cvRakipYok .ryRozet{font:800 10px Manrope,sans-serif;letter-spacing:.14em;padding:3px 7px;border-radius:6px;background:#E8B64C;color:#1a1408}
+#cvRakipYok button{display:block;width:100%;padding:12px;border-radius:14px;font:700 14px 'Cinzel',serif;letter-spacing:.06em;cursor:pointer}
+#cvRakipYok .ryBirincil{border:none;background:linear-gradient(180deg,#F2CC6E,#D69F33);color:#1a1408;margin-bottom:8px}
+#cvRakipYok .ryIkincil{background:transparent;border:1px solid var(--line);color:var(--bone)}
 </style>
 </head>
 <body>
@@ -2222,6 +2239,14 @@ body.onizlemede #anlatim{z-index:45;bottom:auto;top:calc(190px + env(safe-area-i
     <div class="cember"></div>
     <div id="cvBeklemeMetin">Rakip aranıyor…</div>
     <div id="cvKodGoster"></div>
+    <div id="cvSayac"></div>
+    <div id="cvRakipYok">
+      <div class="ryBaslik">Uygun rakip bulunamadı</div>
+      <div class="ryMetin">Bu süre ve animasyon ayarında şu an bekleyen başka oyuncu yok.</div>
+      <div class="ryBot"></div>
+      <button type="button" id="ryBotOyna" class="ryBirincil"></button>
+      <button type="button" id="ryBekle" class="ryIkincil">Beklemeye devam et</button>
+    </div>
     <div id="cvBilgi"><span class="bilgiBaslik">Bunu biliyor muydunuz?</span><span id="cvBilgiMetin"></span></div>
     <button id="cvIptal" class="ikincil">İptal</button>
   </div>
@@ -7515,6 +7540,7 @@ function menuKur(){
   }
   const cvR=document.getElementById('cvRastgele'); if(cvR) cvR.onclick=async()=>{
     cevrimiciHata(''); cvBeklemeGoster('Rakip aranıyor…');
+    rakipYokZamanla();
     await Cevrimici.rastgeleEsles();
   };
   const cvO=document.getElementById('cvOdaOlustur'); if(cvO) cvO.onclick=async()=>{
@@ -7529,6 +7555,8 @@ function menuKur(){
     await odayaKatilAkis(kod, ()=>cvBeklemeGoster('Bağlanılıyor…'));
   };
   const cvI=document.getElementById('cvIptal'); if(cvI) cvI.onclick=()=>{
+    clearTimeout(_rakipYokZam); clearInterval(_sayacZam);
+    const ry=document.getElementById('cvRakipYok'); if(ry) ry.classList.remove('acik');
     Cevrimici.ayril();
     document.getElementById('cvBekleme').classList.remove('acik');
     if(cvBilgiZamanlayici){ clearInterval(cvBilgiZamanlayici); cvBilgiZamanlayici=null; }
@@ -8398,6 +8426,7 @@ function cvAnimNotYaz(){
 }
 function cevrimiciAc(){
   cvAnimNotYaz();
+  try{ varlikYaz(); }catch(e){}
   cevrimiciHata('');
   // İnternet kontrolü — bağlantı yoksa çevrimiçi mod anlamsız
   if(!navigator.onLine){
@@ -8798,7 +8827,87 @@ function cevrimiciKapat(){
   document.getElementById('cvBekleme').classList.remove('acik');
 }
 let cvBilgiZamanlayici=null;
+/* ===== ÇEVRİMİÇİ SAYACI + RAKİP YOK (4 Ekim 2026) =====
+   Giriş yapmış oyuncu uygulama açıkken 2 dk'da bir "buradayım" yazar (cevrimici/{uid}, yalnız
+   sunucu saati). Sayaç son 5 dk'da yazanları sayar. 1 dk içinde rakip çıkmazsa "Uygun rakip
+   bulunamadı": açıkça BOT olan, oyuncunun puanına uygun bir yapay zekâ rakip önerilir.
+   Bot maçı yerel yapay zekâ oyunudur, çevrimiçi puanı etkilemez. Gerçek oyuncu gibi
+   gösterilen bot YOK (mağaza kuralları ve dürüstlük; sahibiyle konuşuldu). */
+function varlikYaz(){
+  try{
+    if(!fbDb || !fbKullanici || misafirMod || document.hidden) return;
+    fbDb.collection('cevrimici').doc(fbKullanici.uid).set({ ts: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
+  }catch(e){}
+}
+setInterval(varlikYaz, 120000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) varlikYaz(); });
+async function cevrimiciSayi(){
+  try{
+    if(!fbDb || !fbKullanici) return null;
+    const esik=firebase.firestore.Timestamp.fromMillis(Date.now()-5*60000);
+    const s=await fbDb.collection('cevrimici').where('ts','>',esik).limit(100).get();
+    return Math.max(1, s.size);
+  }catch(e){ return null; }
+}
+let _sayacZam=null;
+async function sayacYaz(){
+  const el=document.getElementById('cvSayac'); if(!el) return;
+  const n=await cevrimiciSayi();
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  if(n===null){ el.textContent=''; return; }
+  el.innerHTML='<i></i><span></span>';
+  el.querySelector('span').textContent = (n>=100?'100+':n)+' '+c(n===1?'oyuncu çevrimiçi':'oyuncu çevrimiçi');
+}
+const BOTLAR=[
+  {ad:'Çaylak Piyon', zor:'kolay', puan:800},
+  {ad:'Bilge At',     zor:'orta',  puan:1200},
+  {ad:'Usta Vezir',   zor:'zor',   puan:1600}
+];
+function uygunBot(){
+  const p=(typeof bulutIst!=='undefined' && bulutIst.puan) ? bulutIst.puan : 800;
+  return p<1000 ? BOTLAR[0] : (p<1400 ? BOTLAR[1] : BOTLAR[2]);
+}
+let _rakipYokZam=null;
+function rakipYokZamanla(){
+  clearTimeout(_rakipYokZam);
+  const p=document.getElementById('cvRakipYok'); if(p) p.classList.remove('acik');
+  _rakipYokZam=setTimeout(()=>{
+    if(typeof Cevrimici==='undefined' || Cevrimici.durum!=='araniyor') return;
+    if(!document.getElementById('cvBekleme').classList.contains('acik')) return;
+    rakipYokGoster();
+  }, 60000);
+}
+function rakipYokGoster(){
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  const p=document.getElementById('cvRakipYok'); if(!p) return;
+  const b=uygunBot();
+  p.querySelector('.ryBot').innerHTML='<span class="ryRozet">BOT</span><b></b><small></small>';
+  p.querySelector('.ryBot b').textContent=b.ad;
+  p.querySelector('.ryBot small').textContent='~'+b.puan+' · '+c('çevrimiçi puanı etkilemez');
+  document.getElementById('ryBotOyna').textContent=c('Bota karşı oyna');
+  document.getElementById('ryBotOyna').onclick=()=>botlaOyna(b);
+  document.getElementById('ryBekle').onclick=()=>{ p.classList.remove('acik'); rakipYokZamanla(); };
+  try{ if(typeof agacTara==='function') agacTara(p); }catch(e){}
+  p.classList.add('acik');
+}
+async function botlaOyna(b){
+  clearTimeout(_rakipYokZam); clearInterval(_sayacZam);
+  try{ await Cevrimici.ayril(); }catch(e){}
+  document.getElementById('cvRakipYok').classList.remove('acik');
+  document.getElementById('cvBekleme').classList.remove('acik');
+  if(typeof cvBilgiZamanlayici!=='undefined' && cvBilgiZamanlayici){ clearInterval(cvBilgiZamanlayici); cvBilgiZamanlayici=null; }
+  document.getElementById('cevrimiciEkran').classList.remove('acik');
+  mod='ai'; aiZorluk=b.zor; insanRenk=(Math.random()<.5?'w':'b');
+  sureSecim=(cvSecilenSure.dk||0)*60; sureArtis=cvSecilenSure.inc||0;
+  document.getElementById('menu').classList.add('gizli');
+  oyunaBasla();
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  setTimeout(()=>{ if(typeof kisaBilgi==='function') kisaBilgi(c('Rakibin')+': '+b.ad+' (BOT)'); }, 900);
+}
 function cvBeklemeGoster(metin, kod, ayar){
+  clearInterval(_sayacZam);
+  if(!kod){ sayacYaz(); _sayacZam=setInterval(()=>{ if(document.getElementById('cvBekleme').classList.contains('acik')) sayacYaz(); else clearInterval(_sayacZam); }, 30000); }
+  else { const s=document.getElementById('cvSayac'); if(s) s.textContent=''; }
   document.getElementById('cvBeklemeMetin').textContent=metin||'Rakip aranıyor…';
   document.getElementById('cvKodGoster').textContent=kod||'';
   let oa=document.getElementById('cvOdaAyar');
@@ -10968,6 +11077,7 @@ function basarimBildir(b){
 }
 
 function girisDurumGuncelle(){
+  setTimeout(varlikYaz, 1500);
   const cubuk=document.getElementById('profilCubuk');
   if(!cubuk) return;
   cubuk.style.cursor='pointer';
@@ -12114,6 +12224,13 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Tüm sesler kapalı']=CEVM['Tüm sesler kapalı']||{en:'All sounds off',ru:'Все звуки выключены',ar:'كل الأصوات متوقفة',fr:'Tous les sons coupés',de:'Alle Töne aus',it:'Tutti i suoni disattivati',zh:'关闭所有声音'};
   CEVM['Süre uyarısı, teklif ve bildirimlerde']=CEVM['Süre uyarısı, teklif ve bildirimlerde']||{en:'For low time, offers and notifications',ru:'При нехватке времени, предложениях и уведомлениях',ar:'عند قلة الوقت والعروض والإشعارات',fr:'Temps faible, offres et notifications',de:'Bei wenig Zeit, Angeboten und Mitteilungen',it:'Per poco tempo, offerte e notifiche',zh:'时间不足、提议和通知时'};
   CEVM['Hiç titreşmez']=CEVM['Hiç titreşmez']||{en:'Never vibrates',ru:'Без вибрации',ar:'لا يهتز أبدًا',fr:'Ne vibre jamais',de:'Vibriert nie',it:'Non vibra mai',zh:'从不振动'};
+  CEVM['oyuncu çevrimiçi']=CEVM['oyuncu çevrimiçi']||{en:'players online',ru:'игроков онлайн',ar:'لاعبين متصلين',fr:'joueurs en ligne',de:'Spieler online',it:'giocatori online',zh:'名玩家在线'};
+  CEVM['Uygun rakip bulunamadı']=CEVM['Uygun rakip bulunamadı']||{en:'No suitable opponent found',ru:'Подходящий соперник не найден',ar:'لم يُعثر على خصم مناسب',fr:'Aucun adversaire trouvé',de:'Kein passender Gegner gefunden',it:'Nessun avversario adatto',zh:'未找到合适的对手'};
+  CEVM['Bu süre ve animasyon ayarında şu an bekleyen başka oyuncu yok.']=CEVM['Bu süre ve animasyon ayarında şu an bekleyen başka oyuncu yok.']||{en:'No other player is waiting with this time control and animation setting right now.',ru:'Сейчас нет других игроков с этим контролем времени и настройкой анимации.',ar:'لا يوجد لاعب آخر ينتظر بهذا الوقت وإعداد الرسوم المتحركة الآن.',fr:'Aucun autre joueur n’attend avec ce temps et ce réglage d’animation.',de:'Gerade wartet kein anderer Spieler mit dieser Bedenkzeit und Animationseinstellung.',it:'Nessun altro giocatore in attesa con questo tempo e questa animazione.',zh:'目前没有其他玩家以此时间和动画设置等待。'};
+  CEVM['Bota karşı oyna']=CEVM['Bota karşı oyna']||{en:'Play the bot',ru:'Играть с ботом',ar:'العب ضد الروبوت',fr:'Jouer contre le bot',de:'Gegen den Bot spielen',it:'Gioca contro il bot',zh:'与机器人对弈'};
+  CEVM['Beklemeye devam et']=CEVM['Beklemeye devam et']||{en:'Keep waiting',ru:'Продолжить ожидание',ar:'استمر في الانتظار',fr:'Continuer d’attendre',de:'Weiter warten',it:'Continua ad aspettare',zh:'继续等待'};
+  CEVM['çevrimiçi puanı etkilemez']=CEVM['çevrimiçi puanı etkilemez']||{en:'does not affect online rating',ru:'не влияет на онлайн-рейтинг',ar:'لا يؤثر على التصنيف',fr:'n’affecte pas le classement',de:'ohne Einfluss auf die Online-Wertung',it:'non influisce sul punteggio',zh:'不影响在线积分'};
+  CEVM['Rakibin']=CEVM['Rakibin']||{en:'Your opponent',ru:'Ваш соперник',ar:'خصمك',fr:'Votre adversaire',de:'Dein Gegner',it:'Il tuo avversario',zh:'你的对手'};
   CEVM['Tema']={en:'Theme',ru:'Тема',ar:'المظهر',fr:'Thème',de:'Design',it:'Tema',zh:'主题'};
   CEVM['Dil']={en:'Language',ru:'Язык',ar:'اللغة',fr:'Langue',de:'Sprache',it:'Lingua',zh:'语言'};
   CEVM['Fildişi']={en:'Ivory',ru:'Слоновая кость',ar:'عاجي',fr:'Ivoire',de:'Elfenbein',it:'Avorio',zh:'象牙白'};
