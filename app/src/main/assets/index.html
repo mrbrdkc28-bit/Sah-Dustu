@@ -2109,6 +2109,16 @@ body.dikeyAktif #hud .hud-sag .hbtn-simge:not([style*="display: none"]):not([sty
 .kbCubuk{width:180px;height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
 .kbCubuk i{display:block;height:100%;width:3%;border-radius:2px;background:linear-gradient(90deg,#C9912A,#F2C765);transition:width .4s ease}
 body.azHareket .kbTahta b{transition:none}
+
+/* ===== Dikey: Sohbet + Döndür ikinci satırın ortasında (4 Ekim 2026, sahibin isteği) =====
+   Üst sırada 9 düğmede yazılar kesiliyordu. İki düğme dikeyde #hudOrta'ya taşınır (yatayda yerine döner). */
+#hudOrta{display:none}
+body.dikeyAktif #hudOrta{display:flex;position:absolute;left:50%;transform:translateX(-50%);gap:6px;z-index:1}
+body.dikeyAktif #hudOrta .hbtn-simge:not([style*="display: none"]):not([style*="display:none"]){display:flex!important}
+#hudOrta .hbtn-simge{flex-direction:row!important;align-items:center!important;height:34px;min-height:0!important;min-width:0!important;
+  padding:0 12px 0 10px!important;gap:6px!important;border-radius:17px!important;margin:0}
+#hudOrta .hbtn-simge svg{width:16px;height:16px}
+#hudOrta .hbtn-simge i{font-size:10px!important;color:var(--bone)!important;letter-spacing:.06em}
 </style>
 </head>
 <body>
@@ -15900,6 +15910,34 @@ function devPanelAc(){
   new MutationObserver(()=>setTimeout(konumla,60)).observe(document.body,{attributes:true,attributeFilter:['class']});
   addEventListener('resize',()=>{ setTimeout(konumla,300); setTimeout(konumla,800); });
   uygula(); setTimeout(konumla,600);
+})();
+</script>
+
+<script>
+/* Dikeyde Sohbet ve Döndür'ü ikinci satırın ortasına taşı; yatayda eski yerlerine koy (olaylar elemanla gider). */
+(function(){
+  const hud=document.getElementById('hud'), sag=hud&&hud.querySelector('.hud-sag'); if(!sag) return;
+  const orta=document.createElement('div'); orta.id='hudOrta'; hud.appendChild(orta);
+  const ids=['btnSohbet','btnYonDikey'];
+  const yer={}; ids.forEach(id=>{ const e=document.getElementById(id); if(e) yer[id]=e.nextElementSibling; });
+  function duzenle(){
+    const dik=document.body.classList.contains('dikeyAktif');
+    ids.forEach(id=>{
+      const e=document.getElementById(id); if(!e) return;
+      if(dik){ if(e.parentElement!==orta) orta.appendChild(e); }
+      else if(e.parentElement!==sag){ const n=yer[id]; if(n && n.parentElement===sag) sag.insertBefore(e,n); else sag.appendChild(e); }
+    });
+    if(dik){
+      const sira=document.getElementById('sira');
+      if(sira){ const hr=hud.getBoundingClientRect(), sr=sira.getBoundingClientRect();
+        const kenar=parseFloat(getComputedStyle(hud).borderTopWidth)||0;   // güvenli alan kenarlığı (konum orijini onun altında)
+        if(sr.height) orta.style.top=(sr.top-hr.top-kenar+(sr.height-34)/2)+'px'; }
+    }
+  }
+  new MutationObserver(()=>setTimeout(duzenle,40)).observe(document.body,{attributes:true,attributeFilter:['class']});
+  new MutationObserver(()=>setTimeout(duzenle,40)).observe(hud,{attributes:true,attributeFilter:['class']});
+  addEventListener('resize',()=>setTimeout(duzenle,300));
+  setTimeout(duzenle,500);
 })();
 </script>
 </body>

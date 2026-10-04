@@ -770,3 +770,5 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Analiz sürerken halkaların yerinde 5×3 mini tahtada altın at/fil/kale kendi kurallarıyla kayar (`analizTahtasiBaslat`),
   "Stockfish inceliyor… %N" + ilerleme çubuğu (`otoAnalizNotYaz` yüzdeyi okur).
 - Not: çevrimiçi dikeyde 9 düğme sığıyor ama "Berabere"/"Döndür" etiketleri kısalıyor (BERAB…).
+- (8.32 ek) Dikeyde Sohbet ve Döndür ikinci satırın ortasında hap olarak (#hudOrta; JS ile taşınır, yatayda yerine döner).
+  Üst sırada yazılar artık kesilmiyor (çevrimiçi 7 düğme).
