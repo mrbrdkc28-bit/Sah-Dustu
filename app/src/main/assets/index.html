@@ -1731,6 +1731,15 @@ html[data-tema="fildisi"] #girisForm input{background:#fffdf8;border-color:rgba(
 .cvSure.cvSuresiz{grid-column:1/-1;flex-direction:row;justify-content:center;gap:10px}
 .cvSure.cvSuresiz small{margin:0}
 #cvAnimNot{margin:10px auto 0;max-width:320px}
+
+/* ===== ODA AYARI ONAYI + ODA BİLGİSİ (4 Ekim 2026) ===== */
+#cvAyarPop{position:fixed;inset:0;z-index:72;background:rgba(6,7,11,.88);display:none;align-items:center;justify-content:center;padding:22px}
+#cvAyarPop.acik{display:flex}
+#cvAyarPop .caSure{font-family:'Cinzel',serif;font-weight:700;font-size:20px;color:var(--bone);margin:2px 0 10px}
+#cvAyarPop .caMetin{color:var(--dim);font-size:13.5px;line-height:1.55;margin-bottom:18px}
+#cvAyarPop .caBtnlar{display:flex;flex-direction:column;gap:9px}
+#cvAyarPop .caBtnlar .sbtn{width:100%}
+#cvOdaAyar{color:var(--dim);font-size:13px;letter-spacing:.06em;margin-top:-8px}
 </style>
 </head>
 <body>
@@ -7362,13 +7371,13 @@ function menuKur(){
   const cvO=document.getElementById('cvOdaOlustur'); if(cvO) cvO.onclick=async()=>{
     cevrimiciHata('');
     const kod=await Cevrimici.odaOlustur();
-    if(kod) cvBeklemeGoster('Arkadaşın bekleniyor…', kod);
+    if(kod) cvBeklemeGoster('Arkadaşın bekleniyor…', kod,
+      odaAyarMetni(cvSecilenSure.dk, cvSecilenSure.inc, cvSecilenSure.dk>0 ? (sahneAyari?1:0) : null));
   };
   const cvK=document.getElementById('cvOdayaKatil'); if(cvK) cvK.onclick=async()=>{
     cevrimiciHata('');
     const kod=document.getElementById('cvKodGiris').value;
-    const ok2=await Cevrimici.odayaKatil(kod);
-    if(ok2) cvBeklemeGoster('Bağlanılıyor…');
+    await odayaKatilAkis(kod, ()=>cvBeklemeGoster('Bağlanılıyor…'));
   };
   const cvI=document.getElementById('cvIptal'); if(cvI) cvI.onclick=()=>{
     Cevrimici.ayril();
@@ -8170,6 +8179,47 @@ function cevrimiciBilgiGoster(rakipAd){
   }catch(e){}
 }
 
+/* Odanın ayarını tek satırda yaz: "3+2 · animasyonlu", "Süresiz" */
+function odaAyarMetni(dk, inc, sahne){
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  if(!(dk>0)) return c('Süresiz');
+  return dk+'+'+(inc||0)+(sahne===1?' · '+c('animasyonlu'):(sahne===0?' · '+c('animasyonsuz'):''));
+}
+/* Animasyon ayarını her yerde birlikte güncelle (kurulum düğmeleri, simge, çevrimiçi notu) */
+function sahneAyarla(acik){
+  sahneAyari=!!acik;
+  document.querySelectorAll('#sahneler .mod').forEach(x=>x.classList.toggle('secili',(x.dataset.sahne==='1')===sahneAyari));
+  sahneSimgeGuncelle(); cvAnimNotYaz();
+}
+/* Odaya katıl; süreli odanın animasyon ayarı farklıysa nedenini söyleyip sor. */
+async function odayaKatilAkis(kod, basarili){
+  const r=await Cevrimici.odayaKatil(kod);
+  if(r===true){ basarili(); return; }
+  if(r && typeof r==='object' && (r.sahne===0||r.sahne===1)) odaAyarSor(r, ()=>odayaKatilAkis(kod, basarili));
+}
+function odaAyarSor(r, katil){
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  let pop=document.getElementById('cvAyarPop');
+  if(!pop){
+    pop=document.createElement('div'); pop.id='cvAyarPop';
+    pop.innerHTML='<div class="davetKart"><div class="davetBas"></div><div class="caSure"></div><div class="caMetin"></div>'+
+      '<div class="caBtnlar"><button class="sbtn dolu caEvet"></button><button class="sbtn caHayir"></button></div></div>';
+    pop.onclick=e=>{ if(e.target===pop) pop.classList.remove('acik'); };
+    document.body.appendChild(pop);
+  }
+  const acik=r.sahne===1;
+  pop.querySelector('.davetBas').textContent=c('ODA AYARI');
+  pop.querySelector('.caSure').textContent=r.sure+' · '+c(acik?'animasyonlu':'animasyonsuz');
+  pop.querySelector('.caMetin').textContent=c(acik
+    ? 'Süreli odalarda iki oyuncu aynı ayarla oynar. Odayı kuran animasyonu açık seçmiş; katılmak için senin de açman gerekiyor.'
+    : 'Süreli odalarda iki oyuncu aynı ayarla oynar. Odayı kuran animasyonu kapalı seçmiş; katılmak için senin de kapatman gerekiyor.');
+  const ev=pop.querySelector('.caEvet'), hy=pop.querySelector('.caHayir');
+  ev.textContent=c(acik?'Animasyonu aç ve katıl':'Animasyonu kapat ve katıl');
+  hy.textContent=c('Vazgeç');
+  ev.onclick=()=>{ pop.classList.remove('acik'); sahneAyarla(acik); katil(); };
+  hy.onclick=()=>{ pop.classList.remove('acik'); cevrimiciHata(c('Odaya katılmadın: animasyon ayarı farklı.')); };
+  pop.classList.add('acik');
+}
 function cvAnimNotYaz(){
   const el=document.getElementById('cvAnimNot'); if(!el) return;
   const m = sahneAyari ? 'Süreli maçta animasyonu açık oyuncularla eşleşirsin.'
@@ -8578,9 +8628,12 @@ function cevrimiciKapat(){
   document.getElementById('cvBekleme').classList.remove('acik');
 }
 let cvBilgiZamanlayici=null;
-function cvBeklemeGoster(metin, kod){
+function cvBeklemeGoster(metin, kod, ayar){
   document.getElementById('cvBeklemeMetin').textContent=metin||'Rakip aranıyor…';
   document.getElementById('cvKodGoster').textContent=kod||'';
+  let oa=document.getElementById('cvOdaAyar');
+  if(!oa){ oa=document.createElement('div'); oa.id='cvOdaAyar'; document.getElementById('cvKodGoster').after(oa); }
+  oa.textContent=ayar||''; oa.style.display=ayar?'':'none';
   document.getElementById('cvBekleme').classList.add('acik');
   // Rastgele bilgi göster ve her 6 saniyede bir değiştir
   const bm=document.getElementById('cvBilgiMetin');
@@ -10823,12 +10876,22 @@ const Cevrimici=(()=>{
         const d=snap.data();
         if(d.siyah){ throw new Error('Oda dolu.'); }
         if(d.beyaz===ben){ throw new Error('Kendi odana katılamazsın.'); }
+        /* ODA KURALI (4 Ekim 2026): odayı kuran odanın ayarlarını belirler (süre +
+           animasyon). Süreli odada animasyon ayarı farklıysa sessizce değiştirme;
+           oyuncuya sor (odaAyarSor). Süresiz odada şart yok. */
+        const oDk=(d.sureDk!=null?d.sureDk:3);
+        if(oDk>0 && (d.sahne===0||d.sahne===1) && d.sahne!==(sahneAyari?1:0)){
+          const e=new Error('SAHNE'); e.sahneFarki={ sahne:d.sahne, sure:oDk+'+'+(d.sureInc||0) }; throw e;
+        }
         tx.update(ref,{ siyah:ben, siyahAd:benAd, siyahPuan:(typeof bulutIst!=='undefined'&&bulutIst.puan)?bulutIst.puan:800, siyahUlke:(typeof bulutIst!=='undefined'&&bulutIst.ulke)?bulutIst.ulke:'', durum:'oynaniyor' });
         return true;
       });
       if(ok){ odaId=kod; benimRenk='b'; durum='oynaniyor'; odaDinle(kod); }
       return ok;
-    }catch(e){ cevrimiciHata(e.message||'Katılınamadı.'); return false; }
+    }catch(e){
+      if(e && e.sahneFarki) return e.sahneFarki;   // çağıran odaAyarSor ile sorar
+      cevrimiciHata(e.message||'Katılınamadı.'); return false;
+    }
   }
 
   // ---- RASTGELE EŞLEŞTİRME ----
@@ -11194,7 +11257,7 @@ const Cevrimici=(()=>{
       const sd=document.querySelector('.cvSure.secili');
       const dk=sd?(sd.dataset.dk||3):3, inc=sd?(sd.dataset.inc||0):0;
       await fbDb.collection('davetler').doc(hedefUid+'_'+fbKullanici.uid)
-        .set({oda:kod, sure:dk, inc:inc, ad:benimAd||'Oyuncu',
+        .set({oda:kod, sure:dk, inc:inc, sahne:(+dk>0 ? (sahneAyari?1:0) : null), ad:benimAd||'Oyuncu',
               gonderen:fbKullanici.uid, hedef:hedefUid, ts:Date.now()});
       sonDavetHata='';
       return kod;
@@ -11786,6 +11849,14 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Süresiz · herkesle eşleşir']={en:'Untimed · matches anyone',ru:'Без времени · с любым соперником',ar:'بلا وقت · يطابق الجميع',fr:'Sans limite · tout le monde',de:'Ohne Zeit · mit allen',it:'Senza tempo · con chiunque',zh:'不限时 · 与任何人匹配'};
   CEVM['Süreli maçta animasyonu açık oyuncularla eşleşirsin.']={en:'In timed games you are matched with players who have animation on.',ru:'В играх на время вы играете с теми, у кого анимация включена.',ar:'في المباريات بوقت تُطابَق مع لاعبين الرسوم المتحركة لديهم مفعّلة.',fr:'En partie chronométrée, vous affrontez des joueurs avec l’animation activée.',de:'Bei Partien mit Zeit spielst du gegen Spieler mit eingeschalteter Animation.',it:'Nelle partite a tempo giochi contro chi ha l’animazione attiva.',zh:'计时对局中，你将与开启动画的玩家匹配。'};
   CEVM['Süreli maçta animasyonu kapalı oyuncularla eşleşirsin.']={en:'In timed games you are matched with players who have animation off.',ru:'В играх на время вы играете с теми, у кого анимация выключена.',ar:'في المباريات بوقت تُطابَق مع لاعبين الرسوم المتحركة لديهم متوقفة.',fr:'En partie chronométrée, vous affrontez des joueurs avec l’animation désactivée.',de:'Bei Partien mit Zeit spielst du gegen Spieler mit ausgeschalteter Animation.',it:'Nelle partite a tempo giochi contro chi ha l’animazione disattivata.',zh:'计时对局中，你将与关闭动画的玩家匹配。'};
+  CEVM['animasyonlu']={en:'animation on',ru:'с анимацией',ar:'بالرسوم المتحركة',fr:'avec animation',de:'mit Animation',it:'con animazione',zh:'有动画'};
+  CEVM['animasyonsuz']={en:'animation off',ru:'без анимации',ar:'بدون رسوم متحركة',fr:'sans animation',de:'ohne Animation',it:'senza animazione',zh:'无动画'};
+  CEVM['ODA AYARI']={en:'ROOM SETTINGS',ru:'НАСТРОЙКИ КОМНАТЫ',ar:'إعدادات الغرفة',fr:'PARAMÈTRES DU SALON',de:'RAUMEINSTELLUNGEN',it:'IMPOSTAZIONI STANZA',zh:'房间设置'};
+  CEVM['Süreli odalarda iki oyuncu aynı ayarla oynar. Odayı kuran animasyonu açık seçmiş; katılmak için senin de açman gerekiyor.']={en:'In timed rooms both players use the same setting. The host chose animation on; turn it on to join.',ru:'В комнатах на время оба игрока играют с одной настройкой. Создатель включил анимацию; чтобы войти, включите её.',ar:'في الغرف بوقت يلعب اللاعبان بالإعداد نفسه. اختار المضيف تشغيل الرسوم المتحركة؛ شغّلها للانضمام.',fr:'Dans les salons chronométrés, les deux joueurs ont le même réglage. L\u2019hôte a activé l\u2019animation ; activez-la pour rejoindre.',de:'In Räumen mit Zeit spielen beide mit derselben Einstellung. Der Gastgeber hat die Animation an; schalte sie ein, um beizutreten.',it:'Nelle stanze a tempo entrambi usano la stessa impostazione. L\u2019host ha attivato l\u2019animazione; attivala per entrare.',zh:'计时房间中双方使用相同设置。房主开启了动画；开启后才能加入。'};
+  CEVM['Süreli odalarda iki oyuncu aynı ayarla oynar. Odayı kuran animasyonu kapalı seçmiş; katılmak için senin de kapatman gerekiyor.']={en:'In timed rooms both players use the same setting. The host chose animation off; turn it off to join.',ru:'В комнатах на время оба игрока играют с одной настройкой. Создатель выключил анимацию; чтобы войти, выключите её.',ar:'في الغرف بوقت يلعب اللاعبان بالإعداد نفسه. اختار المضيف إيقاف الرسوم المتحركة؛ أوقفها للانضمام.',fr:'Dans les salons chronométrés, les deux joueurs ont le même réglage. L\u2019hôte a désactivé l\u2019animation ; désactivez-la pour rejoindre.',de:'In Räumen mit Zeit spielen beide mit derselben Einstellung. Der Gastgeber hat die Animation aus; schalte sie aus, um beizutreten.',it:'Nelle stanze a tempo entrambi usano la stessa impostazione. L\u2019host ha disattivato l\u2019animazione; disattivala per entrare.',zh:'计时房间中双方使用相同设置。房主关闭了动画；关闭后才能加入。'};
+  CEVM['Animasyonu aç ve katıl']={en:'Turn on animation and join',ru:'Включить анимацию и войти',ar:'شغّل الرسوم المتحركة وانضم',fr:'Activer l\u2019animation et rejoindre',de:'Animation an und beitreten',it:'Attiva l\u2019animazione ed entra',zh:'开启动画并加入'};
+  CEVM['Animasyonu kapat ve katıl']={en:'Turn off animation and join',ru:'Выключить анимацию и войти',ar:'أوقف الرسوم المتحركة وانضم',fr:'Désactiver l\u2019animation et rejoindre',de:'Animation aus und beitreten',it:'Disattiva l\u2019animazione ed entra',zh:'关闭动画并加入'};
+  CEVM['Odaya katılmadın: animasyon ayarı farklı.']={en:'You did not join: animation setting differs.',ru:'Вы не вошли: настройка анимации отличается.',ar:'لم تنضم: إعداد الرسوم المتحركة مختلف.',fr:'Vous n\u2019avez pas rejoint : réglage d\u2019animation différent.',de:'Nicht beigetreten: Animationseinstellung unterschiedlich.',it:'Non sei entrato: impostazione animazione diversa.',zh:'未加入：动画设置不同。'};
   CEVM['Tema']={en:'Theme',ru:'Тема',ar:'المظهر',fr:'Thème',de:'Design',it:'Tema',zh:'主题'};
   CEVM['Dil']={en:'Language',ru:'Язык',ar:'اللغة',fr:'Langue',de:'Sprache',it:'Lingua',zh:'语言'};
   CEVM['Fildişi']={en:'Ivory',ru:'Слоновая кость',ar:'عاجي',fr:'Ivoire',de:'Elfenbein',it:'Avorio',zh:'象牙白'};
@@ -12180,7 +12251,7 @@ function davetGoster(d){
   bekleyenDavet=d;
   document.getElementById('davetMetin').innerHTML =
     '<b>'+(d.ad||'Bir oyuncu')+'</b> seni oyuna davet ediyor.<br>'+
-    '<span style="color:var(--dim);font-size:13px">'+(d.sure||3)+'+'+(d.inc||0)+'</span>';
+    '<span style="color:var(--dim);font-size:13px">'+odaAyarMetni(+(d.sure!=null?d.sure:3), +(d.inc||0), d.sahne)+'</span>';
   document.getElementById('davetPop').classList.add('acik');
 }
 function davetKapat(){
@@ -12194,11 +12265,10 @@ function davetOlaylariBagla(){
     if(!bekleyenDavet) return;
     const d=bekleyenDavet; davetKapat();
     await Cevrimici.davetSil(d.id);
-    const ok=await Cevrimici.odayaKatil(d.oda);
-    if(ok){
+    await odayaKatilAkis(d.oda, ()=>{
       document.getElementById('cevrimiciEkran').classList.add('acik');
       cvBeklemeGoster('Bağlanılıyor…');
-    }
+    });
   };
   r.onclick=async ()=>{
     if(bekleyenDavet) await Cevrimici.davetSil(bekleyenDavet.id);

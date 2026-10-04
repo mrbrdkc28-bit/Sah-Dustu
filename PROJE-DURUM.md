@@ -564,6 +564,9 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
 - **Çevrimiçi:** "Süresiz" seçeneği eklendi (herkes eşleşir). Eşleşmede süre AYNI olmalı (eskiden bakılmıyordu).
   Süreli maçta yalnız aynı animasyon ayarındakiler eşleşir; maç boyunca ayar `cvSahneSabit` ile sabit
   (`sahneAcik()`). Oda/davet: kurucunun ayarı. Her hamle `kalan` süreyi taşır, karşı saat eşitlenir.
+  **Oda kuralı:** odayı kuran süre + animasyonu belirler. Süreli odada katılanın animasyon ayarı farklıysa
+  "ODA AYARI" kutusu nedenini söyler, "Animasyonu aç/kapat ve katıl" ya da Vazgeç (`odayaKatilAkis`,
+  `odaAyarSor`). Süresizde şart yok. Davet penceresi ve oda bekleme ekranı ayarı gösterir ("3+2 · animasyonlu").
   Yerel emülatörde iki oyuncuyla 6 senaryo test edildi, hepsi geçti (`araclar/cevrimici-test/OKU.txt`).
   Gerçek sunucuda iki gerçek cihazla deneme kapalı testte yapılacak.
 
