@@ -117,6 +117,12 @@ class MainActivity : AppCompatActivity() {
        surekliAktif: dongu acik; iptal() / TTS konusmasi / sure dolumu kapatir. */
     private var surekliAktif = false
     private var surekliBekleyen = false
+    /* DINLEME ISTEGI (4 Ekim 2026): JS dinle()/dinleSurekli() ile acar, iptal()/onPause kapatir.
+       ESKI HATA: iptal() taniciyi kapatinca Android ERROR_CLIENT donduruyor, onError bunu "bozuk ornek"
+       sanip 420 ms sonra KENDILIGINDEN yeniden aciyordu; onReadyForSpeech tekrar sayacini sifirladigi
+       icin dongu hic bitmiyordu: mikrofon kapali, oyundan cikilmis olsa bile ~0.8 sn'de bir acilis bipi.
+       Ertelenmis tum yeniden baslatmalar once bu bayraga bakar. */
+    private var dinlemeIstegi = false
     private var surekliBaslangic = 0L
     /* Google tanima servisi her oturum acilisinda "open", bos oturum sonunda
        "failure" bipi calar (USAGE_NOTIFICATION_EVENT; logcat'te goruldu). Eller
@@ -944,7 +950,7 @@ class MainActivity : AppCompatActivity() {
 
             /** Dinlemeyi baslatir. dilKodu ornek: "tr-TR". */
             @JavascriptInterface
-            fun dinle(dilKodu: String) { runOnUiThread { dinlemeBaslat(dilKodu) } }
+            fun dinle(dilKodu: String) { runOnUiThread { dinlemeIstegi = true; dinlemeBaslat(dilKodu) } }
 
             /** Eller serbest: sureMs boyunca tek oturumda dinler (Android 13+). */
             @JavascriptInterface
@@ -952,6 +958,7 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     // Dongu zaten aciksa JS'in her sonuc sonrasi istegini yok say.
                     if (surekliAktif && (dinliyor || surekliBekleyen || hazirBekcisi != null)) return@runOnUiThread
+                    dinlemeIstegi = true
                     surekliAktif = true
                     surekliBaslangic = android.os.SystemClock.uptimeMillis()
                     bildirimSesiKapat()
@@ -1006,6 +1013,7 @@ class MainActivity : AppCompatActivity() {
             @JavascriptInterface
             fun iptal() {
                 runOnUiThread {
+                    dinlemeIstegi = false
                     dinliyor = false
                     surekliOturum = false
                     surekliAktif = false
@@ -1165,6 +1173,7 @@ class MainActivity : AppCompatActivity() {
 
     /** Dinlemeyi baslatir. SpeechRecognizer YALNIZCA ana is parcaciginda kullanilabilir. */
     private fun dinlemeBaslat(dilKodu: String, surekli: Boolean = false, sure: Long = 180000L) {
+        if (!dinlemeIstegi) return   // iptal edildikten sonra gelen ertelenmis baslatmalar
 
         // 1) Kendi TTS'imiz konusuyorsa mikrofonu acma: kendi sesini duyar.
         if (try { tts?.isSpeaking == true } catch (t: Throwable) { false }) {
@@ -1243,6 +1252,7 @@ class MainActivity : AppCompatActivity() {
                     bekciIptal()
                     dinliyor = false
                     taniciYenilensin = true          // bu ornek artik guvenilmez
+                    if (!dinlemeIstegi) return       // biz iptal ettik: iptalin dogurdugu hata, tekrar deneme yok
                     val et = sesHataEtiket(hata)
                     sesSonHata = et + " (oturum " + sesOturum + ")"
                     /* ERROR_CLIENT ve BUSY genelde ornegin bozulmasindan gelir.
@@ -1487,6 +1497,7 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         // Arka plana gecerken mikrofonu MUTLAKA birak: acik kalirsa hem pil yer
         // hem de kullanici "dinleniyorum" hissi yasar.
+        dinlemeIstegi = false
         bekciIptal()
         surekliAktif = false
         surekliBekleyen = false

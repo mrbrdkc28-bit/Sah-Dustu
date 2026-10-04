@@ -746,3 +746,11 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Çözüm: `Ses.cal` aynı `sfx/*.mp3` dosyalarını bir kez çözüp WebAudio tamponuyla çalar (`tamponYukle`/`tamponCal`); dosya yoksa eski
   zincir (gömülü veri → sentez). `sesAc` askıdaki ses bağlamını her seferinde uyandırır.
 - Telefonda ölçüldü: dinleme sırasında uygulama artık ses odağı istemiyor, ses izi normal seviyede aktif.
+
+### 8.30 Mikrofon bip döngüsü + raf üstte (4 Ekim 2026)
+- HATA: mikrofon kapatılınca (oyundan çıkılsa bile) ~0.8 sn'de bir tanıyıcı açılış bipi. Sebep Kotlin'de: `iptal()` taniciyi kapatınca
+  ERROR_CLIENT geliyor, onError bunu "bozuk örnek" sanıp 420 ms sonra yeniden açıyordu; onReadyForSpeech tekrar sayacını sıfırladığı için
+  döngü bitmiyordu. Çözüm: `dinlemeIstegi` bayrağı (dinle/dinleSurekli açar, iptal/onPause kapatır); `dinlemeBaslat` ve onError ona bakar.
+  Telefonda doğrulandı: kapatınca ve menüde tanıyıcı bir daha açılmıyor; bildirim/zil sesi kısık kalmıyor.
+- Araç rafı dikeyde artık üst çubuğun altında ikinci sıra (hbtn-simge sınıfları, konum JS ile Menü düğmesinin altına; rakip şeridi de
+  rafın altına iner).

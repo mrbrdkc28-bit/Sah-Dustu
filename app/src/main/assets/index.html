@@ -2037,19 +2037,13 @@ body:has(#son.acik) #hud,body:has(#son.acik) #notSeritUst,body:has(#son.acik) #n
    gezinme düğmeleri yuvarlak/hap biçiminde (inceleme paneliyle aynı dil). */
 #aracRafi{display:none}
 body.dikeyAktif #hud.acik ~ #aracRafi{display:flex}
-#aracRafi{position:fixed;left:50%;transform:translateX(-50%);z-index:19;gap:6px;padding:6px;
-  bottom:calc(160px + env(safe-area-inset-bottom));border-radius:22px;
-  background:rgba(12,14,22,.62);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 8px 24px rgba(0,0,0,.25)}
-#aracRafi button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-  width:58px;height:50px;border:none;border-radius:16px;background:transparent;color:var(--bone);cursor:pointer;
-  -webkit-tap-highlight-color:transparent;transition:background .15s,opacity .2s,transform .12s;padding:0}
-#aracRafi button:active{transform:scale(.93);background:rgba(255,255,255,.07)}
-#aracRafi button svg{width:20px;height:20px;display:block}
-#aracRafi button .sg{display:flex}
-#aracRafi button i{font-style:normal;font:700 8.5px Manrope,sans-serif;letter-spacing:.08em;text-transform:uppercase;
-  color:rgba(232,226,210,.62);white-space:nowrap}
-#aracRafi button.kapali{opacity:.45}
+/* Raf ÜSTTE (sahibin isteği): üst çubuğun hemen altında, sağa hizalı ikinci sıra; düğmeler üst çubuktaki
+   hbtn-simge ile birebir aynı (sınıfları paylaşır). Konum JS ile Ayarlar düğmesinin altına oturtulur. */
+#aracRafi{position:fixed;right:10px;top:calc(env(safe-area-inset-top,0px) + 64px);z-index:21;gap:5px;
+  align-items:flex-start;justify-content:flex-end}
+#aracRafi button i{white-space:nowrap}
 #aracRafi button.gizli{display:none}
+#aracRafi button.kapali{opacity:.5}
 body:has(#son.acik) #aracRafi,body.incelemede #aracRafi,body:has(#bulmacaSerit.acik) #aracRafi{display:none!important}
 /* Döndür artık rafta: dikey oyun sırasında yüzen düğme gizli (incelemede yine görünür) */
 body.dikeyAktif:not(.incelemede) #yonBtn{display:none!important}
@@ -15772,7 +15766,7 @@ function devPanelAc(){
   const cift=[];
   for(const o of liste){
     const asil=document.getElementById(o.id); if(!asil) continue;
-    const b=document.createElement('button'); b.type='button'; b.dataset.asil=o.id;
+    const b=document.createElement('button'); b.type='button'; b.dataset.asil=o.id; b.className='hbtn hbtn-simge';
     b.onclick=(e)=>{ e.stopPropagation(); asil.click(); setTimeout(esle,50); };
     raf.appendChild(b); cift.push([asil,b,o]);
   }
@@ -15794,6 +15788,25 @@ function devPanelAc(){
   const mo=new MutationObserver(()=>{ clearTimeout(mo._z); mo._z=setTimeout(esle,30); });
   for(const [asil] of cift) mo.observe(asil,{attributes:true,attributeFilter:['style','title','class'],childList:true,subtree:true,characterData:true});
   window.aracRafiEsle=esle;
+  /* Konum: üst çubuğun altına; rakip şeridi de rafın altına iner (dikeyde) */
+  function konumla(){
+    try{
+      const serit=document.getElementById('notSeritUst');
+      const dik=document.body.classList.contains('dikeyAktif');
+      const ref=document.getElementById('btnMenu');
+      if(!dik || !ref || getComputedStyle(raf).display==='none'){ if(serit) serit.style.top=''; return; }
+      const alt=ref.getBoundingClientRect().bottom;
+      if(alt>0) raf.style.top=(alt+6)+'px';
+      const rafAlt=raf.getBoundingClientRect().bottom;
+      if(serit && rafAlt>0) serit.style.top=(rafAlt+8)+'px';
+    }catch(e){}
+  }
+  window.aracRafiKonumla=konumla;
+  addEventListener('resize',()=>setTimeout(konumla,300));
+  const hud=document.getElementById('hud');
+  if(hud) new MutationObserver(()=>setTimeout(konumla,50)).observe(hud,{attributes:true,attributeFilter:['class']});
+  new MutationObserver(()=>setTimeout(konumla,50)).observe(document.body,{attributes:true,attributeFilter:['class']});
+  setTimeout(konumla,500);
 })();
 </script>
 </body>
