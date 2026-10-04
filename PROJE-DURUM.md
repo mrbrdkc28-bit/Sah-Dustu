@@ -564,7 +564,8 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
 - **Çevrimiçi:** "Süresiz" seçeneği eklendi (herkes eşleşir). Eşleşmede süre AYNI olmalı (eskiden bakılmıyordu).
   Süreli maçta yalnız aynı animasyon ayarındakiler eşleşir; maç boyunca ayar `cvSahneSabit` ile sabit
   (`sahneAcik()`). Oda/davet: kurucunun ayarı. Her hamle `kalan` süreyi taşır, karşı saat eşitlenir.
-  İki cihazlı gerçek eşleşme testi henüz YAPILMADI.
+  Yerel emülatörde iki oyuncuyla 6 senaryo test edildi, hepsi geçti (`araclar/cevrimici-test/OKU.txt`).
+  Gerçek sunucuda iki gerçek cihazla deneme kapalı testte yapılacak.
 
 ## 9. YAYIN ENGELLERİ (hepsi kullanıcı tarafında)
 

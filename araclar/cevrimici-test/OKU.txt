@@ -1,0 +1,11 @@
+Çevrimiçi eşleşme testi (yerel emülatör; gerçek Firebase'e dokunmaz)
+1) Bu klasöre firestore.rules kopyala; JAVA_HOME=Android Studio jbr
+2) firebase emulators:start --only auth,firestore --project demo-chess64
+3) node sunucu.mjs   (assets'i 8765'te yayınlar; index.html'de projectId=demo-chess64 + useEmulator)
+4) Emülatörde iki test kullanıcısı oluştur (accounts:signUp REST), iki headless Chrome:
+   chrome --headless=new --remote-debugging-port=9301/9302 --user-data-dir=profil1/2 http://127.0.0.1:8765/index.html
+5) Sayfada fbAuth.signInWithEmailAndPassword(...) ile giriş, sonra:
+   bash senaryo.sh <dkA> <incA> <sahneA> <dkB> <incB> <sahneB>   ;  bash sifirla.sh
+4 Ekim 2026 sonuçları: farklı animasyon/süreli eşleşmedi; aynı süre+animasyon eşleşti (sabit);
+süresizde farklı tercihler eşleşti; 3+0 ile 5+0 eşleşmedi; oda kodunda kurucunun ayarı geçerli;
+saat eşitleme iki yönde doğru (bozulan saat hamleyle düzeldi).
