@@ -1813,6 +1813,19 @@ body.onizlemede #anlatim{z-index:45;bottom:auto;top:calc(190px + env(safe-area-i
 .onzGeri{flex:0 0 34%!important;background:transparent;border:1px solid rgba(255,255,255,.25);color:#e6e1d6}
 .onzSec{border:none;background:linear-gradient(180deg,#F2CC6E,#D69F33);color:#1a1408}
 .onzSec.kilitli{background:linear-gradient(180deg,#2a2d38,#12151f);border:1px solid #E8B64C;color:#E8B64C}
+
+/* Önizleme: ARENA | ORDU sekmeleri ve kombinasyon satırı */
+.onzKombo{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:5px 12px;border-radius:999px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font:600 11.5px Manrope,sans-serif;color:#e6e1d6}
+.onzKombo span{display:inline-flex;align-items:center;gap:4px}
+.onzKombo span.k{color:#E8B64C}
+.onzKombo svg{width:11px;height:11px}
+.onzKombo em{font-style:normal;opacity:.5}
+.onzSekme{display:flex;gap:6px;margin:0 18px 10px;padding:4px;border-radius:14px;background:rgba(8,10,16,.78);border:1px solid rgba(255,255,255,.14)}
+.onzSekme button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px;border:none;border-radius:10px;
+  background:transparent;color:#d9d3c4;font:700 11.5px Manrope,sans-serif;letter-spacing:.2em;cursor:pointer}
+.onzSekme button svg{width:12px;height:12px;color:#E8B64C}
+.onzSekme button.secili{background:linear-gradient(180deg,#2a2d38,#171a24);color:#F0E9D8;box-shadow:inset 0 0 0 1px rgba(232,182,76,.45)}
 </style>
 </head>
 <body>
@@ -12062,6 +12075,7 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['ARENA']=CEVM['ARENA']||{en:'ARENA',ru:'АРЕНА',ar:'الساحة',fr:'ARÈNE',de:'ARENA',it:'ARENA',zh:'场地'};
   CEVM['ORDU']=CEVM['ORDU']||{en:'ARMY',ru:'АРМИЯ',ar:'الجيش',fr:'ARMÉE',de:'ARMEE',it:'ESERCITO',zh:'棋子'};
   CEVM['Önizleme oyun sürerken kullanılamaz']=CEVM['Önizleme oyun sürerken kullanılamaz']||{en:'Preview is not available during a game',ru:'Предпросмотр недоступен во время игры',ar:'المعاينة غير متاحة أثناء اللعب',fr:'Aperçu indisponible pendant une partie',de:'Vorschau während einer Partie nicht verfügbar',it:'Anteprima non disponibile durante una partita',zh:'对局进行中无法预览'};
+  CEVM['Bu kombinasyonu seç']=CEVM['Bu kombinasyonu seç']||{en:'Choose this combination',ru:'Выбрать это сочетание',ar:'اختر هذه التركيبة',fr:'Choisir cette combinaison',de:'Diese Kombination wählen',it:'Scegli questa combinazione',zh:'选择此组合'};
   CEVM['Tema']={en:'Theme',ru:'Тема',ar:'المظهر',fr:'Thème',de:'Design',it:'Tema',zh:'主题'};
   CEVM['Dil']={en:'Language',ru:'Язык',ar:'اللغة',fr:'Langue',de:'Sprache',it:'Lingua',zh:'语言'};
   CEVM['Fildişi']={en:'Ivory',ru:'Слоновая кость',ar:'عاجي',fr:'Ivoire',de:'Elfenbein',it:'Avorio',zh:'象牙白'};
@@ -14675,11 +14689,12 @@ function devPanelAc(){
 /* =====================================================================
    CANLI ÖNİZLEME (4 Ekim 2026): arena ve ordu kartlarında "Önizle".
    Oyunun kendi 3B motoru kullanılır (ikinci WebGL yok). Kamera tahtanın
-   etrafında döner, taşlar dizilir, kısa bir açılış ve savaş animasyonu
-   oynar. Arena önizlenirken seçili ordu, ordu önizlenirken seçili arena.
+   etrafında döner, taşlar dizilir, kısa bir açılış ve savaş animasyonu oynar.
+   Önizlemede ARENA | ORDU sekmeleriyle HER ŞEY gezilebilir (kilitliler dahil);
+   tahta ve taşlar bağımsız seçilir, kombinasyon birlikte seçilir.
    İstatistik/oyun kaydı tutan hamleOyna KULLANILMAZ: hafif oynatıcı.
-   "Bunu seç" kartın kendi tıklamasını tetikler → Premium kilidi ve seçim
-   mantığı aynen çalışır. Kilitli içerik önizlenebilir ("Kilidi aç").
+   "Seç" kartların kendi tıklamasını tetikler → Premium kilidi ve seçim
+   mantığı aynen çalışır. Kilitliyse "Kilidi aç" (Premium penceresi üstte).
    ===================================================================== */
 (function(){
   const GOZ='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>';
@@ -14688,45 +14703,68 @@ function devPanelAc(){
   // Kısa açılış: İspanyol değişim varyantı — iki alım (iki savaş sahnesi)
   const SENARYO='e2e4 e7e5 g1f3 b8c6 f1b5 a7a6 b5c6 d7c6 f3e5'.split(' ');
   const kare=s=>(s.charCodeAt(0)-97)+(8-(+s[1]))*8;
-  let ekran=null, acik=false, nesil=0, onceki=null, kaynakListe=null, tur='arena', secId=null, sinema=false, donSon=0;
+  let ekran=null, acik=false, nesil=0, onceki=null, sekme='arena', arenaId=null, orduId=null, cv=false, sinema=false, donSon=0;
+
+  const kil=(t,id)=>(typeof kilitli==='function') && kilitli(t,id);
+  const listeler=()=>({ arena:document.getElementById(cv?'cvArenalar':'arenaListe'), ordu:document.getElementById(cv?'cvOrdular':'orduListe') });
+  const kartBul=(t,id)=>{ const l=listeler()[t]; return l ? [...l.querySelectorAll('.arena')].find(k=>k.dataset.kId===id) : null; };
+  const arenaObj=()=>ARENALAR.find(a=>a.id===arenaId)||ARENALAR[0];
+  const orduObj=()=>ORDULAR.find(o=>o.id===orduId)||ORDULAR[0];
 
   function ekranKur(){
     if(ekran) return ekran;
     ekran=document.createElement('div'); ekran.id='onizlemeEkran';
     ekran.innerHTML=
-      '<div class="onzUst"><div class="onzTur"></div><div class="onzAd"></div><div class="onzDesc"></div></div>'+
-      '<div class="onzAlt"><div class="onzSerit"></div>'+
+      '<div class="onzUst"><div class="onzTur"></div><div class="onzAd"></div><div class="onzDesc"></div><div class="onzKombo"></div></div>'+
+      '<div class="onzAlt"><div class="onzSekme"><button type="button" data-s="arena"></button><button type="button" data-s="ordu"></button></div>'+
+      '<div class="onzSerit"></div>'+
       '<div class="onzBtn"><button type="button" class="onzGeri"></button><button type="button" class="onzSec"></button></div></div>';
     document.body.appendChild(ekran);
-    ekran.querySelector('.onzGeri').onclick=()=>kapat(false);
+    ekran.querySelector('.onzGeri').onclick=()=>kapat();
     ekran.querySelector('.onzSec').onclick=sec;
+    ekran.querySelectorAll('.onzSekme button').forEach(b=>b.onclick=()=>{ if(sekme===b.dataset.s) return; sekme=b.dataset.s; seritKur(); bilgiYaz(); });
     return ekran;
   }
-  function liste(){ return tur==='arena' ? ARENALAR : ORDULAR; }
   function bilgiYaz(){
-    const o=liste().find(x=>x.id===secId); if(!o) return;
-    const kil=(typeof kilitli==='function') && kilitli(tur, secId);
-    ekran.querySelector('.onzTur').innerHTML=(kil?KILIT:'')+'<span></span>';
-    ekran.querySelector('.onzTur span').textContent=c(tur==='arena'?'ARENA':'ORDU')+(kil?' · PREMIUM':'');
+    const o = sekme==='arena' ? arenaObj() : orduObj();
+    const k = kil(sekme, o.id);
+    ekran.querySelector('.onzTur').innerHTML=(k?KILIT:'')+'<span></span>';
+    ekran.querySelector('.onzTur span').textContent=c(sekme==='arena'?'ARENA':'ORDU')+(k?' · PREMIUM':'');
     ekran.querySelector('.onzAd').textContent=o.ad;
     ekran.querySelector('.onzDesc').textContent=o.desc||'';
+    const kA=kil('arena',arenaId), kO=kil('ordu',orduId);
+    ekran.querySelector('.onzKombo').innerHTML=
+      '<span class="'+(kA?'k':'')+'">'+(kA?KILIT:'')+'<b></b></span><em>·</em><span class="'+(kO?'k':'')+'">'+(kO?KILIT:'')+'<b></b></span>';
+    const bb=ekran.querySelectorAll('.onzKombo b'); bb[0].textContent=arenaObj().ad; bb[1].textContent=orduObj().ad;
+    const sk=ekran.querySelectorAll('.onzSekme button');
+    sk[0].innerHTML=(kA?KILIT:'')+'<span></span>'; sk[0].querySelector('span').textContent=c('ARENA');
+    sk[1].innerHTML=(kO?KILIT:'')+'<span></span>'; sk[1].querySelector('span').textContent=c('ORDU');
+    sk.forEach(b=>b.classList.toggle('secili', b.dataset.s===sekme));
     ekran.querySelector('.onzGeri').textContent=c('Geri');
-    const b=ekran.querySelector('.onzSec');
-    b.innerHTML=(kil?KILIT:'')+'<span></span>'; b.querySelector('span').textContent=c(kil?'Kilidi aç':'Bunu seç');
-    b.classList.toggle('kilitli', !!kil);
-    ekran.querySelectorAll('.onzKucuk').forEach(k=>k.classList.toggle('secili', k.dataset.id===secId));
-    const aktif=ekran.querySelector('.onzKucuk.secili'); if(aktif) try{ aktif.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'}); }catch(e){}
+    const b=ekran.querySelector('.onzSec'), herhangi=kA||kO;
+    b.innerHTML=(herhangi?KILIT:'')+'<span></span>';
+    b.querySelector('span').textContent=c(herhangi?'Kilidi aç':'Bu kombinasyonu seç');
+    b.classList.toggle('kilitli', !!herhangi);
+    const secId = sekme==='arena' ? arenaId : orduId;
+    ekran.querySelectorAll('.onzKucuk').forEach(x=>{
+      x.classList.toggle('secili', x.dataset.id===secId);
+      const i=x.querySelector('i'); if(i && !kil(sekme,x.dataset.id)) i.remove();
+    });
   }
   function seritKur(){
     const sr=ekran.querySelector('.onzSerit'); sr.innerHTML='';
-    liste().forEach(o=>{
+    (sekme==='arena'?ARENALAR:ORDULAR).forEach(o=>{
       const k=document.createElement('button'); k.type='button'; k.className='onzKucuk'; k.dataset.id=o.id;
-      const kil=(typeof kilitli==='function') && kilitli(tur,o.id);
-      k.innerHTML='<img loading="lazy" src="onizleme/'+tur+'_'+o.id+'.webp" alt="">'+(kil?'<i>'+KILIT+'</i>':'')+'<span></span>';
+      k.innerHTML='<img loading="lazy" src="onizleme/'+sekme+'_'+o.id+'.webp" alt="">'+(kil(sekme,o.id)?'<i>'+KILIT+'</i>':'')+'<span></span>';
       k.querySelector('span').textContent=o.ad;
-      k.onclick=()=>{ if(secId===o.id) return; secId=o.id; bilgiYaz(); sahneKur(); };
+      k.onclick=()=>{
+        if(sekme==='arena'){ if(arenaId===o.id) return; arenaId=o.id; } else { if(orduId===o.id) return; orduId=o.id; }
+        bilgiYaz(); sahneKur(sekme==='arena');
+      };
       sr.appendChild(k);
     });
+    const s=sr.querySelector('.onzKucuk[data-id="'+(sekme==='arena'?arenaId:orduId)+'"]');
+    if(s) setTimeout(()=>{ try{ sr.scrollLeft = s.offsetLeft - (sr.clientWidth - s.offsetWidth)/2; }catch(e){} }, 30);
   }
 
   /* Hafif hamle oynatıcı: Motor'u ilerletir, taşı kaydırır, alımda savaş sahnesi */
@@ -14766,15 +14804,16 @@ function devPanelAc(){
       Motor.reset(); taslariDiz(true);
     }
   }
-  function sahneKur(){
+  function sahneKur(arenaDegisti){
     const n=++nesil;
     try{ if(typeof tweenleriIptalEt==='function') tweenleriIptalEt(); }catch(e){}
     try{ document.body.classList.remove('sinema'); const an=document.getElementById('anlatim'); if(an) an.classList.remove('acik'); }catch(e){}
-    if(tur==='arena') aktifArena=ARENALAR.find(a=>a.id===secId)||aktifArena;
-    else aktifOrdu=ORDULAR.find(o=>o.id===secId)||aktifOrdu;
-    try{ arenaKur(aktifArena); }catch(e){}
+    sinema=false;
+    aktifArena=arenaObj(); aktifOrdu=orduObj();
+    if(arenaDegisti!==false){ try{ arenaKur(aktifArena); }catch(e){} }
     Motor.reset(); taslariDiz(true);
-    kamHedef.set(0,0,0); kamYaw=0.35; kamPitch=dikeyMi()?0.82:0.6; kamUzak=uygunUzaklik()*(dikeyMi()?1.04:0.98);
+    kamHedef.set(0,0,0); kamPitch=dikeyMi()?0.82:0.6; kamUzak=uygunUzaklik()*(dikeyMi()?1.04:0.98);
+    if(arenaDegisti!==false) kamYaw=0.35;
     cizimIste();
     senaryo(n);
   }
@@ -14785,15 +14824,22 @@ function devPanelAc(){
     cizimIste();
     requestAnimationFrame(don);
   }
+  function kartlariEsitle(){
+    const l=listeler();
+    if(l.arena) l.arena.querySelectorAll('.arena').forEach(k=>k.classList.toggle('secili', k.dataset.kId===aktifArena.id));
+    if(l.ordu) l.ordu.querySelectorAll('.arena').forEach(k=>k.classList.toggle('secili', k.dataset.kId===aktifOrdu.id));
+  }
   function ac(t, id, kaynak){
     if((typeof oyunAktif!=='undefined' && oyunAktif) || (typeof cevrimiciArkaplanda!=='undefined' && cevrimiciArkaplanda)){
       if(typeof kisaBilgi==='function') kisaBilgi('Önizleme oyun sürerken kullanılamaz'); return;
     }
-    ekranKur(); tur=t; secId=id; kaynakListe=kaynak;
+    ekranKur();
+    cv = !!(kaynak && kaynak.id && kaynak.id.indexOf('cv')===0);
     onceki={arena:aktifArena, ordu:aktifOrdu};
+    sekme=t; arenaId = t==='arena' ? id : aktifArena.id; orduId = t==='ordu' ? id : aktifOrdu.id;
     seritKur(); bilgiYaz();
     acik=true; document.body.classList.add('onizlemede'); ekran.classList.add('acik');
-    sahneKur(); donSon=0; requestAnimationFrame(don);
+    sahneKur(true); donSon=0; requestAnimationFrame(don);
     try{ if(typeof agacTara==='function') agacTara(ekran); }catch(e){}
   }
   function kapat(){
@@ -14804,34 +14850,26 @@ function devPanelAc(){
     try{ const an=document.getElementById('anlatim'); if(an) an.classList.remove('acik'); }catch(e){}
     ekran.classList.remove('acik');
     if(onceki){ aktifArena=onceki.arena; aktifOrdu=onceki.ordu; }
+    kartlariEsitle();   // Premium penceresi önizlemedeyken kartı seçmiş olabilir: görünen = gerçek
     try{ arenaKur(aktifArena); }catch(e){}
     Motor.reset(); taslariDiz(false);
     if(typeof menuSahnesiniSifirla==='function') menuSahnesiniSifirla();
   }
   function sec(){
-    const kart=kaynakListe && [...kaynakListe.querySelectorAll('.arena')].find(k=>k.dataset.kId===secId);
-    const kil=(typeof kilitli==='function') && kilitli(tur, secId);
-    if(kil){ if(kart) kart.click(); return; }   // Premium penceresi önizlemenin üstünde açılır
+    const kA=kil('arena',arenaId), kO=kil('ordu',orduId);
+    if(kA || kO){
+      // Önce kilitli olanın Premium penceresi (önizlemenin üstünde açılır)
+      const kart = kA ? kartBul('arena',arenaId) : kartBul('ordu',orduId);
+      if(kart) kart.click(); return;
+    }
+    const kartA=kartBul('arena',arenaId), kartO=kartBul('ordu',orduId);
     kapat();
-    if(kart){ kart.click(); try{ kart.scrollIntoView({inline:'center',block:'nearest'}); }catch(e){} }
+    if(kartA) kartA.click();
+    if(kartO) kartO.click();
+    try{ (kartA||kartO).scrollIntoView({inline:'center',block:'nearest'}); }catch(e){}
   }
-  /* Kilit önizlemedeyken açılırsa (Premium/ödüllü reklam) Premium penceresi kartın seçimini zaten
-     yaptı: önizlemeyi o içerikle kapat (Geri'ye basılırsa kart ile gerçek seçim farklı kalmasın). */
-  let kilitliIdi=false;
-  setInterval(()=>{
-    if(!acik) return;
-    try{
-      const simdi=(typeof kilitli==='function') && kilitli(tur, secId);
-      if(kilitliIdi && !simdi && !document.getElementById('premiumModal')){ kilitliIdi=false; sec(); return; }
-      kilitliIdi=simdi; bilgiYaz(); seritKilitTazele();
-    }catch(e){}
-  }, 1000);
-  function seritKilitTazele(){
-    ekran.querySelectorAll('.onzKucuk').forEach(k=>{
-      const kil=(typeof kilitli==='function') && kilitli(tur,k.dataset.id), i=k.querySelector('i');
-      if(!kil && i) i.remove();
-    });
-  }
+  // Kilit önizlemedeyken açılırsa (Premium/ödüllü reklam) yazıları ve kilit simgelerini tazele
+  setInterval(()=>{ if(acik) try{ bilgiYaz(); }catch(e){} }, 1000);
 
   /* Kartlara göz düğmesi: kart listesi değişince (kurulum, çevrimiçi) eklenir */
   function dugmeleriEkle(){

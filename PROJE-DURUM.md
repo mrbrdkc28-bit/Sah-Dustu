@@ -593,6 +593,9 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
   "Bunu seç" kartın kendi tıklamasını tetikler (premiumKapi aynen); kilitliyse "Kilidi aç" → Premium penceresi
   önizlemenin üstünde. Kilit önizlemedeyken açılırsa otomatik seçilip kapanır. Geri/Android geri: önceki seçim
   ve menü sahnesi geri yüklenir. Oyun sürerken önizleme kapalı. hamleOyna kullanılmaz (istatistik/kayıt yok).
+  Güncelleme: önizlemede ARENA | ORDU sekmeleri; tüm arena ve ordular (kilitliler dahil) gezilir, tahta ve taşlar
+  bağımsız değişir, üstte kombinasyon satırı ("Saray · Osmanlı", kilitli olanda kilit). "Bu kombinasyonu seç" ikisini
+  birden seçer; biri kilitliyse "Kilidi aç" önce onun Premium penceresini açar. Kapanışta kartlar gerçek seçimle eşitlenir.
 
 ### 8.18 Yenileme hızı, ısınma koruması, Oyun Ayarları penceresi (4 Ekim 2026)
 - 3 Ekim ısınma düzeltmesi çizimi her kademede ~60 Hz'e sabitlemişti → 120 Hz ekranda akıcılık düştü (sahibin
