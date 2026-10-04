@@ -1756,6 +1756,22 @@ html[data-tema="fildisi"] #secimSayfa .ssTamam{background:linear-gradient(135deg
   border:1px solid var(--line);background:transparent;color:var(--dim);font:500 12.5px Manrope,sans-serif;cursor:pointer}
 #cvAyarSatir b{color:var(--bone);font-weight:700}
 #cvAyarSatir .caIk svg{width:15px;height:15px;display:block}
+
+/* ===== AKICILIK (4 Ekim 2026) — telefonda ölçüldü =====
+   Oyun ekranında kare hızı 120 Hz ekranda ~60'ta kalıyordu; 3B sahne tek başına 5,5 ms (120'ye
+   yeter). Sebep: tahtanın ÜSTÜNDEKİ 14 öğenin backdrop-filter bulanıklığı — arkadaki sahne her
+   karede değiştiği için tarayıcı bulanıklığı her karede yeniden hesaplıyor (kapatınca 56→110-119).
+   Ayrıca #menu oyunda yalnız opacity:0 oluyor, görünmez katman olarak çizimde kalıyordu
+   (tam gizleyince 120-121). Bulanıklık yerine biraz daha koyu düz zemin: görünüm aynı kalır. */
+#menu.gizli{visibility:hidden;transition:opacity .5s,visibility 0s .5s}
+#menu:not(.gizli){transition:opacity .5s,visibility 0s}
+.hbtn{background:rgba(12,14,22,.74);backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+#sira{background:rgba(12,14,22,.72);backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.notSerit{background:rgba(12,14,22,.66);backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+#cevrimiciSerit{background:rgba(12,14,24,.88);backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+#son{background:rgba(6,7,11,.8);backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.karne{background:rgba(14,17,26,.72);backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+#kisaBilgi{background:rgba(12,14,22,.92);backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 </style>
 </head>
 <body>
@@ -3107,11 +3123,14 @@ let grafikKademe = (()=>{
 const KADEME={
   dusuk:{ pixelRatio:1,   golge:true,  golgeBoyut:512,  bloom:false, yansima:false, doku:true, parcacikMs:0,  hz:60 },
   orta: {  pixelRatio:1.5, golge:true,  golgeBoyut:1024, bloom:true,  yansima:false, doku:true, parcacikMs:66, hz:60 },
-  yuksek:{ pixelRatio:2,   golge:true,  golgeBoyut:2048, bloom:true,  yansima:true,  doku:true, parcacikMs:33, hz:0 },
+  yuksek:{ pixelRatio:2,   golge:true,  golgeBoyut:2048, bloom:true,  yansima:true,  doku:true, parcacikMs:1,  hz:0, surekli:true },
   /* hz: çizim üst sınırı. 0 = ekranın en yüksek yenileme hızı (120 Hz ekranda 120, 90'da 90;
      Android'den en hızlı ekran modu da istenir). 60 = en çok ~60 çizim/sn (az ısınma).
      4 Ekim 2026: 3 Ekim'deki ısınma düzeltmesi her kademeyi 60'a sabitlemişti; 120 Hz
-     ekranda akıcılık gözle görülür düştü (sahibin denemesi). Yüksek yeniden tam hız. */
+     ekranda akıcılık gözle görülür düştü (sahibin denemesi). Yüksek yeniden tam hız.
+   surekli: her karede çiz (3 Ekim öncesi davranış). Yalnız "gerekince çiz" yetmedi: boştayken
+     telefon CPU/GPU hızını düşürüyor, hareket başlayınca ilk anlar takılıyordu; parçacıklar da
+     30 adımda ilerliyordu. Isınma korumasında Yüksek, Orta gibi davranır (kareMs/isiKoruma). */
   /* parcacikMs: kül/kar/kum güncelleme aralığı. Telefonda ölçüldü (3 Ekim 2026): oyun ekranındaki
      işlemci yükünün çoğu parçacıklardan (parçacıkla ~%160-200, parçacıksız ~%78; çizim 28/sn → 2/sn).
      Yüksek aynı kalır; Orta yarı hızda; Düşük kapalı. */
@@ -3924,8 +3943,56 @@ function tasYap(t,c){
     halka.userData.tabanHalka=true;  // ölçekleme/animasyon bunu atlasın
     g.add(halka);
   }catch(e){}
+  tasParcaBirlestir(g); // aynı görünüşlü parçaları tek çizime indir (bkz. fonksiyon)
   modelDene(g,t,c); // gerçek .glb model varsa prosedüreli onunla değiştirir
   return g;
+}
+/* TAŞ PARÇALARINI BİRLEŞTİR (4 Ekim 2026)
+   Telefonda ölçüldü: prosedürel 30 taş karede 318 ayrı çizim çağrısıydı (taş başına ~10
+   parça: gövde, bilezik, taç, mazgal…). Darboğaz GPU piksel boyaması değil, çağrı sayısıydı
+   (piksel oranı/gölge/yansıma değiştirmek kare hızını oynatmıyordu; WebView GPU süreci %87).
+   Aynı malzeme ayarına sahip, alt nesnesi ve özel işareti (tabanHalka, vezirMucevher,
+   tasEtiket…) olmayan parçalar taş grubunun koordinatında tek geometride birleşir.
+   Görünüm birebir aynı. Orijinal geometriler silinmez: bazıları paylaşılan önbellek (atGeo)
+   ve henüz hiç çizilmedikleri için GPU'da yer tutmuyorlar. */
+function tasParcaBirlestir(g){
+  try{
+    const kovalar=new Map();
+    for(const ch of g.children){
+      if(!ch.isMesh || ch.children.length) continue;
+      if(ch.userData && Object.keys(ch.userData).length) continue;
+      const m=ch.material;
+      if(!m || Array.isArray(m) || m.map || m.alphaMap) continue;
+      const anahtar=[m.type, m.color?m.color.getHex():'', m.emissive?m.emissive.getHex():'', m.emissiveIntensity,
+        m.roughness, m.metalness, m.transparent, m.opacity, m.depthWrite, m.side, m.flatShading,
+        ch.castShadow, ch.receiveShadow, ch.renderOrder].join('|');
+      if(!kovalar.has(anahtar)) kovalar.set(anahtar, []);
+      kovalar.get(anahtar).push(ch);
+    }
+    for(const liste of kovalar.values()){
+      if(liste.length<2) continue;
+      const pozlar=[], normaller=[]; let toplam=0;
+      for(const ch of liste){
+        ch.updateMatrix();
+        const geo = ch.geometry.index ? ch.geometry.toNonIndexed() : ch.geometry.clone();
+        geo.applyMatrix4(ch.matrix);
+        if(!geo.attributes.normal) geo.computeVertexNormals();
+        pozlar.push(geo.attributes.position.array); normaller.push(geo.attributes.normal.array);
+        toplam+=geo.attributes.position.array.length;
+      }
+      const P=new Float32Array(toplam), N=new Float32Array(toplam); let o=0;
+      for(let i=0;i<pozlar.length;i++){ P.set(pozlar[i],o); N.set(normaller[i],o); o+=pozlar[i].length; }
+      const yeni=new THREE.BufferGeometry();
+      yeni.setAttribute('position', new THREE.BufferAttribute(P,3));
+      yeni.setAttribute('normal', new THREE.BufferAttribute(N,3));
+      yeni.computeBoundingSphere();
+      const ilk=liste[0];
+      const mesh=new THREE.Mesh(yeni, ilk.material);
+      mesh.castShadow=ilk.castShadow; mesh.receiveShadow=ilk.receiveShadow; mesh.renderOrder=ilk.renderOrder;
+      for(const ch of liste){ g.remove(ch); if(ch.material!==ilk.material) try{ ch.material.dispose(); }catch(e){} }
+      g.add(mesh);
+    }
+  }catch(e){ console.log('tasParcaBirlestir:', e); }
 }
 
 /* ---- Mini GLB çözücü: dış kütüphane gerektirmez ----
@@ -9897,6 +9964,16 @@ function cizimIste(){ cizimGerek=true; }
    Android sıcaklık durumu "orta" (2) ve üstüne çıkınca parçacıklar kapanır, çizim
    60'a iner ve ekran modu sisteme bırakılır; soğuyunca (0-1) seçili kademeye dönülür. */
 let isiKoruma=false;
+/* Tahta ekranda görünüyor mu: oyun/inceleme ekranı ya da arkasında 3B sahne görünen Buzlu Cam menüsü.
+   Diğer menülerde sahne tamamen örtülü; orada sürekli çizim boşuna ısıtır. */
+let _hudEl=null, _anEl=null;
+function tahtaGorunur(){
+  if(!_hudEl){ _hudEl=document.getElementById('hud'); _anEl=document.getElementById('analizEkran'); }
+  if(_anEl && _anEl.classList.contains('acik')) return false;
+  /* Yalnız oyun/inceleme tahtası. Buzlu Cam menüsünde kartların arkası bulanıklaştırılıyor;
+     orada her kare çizim bulanıklığı her karede yeniden hesaplatıp akıcılığı düşürür. */
+  return !!(_hudEl && _hudEl.classList.contains('acik'));
+}
 function kareMs(){ return (isiKoruma || (KADEME[grafikKademe] && KADEME[grafikKademe].hz)) ? 15.5 : 0; }
 function maksHz(){ try{ if(window.AndroidEkran && AndroidEkran.maksHz) return Math.round(AndroidEkran.maksHz()); }catch(e){} return 60; }
 function yenilemeUygula(){ try{ if(window.AndroidEkran && AndroidEkran.yenileme) AndroidEkran.yenileme(grafikKademe==='yuksek' && !isiKoruma); }catch(e){} }
@@ -9942,7 +10019,8 @@ function dongu(){
      gözle fark edilmez, ama 120 Hz ekranda her karede çizim istemeleri tahtayı
      sürekli tam yükte tutuyordu. Geçen süre biriktirilir; hız değişmez. */
   const _simdi = (typeof performance!=='undefined'?performance.now():Date.now());
-  const _pms = isiKoruma ? 0 : ((KADEME[grafikKademe] && KADEME[grafikKademe].parcacikMs!==undefined) ? KADEME[grafikKademe].parcacikMs : 33);
+  let _pms = isiKoruma ? 0 : ((KADEME[grafikKademe] && KADEME[grafikKademe].parcacikMs!==undefined) ? KADEME[grafikKademe].parcacikMs : 33);
+  if(_pms===1 && !tahtaGorunur()) _pms=33;   // her kare parçacık yalnız oyun tahtasında
   if(parcacikVar && _pms){
     if(!parcacikSys.visible){ parcacikSys.visible=true; cizimIste(); }
     _parcacikBirikim += dt;
@@ -9978,6 +10056,8 @@ function dongu(){
   }
   matDususGuncelle(ham);
 
+  // Yüksek: her karede çiz (ısınma korumasında değil)
+  if(!isiKoruma && KADEME[grafikKademe] && KADEME[grafikKademe].surekli && tahtaGorunur()) cizimGerek=true;
   /* Güvenlik ağı: gözden kaçan bir sahne değişikliği olursa ekran donmasın.
      Hareketsizken saniyede 2 kare çizilir — 60 yerine 2, yani GPU yükü ~%97 az. */
   const simdiMs = (typeof performance!=='undefined'?performance.now():Date.now());

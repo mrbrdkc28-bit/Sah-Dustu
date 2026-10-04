@@ -570,6 +570,20 @@ zamanı CSS animasyonunun startTime'ına eşlenir, dokununca susar, ses kapalıy
   Yerel emülatörde iki oyuncuyla 6 senaryo test edildi, hepsi geçti (`araclar/cevrimici-test/OKU.txt`).
   Gerçek sunucuda iki gerçek cihazla deneme kapalı testte yapılacak.
 
+### 8.19 AKICILIK: asıl sebep bulundu (4 Ekim 2026, telefonda ölçüldü)
+- 120 Hz ekranda oyun ~55-69 kare/sn'de kalıyordu. 3B sahne tek başına 5,5 ms (120'ye yeter); piksel oranı,
+  gölge, yansıma değiştirmek kare hızını OYNATMIYORDU. Çizim yokken rAF 118, çizince tam yarısı.
+- **Sebep 1 (ana):** tahtanın üstündeki 14 öğede `backdrop-filter` bulanıklığı (3 Ekim "cam düğmeler").
+  Arkadaki sahne her karede değiştiği için tarayıcı bulanıklığı her karede yeniden hesaplıyor. Kaldırıldı,
+  yerine daha koyu düz zemin (`.hbtn`, `#sira`, `.notSerit`, `#son`, `.karne`, `#kisaBilgi`…).
+  **Oyun ekranına tekrar backdrop-filter KOYMA.**
+- **Sebep 2:** `#menu.gizli` yalnız opacity:0 idi; görünmez menü (animasyonlu başlık/slogan, gölgeli kartlar)
+  oyunun üstünde çizimde kalıyordu → artık visibility:hidden (geçişten sonra).
+- Sonuç: Yüksek'te tahta dururken ve kamera dönerken 119-121 kare/sn, takılan kare 0-2.
+- Yüksek = sürekli çizim yalnız oyun tahtasında (`tahtaGorunur()`); Buzlu Cam menüsünde bulanıklık tasarımın
+  parçası olduğu için orada sürekli çizim yok, parçacıklar 30/sn.
+- Ayrıca taş parçaları aynı malzemeye göre birleştiriliyor (`tasParcaBirlestir`, 421→337 çağrı; asıl sebep değildi).
+
 ### 8.18 Yenileme hızı, ısınma koruması, Oyun Ayarları penceresi (4 Ekim 2026)
 - 3 Ekim ısınma düzeltmesi çizimi her kademede ~60 Hz'e sabitlemişti → 120 Hz ekranda akıcılık düştü (sahibin
   denemesi). Artık `KADEME[..].hz`: **Yüksek = 0 (ekranın en yükseği; 120/90)**, Orta/Düşük = 60.
