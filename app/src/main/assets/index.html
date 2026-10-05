@@ -189,6 +189,12 @@ canvas{display:block}
   background:radial-gradient(120% 90% at 50% 0%, #131726 0%, var(--ink) 62%);
   padding:0 0 24px}
 #istEkran.acik{display:flex}
+/* Arkadaşlar profil içinde (5 Ekim 2026): ana menüden kalktı, menü ekrana sığsın diye */
+#istArkadas{margin-left:auto;align-self:center;display:flex;align-items:center;gap:7px;height:40px;padding:0 15px;border-radius:20px;
+  border:1px solid var(--brass);background:rgba(185,154,91,.12);color:var(--brass);font:700 12.5px Manrope,sans-serif;letter-spacing:.04em;cursor:pointer;flex:0 0 auto}
+#istArkadas svg{width:18px;height:18px}
+#istArkadas:active{transform:scale(.96)}
+#arkadasEkran.profildenAcik{z-index:45}
 #istBaslik{display:flex;align-items:center;gap:8px;padding:18px 16px 10px}
 #istBaslik span{font-family:'Cinzel',serif;font-weight:700;letter-spacing:.14em;
   font-size:16px;color:var(--bone)}
@@ -1578,7 +1584,7 @@ html[dir="rtl"] .menuSlogan.yaz{animation-name:sloganYazRtl}
   80%{filter:blur(0)}100%{clip-path:inset(-20% 0 -20% -4%);filter:blur(0)}}
 body.azHareket .menuSlogan.yaz,body.azHareket .menuSlogan.sil{animation:none}
 /* Sözler (5 Ekim 2026): sabit yükseklikli alan (söz değişince kartlar oynamaz), yazar satırı */
-.menuSoz{width:100%;box-sizing:border-box;padding:0 6px;min-height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:2px}
+.menuSoz{width:100%;box-sizing:border-box;padding:0 6px;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:2px}
 .menuSoz .menuSlogan{max-width:100%;margin-top:0;text-wrap:balance;font-family:'SozYazi',Georgia,'Noto Serif CJK SC','Noto Serif',serif;font-weight:500;
   transform:none!important;letter-spacing:0!important;text-shadow:none}
 html:not([data-tema="fildisi"]) .menuSoz .menuSlogan{text-shadow:0 1px 8px rgba(0,0,0,.35)}
@@ -1586,6 +1592,10 @@ html:not([data-tema="fildisi"]) .menuSoz .menuSlogan{text-shadow:0 1px 8px rgba(
   transition:opacity .5s ease}
 .sozYazar.gor{opacity:.72;transition:opacity .8s ease 1.6s}
 html[lang="ar"] .sozYazar,html[lang="zh"] .sozYazar{letter-spacing:.04em;font-size:11px}
+/* Menü ekrana sığsın (5 Ekim 2026): sözler alanı eklendi, Arkadaşlar profile taşındı; boşluklar sıkıldı */
+html[data-tema] #menu .anaBaslik{margin-top:20px}
+html[data-tema] #menu .kartlar{margin-top:8px}
+html[data-tema] #menu .altSecim{margin-top:10px}
 
 /* ===== OYUN İÇİ (3 Ekim 2026): cam düğmeler, ince çizgi ikonlar, düzgün hamle yazısı ===== */
 .hbtn{border-radius:12px;background:rgba(12,14,22,.55);border-color:rgba(255,255,255,.10);
@@ -2199,6 +2209,7 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
       <div id="istPuan">800 puan</div>
       <button id="istUlke" title="Ülke seç" style="background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 0;text-align:left">🏳️ Ülke seç</button>
     </div>
+    <button id="istArkadas" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3"/><path d="M3.8 19c.6-3.2 2.6-5 5.2-5s4.6 1.8 5.2 5"/><circle cx="16.6" cy="9.3" r="2.4"/><path d="M15.8 14.2c2.4-.3 4 1.2 4.6 4.3"/></svg><span>Arkadaşlar</span></button>
   </div>
   <select id="ulkeSecici"></select>
   <div id="avatarSecici"></div>
@@ -2303,15 +2314,6 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
       <div class="kartMetin">
         <div class="kartAd">Profilim</div>
         <div class="kartAlt">İstatistikler, rozetler, geçmiş</div>
-      </div>
-      <div class="kartOk">›</div>
-    </button>
-
-    <button class="anaKart" id="arkadasKart">
-      <div class="kartIkon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3"/><path d="M3.8 19c.6-3.2 2.6-5 5.2-5s4.6 1.8 5.2 5"/><circle cx="16.6" cy="9.3" r="2.4"/><path d="M15.8 14.2c2.4-.3 4 1.2 4.6 4.3"/></svg></div>
-      <div class="kartMetin">
-        <div class="kartAd">ARKADAŞLAR</div>
-        <div class="kartAlt">Arkadaş ekle, oyuna davet et</div>
       </div>
       <div class="kartOk">›</div>
     </button>
@@ -13341,6 +13343,7 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["Doğruluğun"]={"en": "Your accuracy", "ru": "Ваша точность", "ar": "دقتك", "fr": "Ta précision", "de": "Deine Genauigkeit", "it": "La tua precisione", "zh": "你的准确率"};
   CEVM["Rakip doğruluğu"]={"en": "Opponent accuracy", "ru": "Точность соперника", "ar": "دقة الخصم", "fr": "Précision de l'adversaire", "de": "Genauigkeit Gegner", "it": "Precisione dell'avversario", "zh": "对手准确率"};
   CEVM['Diğer ayarlar']={en:'More settings',ru:'Другие настройки',ar:'إعدادات أخرى',fr:'Autres réglages',de:'Weitere Einstellungen',it:'Altre impostazioni',zh:'更多设置'};
+  CEVM['Arkadaşlar']={en:'Friends',ru:'Друзья',ar:'الأصدقاء',fr:'Amis',de:'Freunde',it:'Amici',zh:'好友'};
   CEVM['Satranç her şeydir.']={en:'Chess is everything.',ru:'Шахматы — это всё.',ar:'الشطرنج هو كل شيء.',fr:'Les échecs sont tout.',de:'Schach ist alles.',it:'Gli scacchi sono tutto.',zh:'国际象棋就是一切。'};
   CEVM['Oynat']={en:'Play',ru:'Пуск',ar:'تشغيل',fr:'Lire',de:'Abspielen',it:'Riproduci',zh:'播放'};
   CEVM['Durdur']={en:'Pause',ru:'Пауза',ar:'إيقاف',fr:'Pause',de:'Pause',it:'Pausa',zh:'暂停'};
@@ -13989,6 +13992,10 @@ window.reklamSonucu=function(etiket,durum){
     try{ arkadasOlaylariBagla(); davetOlaylariBagla(); istekBildirimBagla(); }catch(e){}
     const ak=document.getElementById('arkadasKart');
     if(ak) ak.onclick=arkadasAc;
+    /* Profildeki Arkadaşlar düğmesi: arkadaş ekranı profilin ÜSTÜNDE açılır, kapanınca profile dönülür */
+    const pa=document.getElementById('istArkadas'), ae=document.getElementById('arkadasEkran');
+    if(pa && ae){ pa.onclick=()=>{ ae.classList.add('profildenAcik'); arkadasAc(); };
+      new MutationObserver(()=>{ if(!ae.classList.contains('acik') && ae.classList.contains('profildenAcik')) ae.classList.remove('profildenAcik'); }).observe(ae,{attributes:true,attributeFilter:['class']}); }   // contains kontrolü şart: yokken remove da kayıt üretir → sonsuz döngü
   };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bagla);
   else bagla();

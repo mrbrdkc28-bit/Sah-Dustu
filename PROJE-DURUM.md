@@ -878,3 +878,8 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Söz yazı tipi (sahibin seçimi): Cormorant Garamond İtalik 500 ('SozYazi', lib/fonts, OFL) + Arapça Amiri; Çince sistem serif.
   Düz (eğiklik kaldırıldı), taban 24.5 px, text-wrap:balance, alan tam genişlik. 28 sözün hepsi telefonda en çok 2 satır.
   Not: eski 'SloganYazi' (Great Vibes) yalnız "Satranç her şeydir." harflerini içeren alt kümedir; açılış ekranında kalıyor.
+- Menü ekrana sığmıyordu (sözler alanı + yeni font: içerik 117 px uzun, kullanıcı rozeti ve alt dil/tema satırı kesiliyordu).
+  Arkadaşlar kartı ana menüden kalktı → Profil ekranında #istArkadas düğmesi (arkadaş ekranı profilin üstünde açılır, z 45,
+  kapanınca profile dönülür). Boşluklar: anaBaslik 20, kartlar 8, altSecim 10, söz alanı min 70. 6 temada scrollH = clientH.
+  DİKKAT: classList.remove yokken de "class" kaydı üretir; kendi sınıfını değiştiren MutationObserver'da contains kontrolü şart
+  (yoksa sonsuz döngü, sayfa donar — bu oturumda yaşandı ve düzeltildi).
