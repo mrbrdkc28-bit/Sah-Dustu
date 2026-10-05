@@ -854,3 +854,17 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   tepeden; deride parlaklık yakın olduğu için kırmızı-mavi farkıyla doğrulandı (a1 kahve, h1 turuncu).
 - Ölçülen ve doğru: Ahşap Turnuva, Retro, Mermer Salon, Oyma, Usta, Gül Ağacı. Oyma Tahta: kaynak (Criistinaa) düz renkli bir küp;
   kenarlarına da kare basılı, "el oyması ahşap" açıklamasını karşılamıyor — sahibe soruldu.
+
+### 8.41 Savaş sahneleri v2 + Oyma Tahta kaplaması (5 Ekim 2026)
+- Savaş sahnesi baştan yazıldı (index.html "SAVAŞ SAHNESİ EFEKTLERİ v2"): kir() yenen taşı KENDİ üçgenlerinden 16 parçaya böler
+  (malzeme/doku korunur, seker, söner); kivilcim() GPU nokta shader'ı (yumuşak, kare değil); duman() sprite bulutları; sokHalka,
+  yanikIzi (yumuşak doku), efektIsik (arenada hep var, şiddet 0 → ışık sayısı değişmez, shader yeniden derlenmez). Hepsi tween
+  ilerlemesinden dt alır (120 Hz'de hızlanmaz, ağır çekime uyar), grafik kademesine göre adet (EFK.k).
+- Sahneler mesafeye duyarlı: kale (geri tepme, namlu alevi, duman izli gülle, yay = .45+d*.15), at (çömelme, sıçrayış, toz),
+  fil (filden hedefe yay çizen büyü akımı → sarmal → taş ışıyıp süzülerek dağılır), vezir (güç toplama → çekirdek+parıltı ışın),
+  şah (göğe güç, gök kararır, dallanan tüp şimşek ×3), piyon (hamle, kıvılcım, devrilme).
+- killCam kadrajı: uzak alımda hedef ekran dışında kalıyordu (kayıtta görüldü). Kamera saldıranın arkasından/çaprazından bakar,
+  uzaklık sayısal bulunur (iki taşın tabanı/tepesi, yay tepesi, patlama alanı güvenli bölgeye girene dek). Yaw en kısa yoldan.
+- Telefonda (Yüksek): 6 sahne, kare medyan 13 ms, p95 29 ms. Flaş .32, vuruş ışığı ×.65 (ekran bembeyaz oluyordu).
+- Oyma Tahta: tahta_oyma.glb tik (açık) + gül ağacı (koyu) Poly Haven kaplamasıyla kaplandı (setler/oyma_kapla.mjs: kare başına
+  rastgele kesit, koyuda damar 90°, yanlarda ayrı izdüşüm, UV [0,1] içinde — ayrıştırıcı ClampToEdge kullanır). Yön ölçüldü (a1 koyu).
