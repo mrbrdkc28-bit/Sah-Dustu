@@ -829,3 +829,18 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   koyu karelerde damar 90°, ince birleşim çizgisi). dokular/tahta_{gul,abanoz,duman}.jpg + cerceve_*.jpg (çerçeve de ahşap).
 - YENİ alanlar: cerceveDoku (çerçeve dokusu) ve dokuTon (dokuyu çarpan renk). Sahne ışığı açık ahşabı bembeyaz yapıyordu;
   gri kısma rengi soldurdu, sıcak ton krem tuttu (telefonda denendi). Yön ölçüldü: a1 koyu, h1 açık (üçü de doğru).
+
+### 8.39 Eski orduların denetimi ve yeniden üretimi (5 Ekim 2026)
+- 11 eski ordu stüdyoda (12 taş yan yana) çizilip kaynaklarla (İndirilenler/*.glb) karşılaştırıldı. Eski boru hattı:
+  aşırı sadeleştirme (Criistinaa 878k → taş başına 4-17k; at kırıktı) ve uydurma "tepe_altin/tepe_vurgu" boyası (at/fil başında lekeler).
+- YENİDEN ÜRETİLDİ (kaynaktan, taş başına ≤60k üçgen, orijinal malzeme): gercek3 (Criistinaa; kaynakta tek at/kale ve iki açık fil
+  var → karşı renk malzemesiyle), gercek4 (cmzw), gercek6 (Verfassen), gercek7 (3DVISIONROSCA; renk elle: kaynak düz beyaz;
+  şah 3 iç içe kabuktur, üçü birlikte), retropc (dark_igorek), sade (duck123acb), lowpoly (Bharad). gercek5: kaynak bulunamadı
+  (yazar bilgisi yok — LİSANS AÇIĞI, kaynağı bulunmalı), yalnız sahte altın kaldırıldı. c2: kaynakta tek takım var, renkli
+  taraflar eskiden üretilmişti; dokunulmadı.
+- ARAÇ: scratchpad setler/sec.mjs (düğüm adıyla seçim, "m" malzeme, "renk", "don"), kucult.mjs + denet/gonder.sh + izgara.js
+  (kaynağı telefonda parça parça numaralı çizdirme), denet/dizi_sablon.js (stüdyo dizisi; dokular yüklenmeden çizmesin diye 2.5 sn bekler —
+  son yüklenen taş siyah görünüyordu, yanlış alarm verdi).
+- glbCoz artık emissiveTexture + KHR_materials_emissive_strength okur: Retro Piksel taşları düz beyaz parlıyordu (siyah şah beyazdı).
+- At yönü ölçüldü (yan yana görüntü): lowpoly 0, retropc PI, gercek5 -PI/2; gercek5_n_b ve sade_n_b dosyaları 180° çevrildi
+  (siyah at beyazla aynı yöne bakıyordu). Ordu önizlemeleri yeniden çekildi. APK ~96 MB.

@@ -4586,6 +4586,10 @@ function glbCoz(buf){
     if(p.baseColorTexture && json.textures) mat.map=doku(p.baseColorTexture.index);
     if(m.emissiveFactor) mat.emissive=new THREE.Color(
       m.emissiveFactor[0],m.emissiveFactor[1],m.emissiveFactor[2]);
+    /* Işık yayan doku (5 Ekim 2026): okunmuyordu; emissiveFactor 1 olan malzemeler (Retro Piksel) dokusuz
+       düz beyaz parlıyordu — siyah şah bembeyaz görünüyordu. Doku + KHR_materials_emissive_strength okunur. */
+    if(m.emissiveTexture && json.textures) mat.emissiveMap=doku(m.emissiveTexture.index);
+    if(m.extensions && m.extensions.KHR_materials_emissive_strength) mat.emissiveIntensity=m.extensions.KHR_materials_emissive_strength.emissiveStrength;
     return mat;
   }
   function meshYap(mi){
@@ -4646,7 +4650,7 @@ function modelDene(g,t,c){
     // At yönü: SETE ÖZEL (her modelin doğal baş ekseni farklı — kütle analiziyle bulundu).
     // Hedef: beyaz at beyazın SOLUNA (-X) bakar (diyagram geleneği), siyah aynalı.
     if(t==='n'){
-      const A={gercek3:0, gercek4:Math.PI, gercek5:Math.PI/2, gercek6:-Math.PI/2, gercek7:-Math.PI/2, retropc:0, c2:-Math.PI/2, metal:Math.PI, lowpoly:-Math.PI/2, sade:-Math.PI/2, scifi:-Math.PI/2,
+      const A={gercek3:0, gercek4:Math.PI, gercek5:-Math.PI/2, gercek6:-Math.PI/2, gercek7:-Math.PI/2, retropc:Math.PI, c2:-Math.PI/2, metal:Math.PI, lowpoly:0, sade:-Math.PI/2, scifi:-Math.PI/2,
         lewis:Math.PI/2, samuray:Math.PI, gercektam:Math.PI/2, klasikset:-Math.PI/2, cizgi:Math.PI, camtas:-Math.PI/2, yanez:Math.PI, mermer:Math.PI}[aktifOrdu.id];
       const taban=(A!==undefined)?A:Math.PI/2;
       m.rotation.y = c==='w' ? taban : taban+Math.PI;
