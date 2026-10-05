@@ -875,3 +875,6 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Aynı el yazısı/renk döngüsü; altında yazar (büyük harf dönüşümü YOK: Türkçe kural "FİSCHER" yapıyordu). Uzunluğa göre yazı
   24→~15 px, alan min-height 84px (kartlar oynamaz), süre max(10 sn, 4.5 sn + 85 ms/harf), karışık sıra. Dil değişince aynı söz yeni dilde.
   window.sozGoster(k) deneme içindir. Açılış ekranındaki "Satranç her şeydir." aynen kaldı.
+- Söz yazı tipi (sahibin seçimi): Cormorant Garamond İtalik 500 ('SozYazi', lib/fonts, OFL) + Arapça Amiri; Çince sistem serif.
+  Düz (eğiklik kaldırıldı), taban 24.5 px, text-wrap:balance, alan tam genişlik. 28 sözün hepsi telefonda en çok 2 satır.
+  Not: eski 'SloganYazi' (Great Vibes) yalnız "Satranç her şeydir." harflerini içeren alt kümedir; açılış ekranında kalıyor.

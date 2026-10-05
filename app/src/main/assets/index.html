@@ -1578,10 +1578,12 @@ html[dir="rtl"] .menuSlogan.yaz{animation-name:sloganYazRtl}
   80%{filter:blur(0)}100%{clip-path:inset(-20% 0 -20% -4%);filter:blur(0)}}
 body.azHareket .menuSlogan.yaz,body.azHareket .menuSlogan.sil{animation:none}
 /* Sözler (5 Ekim 2026): sabit yükseklikli alan (söz değişince kartlar oynamaz), yazar satırı */
-.menuSoz{min-height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:2px}
-.menuSoz .menuSlogan{max-width:94%;margin-top:0}
+.menuSoz{width:100%;box-sizing:border-box;padding:0 6px;min-height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:2px}
+.menuSoz .menuSlogan{max-width:100%;margin-top:0;text-wrap:balance;font-family:'SozYazi',Georgia,'Noto Serif CJK SC','Noto Serif',serif;font-weight:500;
+  transform:none!important;letter-spacing:0!important;text-shadow:none}
+html:not([data-tema="fildisi"]) .menuSoz .menuSlogan{text-shadow:0 1px 8px rgba(0,0,0,.35)}
 .sozYazar{font:600 11.5px Manrope,sans-serif;letter-spacing:.06em;margin-top:6px;opacity:0;
-  transform:rotate(-3deg);transition:opacity .5s ease}
+  transition:opacity .5s ease}
 .sozYazar.gor{opacity:.72;transition:opacity .8s ease 1.6s}
 html[lang="ar"] .sozYazar,html[lang="zh"] .sozYazar{letter-spacing:.04em;font-size:11px}
 
@@ -2373,7 +2375,7 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
 
     <h3 style="font-family:'Cinzel',Georgia,serif;color:#E8E2D2;margin:26px 0 10px;letter-spacing:.06em;font-size:15px">Yazı Tipleri</h3>
     <p>Aşağıdaki yazı tipleri <b>SIL Open Font License 1.1</b> ile kullanılmıştır; lisans metinleri uygulama paketinde (lib/fonts) yer alır.</p>
-    <p><b>Cinzel</b> — © 2020 The Cinzel Project Authors<br><b>Manrope</b> — © 2019 The Manrope Project Authors<br><b>Great Vibes</b> — © 2015 The Great Vibes Pro Project Authors<br><b>Aref Ruqaa</b> — © 2015-2020 The Aref Ruqaa Project Authors<br><b>Ma Shan Zheng</b> — © 2018 The Ma Shan Zheng Project Authors</p>
+    <p><b>Cinzel</b> — © 2020 The Cinzel Project Authors<br><b>Manrope</b> — © 2019 The Manrope Project Authors<br><b>Great Vibes</b> — © 2015 The Great Vibes Pro Project Authors<br><b>Cormorant Garamond</b> — © 2015 The Cormorant Project Authors<br><b>Amiri</b> — © 2010-2022 The Amiri Project Authors<br><b>Aref Ruqaa</b> — © 2015-2020 The Aref Ruqaa Project Authors<br><b>Ma Shan Zheng</b> — © 2018 The Ma Shan Zheng Project Authors</p>
 
     <h3 style="font-family:'Cinzel',Georgia,serif;color:#E8E2D2;margin:26px 0 10px;letter-spacing:.06em;font-size:15px">Ses efektleri</h3>
     <p>Ordu ses paketindeki kayıtlar <b>Kenney.nl</b> ("RPG Audio", "Impact Sounds") ve <b>BigSoundBank.com</b> arşivlerinden alınmıştır; hepsi CC0 kamu malıdır. Ahşap paket ve hamle sesi oyunun içinde üretilir. Teşekkürler.</p>
@@ -16238,7 +16240,7 @@ const SOZLER=[
     an=sira.shift(); return SOZLER[an];
   }
   function boyut(s,d){
-    const L=s.length*(d==='zh'?2.1:d==='ar'?1.1:1), taban=d==='zh'?20:d==='ar'?22:d==='ru'?23:24;
+    const L=s.length*(d==='zh'?2.1:d==='ar'?1.1:1), taban=d==='zh'?20:d==='ar'?23:24.5;   // Cormorant: kısa söz tek satıra sığsın (26'da taşıyordu)
     const k=L<=34?1:L<=60?.86:L<=95?.74:.64;
     return Math.round(taban*k);
   }
