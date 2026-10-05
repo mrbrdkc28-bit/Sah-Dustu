@@ -823,3 +823,9 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Paketler artık 5: Klasik, Ahşap, Ordu, Gerçek (gerçek tahta kayıtları), Savaş (nal/kılıç/zırh/taş/davul). Gerçek ve Savaş,
   kütüphanenin tarifidir (PAKET_TARIF, "anahtar:gecikme:kazanç + …"; yemede iki vuruş). TS.ozel değeri 'kt_nal_03' de olabilir.
 - Taş sesleri sayfasında hücreye dokununca seçim görünümü açılır: 5 paket + 59 numaralı düğme; dokun = seç ve dinle.
+
+### 8.38 Kakma tahtalar: Gül Ağacı, Meşe ve Abanoz, Duman (5 Ekim 2026)
+- Poly Haven CC0 ahşap kaplamaları (1k diffuse) kare kare dizildi: scratchpad ph/kakma.py (her kare dokunun rastgele yerinden,
+  koyu karelerde damar 90°, ince birleşim çizgisi). dokular/tahta_{gul,abanoz,duman}.jpg + cerceve_*.jpg (çerçeve de ahşap).
+- YENİ alanlar: cerceveDoku (çerçeve dokusu) ve dokuTon (dokuyu çarpan renk). Sahne ışığı açık ahşabı bembeyaz yapıyordu;
+  gri kısma rengi soldurdu, sıcak ton krem tuttu (telefonda denendi). Yön ölçüldü: a1 koyu, h1 açık (üçü de doğru).

@@ -3518,6 +3518,27 @@ const ARENALAR = [
     aksan:'#B8B4A8', parcacik:'yildiz', acikTas:0xEDEDEA, koyuTas:0x3E3E42,
     tahtaGLB:'models/tahta_mermer.glb', tahtaDon:0, grad:'linear-gradient(160deg,#2C2C30,#0F0F11 72%)',
     kareAcik:0xE2E2E0, kareKoyu:0x202022},
+  /* 5 Ekim 2026: kakma tahtalar — Poly Haven CC0 ahşap kaplamalarından kare kare dizildi (scratchpad ph/kakma.py).
+     cerceveDoku: çerçeve de aynı ahşaptan. dokuTon: dokuyu çarpan renk — sahne ışığı açık ahşabı bembeyaz yapıyordu
+     (telefonda denendi: gri kısma rengi soldurur, sıcak ton akçaağacı krem tutar). */
+  { id:'gulmasa', ad:'Gül Ağacı', desc:'Akçaağaç ve gül ağacı kakma turnuva tahtası.',
+    gok:0x15100C, sis:0x1E1712, sisYog:0.012, zemin:0x1A130E,
+    acikKare:0xE3D3B7, koyuKare:0x75340E, isik:0xFFF0DC, ortam:0x8A7660,
+    aksan:'#C98A4E', parcacik:'yildiz', acikTas:0xF0E6D4, koyuTas:0x4A2A1A,
+    tahtaDoku:'dokular/tahta_gul.jpg', cerceveDoku:'dokular/cerceve_gul.jpg', dokuTon:[.42,.3,.19], grad:'linear-gradient(160deg,#3E2416,#140B06 72%)',
+    kareAcik:0xE3D3B7, kareKoyu:0x75340E},
+  { id:'abanozmasa', ad:'Meşe ve Abanoz', desc:'Bal rengi meşe, koyu abanoz. Ağır, sıcak bir tahta.',
+    gok:0x120E0A, sis:0x1A1510, sisYog:0.012, zemin:0x16110C,
+    acikKare:0xB0875B, koyuKare:0x2B190C, isik:0xFFEDD4, ortam:0x84705A,
+    aksan:'#B88A50', parcacik:'yildiz', acikTas:0xEADCC4, koyuTas:0x3E2E22,
+    tahtaDoku:'dokular/tahta_abanoz.jpg', cerceveDoku:'dokular/cerceve_abanoz.jpg', dokuTon:[.5,.4,.3], grad:'linear-gradient(160deg,#36261A,#100B07 72%)',
+    kareAcik:0xB0875B, kareKoyu:0x2B190C},
+  { id:'dumanmasa', ad:'Duman', desc:'Desenli açık ceviz ve füme kaplama. Modern ve sakin.',
+    gok:0x111112, sis:0x19191B, sisYog:0.012, zemin:0x141415,
+    acikKare:0xCBA88A, koyuKare:0x35312E, isik:0xF8F2EA, ortam:0x86807A,
+    aksan:'#BFA58A', parcacik:'yildiz', acikTas:0xEEE6DC, koyuTas:0x3A3836,
+    tahtaDoku:'dokular/tahta_duman.jpg', cerceveDoku:'dokular/cerceve_duman.jpg', dokuTon:[.42,.38,.34], grad:'linear-gradient(160deg,#2E2B28,#0E0D0C 72%)',
+    kareAcik:0xCBA88A, kareKoyu:0x35312E},
 ];
 
 let scene, camera, renderer, saat;
@@ -3850,6 +3871,7 @@ function tahtaYap(a){
     }
     tex.colorSpace=THREE.SRGBColorSpace;
     const tahtaMat=new THREE.MeshStandardMaterial({map:tex, roughness:.65, metalness:.05});
+    if(a.dokuTon) tahtaMat.color.setRGB(a.dokuTon[0],a.dokuTon[1],a.dokuTon[2]);
     tahtaMat.userData={paylasilanDoku:true};   // önbellekteki doku dispose edilmesin
     const kalin=0.22;
     const tahta=new THREE.Mesh(new THREE.BoxGeometry(8.0,kalin,8.0), tahtaMat);
@@ -3857,8 +3879,16 @@ function tahtaYap(a){
     tahta.receiveShadow=true;
     tahtaGrup.add(tahta);
     // Ahşap çerçeve
-    const cer=new THREE.Mesh(new THREE.BoxGeometry(8.8,0.3,8.8),
-      new THREE.MeshStandardMaterial({color:0x3A2A1C, roughness:.8, metalness:.1}));
+    let cerMat;
+    if(a.cerceveDoku){
+      let ct=globalThis._tahtaDokuOnbellek[a.cerceveDoku];
+      if(!ct){ ct=new THREE.TextureLoader().load(a.cerceveDoku); ct.userData=ct.userData||{}; ct.userData.paylasilanDoku=true;
+        globalThis._tahtaDokuOnbellek[a.cerceveDoku]=ct; }
+      ct.colorSpace=THREE.SRGBColorSpace;
+      cerMat=new THREE.MeshStandardMaterial({map:ct, roughness:.6, metalness:.05}); cerMat.userData={paylasilanDoku:true};
+      if(a.dokuTon) cerMat.color.setRGB(a.dokuTon[0]*.8,a.dokuTon[1]*.8,a.dokuTon[2]*.8);
+    } else cerMat=new THREE.MeshStandardMaterial({color:0x3A2A1C, roughness:.8, metalness:.1});
+    const cer=new THREE.Mesh(new THREE.BoxGeometry(8.8,0.3,8.8), cerMat);
     cer.position.y=-0.2; cer.receiveShadow=true; tahtaGrup.add(cer);
     koordinatlarEkle(tahtaGrup, a.aksan || '#C8A870', 0.012);
     scene.add(tahtaGrup);

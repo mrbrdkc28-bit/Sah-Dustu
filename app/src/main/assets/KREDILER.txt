@@ -106,3 +106,6 @@ Firebase JavaScript SDK 10.12.2 (app, auth, firestore — compat)
 Cinzel (Natanael Gama) ve Manrope (Mikhail Sharanda) yazı tipleri
   Lisans: SIL Open Font License 1.1 — lib/fonts/*-OFL.txt
   Kaynak: https://fonts.google.com (dosyalar @fontsource paketlerinden)
+
+Kakma tahtalar (Gül Ağacı, Meşe ve Abanoz, Duman): Poly Haven (polyhaven.com) CC0 dokuları — white_maple_veneer,
+rosewood_veneer1, oak_veneer_01, lacquered_cherry_wood, smoked_walnut_veneer, flamed_black_veneer. Kareler bu dokulardan dizildi.
