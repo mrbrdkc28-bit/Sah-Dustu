@@ -870,7 +870,7 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   rastgele kesit, koyuda damar 90°, yanlarda ayrı izdüşüm, UV [0,1] içinde — ayrıştırıcı ClampToEdge kullanır). Yön ölçüldü (a1 koyu).
 
 ### 8.42 Menü sözleri (5 Ekim 2026)
-- "Satranç her şeydir." yerine dönen sözler (index.html SOZLER/SOZ_YAZAR, 17 söz, 8 dil): Fischer, Philidor, Lasker, Tartakower ×2,
+- "Satranç her şeydir." yerine dönen sözler (index.html SOZLER/SOZ_YAZAR, 28 söz, 8 dil; 2. turda +11: Fischer, Steinitz, Tarrasch, Capablanca, Lasker, Tal, Alekhine, Tartakower, Franklin, Sun Tzu ×2 — Kasparov sahibin isteğiyle alınmadı; süre en az 15 sn, menüye her dönüşte yeni söz): Fischer, Philidor, Lasker, Tartakower ×2,
   Nimzowitsch, Chernev, Capablanca, Tarrasch, Tal, Goethe, Hint ve İtalyan atasözü, Sun Tzu ×2, Franklin. Kaynağı şüpheli sözler alınmadı.
 - Aynı el yazısı/renk döngüsü; altında yazar (büyük harf dönüşümü YOK: Türkçe kural "FİSCHER" yapıyordu). Uzunluğa göre yazı
   24→~15 px, alan min-height 84px (kartlar oynamaz), süre max(10 sn, 4.5 sn + 85 ms/harf), karışık sıra. Dil değişince aynı söz yeni dilde.
