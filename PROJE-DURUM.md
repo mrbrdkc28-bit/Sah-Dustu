@@ -883,3 +883,13 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   kapanınca profile dönülür). Boşluklar: anaBaslik 20, kartlar 8, altSecim 10, söz alanı min 70. 6 temada scrollH = clientH.
   DİKKAT: classList.remove yokken de "class" kaydı üretir; kendi sınıfını değiştiren MutationObserver'da contains kontrolü şart
   (yoksa sonsuz döngü, sayfa donar — bu oturumda yaşandı ve düzeltildi).
+
+### 8.43 Sinematik açılış (5 Ekim 2026)
+- Klasik açılış (taşlar + boya + logo) aynen oynar; ardından (index.html, #acilisPerde'nin hemen altındaki betik): taş sırası ve logo
+  yukarı süzülür, tahtanın (dokular/tahta_abanoz.jpg) iki yarısı üstten/alttan gelip ortada çarpışır — tuvalde kızgın kırık dikiş,
+  kıvılcım, kor, şok halkası, sarsıntı, flaş, gümbürtü (WebAudio). Siyah şah h8'e, sonra renkli taşlar sıradaki yerlerinden yay
+  çizerek: piyon h6, at f5, fil f8, kale g1, şah e3, vezir g7 = MAT (vezir f8/h6/f5/g1'den korunur; ön pozisyon yasal). Şah kızarıp
+  devrilir, "ŞAH MAT" (8 dil) belirir, perde kalkar. Toplam ~10.5 sn, dokununca atlanır.
+- Ayarlar › "Açılış animasyonu": Sinematik (varsayılan) / Klasik (localStorage.acilisTur). Hareket azaltma açıksa klasik.
+- window.ACILIS_MS / ACILIS_KURULUM_MS: 3B ağır kurulum mat sonrası durgun ana alındı (animasyon takılmasın).
+  Giriş/menü açılışı artık perdeBittiginde(fn) ile perdenin kapanmasına bağlı (sabit 5.8 sn değil; dokununca hemen açılır).

@@ -2178,6 +2178,34 @@ html[data-tema="fildisi"] #secimSayfa .tsIpucu,html[data-tema="fildisi"] #secimS
 html[data-tema="fildisi"] #secimSayfa .tsHucre.ozel,html[data-tema="fildisi"] #secimSayfa .tsPaket.yari{border-color:#B07E22;box-shadow:inset 0 0 0 1px #B07E22;color:#8a5f14}
 html[data-tema="fildisi"] #secimSayfa .tsSecBaslik{color:#2b261d}
 html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #secimSayfa .tsPaket.secili{background:linear-gradient(135deg,#F2C765,#C9912A);color:#1a1408;border-color:transparent}
+
+/* ===== SİNEMATİK AÇILIŞ (5 Ekim 2026) ===== */
+#acilisPerde.sinematik{animation:none}
+#acilisPerde.kalk{transition:opacity .8s ease;opacity:0}
+#acSahne{position:absolute;inset:0;pointer-events:none}
+#acTahta{position:absolute;opacity:0}
+#acTahta.gor{opacity:1}
+.acYari{position:absolute;left:0;width:100%;height:50%;background:url(dokular/tahta_abanoz.jpg) no-repeat;background-size:100% 200%;
+  box-shadow:0 18px 40px rgba(0,0,0,.55);will-change:transform}
+.acUst{top:0;background-position:0 0}
+.acAlt{bottom:0;background-position:0 100%}
+.acYari::before{content:'';position:absolute;pointer-events:none;border:8px solid #3a2414;box-shadow:inset 0 0 0 1px rgba(232,182,76,.35),0 0 0 1px rgba(0,0,0,.5)}
+.acUst::before{inset:-8px -8px 0 -8px;border-bottom:none;border-radius:7px 7px 0 0}
+.acAlt::before{inset:0 -8px -8px -8px;border-top:none;border-radius:0 0 7px 7px}
+#acTuval{position:absolute;left:0;top:0}
+#acFlas{position:absolute;inset:0;background:#fff3dc;opacity:0}
+#acMat{position:absolute;left:0;right:0;text-align:center;font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:clamp(18px,5vw,26px);
+  letter-spacing:.38em;color:#E8B64C;opacity:0;text-shadow:0 0 18px rgba(232,120,40,.45)}
+#acMat.gor{animation:logoBel .9s ease forwards}
+#acSahne .aT{position:absolute;line-height:1;display:block;text-align:center;
+  font-size:clamp(30px,9vw,58px);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--renk) 78%,#fff) 0%,var(--renk) 62%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;
+  filter:drop-shadow(0 0 1.4px rgba(255,248,230,.75)) drop-shadow(0 3px 3px rgba(0,0,0,.55));animation:none;opacity:1}
+#acSahne .aT::before,#acSahne .aT::after{display:none}
+#acSahne .acSiyah{--renk:#2a2a2e;background:linear-gradient(180deg,#5a5a62 0%,#141416 70%);-webkit-background-clip:text;background-clip:text;
+  transform-origin:50% 88%;filter:drop-shadow(0 0 1px #f4ead6) drop-shadow(0 0 2.5px rgba(244,234,214,.85)) drop-shadow(0 3px 3px rgba(0,0,0,.6))}
+#acSahne .acSiyah.matOldu{filter:drop-shadow(0 0 2px rgba(255,90,70,.95)) drop-shadow(0 0 10px rgba(255,40,30,.8)) drop-shadow(0 3px 3px rgba(0,0,0,.6))}
 </style>
 </head>
 <body>
@@ -2196,6 +2224,158 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
   </div>
   <div id="acilisLogo">CHESS<span>64</span></div>
 </div>
+<script>
+/* =====================================================================
+   SİNEMATİK AÇILIŞ (5 Ekim 2026, sahibin isteği). Klasik açılış (taşlar + boya + logo) aynen oynar;
+   bitince tahtanın iki yarısı üstten ve alttan gelip ortada kızgın, kıvılcımlı bir dikişle birleşir,
+   renkli taşlar sırayla tahtaya düşüp gerçek bir MAT kurar (siyah Şh8; Vg7#: Ff8, h6 piyonu, Af5 ve Kg1 korur).
+   Ayar: localStorage.acilisTur = 'sinematik' (varsayılan) | 'klasik'. Dokununca atlanır.
+   Zamanlama dışarıya: window.ACILIS_MS (perde kapanışı), window.ACILIS_KURULUM_MS (3B kurulum —
+   mat sonrası durgun anda yapılır, animasyon takılmasın). Giriş/menü açılışı perdenin KAPANMASINA bağlıdır.
+   ===================================================================== */
+(function(){
+  let tur='sinematik';
+  try{ tur=localStorage.getItem('acilisTur')||'sinematik'; }catch(e){}
+  const azHareket = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const perde=document.getElementById('acilisPerde');
+  window.ACILIS_MS=5800; window.ACILIS_KURULUM_MS=4250;
+  if(!perde || tur!=='sinematik' || azHareket) return;
+  perde.classList.add('sinematik');
+  const T0=4300, T1=T0+780, TSAH=T1+620, TTAS=TSAH+520, ARA=270, TVEZ=TTAS+5*ARA+330, TMAT=TVEZ+430, TSON=TMAT+1800;
+  window.ACILIS_MS=TSON+800; window.ACILIS_KURULUM_MS=TMAT+300;
+
+  const sesVar=(()=>{ try{ return localStorage.getItem('sesKapali')!=='1'; }catch(e){ return true; } })();
+  let ses=null;
+  function sesKur(){ if(ses||!sesVar) return ses; try{ const AC=window.AudioContext||window.webkitAudioContext; ses=new AC(); if(ses.state==='suspended') ses.resume(); }catch(e){ ses=null; } return ses; }
+  function gurultu(c,sure){ const b=c.createBuffer(1,Math.floor(c.sampleRate*sure),c.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; const s=c.createBufferSource(); s.buffer=b; return s; }
+  function gumbur(guc){ const c=sesKur(); if(!c) return; const t=c.currentTime;
+    const o=c.createOscillator(), g=c.createGain(); o.type='sine'; o.frequency.setValueAtTime(70,t); o.frequency.exponentialRampToValueAtTime(32,t+.6);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.9*guc,t+.012); g.gain.exponentialRampToValueAtTime(.0001,t+.9); o.connect(g).connect(c.destination); o.start(t); o.stop(t+1);
+    const n=gurultu(c,.7), f=c.createBiquadFilter(), gn=c.createGain(); f.type='lowpass'; f.frequency.setValueAtTime(1800,t); f.frequency.exponentialRampToValueAtTime(140,t+.6);
+    gn.gain.setValueAtTime(.55*guc,t); gn.gain.exponentialRampToValueAtTime(.0001,t+.7); n.connect(f).connect(gn).connect(c.destination); n.start(t); }
+  function tok(perde_){ const c=sesKur(); if(!c) return; const t=c.currentTime;
+    const o=c.createOscillator(), g=c.createGain(); o.type='sine'; o.frequency.setValueAtTime(240*perde_,t); o.frequency.exponentialRampToValueAtTime(110*perde_,t+.08);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.35,t+.004); g.gain.exponentialRampToValueAtTime(.0001,t+.22); o.connect(g).connect(c.destination); o.start(t); o.stop(t+.25);
+    const n=gurultu(c,.05), f=c.createBiquadFilter(), gn=c.createGain(); f.type='bandpass'; f.frequency.value=2600; gn.gain.setValueAtTime(.25,t); gn.gain.exponentialRampToValueAtTime(.0001,t+.04); n.connect(f).connect(gn).connect(c.destination); n.start(t); }
+  function akor(){ const c=sesKur(); if(!c) return; const t=c.currentTime;
+    [196,246.9,293.7,392].forEach((fr,i)=>{ const o=c.createOscillator(), g=c.createGain(); o.type='triangle'; o.frequency.value=fr;
+      g.gain.setValueAtTime(.0001,t+i*.05); g.gain.exponentialRampToValueAtTime(.12,t+i*.05+.04); g.gain.exponentialRampToValueAtTime(.0001,t+2.2); o.connect(g).connect(c.destination); o.start(t+i*.05); o.stop(t+2.3); }); }
+
+  /* --- sahne iskeleti --- */
+  const sahne=document.createElement('div'); sahne.id='acSahne';
+  sahne.innerHTML='<div id="acTahta"><div class="acYari acUst"></div><div class="acYari acAlt"></div></div><div id="acMat"></div><canvas id="acTuval"></canvas><div id="acFlas"></div>';
+  perde.appendChild(sahne);
+  const tahta=sahne.querySelector('#acTahta'), ust=sahne.querySelector('.acUst'), alt=sahne.querySelector('.acAlt');
+  const tuval=sahne.querySelector('#acTuval'), cx=tuval.getContext('2d'), flasEl=sahne.querySelector('#acFlas'), matEl=sahne.querySelector('#acMat');
+  let W=0,H=0,DPR=1,B=0,TX=0,TY=0;
+  function olc(){ W=innerWidth; H=innerHeight; DPR=Math.min(2,window.devicePixelRatio||1);
+    tuval.width=W*DPR; tuval.height=H*DPR; tuval.style.width=W+'px'; tuval.style.height=H+'px'; cx.setTransform(DPR,0,0,DPR,0,0);
+    B=Math.round(Math.min(W*.86, H*.46, 400)); TX=Math.round((W-B)/2); TY=Math.round(H*.43);
+    if(TY+B>H-40) TY=Math.max(H*.3,H-40-B);
+    tahta.style.cssText='left:'+TX+'px;top:'+TY+'px;width:'+B+'px;height:'+B+'px'; matEl.style.top=(TY+B+18)+'px'; }
+  olc();
+  const kare=(sq)=>{ const f=sq.charCodeAt(0)-97, r=+sq[1]; const s=B/8; return {x:TX+(f+.5)*s, y:TY+(8-r+.5)*s, s}; };
+
+  /* --- tuval efektleri --- */
+  const P=[]; let dikis=null, sok=null, matParilti=0, aktif=true;
+  function dikisKur(){ const y=TY+B/2, n=Math.max(14,Math.round(B/14)), pts=[];
+    for(let i=0;i<=n;i++){ pts.push([TX+B*i/n, y+(i===0||i===n?0:(Math.random()-.5)*9)]); }
+    const dal=[]; for(let k=0;k<7;k++){ const i=1+Math.floor(Math.random()*(n-1)), yon=Math.random()<.5?-1:1; let x=pts[i][0], yy=pts[i][1]; const d=[[x,yy]];
+      for(let j=0;j<3+Math.floor(Math.random()*3);j++){ x+=(Math.random()-.5)*16; yy+=yon*(6+Math.random()*12); d.push([x,yy]); } dal.push(d); }
+    dikis={pts,dal,t:0}; }
+  function kivilcimSac(x,y,adet,yayX,renk){ for(let i=0;i<adet;i++){ const a=Math.random()*Math.PI*2, h=60+Math.random()*420;
+      P.push({x:x+(Math.random()-.5)*yayX, y, vx:Math.cos(a)*h, vy:Math.sin(a)*h-120, om:.35+Math.random()*.75, t:0, tur:'k', r:renk||(Math.random()<.5?'255,170,60':'255,225,140')}); } }
+  function kor(x,y,adet,yayX){ for(let i=0;i<adet;i++) P.push({x:x+(Math.random()-.5)*yayX, y:y+(Math.random()-.5)*10, vx:(Math.random()-.5)*20, vy:-20-Math.random()*45, om:1.2+Math.random()*1.4, t:0, tur:'o'}); }
+  function toz(x,y,renk){ for(let i=0;i<16;i++){ const a=Math.PI+Math.random()*Math.PI, h=30+Math.random()*90; P.push({x, y, vx:Math.cos(a)*h, vy:Math.sin(a)*h*.35, om:.45+Math.random()*.4, t:0, tur:'t', r:renk}); } }
+  let son=performance.now();
+  function cizim(){
+    if(!aktif) return;
+    if(perde.classList.contains('bitti')){ durdur(); return; }
+    const sim=performance.now(), dt=Math.min(.05,(sim-son)/1000); son=sim;
+    cx.clearRect(0,0,W,H);
+    if(dikis){ dikis.t+=dt; const k=dikis.t, sic=Math.max(0,1-k/1.5);
+      const yol=(pts)=>{ cx.beginPath(); cx.moveTo(pts[0][0],pts[0][1]); for(let i=1;i<pts.length;i++) cx.lineTo(pts[i][0],pts[i][1]); };
+      cx.lineCap='round'; cx.lineJoin='round';
+      cx.strokeStyle='rgba(12,6,3,.55)'; cx.lineWidth=2.2; yol(dikis.pts); cx.stroke(); dikis.dal.forEach(d=>{ cx.lineWidth=1.2; yol(d); cx.stroke(); });
+      if(sic>0){ cx.globalCompositeOperation='lighter';
+        [[16,'255,90,20',.28],[7,'255,150,40',.6],[2.6,'255,230,170',1]].forEach(([lw,rgb,a])=>{ cx.strokeStyle='rgba('+rgb+','+(a*sic)+')'; cx.lineWidth=lw*(.6+.4*sic); yol(dikis.pts); cx.stroke();
+          cx.lineWidth=lw*.45*(.6+.4*sic); dikis.dal.forEach(d=>{ yol(d); cx.stroke(); }); });
+        cx.globalCompositeOperation='source-over'; } }
+    if(sok){ sok.t+=dt; const k=sok.t/.75; if(k>=1) sok=null; else { cx.globalCompositeOperation='lighter'; cx.strokeStyle='rgba(255,170,80,'+(.55*(1-k))+')'; cx.lineWidth=6*(1-k)+1;
+      cx.beginPath(); cx.ellipse(sok.x,sok.y,sok.r*k,sok.r*k*.42,0,0,Math.PI*2); cx.stroke(); cx.globalCompositeOperation='source-over'; } }
+    if(matParilti>0){ const s=kare('h8'), pul=.6+.4*Math.sin(sim/110);
+      const g=cx.createRadialGradient(s.x,s.y,2,s.x,s.y,s.s*1.15); g.addColorStop(0,'rgba(255,50,30,'+(.5*matParilti*pul)+')'); g.addColorStop(.55,'rgba(255,40,30,'+(.18*matParilti*pul)+')'); g.addColorStop(1,'rgba(255,40,30,0)');
+      cx.fillStyle=g; cx.beginPath(); cx.arc(s.x,s.y,s.s*1.15,0,7); cx.fill(); }
+    cx.globalCompositeOperation='lighter';
+    for(let i=P.length-1;i>=0;i--){ const p=P[i]; p.t+=dt; if(p.t>=p.om){ P.splice(i,1); continue; } const a=1-p.t/p.om;
+      if(p.tur==='k'){ p.vy+=650*dt; p.vx*=Math.exp(-1.2*dt); const x0=p.x, y0=p.y; p.x+=p.vx*dt; p.y+=p.vy*dt;
+        cx.strokeStyle='rgba('+p.r+','+a+')'; cx.lineWidth=1.6; cx.beginPath(); cx.moveTo(x0-p.vx*.018,y0-p.vy*.018); cx.lineTo(p.x,p.y); cx.stroke(); }
+      else if(p.tur==='o'){ p.x+=p.vx*dt+Math.sin(p.t*7+i)*.3; p.y+=p.vy*dt; const r=1.4+1.2*a; cx.fillStyle='rgba(255,'+(120+Math.round(80*a))+',40,'+(a*(.6+.4*Math.sin(p.t*20+i)))+')'; cx.beginPath(); cx.arc(p.x,p.y,r,0,7); cx.fill(); }
+      else { cx.globalCompositeOperation='source-over'; p.x+=p.vx*dt; p.y+=p.vy*dt; p.vx*=Math.exp(-3*dt); p.vy*=Math.exp(-3*dt); const r=3+9*(1-a);
+        cx.fillStyle='rgba('+p.r+','+(.32*a)+')'; cx.beginPath(); cx.arc(p.x,p.y,r,0,7); cx.fill(); cx.globalCompositeOperation='lighter'; } }
+    cx.globalCompositeOperation='source-over';
+    requestAnimationFrame(cizim);
+  }
+  function sars(px,ms){ const t0=performance.now(); const k=()=>{ const e=(performance.now()-t0)/ms; if(e>=1||!aktif){ sahne.style.transform=''; for(const el of yukari) el.style.translate=''; return; }
+      const a=px*(1-e); const dx=(Math.random()-.5)*2*a, dy=(Math.random()-.5)*2*a; sahne.style.transform='translate('+dx+'px,'+dy+'px)'; for(const el of yukari) el.style.translate=dx+'px '+dy+'px'; requestAnimationFrame(k); }; k(); }
+  const zaman=[]; const sonra=(ms,fn)=>zaman.push(setTimeout(()=>{ if(aktif && !perde.classList.contains('bitti')) fn(); }, Math.max(0, ms-performance.now())));
+  function durdur(){ aktif=false; zaman.forEach(clearTimeout); }
+
+  /* --- 1) taş sırası ve logo yukarı süzülür, tahta yarıları gelir --- */
+  const sira=document.getElementById('acilisTaslar'), logo=document.getElementById('acilisLogo'); const yukari=[sira,logo].filter(Boolean);
+  sonra(T0,()=>{ olc(); requestAnimationFrame(cizim);
+    const r=sira.getBoundingClientRect(), hedefUst=Math.max(H*.08, TY-200), kay=Math.min(0, hedefUst-r.top);
+    yukari.forEach(el=>{ el.style.transition='transform .7s cubic-bezier(.3,.7,.2,1)'; el.style.transform='translateY('+kay+'px)'; });
+    ust.style.transform='translateY('+(-(TY+B))+'px)'; alt.style.transform='translateY('+(H-TY)+'px)';
+    void tahta.offsetWidth; tahta.classList.add('gor');
+    const ez='cubic-bezier(.55,.02,.85,.4)';
+    ust.animate([{transform:'translateY('+(-(TY+B))+'px)'},{transform:'translateY(0)'}],{duration:T1-T0-120,delay:120,easing:ez,fill:'forwards'});
+    alt.animate([{transform:'translateY('+(H-TY)+'px)'},{transform:'translateY(0)'}],{duration:T1-T0-120,delay:120,easing:ez,fill:'forwards'});
+  });
+  /* --- 2) çarpışma: kızgın dikiş, kıvılcım, şok dalgası, sarsıntı, flaş --- */
+  sonra(T1,()=>{ dikisKur(); const y=TY+B/2;
+    kivilcimSac(TX+B/2,y,Math.round(150),B); kivilcimSac(TX,y,25,10); kivilcimSac(TX+B,y,25,10); kor(TX+B/2,y,40,B);
+    sok={x:TX+B/2,y,r:B*.95,t:0}; sars(9,420); gumbur(1);
+    flasEl.animate([{opacity:.42},{opacity:0}],{duration:260,easing:'ease-out'});
+    tahta.animate([{transform:'scale(1.015)'},{transform:'scale(1)'}],{duration:300,easing:'ease-out'}); });
+  /* --- 3) taşlar: önce siyah şah, sonra renkli taşlar sıradaki yerlerinden yay çizerek düşer --- */
+  const yerlesim=[['♟︎','h6'],['♞︎','f5'],['♝︎','f8'],['♜︎','g1'],['♚︎','e3'],['♛︎','g7']];   // .aT sırası: piyon, at, fil, vezir, şah, kale
+  const kaynak={}; document.querySelectorAll('#acilisTaslar .aT').forEach(el=>{ kaynak[el.textContent.trim()[0]]=el; });
+  function dus(el, hedefKare, gecikme, buyuk){
+    const s=kare(hedefKare), r=el.getBoundingClientRect();
+    const k=el.cloneNode(true); k.classList.add('kopya'); k.style.left=r.left+'px'; k.style.top=r.top+'px'; k.style.width=r.width+'px'; k.style.height=r.height+'px';
+    sahne.insertBefore(k,flasEl); el.style.visibility='hidden';
+    const dx=s.x-(r.left+r.width/2), dy=s.y-(r.top+r.height/2)-s.s*.08, sc=(s.s*.98)/Math.max(r.height,1), tepe=-60-Math.abs(dy)*.25;
+    const a=k.animate([{transform:'translate(0,0) scale(1)',offset:0},{transform:'translate('+dx*.5+'px,'+(dy*.5+tepe)+'px) scale('+(1+(sc-1)*.5+.12)+') rotate(-8deg)',offset:.45},
+      {transform:'translate('+dx+'px,'+dy+'px) scale('+sc+')',offset:.86},{transform:'translate('+dx+'px,'+(dy-4)+'px) scale('+sc*1.03+','+sc*.95+')',offset:.93},{transform:'translate('+dx+'px,'+dy+'px) scale('+sc+')',offset:1}],
+      {duration:buyuk?620:520,easing:'cubic-bezier(.45,.05,.55,1)',fill:'forwards'});
+    a.onfinish=()=>{ if(!aktif) return; toz(s.x,s.y+s.s*.32,'150,130,105'); kor(s.x,s.y+s.s*.3,buyuk?14:6,s.s*.6); tok(buyuk?.8:1); if(buyuk){ kivilcimSac(s.x,s.y,40,s.s*.4); sars(4,220); } };
+    return k; }
+  let siyahSah=null;
+  sonra(TSAH,()=>{ const s=kare('h8'); siyahSah=document.createElement('span'); siyahSah.className='aT kopya acSiyah'; siyahSah.textContent='♚︎';
+    sahne.insertBefore(siyahSah,flasEl); const boy=s.s*.95; siyahSah.style.fontSize=boy+'px'; siyahSah.style.left=(s.x-boy*.5)+'px'; siyahSah.style.top=(s.y-boy*.56)+'px';
+    siyahSah.animate([{transform:'translateY('+(-(s.y+boy))+'px)',opacity:0},{transform:'translateY(0)',opacity:1,offset:.85},{transform:'translateY(-3px)'},{transform:'translateY(0)'}],
+      {duration:480,easing:'cubic-bezier(.5,0,.75,.4)',fill:'forwards'}).onfinish=()=>{ toz(s.x,s.y+s.s*.32,'90,80,70'); tok(.7); }; });
+  yerlesim.forEach(([g,sq],i)=>{ const zamani=i<5?TTAS+i*ARA:TVEZ; sonra(zamani,()=>{ const el=kaynak[g[0]]; if(el) dus(el,sq,0,i===5); }); });
+  /* --- 4) MAT: şah kızarır ve devrilir, yazı belirir --- */
+  sonra(TMAT,()=>{ akor(); matEl.textContent=(typeof metniCevir==='function'?metniCevir('ŞAH MAT'):'ŞAH MAT'); matEl.classList.add('gor');
+    const t0=performance.now(); const kz=()=>{ const e=Math.min(1,(performance.now()-t0)/400); matParilti=e; if(e<1&&aktif) requestAnimationFrame(kz); }; kz();
+    if(siyahSah){ siyahSah.classList.add('matOldu'); siyahSah.animate([{transform:'rotate(0deg)'},{transform:'rotate(-6deg)',offset:.25},{transform:'rotate(78deg) translate(4px,6px)'}],
+      {duration:900,delay:380,easing:'cubic-bezier(.6,0,.4,1)',fill:'forwards'}).onfinish=()=>{ if(aktif) tok(.55); }; } });
+  /* --- 5) perde kalkar --- */
+  sonra(TSON,()=>{ perde.classList.add('kalk'); });
+  sonra(TSON+820,()=>{ durdur(); perde.classList.add('bitti'); });
+  perde.addEventListener('pointerdown',()=>{ durdur(); },{once:true});
+  addEventListener('resize',()=>{ if(aktif) olc(); });
+})();
+/* Perde kapandığında (süre doldu ya da dokunuldu) çalıştır — sabit 5.8 sn beklemek yerine */
+function perdeBittiginde(fn){
+  const p=document.getElementById('acilisPerde'); let oldu=false; const bir=()=>{ if(oldu) return; oldu=true; fn(); };
+  if(!p || p.classList.contains('bitti') || getComputedStyle(p).display==='none'){ bir(); return; }
+  const g=new MutationObserver(()=>{ if(p.classList.contains('bitti')){ g.disconnect(); bir(); } }); g.observe(p,{attributes:true,attributeFilter:['class']});
+  setTimeout(bir, (window.ACILIS_MS||5800)+400);
+}
+</script>
 
 <div id="istEkran">
   <div id="istBaslik">
@@ -2931,15 +3111,14 @@ let fbAuth=null, fbDb=null, fbKullanici=null;
         // Oturum yok: perde kapandıktan sonra giriş ekranını göster
         const perde=document.getElementById('acilisPerde');
         const goster=()=>{ const g=document.getElementById('girisEkran'); if(g) g.classList.remove('gizli'); };
-        if(perde && !perde.classList.contains('bitti')){ setTimeout(goster, 5800); }
-        else { goster(); }
+        perdeBittiginde(goster);
       }
       if(typeof girisDurumGuncelle==='function') girisDurumGuncelle();
     });
     // Güvenlik: Firebase hiç cevap vermezse 6 sn sonra giriş ekranını yine de göster
     setTimeout(()=>{
       if(!fbKullanici){ const g=document.getElementById('girisEkran'); if(g) g.classList.remove('gizli'); }
-    }, 6000);
+    }, (window.ACILIS_MS||5800)+200);
   }catch(e){ console.log('Firebase başlatılamadı:',e); }
 })();
 </script>
@@ -11487,7 +11666,7 @@ function acilisNotalari(perde){
        Dokunmadan çalabildiği telefonda doğrulandı (AudioContext 'running' açılıyor). */
     acilisNotalari(p);
     // animasyon toplam ~5.1s; sonra kesin kapat (load beklemeden, hemen sayar)
-    setTimeout(perdeKapat, 5800);
+    setTimeout(perdeKapat, window.ACILIS_MS||5800);
     p.addEventListener('pointerdown', perdeKapat); // dokununca atla
   }
 })();
@@ -11818,9 +11997,7 @@ function otomatikGiris(){
     // Menü açıldı: aktif çevrimiçi oyun var mı? Varsa ona dön (Chess.com gibi)
     aktifOyunaDonKontrol();
   };
-  if(perde && !perde.classList.contains('bitti')){
-    setTimeout(gec, 5800);
-  } else { gec(); }
+  perdeBittiginde(gec);   // perde kapanınca (süre ya da dokunuş) — sinematik açılış daha uzun
 }
 
 // Açılışta aktif çevrimiçi oyun varsa otomatik geri dön
@@ -12322,7 +12499,7 @@ window.addEventListener('load',()=>{
   const perde=document.getElementById('acilisPerde');
   const perdeVar = perde && !perde.classList.contains('bitti') && getComputedStyle(perde).display!=='none';
   if(perdeVar){
-    setTimeout(agirKurulum, Math.max(0, 4250 - performance.now()));
+    setTimeout(agirKurulum, Math.max(0, (window.ACILIS_KURULUM_MS||4250) - performance.now()));
     perde.addEventListener('pointerdown', ()=>setTimeout(agirKurulum, 0), {once:true});
   } else agirKurulum();
 });
@@ -13343,6 +13520,11 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["Doğruluğun"]={"en": "Your accuracy", "ru": "Ваша точность", "ar": "دقتك", "fr": "Ta précision", "de": "Deine Genauigkeit", "it": "La tua precisione", "zh": "你的准确率"};
   CEVM["Rakip doğruluğu"]={"en": "Opponent accuracy", "ru": "Точность соперника", "ar": "دقة الخصم", "fr": "Précision de l'adversaire", "de": "Genauigkeit Gegner", "it": "Precisione dell'avversario", "zh": "对手准确率"};
   CEVM['Diğer ayarlar']={en:'More settings',ru:'Другие настройки',ar:'إعدادات أخرى',fr:'Autres réglages',de:'Weitere Einstellungen',it:'Altre impostazioni',zh:'更多设置'};
+  CEVM['ŞAH MAT']={en:'CHECKMATE',ru:'ШАХ И МАТ',ar:'كش مات',fr:'ÉCHEC ET MAT',de:'SCHACHMATT',it:'SCACCO MATTO',zh:'将杀'};
+  CEVM['Açılış animasyonu']={en:'Intro animation',ru:'Заставка',ar:'الرسوم الافتتاحية',fr:"Animation d'ouverture",de:'Intro-Animation',it:'Animazione iniziale',zh:'开场动画'};
+  CEVM['Sinematik']={en:'Cinematic',ru:'Кинематографичная',ar:'سينمائي',fr:'Cinématique',de:'Filmisch',it:'Cinematica',zh:'电影式'};
+  CEVM['Tahta birleşir, taşlar mat kurar']={en:'The board assembles, the pieces set up a mate',ru:'Доска собирается, фигуры ставят мат',ar:'تلتئم الرقعة وتصنع القطع كش مات',fr:'Le plateau se forme, les pièces font mat',de:'Das Brett fügt sich, die Figuren setzen matt',it:'La scacchiera si unisce, i pezzi danno matto',zh:'棋盘合拢，棋子摆出将杀'};
+  CEVM['Kısa: taşlar ve logo']={en:'Short: pieces and logo',ru:'Коротко: фигуры и логотип',ar:'قصير: القطع والشعار',fr:'Court : pièces et logo',de:'Kurz: Figuren und Logo',it:'Breve: pezzi e logo',zh:'简短：棋子与标志'};
   CEVM['Arkadaşlar']={en:'Friends',ru:'Друзья',ar:'الأصدقاء',fr:'Amis',de:'Freunde',it:'Amici',zh:'好友'};
   CEVM['Satranç her şeydir.']={en:'Chess is everything.',ru:'Шахматы — это всё.',ar:'الشطرنج هو كل شيء.',fr:'Les échecs sont tout.',de:'Schach ist alles.',it:'Gli scacchi sono tutto.',zh:'国际象棋就是一切。'};
   CEVM['Oynat']={en:'Play',ru:'Пуск',ar:'تشغيل',fr:'Lire',de:'Abspielen',it:'Riproduci',zh:'播放'};
@@ -16030,6 +16212,11 @@ function devPanelAc(){
       b.querySelector('.ssAd small').textContent=c(PAD[ts.paket]||'Klasik')+(Object.keys(ts.ozel).length?' · '+c('özel ayar'):'')+' · '+c('taş taş seçilebilir');
       b.onclick=()=>tasSesleriAc();
       l.appendChild(b); }
+    grup('Açılış animasyonu', [
+      {id:'sinematik', ad:'Sinematik', alt:c('Tahta birleşir, taşlar mat kurar')},
+      {id:'klasik',    ad:'Klasik',    alt:c('Kısa: taşlar ve logo')}
+    ], (()=>{ try{ return localStorage.getItem('acilisTur')||'sinematik'; }catch(e){ return 'sinematik'; } })(),
+       v=>{ try{ localStorage.setItem('acilisTur', v); }catch(e){} });
     grup('Titreşim', [
       {id:1, ad:'Açık',   alt:c('Süre uyarısı, teklif ve bildirimlerde')},
       {id:0, ad:'Kapalı', alt:c('Hiç titreşmez')}
