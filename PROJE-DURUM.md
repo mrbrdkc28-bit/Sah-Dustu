@@ -844,3 +844,13 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - glbCoz artık emissiveTexture + KHR_materials_emissive_strength okur: Retro Piksel taşları düz beyaz parlıyordu (siyah şah beyazdı).
 - At yönü ölçüldü (yan yana görüntü): lowpoly 0, retropc PI, gercek5 -PI/2; gercek5_n_b ve sade_n_b dosyaları 180° çevrildi
   (siyah at beyazla aynı yöne bakıyordu). Ordu önizlemeleri yeniden çekildi. APK ~96 MB.
+
+### 8.40 Eski tahtaların denetimi (5 Ekim 2026)
+- Retro Salon: tahta_retro.glb eski araçla 2110 → 1152 üçgene sadeleştirilmişti; kenarda yeşil sivri parçalar oluşmuştu.
+  Kaynaktan (retropc_chess.glb, bol.mjs TAHTA=1) yeniden çıkarıldı.
+- Dokulu tahtalara dokuTon + ahşap çerçeve: Gerçek Masa [.42,.34,.28] + abanoz, Ahşap Turnuva [.7,.6,.5] + abanoz,
+  Mermer Salon [.62,.62,.65] + füme (beyaz kareler bembeyazdı, damar görünmüyordu).
+- Gerçek Masa (deri) 90° tersti (a1 açık): dokulu tahtalar da artık tahtaDon alır; deriye PI/2 verildi. Ölçüm: taşlar gizli,
+  tepeden; deride parlaklık yakın olduğu için kırmızı-mavi farkıyla doğrulandı (a1 kahve, h1 turuncu).
+- Ölçülen ve doğru: Ahşap Turnuva, Retro, Mermer Salon, Oyma, Usta, Gül Ağacı. Oyma Tahta: kaynak (Criistinaa) düz renkli bir küp;
+  kenarlarına da kare basılı, "el oyması ahşap" açıklamasını karşılamıyor — sahibe soruldu.

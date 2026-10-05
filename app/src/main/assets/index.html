@@ -3460,19 +3460,19 @@ const ARENALAR = [
     gok:0x1A1714, sis:0x252019, sisYog:0.014, zemin:0x2A2018,
     acikKare:0xC9A86E, koyuKare:0x6B4A2E, isik:0xFFF2DC, ortam:0x8A7A66,
     aksan:'#C8964A', parcacik:'yildiz', acikTas:0xF0E8D8, koyuTas:0x4F483C,
-    tahtaDoku:'dokular/tahta_deri.jpg', grad:'linear-gradient(160deg,#3A2E20,#1A130C 72%)',
+    tahtaDoku:'dokular/tahta_deri.jpg', cerceveDoku:'dokular/cerceve_abanoz.jpg', dokuTon:[.42,.34,.28], tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#3A2E20,#1A130C 72%)',
     kareAcik:0x8D2402, kareKoyu:0x2A1508   /* deri dokusundan ölçüldü */},
   { id:'ahsapmasa', ad:'Ahşap Turnuva', desc:'Klasik ahşap satranç tahtası. Sade, zarif.',
     gok:0x18140F, sis:0x221C15, sisYog:0.012, zemin:0x251E16,
     acikKare:0xB08552, koyuKare:0x2A1F16, isik:0xFFEFD8, ortam:0x826048,
     aksan:'#A87838', parcacik:'yildiz', acikTas:0xE0C9A0, koyuTas:0x4D382C,
-    tahtaDoku:'dokular/tahta_ahsap.jpg', grad:'linear-gradient(160deg,#352A1C,#15110C 72%)',
+    tahtaDoku:'dokular/tahta_ahsap.jpg', cerceveDoku:'dokular/cerceve_abanoz.jpg', dokuTon:[.7,.6,.5], grad:'linear-gradient(160deg,#352A1C,#15110C 72%)',
     kareAcik:0x683917, kareKoyu:0x000000   /* ahşap dokusundan ölçüldü */},
   { id:'mermersalon', ad:'Mermer Salon', desc:'Gerçek siyah-beyaz mermer satranç tahtası.',
     gok:0x16161A, sis:0x202024, sisYog:0.013, zemin:0x1C1C20,
     acikKare:0xD8D8DC, koyuKare:0x1C1C1E, isik:0xF5F5FA, ortam:0x8A8A92,
     aksan:'#B8A868', parcacik:'yildiz', acikTas:0xEDEDF0, koyuTas:0x46464B,
-    tahtaDoku:'dokular/tahta_mermer.jpg', grad:'linear-gradient(160deg,#2A2A30,#101012 72%)',
+    tahtaDoku:'dokular/tahta_mermer.jpg', cerceveDoku:'dokular/cerceve_duman.jpg', dokuTon:[.62,.62,.65], grad:'linear-gradient(160deg,#2A2A30,#101012 72%)',
     kareAcik:0xDBDEE5, kareKoyu:0x14181B   /* mermer dokusundan ölçüldü */},
   { id:'retro', ad:'Retro Salon', desc:'Piksel dokulu nostaljik satranç tahtası.',
     gok:0x101408, sis:0x18200E, sisYog:0.012, zemin:0x141A0C,
@@ -3877,6 +3877,7 @@ function tahtaYap(a){
     const tahta=new THREE.Mesh(new THREE.BoxGeometry(8.0,kalin,8.0), tahtaMat);
     tahta.position.y = -0.11; // kare merkeziyle aynı, üst yüzey y=0
     tahta.receiveShadow=true;
+    if(a.tahtaDon) tahta.rotation.y=a.tahtaDon;   // doku yönü (a1 koyu olmalı) — telefonda ölçülerek
     tahtaGrup.add(tahta);
     // Ahşap çerçeve
     let cerMat;
