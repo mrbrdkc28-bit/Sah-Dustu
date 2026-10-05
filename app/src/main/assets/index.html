@@ -2122,8 +2122,8 @@ body.dikeyAktif #hudOrta .hbtn-simge:not([style*="display: none"]):not([style*="
 
 /* ===== TAŞ SESLERİ sayfası (4 Ekim 2026) — temanın renklerini devralır ===== */
 .tsSatir .tsOk{font-size:22px;color:var(--brass);line-height:1}
-.tsPaketler{display:flex;gap:8px;margin:4px 0 12px}
-.tsPaket{flex:1;height:42px;border-radius:21px;border:1px solid var(--line);background:transparent;color:inherit;
+.tsPaketler{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.tsPaket{flex:1 1 28%;height:42px;border-radius:21px;border:1px solid var(--line);background:transparent;color:inherit;
   font:700 13px Manrope,sans-serif;letter-spacing:.03em;cursor:pointer}
 .tsPaket.secili{background:linear-gradient(135deg,#F2C765,#C9912A);color:#1a1408;border-color:transparent}
 .tsPaket.yari{border-color:var(--brass);color:var(--brass)}
@@ -2142,14 +2142,23 @@ body.dikeyAktif #hudOrta .hbtn-simge:not([style*="display: none"]):not([style*="
 .tsIkincil{flex:0 0 auto;height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--line);background:transparent;
   color:inherit;font:600 13px Manrope,sans-serif;cursor:pointer}
 
+.tsHucre span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tsSecBaslik{font:600 20px Fraunces,serif;margin:2px 2px 4px}
+.tsCipler{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:7px;margin:0 0 4px}
+.tsCip{height:44px;border-radius:22px;border:1px solid var(--line);background:transparent;color:inherit;cursor:pointer;
+  font:600 14px Manrope,sans-serif;font-variant-numeric:tabular-nums}
+.tsCip.secili{background:linear-gradient(135deg,#F2C765,#C9912A);color:#1a1408;border-color:transparent}
+.tsCip:active{transform:scale(.93)}
+
 /* Taş sesleri — Fildişi (açık) tema: diğer satırlarla aynı koyu yazı / beyaz zemin */
-html[data-tema="fildisi"] #secimSayfa .tsHucre,html[data-tema="fildisi"] #secimSayfa .tsPaket,html[data-tema="fildisi"] #secimSayfa .tsIkincil{
+html[data-tema="fildisi"] #secimSayfa .tsHucre,html[data-tema="fildisi"] #secimSayfa .tsPaket,html[data-tema="fildisi"] #secimSayfa .tsIkincil,html[data-tema="fildisi"] #secimSayfa .tsCip{
   background:#fff;border-color:rgba(120,95,50,.2);color:#2b261d}
 html[data-tema="fildisi"] #secimSayfa .tsTas{color:#2b261d}
 html[data-tema="fildisi"] #secimSayfa .tsTas b,html[data-tema="fildisi"] #secimSayfa .tsHucre i,html[data-tema="fildisi"] #secimSayfa .tsOk{color:#B07E22}
 html[data-tema="fildisi"] #secimSayfa .tsIpucu,html[data-tema="fildisi"] #secimSayfa .tsBas span{color:#8a7f6a;opacity:1}
 html[data-tema="fildisi"] #secimSayfa .tsHucre.ozel,html[data-tema="fildisi"] #secimSayfa .tsPaket.yari{border-color:#B07E22;box-shadow:inset 0 0 0 1px #B07E22;color:#8a5f14}
-html[data-tema="fildisi"] #secimSayfa .tsPaket.secili{background:linear-gradient(135deg,#F2C765,#C9912A);color:#1a1408;border-color:transparent}
+html[data-tema="fildisi"] #secimSayfa .tsSecBaslik{color:#2b261d}
+html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #secimSayfa .tsPaket.secili{background:linear-gradient(135deg,#F2C765,#C9912A);color:#1a1408;border-color:transparent}
 </style>
 </head>
 <body>
@@ -5019,6 +5028,16 @@ const Ses=(()=>{
   function tamponYukle(ad){
     if(TAMPON[ad]!==undefined) return Promise.resolve(TAMPON[ad]);
     if(SENTEZ[ad] || /^ah_/.test(ad)){ const c=ac(); if(c){ try{ TAMPON[ad]=SENTEZ[ad]?SENTEZ[ad](c):ahsapSentez(ad,c); return Promise.resolve(TAMPON[ad]); }catch(e){} } }
+    const km=/^kt_([a-z]+_\d\d)$/.exec(ad);
+    if(km){
+      if(YUKLENIYOR[ad]) return YUKLENIYOR[ad];
+      const c=ac(); if(!c || !window.fetch) return null;
+      YUKLENIYOR[ad]=fetch('sfx/kutu/'+km[1]+'.ogg').then(r=>{ if(!r.ok) throw 0; return r.arrayBuffer(); })
+        .then(b=>new Promise((ok,no)=>c.decodeAudioData(b,ok,no)))
+        .then(t=>{ TAMPON[ad]=t; return t; })
+        .catch(()=>{ TAMPON[ad]=null; return null; });
+      return YUKLENIYOR[ad];
+    }
     const om=/^ordu_([pnbrqk])_(sec|hamle|yeme)$/.exec(ad);
     if(om){
       if(YUKLENIYOR[ad]) return YUKLENIYOR[ad];
@@ -5040,10 +5059,10 @@ const Ses=(()=>{
       .catch(()=>{ TAMPON[ad]=null; return null; });
     return YUKLENIYOR[ad];
   }
-  function tamponCal(t){
+  function tamponCal(t, kazanc, gecikme){
     const c=ac(); if(!c) return;
-    const k=c.createBufferSource(), g=c.createGain(); g.gain.value=.9;
-    k.buffer=t; k.connect(g).connect(c.destination); k.start();
+    const k=c.createBufferSource(), g=c.createGain(); g.gain.value=(kazanc==null?.9:kazanc);
+    k.buffer=t; k.connect(g).connect(c.destination); k.start(c.currentTime+(gecikme||0));
   }
   function sesAc(){
     const c=ac();
@@ -5073,8 +5092,43 @@ const Ses=(()=>{
     if(an==='hamle') return 'hamle';
     return t==='p' ? (kurb==='p'?'yeme_p_piyon':'yeme_p_diger') : 'yeme_'+t;
   }
-  function tasSesi(t,an,kurb){ cal(tasAnahtar(t,an,tasKaynak(t,an),kurb)); }
-  function tsOnYukle(){ try{ for(const t of 'pnbrqk') for(const an of ['sec','hamle','yeme']){ const pk=tasKaynak(t,an); if(pk!=='klasik') tamponYukle(tasAnahtar(t,an,pk,'n')); } }catch(e){} }
+  /* SES KÜTÜPHANESİ (5 Ekim 2026): Freesound CC0 kesitleri, sfx/kutu/<kat>_<nn>.ogg (KAYNAK.txt).
+     Taş taş seçimde her biri ayrı seçilebilir: TS.ozel değeri 'kt_nal_03' gibi olabilir.
+     GERÇEK ve SAVAŞ paketleri bu kütüphanenin tarifidir: "anahtar:gecikme:kazanç + …" (yemede iki vuruş). */
+  const KUTU=[['satranc','Satranç taşı','Satranç',19],['nal','Nal','Nal',11],['kilic','Kılıç','Kılıç',8],
+    ['zirh','Zırh','Zırh',9],['tas','Taş sürtme','Taş',7],['davul','Davul','Davul',5]];
+  const PAKET_TARIF={
+    gercek:{p_sec:'satranc_13:0:.55',p_hamle:'satranc_03',p_yeme:'satranc_16:0:.7+satranc_03:.11',
+      n_sec:'satranc_14:0:.55',n_hamle:'satranc_05',n_yeme:'satranc_15:0:.7+satranc_05:.11',
+      b_sec:'satranc_15:0:.55',b_hamle:'satranc_02',b_yeme:'satranc_16:0:.7+satranc_02:.11',
+      r_sec:'satranc_16:0:.55',r_hamle:'satranc_04',r_yeme:'satranc_01:0:.7+satranc_04:.12',
+      q_sec:'satranc_13:0:.55',q_hamle:'satranc_07',q_yeme:'satranc_12:0:.7+satranc_07:.12',
+      k_sec:'satranc_14:0:.55',k_hamle:'satranc_09',k_yeme:'satranc_11:0:.7+satranc_10:.13'},
+    savas:{p_sec:'zirh_03:0:.55',p_hamle:'=ordu_p_hamle',p_yeme:'kilic_05',
+      n_sec:'nal_09:0:.6',n_hamle:'nal_02+nal_01:.13:.8',n_yeme:'nal_02+kilic_07:.08',
+      b_sec:'kilic_04:0:.55',b_hamle:'=ordu_b_hamle',b_yeme:'kilic_08',
+      r_sec:'zirh_06:0:.55',r_hamle:'tas_04',r_yeme:'tas_05+davul_04:.03:.8',
+      q_sec:'kilic_01:0:.5',q_hamle:'zirh_07',q_yeme:'kilic_06+kilic_07:.15',
+      k_sec:'zirh_09:0:.55',k_hamle:'davul_04',k_yeme:'davul_03+kilic_05:.05:.8'}
+  };
+  function tarifCoz(tr){ return tr.split('+').map(x=>{ const a=x.split(':');
+    return [a[0][0]==='=' ? a[0].slice(1) : 'kt_'+a[0], +(a[1]||0), a[2]==null?.9:+a[2]]; }); }
+  function tasParcalar(t,an,pk,kurb){
+    if(/^kt_/.test(pk)) return [[pk,0,.9]];
+    const tf=PAKET_TARIF[pk]; if(tf && tf[t+'_'+an]) return tarifCoz(tf[t+'_'+an]);
+    return [[tasAnahtar(t,an,pk,kurb),0,.9]];
+  }
+  function parcaCal(L, zorla){
+    if(sessiz && !zorla) return; sesAc();
+    L.forEach(([ad,gec,kaz])=>{
+      if(TAMPON[ad]){ tamponCal(TAMPON[ad],kaz,gec); return; }
+      if(TAMPON[ad]===undefined){ const p=tamponYukle(ad);
+        if(p){ p.then(t=>{ if(sessiz && !zorla) return; if(t) tamponCal(t,kaz,gec); else if(L.length===1) eskiCal(ad); }); return; } }
+      if(L.length===1) eskiCal(ad);
+    });
+  }
+  function tasSesi(t,an,kurb){ parcaCal(tasParcalar(t,an,tasKaynak(t,an),kurb)); }
+  function tsOnYukle(){ try{ for(const t of 'pnbrqk') for(const an of ['sec','hamle','yeme']){ const pk=tasKaynak(t,an); if(pk!=='klasik') tasParcalar(t,an,pk,'n').forEach(x=>tamponYukle(x[0])); } }catch(e){} }
   setTimeout(()=>{ try{ if(acildiMi) tsOnYukle(); }catch(e){} }, 1500);
   function eskiCal(ad){
     const yedek=YEDEK[ad]||(()=>{});
@@ -5149,8 +5203,8 @@ const Ses=(()=>{
     sec:(tip)=>tasSesi(tip,'sec'),
     hamle:(tip)=>tasSesi(tip||'p','hamle'),
     /* Ayar ekranından: sessiz olsa da dinletir */
-    dinle:(tip,an,paket)=>{ const ad=tasAnahtar(tip,an,paket||tasKaynak(tip,an),'n'); sesAc(); const c=ac();
-      const p=tamponYukle(ad); if(p) p.then(t=>{ if(t) tamponCal(t); else eskiCal(ad); }); else eskiCal(ad); },
+    dinle:(tip,an,paket)=>parcaCal(tasParcalar(tip,an,paket||tasKaynak(tip,an),'n'), true),
+    kutu:KUTU,
     get tasSesAyar(){ return JSON.parse(JSON.stringify(TS)); },
     tasSesPaket(pk){ TS.paket=pk; TS.ozel={}; tsKaydet(); tsOnYukle(); },
     tasSesOzel(tip,an,pk){ if(pk===TS.paket) delete TS.ozel[tip+'_'+an]; else TS.ozel[tip+'_'+an]=pk; tsKaydet(); tsOnYukle(); },
@@ -15704,12 +15758,12 @@ function devPanelAc(){
       {id:0, ad:'Kapalı', alt:c('Tüm sesler kapalı')}
     ], (typeof Ses!=='undefined' && Ses.sessizMi)?0:1, v=>{ if(typeof sesAyarla==='function') sesAyarla(v===1); });
     /* Taş sesleri alt sayfası (4 Ekim 2026) */
-    { const PAD={klasik:'Klasik',ahsap:'Ahşap',ordu:'Ordu'};
+    { const PAD={klasik:'Klasik',ahsap:'Ahşap',ordu:'Ordu',gercek:'Gerçek',savas:'Savaş'};
       const ts=(typeof Ses!=='undefined' && Ses.tasSesAyar) ? Ses.tasSesAyar : {paket:'klasik',ozel:{}};
       const b=document.createElement('button'); b.type='button'; b.className='ssSec tsSatir';
       b.innerHTML='<span class="ssAd"><span></span><small></small></span><span class="tsOk">›</span>';
       b.querySelector('.ssAd span').textContent=c('Taş sesleri');
-      b.querySelector('.ssAd small').textContent=c(PAD[ts.paket]||'Klasik')+(Object.keys(ts.ozel).length?' · '+c('özel ayar'):'')+' · '+c('taş taş ayarlanabilir');
+      b.querySelector('.ssAd small').textContent=c(PAD[ts.paket]||'Klasik')+(Object.keys(ts.ozel).length?' · '+c('özel ayar'):'')+' · '+c('taş taş seçilebilir');
       b.onclick=()=>tasSesleriAc();
       l.appendChild(b); }
     grup('Titreşim', [
@@ -15729,7 +15783,34 @@ function devPanelAc(){
   /* TAŞ SESLERİ sayfası: paket seçimi + 6 taş × (seçme, hamle, yeme). Hücreye dokun: sıradaki pakete geç ve dinle. */
   function tasSesleriAc(){
     const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
-    const PK=['klasik','ahsap','ordu'], PAD={klasik:'Klasik',ahsap:'Ahşap',ordu:'Ordu'};
+    const PK=['klasik','ahsap','ordu','gercek','savas'], PAD={klasik:'Klasik',ahsap:'Ahşap',ordu:'Ordu',gercek:'Gerçek',savas:'Savaş'};
+    const ANAD={sec:'Seçme',hamle:'Hamle',yeme:'Yeme'};
+    const kaynakAd=k=>{ if(PAD[k]) return c(PAD[k]); const m=/^kt_([a-z]+)_(\d\d)$/.exec(k)||[];
+      const kt=Ses.kutu.find(x=>x[0]===m[1]); return kt ? c(kt[2])+' '+(+m[2]) : k; };
+    /* Tek hücre için seçim: paketler + kütüphanedeki tüm sesler (numaralı). Dokun: seç ve dinle. */
+    const secimCiz=(t,an,tAd)=>{
+      l.innerHTML=''; const su=Ses.tasKaynak(t,an);
+      const g=x=>{ const h=document.createElement('div'); h.className='ssGrup'; h.textContent=x; l.appendChild(h); };
+      const bs=document.createElement('div'); bs.className='tsSecBaslik'; bs.textContent=c(tAd)+' · '+c(ANAD[an]); l.appendChild(bs);
+      const ip=document.createElement('div'); ip.className='tsIpucu'; ip.textContent=c('Dokun: seç ve dinle'); l.appendChild(ip);
+      const sec=(k)=>{ Ses.tasSesOzel(t,an,k); Ses.dinle(t,an,k); const y=l.parentNode&&l.parentNode.scrollTop; secimCiz(t,an,tAd); try{ l.parentNode.scrollTop=y; }catch(e){} };
+      g(c('Paketler'));
+      const pk=document.createElement('div'); pk.className='tsPaketler';
+      PK.forEach(k=>{ const b=document.createElement('button'); b.type='button'; b.className='tsPaket'+(su===k?' secili':'');
+        b.textContent=c(PAD[k]); b.onclick=()=>sec(k); pk.appendChild(b); });
+      l.appendChild(pk);
+      Ses.kutu.forEach(([id,ad,,n])=>{
+        g(c(ad)); const w=document.createElement('div'); w.className='tsCipler';
+        for(let i=1;i<=n;i++){ const k='kt_'+id+'_'+String(i).padStart(2,'0'), b=document.createElement('button'); b.type='button';
+          b.className='tsCip'+(su===k?' secili':''); b.textContent=i; b.setAttribute('aria-label',c(ad)+' '+i); b.onclick=()=>sec(k); w.appendChild(b); }
+        l.appendChild(w);
+      });
+      const alt=document.createElement('div'); alt.className='tsAlt';
+      const gr=document.createElement('button'); gr.type='button'; gr.className='ssTamam'; gr.textContent=c('Tamam');
+      gr.onclick=()=>{ ciz(); try{ l.parentNode.scrollTop=0; }catch(e){} };
+      alt.appendChild(gr); l.appendChild(alt);
+      try{ if(typeof agacTara==='function') agacTara(sayfa); }catch(e){}
+    };
     const TAS=[['p','\u265F','Piyon'],['n','\u265E','At'],['b','\u265D','Fil'],['r','\u265C','Kale'],['q','\u265B','Vezir'],['k','\u265A','Şah']];
     sayfa.querySelector('.ssBaslik').textContent=c('Taş sesleri');
     const l=sayfa.querySelector('.ssListe'); l.innerHTML='';
@@ -15742,7 +15823,7 @@ function devPanelAc(){
         b.textContent=c(PAD[k]); b.onclick=()=>{ Ses.tasSesPaket(k); Ses.dinle('n','hamle',k); ciz(); }; pk.appendChild(b); });
       l.appendChild(pk);
       g('Taş taş ayarla');
-      const ip=document.createElement('div'); ip.className='tsIpucu'; ip.textContent=c('Dokun: sıradaki sese geç ve dinle'); l.appendChild(ip);
+      const ip=document.createElement('div'); ip.className='tsIpucu'; ip.textContent=c('Dokun: sesi seç (64 ses)'); l.appendChild(ip);
       const bas=document.createElement('div'); bas.className='tsSatirT tsBas';
       bas.innerHTML='<span></span><span>'+c('SEÇME')+'</span><span>'+c('HAMLE')+'</span><span>'+c('YEME')+'</span>'; l.appendChild(bas);
       TAS.forEach(([t,gl,ad])=>{
@@ -15750,8 +15831,8 @@ function devPanelAc(){
         const et=document.createElement('span'); et.className='tsTas'; et.innerHTML='<b>'+gl+'\uFE0E</b>'; et.appendChild(document.createTextNode(' '+c(ad))); r.appendChild(et);
         ['sec','hamle','yeme'].forEach(an=>{
           const k=Ses.tasKaynak(t,an), h=document.createElement('button'); h.type='button';
-          h.className='tsHucre'+(k!==ts.paket?' ozel':''); h.innerHTML='<i>\u25B6</i><span></span>'; h.querySelector('span').textContent=c(PAD[k]);
-          h.onclick=()=>{ const yeni=PK[(PK.indexOf(Ses.tasKaynak(t,an))+1)%PK.length]; Ses.tasSesOzel(t,an,yeni); Ses.dinle(t,an,yeni); ciz(); };
+          h.className='tsHucre'+(k!==ts.paket?' ozel':''); h.innerHTML='<i>\u25B6</i><span></span>'; h.querySelector('span').textContent=kaynakAd(k);
+          h.onclick=()=>{ Ses.dinle(t,an); secimCiz(t,an,ad); try{ l.parentNode.scrollTop=0; }catch(e){} };
           r.appendChild(h);
         });
         l.appendChild(r);

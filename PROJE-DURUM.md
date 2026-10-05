@@ -816,3 +816,10 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   kontrol olarak ustamasa PI/2 (mevcutla aynı → yöntem doğru).
 - İndirilip KULLANILMAYAN tahtalar (scratchpad setler/tahta_ham): julia ve klasiktahta (taşlar türlerine göre birleşik), clarence/camay/starov
   (yalnız tahta, oyun alanı ölçeği elle bulunmalı).
+
+### 8.37 Ses kütüphanesi: 59 Freesound CC0 kesiti + Gerçek / Savaş paketleri (5 Ekim 2026)
+- sfx/kutu/<kat>_<nn>.ogg (481 KB): satranç taşı 19, nal 11, kılıç 8, zırh 9, taş sürtme 7, davul 5. Kaynaklar sfx/kutu/KAYNAK.txt.
+  Kesitler scratchpad fs/kes.py + disa.py ile (baş sessizliği atılır, ≤1 sn, tepe .75); oyunda ek kırpma yok.
+- Paketler artık 5: Klasik, Ahşap, Ordu, Gerçek (gerçek tahta kayıtları), Savaş (nal/kılıç/zırh/taş/davul). Gerçek ve Savaş,
+  kütüphanenin tarifidir (PAKET_TARIF, "anahtar:gecikme:kazanç + …"; yemede iki vuruş). TS.ozel değeri 'kt_nal_03' de olabilir.
+- Taş sesleri sayfasında hücreye dokununca seçim görünümü açılır: 5 paket + 59 numaralı düğme; dokun = seç ve dinle.

@@ -1,0 +1,18 @@
+Ses kütüphanesi — hepsi Freesound.org, CC0 (kamu malı, atıf gerekmez). Dosyalar kısa kesitlerdir
+(baştaki sessizlik atıldı, en fazla 1 sn, seviye eşitlendi, Ekim 2026).
+satranc_01-06: #366065 "chess pieces.wav" (simone_ds)
+satranc_07-12: #629181 "Chess_foley.mp3" (Amatsuuu)
+satranc_13-16: #556387 "Moving piece on a boardgame" (zachrau)
+satranc_17: #467282 "Chess Pieces hitting wooden board.wav" (XfiXy8)
+satranc_18: #646781 "chess-piece-bounce.ogg" (pbimal)
+satranc_19: #351518 "chess_move_on_alabaster.wav" (mh2o)
+nal_01-04: #175356 "Horse Galloping.wav" (Max_Headroom)
+nal_05-08: #182504 "Horse Clip Clopping Downhill" (swiftoid)
+nal_09-11: #204961 "clatter of hooves.wav" (skitchscharff)
+kilic_01: #107589 "unsheath_sword.wav" (Qat) · kilic_02: #581594 "Sword draw unsheathe" (SamsterBirdies)
+kilic_03: #467291 "Sword Unsheathed.wav" (XfiXy8) · kilic_04: #107590 "sheath_sword.wav" (Qat)
+kilic_05-08: #37605 "swords.wav" (hello_flowers)
+zirh_01-06: #506148 "Lightmetal_armor" (mitchanary) · zirh_07-09: #180231 "armor.wav" (juryduty)
+tas_01-03: #321488 "Scraping Stone" (dslrguide) · tas_04: #558254 "Heavy Stone Push" (msavioti)
+tas_05-07: #347391 "stone_on_stone_ST.wav" (wilhelmsqueek)
+davul_01-02: #209546 "warriordrums.wav" (Sclolex) · davul_03-05: #342465 "Tribe Drum Loop" (PearceWilsonKing)
