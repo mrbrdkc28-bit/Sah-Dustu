@@ -59,6 +59,8 @@ içindeki "Lisanslar & Atıflar" ekranında ve her modelin dosya bilgisinde
   - "Chess set" — brendanwood872
   - "Cartoon Chess Set" — CYX1122
   - "Glass Chess Pieces" — Yanez-Designs
+  - "Chess Board" — Yanez-Designs
+  - "Marble Chess Board" — foggy_123
 Modeller taş taş ayrılmış, ölçeklenmiş ve dokuları küçültülmüştür.
 CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
 

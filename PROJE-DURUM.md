@@ -806,3 +806,13 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   `bol.mjs` TAHTA modu: taş olmayan parçalar, kare=1 birim, merkez, üst yüzey y=0; tahtaDon PI/2 (a1 koyu). Samuray ve Turnuva
   tahtaları denendi, ÇIKARILDI: kendi basılı koordinatları kare renkleri doğru yönde hiç tutmuyor, uygulamanınkiyle çakışıyor.
   Arena önizlemeleri 8.15 tarifiyle (pitch .40 yaw .75 uzak 11).
+
+### 8.36 Porselen + Mermer (ordu ve tahta) ve tahta yönü ölçümü (5 Ekim 2026)
+- Sketchfab tahta taraması ("chessboard" vb., 124 aday). Taşlarıyla gelen iki tahta: Yanez-Designs "Chess Board" → ordu Porselen (yanez,
+  beyaz taraf elle -x) + arena Siyah Mermer Masa (yanezmasa); foggy_123 "Marble Chess Board" → ordu Mermer (mermer, dokular 512) +
+  arena Mermer Tahta (mermermasa). Hepsi CC-BY, atıflar eklendi.
+- TAHTA YÖNÜ ARTIK ÖLÇÜLÜYOR: a1/h1 karelerinin köşesi kareKonum + camera.project ile ekrana düşürülüp ekran görüntüsünden parlaklık okunur.
+  Gözle okuma iki kez yanılttı. Ölçülen doğru tahtaDon: lewismasa 0 (düzeltildi), zarifmasa PI/2, yanezmasa PI/2, mermermasa 0;
+  kontrol olarak ustamasa PI/2 (mevcutla aynı → yöntem doğru).
+- İndirilip KULLANILMAYAN tahtalar (scratchpad setler/tahta_ham): julia ve klasiktahta (taşlar türlerine göre birleşik), clarence/camay/starov
+  (yalnız tahta, oyun alanı ölçeği elle bulunmalı).

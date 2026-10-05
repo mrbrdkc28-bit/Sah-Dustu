@@ -2350,6 +2350,8 @@ html[data-tema="fildisi"] #secimSayfa .tsPaket.secili{background:linear-gradient
     <p>"Chess set" — <b>brendanwood872</b><br><span style="color:#7d7868;font-size:11px">sketchfab.com/3d-models/chess-set-a2664ea4fcaa4a64ad077667d9d0c7fb</span></p>
     <p>"Glass Chess Pieces" — <b>Yanez-Designs</b><br><span style="color:#7d7868;font-size:11px">sketchfab.com/3d-models/glass-chess-pieces-61776a22a2184a9f8ffd97675f68b44b</span></p>
     <p>"Cartoon Chess Set" — <b>CYX1122</b><br><span style="color:#7d7868;font-size:11px">sketchfab.com/3d-models/cartoon-chess-set-daae6882d0354d6389491e24f887b649</span></p>
+    <p>"Chess Board" — <b>Yanez-Designs</b><br><span style="color:#7d7868;font-size:11px">sketchfab.com/3d-models/chess-board-a0fb4aa0e75649e0991a2571ab70ea44</span></p>
+    <p>"Marble Chess Board" — <b>foggy_123</b><br><span style="color:#7d7868;font-size:11px">sketchfab.com/3d-models/marble-chess-board-1d06ba8ef476420094ec09e818bbebb7</span></p>
     <p>Deri tahta dokusu — <b>Glowbox</b> (Sketchfab, CC BY 4.0)</p>
     <p style="margin-top:14px">Klasik taş modelleri: <b>KayKit — Board Game Bits</b>, Kay Lousberg (kaylousberg.com). Lisans metni uygulama paketindeki KayKit-LICENSE.txt dosyasındadır.</p>
 
@@ -3481,13 +3483,13 @@ const ARENALAR = [
     tahtaGLB:'models/tahta_usta.glb', tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#33270F,#0E0A05 72%)',
     kareAcik:0xCCCCCC, kareKoyu:0x020202   /* GLB malzemesinden okundu */},
   /* 5 Ekim 2026: yeni orduların kendi tahtaları (Sketchfab CC-BY; setler/bol.mjs TAHTA modu:
-     kare=1 birim, merkez, üst yüzey y=0). tahtaDon telefonda h1 açık kare olacak şekilde seçildi. Samuray ve Turnuva tahtaları
+     kare=1 birim, merkez, üst yüzey y=0). tahtaDon telefonda ÖLÇÜLEREK seçildi (a1/h1 karelerinin ekran pikseli; gözle okuma iki kez yanılttı). Samuray ve Turnuva tahtaları
      kendi basılı koordinatları standart dışı olduğu için alınmadı. */
   { id:'lewismasa', ad:'Lewis Tahtası', desc:'Ortaçağ Lewis taşlarının sade ahşap tahtası.',
     gok:0x13100B, sis:0x1B160E, sisYog:0.012, zemin:0x17120B,
     acikKare:0xC9B48C, koyuKare:0x3A2A1A, isik:0xFFEFD6, ortam:0x8A7A5E,
     aksan:'#B89A62', parcacik:'yildiz', acikTas:0xE6D8BC, koyuTas:0x5A3A2A,
-    tahtaGLB:'models/tahta_lewis.glb', tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#3A2C18,#120D06 72%)',
+    tahtaGLB:'models/tahta_lewis.glb', tahtaDon:0, grad:'linear-gradient(160deg,#3A2C18,#120D06 72%)',
     kareAcik:0xC9B48C, kareKoyu:0x3A2A1A},
   { id:'zarifmasa', ad:'Zarif Masa', desc:'Kademeli çerçeveli ince işçilik tahta.',
     gok:0x100E0B, sis:0x18140F, sisYog:0.012, zemin:0x14110C,
@@ -3495,6 +3497,18 @@ const ARENALAR = [
     aksan:'#C2A06A', parcacik:'yildiz', acikTas:0xEDE6D6, koyuTas:0x3A322A,
     tahtaGLB:'models/tahta_klasikset.glb', tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#3A2E1E,#110D08 72%)',
     kareAcik:0xD8CDB8, kareKoyu:0x2B241C},
+  { id:'yanezmasa', ad:'Siyah Mermer Masa', desc:'Siyah mermer çerçeveli, ahşap kenarlı tahta.',
+    gok:0x101012, sis:0x18181B, sisYog:0.012, zemin:0x131315,
+    acikKare:0xD8D2C4, koyuKare:0x2A2620, isik:0xFFF4E4, ortam:0x858070,
+    aksan:'#B8A070', parcacik:'yildiz', acikTas:0xF0EAE0, koyuTas:0x3A3632,
+    tahtaGLB:'models/tahta_yanez.glb', tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#2E2A22,#0E0D0B 72%)',
+    kareAcik:0xD8D2C4, kareKoyu:0x2A2620},
+  { id:'mermermasa', ad:'Mermer Tahta', desc:'Beyaz ve siyah mermer satranç tahtası.',
+    gok:0x121214, sis:0x1A1A1E, sisYog:0.012, zemin:0x141417,
+    acikKare:0xE2E2E0, koyuKare:0x202022, isik:0xF6F6FA, ortam:0x8A8A92,
+    aksan:'#B8B4A8', parcacik:'yildiz', acikTas:0xEDEDEA, koyuTas:0x3E3E42,
+    tahtaGLB:'models/tahta_mermer.glb', tahtaDon:0, grad:'linear-gradient(160deg,#2C2C30,#0F0F11 72%)',
+    kareAcik:0xE2E2E0, kareKoyu:0x202022},
 ];
 
 let scene, camera, renderer, saat;
@@ -3919,6 +3933,10 @@ const ORDULAR=[
     w:0xEDE6D6, b:0x1A1612, glb:true},
   {id:'cizgi', ad:'Çizgi Film', desc:'Sevimli, oyuncak gibi set.',
     w:0xF4F0E6, b:0x2B2B33, glb:true},
+  {id:'yanez', ad:'Porselen', desc:'Parlak porselen: beyaz ve siyah klasik taşlar.',
+    w:0xF0EAE0, b:0x1A1A1A, glb:true},
+  {id:'mermer', ad:'Mermer', desc:'Mermer taşlar — beyaz ve siyah mermer.',
+    w:0xEDEDEA, b:0x1E1E20, glb:true},
   {id:'camtas', ad:'Kristal', desc:'Yarı saydam kristal taşlar: berrak cama karşı füme.',
     w:0xEAF2F5, b:0x1C2026, glb:true},
 ];
@@ -4590,7 +4608,7 @@ function modelDene(g,t,c){
     // Hedef: beyaz at beyazın SOLUNA (-X) bakar (diyagram geleneği), siyah aynalı.
     if(t==='n'){
       const A={gercek3:0, gercek4:Math.PI, gercek5:Math.PI/2, gercek6:-Math.PI/2, gercek7:-Math.PI/2, retropc:0, c2:-Math.PI/2, metal:Math.PI, lowpoly:-Math.PI/2, sade:-Math.PI/2, scifi:-Math.PI/2,
-        lewis:Math.PI/2, samuray:Math.PI, gercektam:Math.PI/2, klasikset:-Math.PI/2, cizgi:Math.PI, camtas:-Math.PI/2}[aktifOrdu.id];
+        lewis:Math.PI/2, samuray:Math.PI, gercektam:Math.PI/2, klasikset:-Math.PI/2, cizgi:Math.PI, camtas:-Math.PI/2, yanez:Math.PI, mermer:Math.PI}[aktifOrdu.id];
       const taban=(A!==undefined)?A:Math.PI/2;
       m.rotation.y = c==='w' ? taban : taban+Math.PI;
     }
