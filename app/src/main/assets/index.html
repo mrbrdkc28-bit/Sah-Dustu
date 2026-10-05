@@ -1577,6 +1577,13 @@ html[dir="rtl"] .menuSlogan.yaz{animation-name:sloganYazRtl}
 @keyframes sloganYazRtl{0%{clip-path:inset(-20% 0 -20% 100%);filter:blur(1.2px)}
   80%{filter:blur(0)}100%{clip-path:inset(-20% 0 -20% -4%);filter:blur(0)}}
 body.azHareket .menuSlogan.yaz,body.azHareket .menuSlogan.sil{animation:none}
+/* Sözler (5 Ekim 2026): sabit yükseklikli alan (söz değişince kartlar oynamaz), yazar satırı */
+.menuSoz{min-height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:2px}
+.menuSoz .menuSlogan{max-width:94%;margin-top:0}
+.sozYazar{font:600 11.5px Manrope,sans-serif;letter-spacing:.06em;margin-top:6px;opacity:0;
+  transform:rotate(-3deg);transition:opacity .5s ease}
+.sozYazar.gor{opacity:.72;transition:opacity .8s ease 1.6s}
+html[lang="ar"] .sozYazar,html[lang="zh"] .sozYazar{letter-spacing:.04em;font-size:11px}
 
 /* ===== OYUN İÇİ (3 Ekim 2026): cam düğmeler, ince çizgi ikonlar, düzgün hamle yazısı ===== */
 .hbtn{border-radius:12px;background:rgba(12,14,22,.55);border-color:rgba(255,255,255,.10);
@@ -2240,7 +2247,7 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
   <div id="profilCubuk"></div>
   <div class="anaBaslik">
     <h1>CHESS <span>64</span></h1>
-    <div class="menuSlogan">Satranç her şeydir.</div>
+    <div class="menuSoz"><div class="menuSlogan"></div><div class="sozYazar"></div></div>
   </div>
 
   <div class="kartlar">
@@ -16166,28 +16173,83 @@ function devPanelAc(){
 })();
 </script>
 <script>
-/* MENÜ SLOGANI — canlı yazım döngüsü (10 sn) */
+/* MENÜ SÖZLERİ (5 Ekim 2026, sahibin isteği): her turda sıradaki söz el yazısıyla yazılır, altında yazarı.
+   Kaynağı sağlam sözler seçildi (yaygın ama yanlış atfedilenler alınmadı). Uzun sözde yazı küçülür (en çok 3 satır),
+   alanın yüksekliği sabit (kartlar oynamaz), okuma süresi uzunluğa göre. Karışık sıra, aynı söz arka arkaya gelmez. */
+const SOZ_YAZAR={
+  fischer:{tr:'Bobby Fischer',ru:'Бобби Фишер',ar:'بوبي فيشر',zh:'鲍比·费舍尔'},
+  philidor:{tr:'Philidor',ru:'Филидор',ar:'فيليدور',zh:'菲利多尔'},
+  lasker:{tr:'Emanuel Lasker',ru:'Эмануил Ласкер',ar:'إيمانويل لاسكر',zh:'伊曼纽尔·拉斯克'},
+  tartakower:{tr:'Savielly Tartakower',ru:'Савелий Тартаковер',ar:'سافيلي تارتاكوفر',zh:'萨维利·塔塔科维'},
+  nimzo:{tr:'Aron Nimzowitsch',ru:'Арон Нимцович',ar:'آرون نيمزوفيتش',zh:'阿伦·尼姆佐维奇'},
+  chernev:{tr:'Irving Chernev',ru:'Ирвинг Чернев',ar:'إرفينغ تشيرنيف',zh:'欧文·切尔涅夫'},
+  capablanca:{tr:'José Raúl Capablanca',ru:'Хосе Рауль Капабланка',ar:'خوسيه راؤول كابابلانكا',zh:'何塞·劳尔·卡帕布兰卡'},
+  tarrasch:{tr:'Siegbert Tarrasch',ru:'Зигберт Тарраш',ar:'زيغبرت تاراش',zh:'西格伯特·塔拉什'},
+  tal:{tr:'Mihail Tal',en:'Mikhail Tal',fr:'Mikhaïl Tal',de:'Michail Tal',it:'Michail Tal',ru:'Михаил Таль',ar:'ميخائيل تال',zh:'米哈伊尔·塔尔'},
+  goethe:{tr:'Goethe',ru:'Гёте',ar:'غوته',zh:'歌德'},
+  hint:{tr:'Hint atasözü',en:'Indian proverb',ru:'Индийская пословица',ar:'مثل هندي',fr:'Proverbe indien',de:'Indisches Sprichwort',it:'Proverbio indiano',zh:'印度谚语'},
+  italyan:{tr:'İtalyan atasözü',en:'Italian proverb',ru:'Итальянская пословица',ar:'مثل إيطالي',fr:'Proverbe italien',de:'Italienisches Sprichwort',it:'Proverbio italiano',zh:'意大利谚语'},
+  suntzu:{tr:'Sun Tzu',ru:'Сунь-цзы',ar:'سون تزو',zh:'孙子'},
+  franklin:{tr:'Benjamin Franklin',ru:'Бенджамин Франклин',ar:'بنجامين فرانكلين',zh:'本杰明·富兰克林'}
+};
+const SOZLER=[
+  {y:'fischer', tr:'Satranç hayatın kendisidir.', en:'Chess is life.', ru:'Шахматы — это жизнь.', ar:'الشطرنج هو الحياة.', fr:'Les échecs, c\'est la vie.', de:'Schach ist Leben.', it:'Gli scacchi sono la vita.', zh:'国际象棋就是生活。'},
+  {y:'philidor', tr:'Piyonlar satrancın ruhudur.', en:'Pawns are the soul of chess.', ru:'Пешки — душа шахмат.', ar:'البيادق روح الشطرنج.', fr:'Les pions sont l\'âme des échecs.', de:'Die Bauern sind die Seele des Schachspiels.', it:'I pedoni sono l\'anima degli scacchi.', zh:'兵是国际象棋的灵魂。'},
+  {y:'lasker', tr:'İyi bir hamle gördüğünde, daha iyisini ara.', en:'When you see a good move, look for a better one.', ru:'Увидев хороший ход, ищи лучший.', ar:'إذا رأيت نقلة جيدة، فابحث عن نقلة أفضل.', fr:'Quand tu vois un bon coup, cherches-en un meilleur.', de:'Siehst du einen guten Zug, such einen besseren.', it:'Quando vedi una buona mossa, cercane una migliore.', zh:'看到一步好棋时，再找一步更好的。'},
+  {y:'tartakower', tr:'Kazanan, sondan bir önceki hatayı yapandır.', en:'The winner of the game is the player who makes the next-to-last mistake.', ru:'Побеждает тот, кто делает предпоследнюю ошибку.', ar:'الفائز هو من يرتكب الخطأ قبل الأخير.', fr:'Le vainqueur est celui qui commet l\'avant-dernière faute.', de:'Gewinner ist, wer den vorletzten Fehler macht.', it:'Vince chi commette il penultimo errore.', zh:'赢家是犯倒数第二个错误的人。'},
+  {y:'tartakower', tr:'Taktik, yapılacak bir şey varken ne yapacağını bilmektir; strateji ise yapılacak bir şey yokken ne yapacağını bilmek.', en:'Tactics is knowing what to do when there is something to do; strategy is knowing what to do when there is nothing to do.', ru:'Тактика — знать, что делать, когда есть что делать; стратегия — знать, что делать, когда делать нечего.', ar:'التكتيك أن تعرف ما تفعله حين يكون هناك ما يُفعل، والاستراتيجية أن تعرف ما تفعله حين لا يكون هناك ما يُفعل.', fr:'La tactique, c\'est savoir quoi faire quand il y a quelque chose à faire ; la stratégie, c\'est savoir quoi faire quand il n\'y a rien à faire.', de:'Taktik heißt wissen, was zu tun ist, wenn es etwas zu tun gibt; Strategie heißt wissen, was zu tun ist, wenn es nichts zu tun gibt.', it:'La tattica è sapere cosa fare quando c\'è qualcosa da fare; la strategia è sapere cosa fare quando non c\'è niente da fare.', zh:'战术是有事可做时知道该做什么；战略是无事可做时知道该做什么。'},
+  {y:'nimzo', tr:'Tehdit, uygulanmasından daha güçlüdür.', en:'The threat is stronger than the execution.', ru:'Угроза сильнее исполнения.', ar:'التهديد أقوى من تنفيذه.', fr:'La menace est plus forte que son exécution.', de:'Die Drohung ist stärker als die Ausführung.', it:'La minaccia è più forte della sua esecuzione.', zh:'威胁比执行更有力。'},
+  {y:'chernev', tr:'Her satranç ustası bir zamanlar acemiydi.', en:'Every chess master was once a beginner.', ru:'Каждый мастер когда-то был новичком.', ar:'كل أستاذ في الشطرنج كان يومًا مبتدئًا.', fr:'Tout maître d\'échecs a d\'abord été débutant.', de:'Jeder Schachmeister war einmal ein Anfänger.', it:'Ogni maestro di scacchi è stato un principiante.', zh:'每位国际象棋大师都曾是初学者。'},
+  {y:'capablanca', tr:'Kaybettiğin bir oyundan, kazandığından çok daha fazlasını öğrenirsin.', en:'You may learn much more from a game you lose than from a game you win.', ru:'Из проигранной партии можно узнать гораздо больше, чем из выигранной.', ar:'قد تتعلم من مباراة تخسرها أكثر بكثير مما تتعلمه من مباراة تفوز بها.', fr:'On apprend bien plus d\'une partie perdue que d\'une partie gagnée.', de:'Aus einer verlorenen Partie lernt man viel mehr als aus einer gewonnenen.', it:'Da una partita persa si impara molto più che da una vinta.', zh:'输掉的一局棋能教给你的，远比赢下的一局多。'},
+  {y:'tarrasch', tr:'Satranç da aşk ve müzik gibi insanı mutlu etme gücüne sahiptir.', en:'Chess, like love, like music, has the power to make men happy.', ru:'Шахматы, как любовь и музыка, способны сделать человека счастливым.', ar:'الشطرنج، مثل الحب والموسيقى، يملك القدرة على إسعاد الإنسان.', fr:'Les échecs, comme l\'amour, comme la musique, ont le pouvoir de rendre les hommes heureux.', de:'Schach hat wie die Liebe, wie die Musik die Kraft, den Menschen glücklich zu machen.', it:'Gli scacchi, come l\'amore e la musica, hanno il potere di rendere felici.', zh:'国际象棋如同爱情与音乐，拥有让人幸福的力量。'},
+  {y:'tal', tr:'Rakibini derin, karanlık bir ormana götür; orada 2+2=5 eder ve çıkış yolu yalnızca bir kişiye yetecek kadar geniştir.', en:'You must take your opponent into a deep dark forest where 2+2=5, and the path leading out is only wide enough for one.', ru:'Нужно завести соперника в тёмный лес, где 2+2=5, а тропинка из него рассчитана только на одного.', ar:'عليك أن تقود خصمك إلى غابة مظلمة عميقة حيث 2+2=5، والطريق للخروج منها لا يتسع إلا لشخص واحد.', fr:'Il faut entraîner l\'adversaire dans une forêt profonde et sombre où 2+2=5, et dont le sentier de sortie n\'est assez large que pour un seul.', de:'Man muss den Gegner in einen tiefen, dunklen Wald führen, wo 2+2=5 ist und der Weg hinaus nur für einen breit genug ist.', it:'Devi portare l\'avversario in una foresta profonda e buia dove 2+2=5, e il sentiero per uscirne è largo solo per uno.', zh:'你要把对手引入一片幽深的黑森林，那里二加二等于五，而走出去的小路只容得下一个人。'},
+  {y:'fischer', tr:'Psikolojiye inanmam. İyi hamlelere inanırım.', en:'I don\'t believe in psychology. I believe in good moves.', ru:'Я не верю в психологию. Я верю в хорошие ходы.', ar:'لا أؤمن بعلم النفس، أؤمن بالنقلات الجيدة.', fr:'Je ne crois pas à la psychologie. Je crois aux bons coups.', de:'Ich glaube nicht an Psychologie. Ich glaube an gute Züge.', it:'Non credo nella psicologia. Credo nelle buone mosse.', zh:'我不相信心理学，我相信好棋。'},
+  {y:'goethe', tr:'Satranç zekânın mihenk taşıdır.', en:'Chess is the touchstone of the intellect.', ru:'Шахматы — пробный камень интеллекта.', ar:'الشطرنج محكّ العقل.', fr:'Les échecs sont la pierre de touche de l\'intelligence.', de:'Schach ist der Prüfstein des Geistes.', it:'Gli scacchi sono la pietra di paragone dell\'intelletto.', zh:'国际象棋是智慧的试金石。'},
+  {y:'hint', tr:'Satranç öyle bir denizdir ki sivrisinek de içinden su içebilir, fil de yıkanabilir.', en:'Chess is a sea in which a gnat may drink and an elephant may bathe.', ru:'Шахматы — море, в котором комар может напиться, а слон — искупаться.', ar:'الشطرنج بحر يشرب منه البعوض ويستحم فيه الفيل.', fr:'Les échecs sont une mer où un moucheron peut boire et un éléphant se baigner.', de:'Schach ist ein Meer, aus dem eine Mücke trinken und in dem ein Elefant baden kann.', it:'Gli scacchi sono un mare in cui un moscerino può bere e un elefante fare il bagno.', zh:'国际象棋是一片海，蚊子可以在此饮水，大象可以在此沐浴。'},
+  {y:'italyan', tr:'Oyun bitince şah da piyon da aynı kutuya girer.', en:'After the game, the king and the pawn go into the same box.', ru:'После игры король и пешка ложатся в одну коробку.', ar:'بعد انتهاء اللعبة، يعود الملك والبيدق إلى العلبة نفسها.', fr:'Après la partie, le roi et le pion retournent dans la même boîte.', de:'Nach dem Spiel kommen König und Bauer in dieselbe Schachtel.', it:'Finita la partita, il re e il pedone tornano nella stessa scatola.', zh:'棋局结束后，王与兵都回到同一个盒子里。'},
+  {y:'suntzu', tr:'Muzaffer savaşçılar önce kazanır, sonra savaşa girer.', en:'Victorious warriors win first and then go to war.', ru:'Победоносные воины сначала побеждают, а потом идут на войну.', ar:'المحاربون المنتصرون يفوزون أولًا ثم يذهبون إلى الحرب.', fr:'Les guerriers victorieux gagnent d\'abord, puis partent en guerre.', de:'Siegreiche Krieger gewinnen zuerst und ziehen dann in den Krieg.', it:'I guerrieri vittoriosi prima vincono, poi vanno in guerra.', zh:'胜兵先胜而后求战。'},
+  {y:'suntzu', tr:'Savaşmadan düşmanı yenmek, ustalığın doruğudur.', en:'The supreme art of war is to subdue the enemy without fighting.', ru:'Высшее искусство войны — покорить врага без сражения.', ar:'قمة فن الحرب أن تُخضع عدوك دون قتال.', fr:'L\'art suprême de la guerre est de soumettre l\'ennemi sans combattre.', de:'Die höchste Kriegskunst ist es, den Feind ohne Kampf zu unterwerfen.', it:'L\'arte suprema della guerra è sottomettere il nemico senza combattere.', zh:'不战而屈人之兵，善之善者也。'},
+  {y:'franklin', tr:'Satranç oyunu boş bir eğlence değildir.', en:'The game of chess is not merely an idle amusement.', ru:'Шахматы — не просто праздное развлечение.', ar:'ليس الشطرنج مجرد تسلية عابثة.', fr:'Le jeu d\'échecs n\'est pas un simple amusement oisif.', de:'Schach ist nicht bloß ein müßiger Zeitvertreib.', it:'Gli scacchi non sono un semplice passatempo.', zh:'国际象棋不只是消遣。'}
+];
 (function(){
-  const el=document.querySelector('.menuSlogan'), menu=document.getElementById('menu'); if(!el||!menu) return;
+  const el=document.querySelector('.menuSlogan'), yz=document.querySelector('.sozYazar'), menu=document.getElementById('menu');
+  if(!el||!yz||!menu) return;
   const ACIK=['#B3261E','#B07E22','#2B5197','#1F7A4D','#7A2E6E','#A2441C'];   // Fildişi
   const KOYU=['#E0503F','#E8B64C','#7FA8E8','#5CC08A','#C77DBA','#E8894A'];   // koyu temalar
-  let i=0;
+  let i=0, sira=[], an=-1, zaman=null;
+  const dil=()=>{ const d=(typeof uygDil!=='undefined'&&uygDil)||document.documentElement.lang||'tr'; return SOZLER[0][d]?d:'en'; };
   function renk(){ const p=document.documentElement.getAttribute('data-tema')==='fildisi'?ACIK:KOYU; return p[i%p.length]; }
-  function yaz(){
-    el.style.setProperty('--sloganRenk', renk());
-    el.classList.remove('sil','yaz'); void el.offsetWidth; el.classList.add('yaz');
+  function sonraki(){
+    if(!sira.length){ sira=SOZLER.map((_,k)=>k).sort(()=>Math.random()-.5); if(sira[0]===an && sira.length>1) sira.push(sira.shift()); }
+    an=sira.shift(); return SOZLER[an];
   }
+  function boyut(s,d){
+    const L=s.length*(d==='zh'?2.1:d==='ar'?1.1:1), taban=d==='zh'?20:d==='ar'?22:d==='ru'?23:24;
+    const k=L<=34?1:L<=60?.86:L<=95?.74:.64;
+    return Math.round(taban*k);
+  }
+  function yaz(soz){
+    const d=dil(), s=soz[d]||soz.en, a=SOZ_YAZAR[soz.y]||{};
+    el.textContent=s; el.style.fontSize=boyut(s,d)+'px'; el.style.lineHeight=s.length>34?'1.18':'1.1';
+    yz.textContent='— '+(a[d]||a.tr||'');
+    el.style.setProperty('--sloganRenk', renk()); yz.style.color=renk();
+    el.classList.remove('sil','yaz'); yz.classList.remove('gor'); void el.offsetWidth; el.classList.add('yaz'); yz.classList.add('gor');
+    return s.length;
+  }
+  function planla(uz){ clearTimeout(zaman); zaman=setTimeout(dongu, Math.max(10000, 4500+uz*85)); }
   function dongu(){
-    // Menü görünmüyorsa (oyun ekranı vb.) boşuna çalışma
-    if(menu.classList.contains('gizli') || getComputedStyle(menu).display==='none') return;
-    el.classList.remove('yaz'); el.classList.add('sil');
-    setTimeout(()=>{ i++; yaz(); }, 520);
+    // Menü görünmüyorsa (oyun ekranı vb.) boşuna çalışma; kısa aralıkla tekrar bak
+    if(menu.classList.contains('gizli') || getComputedStyle(menu).display==='none'){ clearTimeout(zaman); zaman=setTimeout(dongu,3000); return; }
+    el.classList.remove('yaz'); el.classList.add('sil'); yz.classList.remove('gor');
+    setTimeout(()=>{ i++; planla(yaz(sonraki())); }, 520);
   }
-  yaz();
-  setInterval(dongu, 10000);
-  // Tema değişince o anki renk yeni paletten gelsin
-  new MutationObserver(()=>el.style.setProperty('--sloganRenk', renk()))
+  planla(yaz(sonraki()));
+  window.sozGoster=k=>{ an=k; planla(yaz(SOZLER[k])); };   // deneme/önizleme için
+  // Tema değişince renk yeni paletten, dil değişince aynı söz yeni dilde
+  new MutationObserver(()=>{ el.style.setProperty('--sloganRenk', renk()); yz.style.color=renk(); })
     .observe(document.documentElement,{attributes:true,attributeFilter:['data-tema']});
+  new MutationObserver(()=>{ if(an>=0) yaz(SOZLER[an]); })
+    .observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
 })();
 </script>
 
