@@ -893,3 +893,15 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Ayarlar › "Açılış animasyonu": Sinematik (varsayılan) / Klasik (localStorage.acilisTur). Hareket azaltma açıksa klasik.
 - window.ACILIS_MS / ACILIS_KURULUM_MS: 3B ağır kurulum mat sonrası durgun ana alındı (animasyon takılmasın).
   Giriş/menü açılışı artık perdeBittiginde(fn) ile perdenin kapanmasına bağlı (sabit 5.8 sn değil; dokununca hemen açılır).
+
+### 8.44 Menü/başlık, açılış takılmaları, atlama, geri tuşu, sıralama (5 Ekim 2026)
+- Menü başlığı: sola yaslıydı ve kullanıcı rozetiyle kesişiyordu → ortalı (harf aralığı dengeli), rozetin altında (anaBaslik 34 px);
+  söz alanı sabit 82 px (1↔2 satır geçişinde başlık kıpırdıyordu). Kart iç boşluğu 10 px, #altSecim 10 px → 6 temada tam sığıyor.
+- Açılış: 3B kurulum vezir inişine denk geliyordu (~0.7 sn donma) → ACILIS_KURULUM_MS = TMAT+1320 (şah devrildikten sonra).
+  Çarpışma anı 93 ms → ≤35 ms: gürültü tamponları önceden, tahta ölçek darbesi kaldırıldı, tuval önceden ısıtılıyor.
+  window.__acKare: açılışta 250 ms dilimlerinde en uzun kare (ölçüm için).
+- Dokunarak atlama: aynı dokunuşun click'i alttaki menü kartını açıyordu → perdeye basıldıktan sonra 700 ms tıklamalar yutulur.
+- Geri tuşu (geriTusu): önce açık olanı kapatır — secimSayfa (ses seçici → taş sesleri → ayarlar → kapat; zorunluda kapanmaz),
+  cvAyarPop, davetPop, analiz ekranı, arkadaşlar, lisanslar. Oyun içinde ayarlar açıkken artık oyundan çıkmıyor.
+- Ordular: Gerçekçi V (gercek5, kaynağı belirsizdi) kaldırıldı. Sıra: klasik (ücretsiz), Çizgi Film, Kristal, sonra diğerleri.
+  Arenalar: harp ve retro (ücretsiz), Gül Ağacı, sonra diğerleri. Seçimler kimlikle saklandığı için sıra değişimi güvenli.

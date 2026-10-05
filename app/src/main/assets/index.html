@@ -1584,7 +1584,7 @@ html[dir="rtl"] .menuSlogan.yaz{animation-name:sloganYazRtl}
   80%{filter:blur(0)}100%{clip-path:inset(-20% 0 -20% -4%);filter:blur(0)}}
 body.azHareket .menuSlogan.yaz,body.azHareket .menuSlogan.sil{animation:none}
 /* Sözler (5 Ekim 2026): sabit yükseklikli alan (söz değişince kartlar oynamaz), yazar satırı */
-.menuSoz{width:100%;box-sizing:border-box;padding:0 6px;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:2px}
+.menuSoz{width:100%;box-sizing:border-box;padding:0 6px;height:82px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:2px}
 .menuSoz .menuSlogan{max-width:100%;margin-top:0;text-wrap:balance;font-family:'SozYazi',Georgia,'Noto Serif CJK SC','Noto Serif',serif;font-weight:500;
   transform:none!important;letter-spacing:0!important;text-shadow:none}
 html:not([data-tema="fildisi"]) .menuSoz .menuSlogan{text-shadow:0 1px 8px rgba(0,0,0,.35)}
@@ -1593,9 +1593,11 @@ html:not([data-tema="fildisi"]) .menuSoz .menuSlogan{text-shadow:0 1px 8px rgba(
 .sozYazar.gor{opacity:.72;transition:opacity .8s ease 1.6s}
 html[lang="ar"] .sozYazar,html[lang="zh"] .sozYazar{letter-spacing:.04em;font-size:11px}
 /* Menü ekrana sığsın (5 Ekim 2026): sözler alanı eklendi, Arkadaşlar profile taşındı; boşluklar sıkıldı */
-html[data-tema] #menu .anaBaslik{margin-top:20px}
+html[data-tema] #menu .anaBaslik{margin-top:34px}
+html[data-tema] #menu .anaBaslik h1{text-align:center;padding-left:.14em}   /* harf aralığının sondaki boşluğunu dengeler */
+html[data-tema] #menu .kartlar .anaKart{padding-top:10px;padding-bottom:10px}
 html[data-tema] #menu .kartlar{margin-top:8px}
-html[data-tema] #menu .altSecim{margin-top:10px}
+html[data-tema] #menu #altSecim{margin-top:10px}
 
 /* ===== OYUN İÇİ (3 Ekim 2026): cam düğmeler, ince çizgi ikonlar, düzgün hamle yazısı ===== */
 .hbtn{border-radius:12px;background:rgba(12,14,22,.55);border-color:rgba(255,255,255,.10);
@@ -2242,12 +2244,13 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
   if(!perde || tur!=='sinematik' || azHareket) return;
   perde.classList.add('sinematik');
   const T0=4300, T1=T0+780, TSAH=T1+620, TTAS=TSAH+520, ARA=270, TVEZ=TTAS+5*ARA+330, TMAT=TVEZ+430, TSON=TMAT+1800;
-  window.ACILIS_MS=TSON+800; window.ACILIS_KURULUM_MS=TMAT+300;
+  window.ACILIS_MS=TSON+800; window.ACILIS_KURULUM_MS=TMAT+1320;   // şah devrilmesi bittikten sonra (vezir inişinde takılma yapıyordu)
 
   const sesVar=(()=>{ try{ return localStorage.getItem('sesKapali')!=='1'; }catch(e){ return true; } })();
   let ses=null;
   function sesKur(){ if(ses||!sesVar) return ses; try{ const AC=window.AudioContext||window.webkitAudioContext; ses=new AC(); if(ses.state==='suspended') ses.resume(); }catch(e){ ses=null; } return ses; }
-  function gurultu(c,sure){ const b=c.createBuffer(1,Math.floor(c.sampleRate*sure),c.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; const s=c.createBufferSource(); s.buffer=b; return s; }
+  const _gb={};   // gürültü tamponları önceden üretilir (çarpışma anında üretmek 90 ms takılma yapıyordu)
+  function gurultu(c,sure){ let b=_gb[sure]; if(!b){ b=c.createBuffer(1,Math.floor(c.sampleRate*sure),c.sampleRate); const d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; _gb[sure]=b; } const s=c.createBufferSource(); s.buffer=b; return s; }
   function gumbur(guc){ const c=sesKur(); if(!c) return; const t=c.currentTime;
     const o=c.createOscillator(), g=c.createGain(); o.type='sine'; o.frequency.setValueAtTime(70,t); o.frequency.exponentialRampToValueAtTime(32,t+.6);
     g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.9*guc,t+.012); g.gain.exponentialRampToValueAtTime(.0001,t+.9); o.connect(g).connect(c.destination); o.start(t); o.stop(t+1);
@@ -2291,7 +2294,8 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
   function cizim(){
     if(!aktif) return;
     if(perde.classList.contains('bitti')){ durdur(); return; }
-    const sim=performance.now(), dt=Math.min(.05,(sim-son)/1000); son=sim;
+    const sim=performance.now(), ham=sim-son, dt=Math.min(.05,ham/1000); son=sim;
+    try{ const kb=(window.__acKare=window.__acKare||{}), dil=Math.floor(sim/250)*250; if(!kb[dil]||ham>kb[dil]) kb[dil]=Math.round(ham); }catch(e){}   // kare süresi ölçümü (en uzun, 250 ms dilimlerinde)
     cx.clearRect(0,0,W,H);
     if(dikis){ dikis.t+=dt; const k=dikis.t, sic=Math.max(0,1-k/1.5);
       const yol=(pts)=>{ cx.beginPath(); cx.moveTo(pts[0][0],pts[0][1]); for(let i=1;i<pts.length;i++) cx.lineTo(pts[i][0],pts[i][1]); };
@@ -2323,7 +2327,12 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
 
   /* --- 1) taş sırası ve logo yukarı süzülür, tahta yarıları gelir --- */
   const sira=document.getElementById('acilisTaslar'), logo=document.getElementById('acilisLogo'); const yukari=[sira,logo].filter(Boolean);
+  sonra(T0-500,()=>{ const c=sesKur(); if(c){ gurultu(c,.7); gurultu(c,.05); } });   // ses hazırlığı, sessiz anda
   sonra(T0,()=>{ olc(); requestAnimationFrame(cizim);
+    /* tuval ısıtma: çarpışmadaki ilk "lighter" çizimi ve kalın çizgiler 30-60 ms takılma yapıyordu; görünmez bir ön çizim */
+    try{ cx.globalCompositeOperation='lighter'; cx.strokeStyle='rgba(255,150,40,.004)'; cx.lineCap='round'; cx.lineJoin='round';
+      [16,7,2.6].forEach(lw=>{ cx.lineWidth=lw; cx.beginPath(); cx.moveTo(TX,TY+B/2); cx.lineTo(TX+B,TY+B/2+3); cx.stroke(); });
+      cx.fillStyle='rgba(255,200,80,.004)'; cx.beginPath(); cx.arc(TX+B/2,TY+B/2,3,0,7); cx.fill(); cx.globalCompositeOperation='source-over'; }catch(e){}
     const r=sira.getBoundingClientRect(), hedefUst=Math.max(H*.08, TY-200), kay=Math.min(0, hedefUst-r.top);
     yukari.forEach(el=>{ el.style.transition='transform .7s cubic-bezier(.3,.7,.2,1)'; el.style.transform='translateY('+kay+'px)'; });
     ust.style.transform='translateY('+(-(TY+B))+'px)'; alt.style.transform='translateY('+(H-TY)+'px)';
@@ -2336,8 +2345,7 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
   sonra(T1,()=>{ dikisKur(); const y=TY+B/2;
     kivilcimSac(TX+B/2,y,Math.round(150),B); kivilcimSac(TX,y,25,10); kivilcimSac(TX+B,y,25,10); kor(TX+B/2,y,40,B);
     sok={x:TX+B/2,y,r:B*.95,t:0}; sars(9,420); gumbur(1);
-    flasEl.animate([{opacity:.42},{opacity:0}],{duration:260,easing:'ease-out'});
-    tahta.animate([{transform:'scale(1.015)'},{transform:'scale(1)'}],{duration:300,easing:'ease-out'}); });
+    flasEl.animate([{opacity:.42},{opacity:0}],{duration:260,easing:'ease-out'}); });
   /* --- 3) taşlar: önce siyah şah, sonra renkli taşlar sıradaki yerlerinden yay çizerek düşer --- */
   const yerlesim=[['♟︎','h6'],['♞︎','f5'],['♝︎','f8'],['♜︎','g1'],['♚︎','e3'],['♛︎','g7']];   // .aT sırası: piyon, at, fil, vezir, şah, kale
   const kaynak={}; document.querySelectorAll('#acilisTaslar .aT').forEach(el=>{ kaynak[el.textContent.trim()[0]]=el; });
@@ -2367,6 +2375,14 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
   sonra(TSON+820,()=>{ durdur(); perde.classList.add('bitti'); });
   perde.addEventListener('pointerdown',()=>{ durdur(); },{once:true});
   addEventListener('resize',()=>{ if(aktif) olc(); });
+})();
+/* Perdeye dokunup atlayınca aynı dokunuşun "click"i alttaki menü kartına düşüyordu (kart açılıyordu).
+   Perdeye basıldığı andan 700 ms boyunca tıklamaları yakala ve yut. */
+(function(){
+  const p=document.getElementById('acilisPerde'); if(!p) return; let t=0;
+  p.addEventListener('pointerdown',()=>{ t=performance.now(); },{capture:true});
+  const yut=e=>{ if(t && performance.now()-t<700){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); } };
+  ['click','pointerup','mouseup','touchend'].forEach(ev=>document.addEventListener(ev,yut,{capture:true}));
 })();
 /* Perde kapandığında (süre doldu ya da dokunuldu) çalıştır — sabit 5.8 sn beklemek yerine */
 function perdeBittiginde(fn){
@@ -3626,6 +3642,17 @@ const ARENALAR = [
     gok:0x14110D, sis:0x241C14, sisYog:0.030, zemin:0x2A211A,
     acikKare:0x4A3D2E, koyuKare:0x2C231B, isik:0xFFD9A8, ortam:0x6B5B4A,
     aksan:'#D96B2B', parcacik:'kul', acikTas:0xFFE8C8, koyuTas:0x4F4F5F, grad:'linear-gradient(160deg,#3A2A1C,#120C08 70%)' },
+  { id:'retro', ad:'Retro Salon', desc:'Piksel dokulu nostaljik satranç tahtası.',
+    gok:0x101408, sis:0x18200E, sisYog:0.012, zemin:0x141A0C,
+    acikKare:0x9AB06A, koyuKare:0x2A3A1C, isik:0xF2FFDE, ortam:0x7A8A5A,
+    aksan:'#9FBF6F', parcacik:'yildiz', acikTas:0xE8E4D0, koyuTas:0x556441,
+    tahtaGLB:'models/tahta_retro.glb', tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#2A3618,#0C1206 72%)' },
+  { id:'gulmasa', ad:'Gül Ağacı', desc:'Akçaağaç ve gül ağacı kakma turnuva tahtası.',
+    gok:0x15100C, sis:0x1E1712, sisYog:0.012, zemin:0x1A130E,
+    acikKare:0xE3D3B7, koyuKare:0x75340E, isik:0xFFF0DC, ortam:0x8A7660,
+    aksan:'#C98A4E', parcacik:'yildiz', acikTas:0xF0E6D4, koyuTas:0x4A2A1A,
+    tahtaDoku:'dokular/tahta_gul.jpg', cerceveDoku:'dokular/cerceve_gul.jpg', dokuTon:[.42,.3,.19], grad:'linear-gradient(160deg,#3E2416,#140B06 72%)',
+    kareAcik:0xE3D3B7, kareKoyu:0x75340E},
   { id:'buz', ad:'Buzlar Ülkesi', desc:'Donmuş göl üstünde savaş. Her çatlak bir hamle.',
     gok:0x0D1620, sis:0x16242F, sisYog:0.026, zemin:0x18232C,
     acikKare:0x52707F, koyuKare:0x29414F, isik:0xCFEAFF, ortam:0x4A6E85,
@@ -3664,11 +3691,6 @@ const ARENALAR = [
     aksan:'#B8A868', parcacik:'yildiz', acikTas:0xEDEDF0, koyuTas:0x46464B,
     tahtaDoku:'dokular/tahta_mermer.jpg', cerceveDoku:'dokular/cerceve_duman.jpg', dokuTon:[.62,.62,.65], grad:'linear-gradient(160deg,#2A2A30,#101012 72%)',
     kareAcik:0xDBDEE5, kareKoyu:0x14181B   /* mermer dokusundan ölçüldü */},
-  { id:'retro', ad:'Retro Salon', desc:'Piksel dokulu nostaljik satranç tahtası.',
-    gok:0x101408, sis:0x18200E, sisYog:0.012, zemin:0x141A0C,
-    acikKare:0x9AB06A, koyuKare:0x2A3A1C, isik:0xF2FFDE, ortam:0x7A8A5A,
-    aksan:'#9FBF6F', parcacik:'yildiz', acikTas:0xE8E4D0, koyuTas:0x556441,
-    tahtaGLB:'models/tahta_retro.glb', tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#2A3618,#0C1206 72%)' },
   { id:'oymamasa', ad:'Oyma Tahta', desc:'Tik ve gül ağacı kaplama, kalın blok tahta.',
     gok:0x171008, sis:0x201709, sisYog:0.012, zemin:0x1A130A,
     acikKare:0xB07A42, koyuKare:0x241108, isik:0xFFE8C8, ortam:0x8A6844,
@@ -3681,9 +3703,6 @@ const ARENALAR = [
     aksan:'#C89A4A', parcacik:'yildiz', acikTas:0xE8E8E4, koyuTas:0x3D3D3D,
     tahtaGLB:'models/tahta_usta.glb', tahtaDon:Math.PI/2, grad:'linear-gradient(160deg,#33270F,#0E0A05 72%)',
     kareAcik:0xCCCCCC, kareKoyu:0x020202   /* GLB malzemesinden okundu */},
-  /* 5 Ekim 2026: yeni orduların kendi tahtaları (Sketchfab CC-BY; setler/bol.mjs TAHTA modu:
-     kare=1 birim, merkez, üst yüzey y=0). tahtaDon telefonda ÖLÇÜLEREK seçildi (a1/h1 karelerinin ekran pikseli; gözle okuma iki kez yanılttı). Samuray ve Turnuva tahtaları
-     kendi basılı koordinatları standart dışı olduğu için alınmadı. */
   { id:'lewismasa', ad:'Lewis Tahtası', desc:'Ortaçağ Lewis taşlarının sade ahşap tahtası.',
     gok:0x13100B, sis:0x1B160E, sisYog:0.012, zemin:0x17120B,
     acikKare:0xC9B48C, koyuKare:0x3A2A1A, isik:0xFFEFD6, ortam:0x8A7A5E,
@@ -3708,15 +3727,6 @@ const ARENALAR = [
     aksan:'#B8B4A8', parcacik:'yildiz', acikTas:0xEDEDEA, koyuTas:0x3E3E42,
     tahtaGLB:'models/tahta_mermer.glb', tahtaDon:0, grad:'linear-gradient(160deg,#2C2C30,#0F0F11 72%)',
     kareAcik:0xE2E2E0, kareKoyu:0x202022},
-  /* 5 Ekim 2026: kakma tahtalar — Poly Haven CC0 ahşap kaplamalarından kare kare dizildi (scratchpad ph/kakma.py).
-     cerceveDoku: çerçeve de aynı ahşaptan. dokuTon: dokuyu çarpan renk — sahne ışığı açık ahşabı bembeyaz yapıyordu
-     (telefonda denendi: gri kısma rengi soldurur, sıcak ton akçaağacı krem tutar). */
-  { id:'gulmasa', ad:'Gül Ağacı', desc:'Akçaağaç ve gül ağacı kakma turnuva tahtası.',
-    gok:0x15100C, sis:0x1E1712, sisYog:0.012, zemin:0x1A130E,
-    acikKare:0xE3D3B7, koyuKare:0x75340E, isik:0xFFF0DC, ortam:0x8A7660,
-    aksan:'#C98A4E', parcacik:'yildiz', acikTas:0xF0E6D4, koyuTas:0x4A2A1A,
-    tahtaDoku:'dokular/tahta_gul.jpg', cerceveDoku:'dokular/cerceve_gul.jpg', dokuTon:[.42,.3,.19], grad:'linear-gradient(160deg,#3E2416,#140B06 72%)',
-    kareAcik:0xE3D3B7, kareKoyu:0x75340E},
   { id:'abanozmasa', ad:'Meşe ve Abanoz', desc:'Bal rengi meşe, koyu abanoz. Ağır, sıcak bir tahta.',
     gok:0x120E0A, sis:0x1A1510, sisYog:0.012, zemin:0x16110C,
     acikKare:0xB0875B, koyuKare:0x2B190C, isik:0xFFEDD4, ortam:0x84705A,
@@ -3729,6 +3739,12 @@ const ARENALAR = [
     aksan:'#BFA58A', parcacik:'yildiz', acikTas:0xEEE6DC, koyuTas:0x3A3836,
     tahtaDoku:'dokular/tahta_duman.jpg', cerceveDoku:'dokular/cerceve_duman.jpg', dokuTon:[.42,.38,.34], grad:'linear-gradient(160deg,#2E2B28,#0E0D0C 72%)',
     kareAcik:0xCBA88A, kareKoyu:0x35312E},
+  /* 5 Ekim 2026: yeni orduların kendi tahtaları (Sketchfab CC-BY; setler/bol.mjs TAHTA modu:
+     kare=1 birim, merkez, üst yüzey y=0). tahtaDon telefonda ÖLÇÜLEREK seçildi (a1/h1 karelerinin ekran pikseli; gözle okuma iki kez yanılttı). Samuray ve Turnuva tahtaları
+     kendi basılı koordinatları standart dışı olduğu için alınmadı. */
+  /* 5 Ekim 2026: kakma tahtalar — Poly Haven CC0 ahşap kaplamalarından kare kare dizildi (scratchpad ph/kakma.py).
+     cerceveDoku: çerçeve de aynı ahşaptan. dokuTon: dokuyu çarpan renk — sahne ışığı açık ahşabı bembeyaz yapıyordu
+     (telefonda denendi: gri kısma rengi soldurur, sıcak ton akçaağacı krem tutar). */
 ];
 
 let scene, camera, renderer, saat;
@@ -4123,6 +4139,10 @@ function tahtaYap(a){
 const ORDULAR=[
   {id:'klasik',   ad:'Klasik',   desc:'Sade ve zarif: geleneksel satranç taşı siluetleri.',
     w:0xF0E6CC, b:0x14161B},
+  {id:'cizgi', ad:'Çizgi Film', desc:'Sevimli, oyuncak gibi set.',
+    w:0xF4F0E6, b:0x2B2B33, glb:true},
+  {id:'camtas', ad:'Kristal', desc:'Yarı saydam kristal taşlar: berrak cama karşı füme.',
+    w:0xEAF2F5, b:0x1C2026, glb:true},
   {id:'misir',    ad:'Mısır',    desc:'Kumtaşı ordusu: piramit burç, çakal başlık, firavun tacı.',
     w:0xE6D3A3, b:0x3E3226},
   {id:'pers',     ad:'Pers',     desc:'Fildişi ve lacivert: soğan kubbe, kanat, sivri miğfer.',
@@ -4137,8 +4157,6 @@ const ORDULAR=[
     w:0xF2EAD8, b:0x15171C},
   {id:'gercek4',  ad:'Gerçekçi 3B IV', desc:'Ahşap turnuva seti — gerçek renkleriyle.',
     w:0xE0C9A0, b:0x2A1F18},
-  {id:'gercek5',  ad:'Gerçekçi 3B V', desc:'Sade modern set — net siluetler.',
-    w:0xE8E8E8, b:0x161616},
   {id:'gercek6',  ad:'Gerçekçi 3B VI', desc:'Bakır-altın detaylı zarif set.',
     w:0xD8D0C0, b:0x1C1814},
   {id:'gercek7',  ad:'Gerçekçi 3B VII', desc:'Profesyonel turnuva seti.',
@@ -4155,8 +4173,6 @@ const ORDULAR=[
     w:0xB7B7B7, b:0x0C0C0C, glb:true},
   {id:'scifi', ad:'Bilim Kurgu', desc:'Beyaz-teal fütürizme karşı kızıl cam.',
     w:0xF2F2F5, b:0x511008, glb:true},
-  /* 5 Ekim 2026: Sketchfab CC-BY 4.0 setler (atıflar Lisanslar ekranında). Başlangıç dizilişindeki
-     sahneden taş taş ayrıldı (scratchpad setler/bol.mjs), dokular küçültüldü. */
   {id:'lewis', ad:'Lewis', desc:'12. yüzyıl Lewis taşlarının replikası — gerçek tarama.',
     w:0xE6D8BC, b:0x6A2E22, glb:true},
   {id:'samuray', ad:'Samuray', desc:'Japon savaşçı ordusu — figürlü set.',
@@ -4165,14 +4181,12 @@ const ORDULAR=[
     w:0xF0EEE8, b:0x161616, glb:true},
   {id:'klasikset', ad:'Zarif Klasik', desc:'İnce işçilikli klasik set.',
     w:0xEDE6D6, b:0x1A1612, glb:true},
-  {id:'cizgi', ad:'Çizgi Film', desc:'Sevimli, oyuncak gibi set.',
-    w:0xF4F0E6, b:0x2B2B33, glb:true},
   {id:'yanez', ad:'Porselen', desc:'Parlak porselen: beyaz ve siyah klasik taşlar.',
     w:0xF0EAE0, b:0x1A1A1A, glb:true},
   {id:'mermer', ad:'Mermer', desc:'Mermer taşlar — beyaz ve siyah mermer.',
     w:0xEDEDEA, b:0x1E1E20, glb:true},
-  {id:'camtas', ad:'Kristal', desc:'Yarı saydam kristal taşlar: berrak cama karşı füme.',
-    w:0xEAF2F5, b:0x1C2026, glb:true},
+  /* 5 Ekim 2026: Sketchfab CC-BY 4.0 setler (atıflar Lisanslar ekranında). Başlangıç dizilişindeki
+     sahneden taş taş ayrıldı (scratchpad setler/bol.mjs), dokular küçültüldü. */
 ];
 let aktifOrdu=ORDULAR[0];
 
@@ -4845,7 +4859,7 @@ function modelDene(g,t,c){
     // At yönü: SETE ÖZEL (her modelin doğal baş ekseni farklı — kütle analiziyle bulundu).
     // Hedef: beyaz at beyazın SOLUNA (-X) bakar (diyagram geleneği), siyah aynalı.
     if(t==='n'){
-      const A={gercek3:0, gercek4:Math.PI, gercek5:-Math.PI/2, gercek6:-Math.PI/2, gercek7:-Math.PI/2, retropc:Math.PI, c2:-Math.PI/2, metal:Math.PI, lowpoly:0, sade:-Math.PI/2, scifi:-Math.PI/2,
+      const A={gercek3:0, gercek4:Math.PI, gercek6:-Math.PI/2, gercek7:-Math.PI/2, retropc:Math.PI, c2:-Math.PI/2, metal:Math.PI, lowpoly:0, sade:-Math.PI/2, scifi:-Math.PI/2,
         lewis:Math.PI/2, samuray:Math.PI, gercektam:Math.PI/2, klasikset:-Math.PI/2, cizgi:Math.PI, camtas:-Math.PI/2, yanez:Math.PI, mermer:Math.PI}[aktifOrdu.id];
       const taban=(A!==undefined)?A:Math.PI/2;
       m.rotation.y = c==='w' ? taban : taban+Math.PI;
@@ -10456,6 +10470,20 @@ window.geriTusu=function(){
     const pm=document.getElementById('premiumModal');
     if(pm){ pm.remove(); if(typeof pmBekleyen!=='undefined') pmBekleyen=null; return true; }
     const rm=document.getElementById('raporModal'); if(rm){ rm.remove(); return true; }
+    /* (5 Ekim 2026) Geri tuşu önce açık olanı kapatır: alttan açılan seçim/ayar sayfası (oyun içindeyken de),
+       arkadaşlar, lisanslar, analiz, davet/oda pencereleri. Eskiden oyun ayarlarındayken geri oyundan çıkarıyordu. */
+    const ss=document.getElementById('secimSayfa');
+    if(ss && ss.classList.contains('acik')){
+      if(ss.classList.contains('zorunlu')) return true;
+      if(ss.querySelector('.tsCipler') && window.tasSesleriAc){ window.tasSesleriAc(); return true; }      // ses seçimi → taş sesleri
+      if(ss.querySelector('.tsSatirT') && window.oyunAyarlariAc){ window.oyunAyarlariAc(); return true; } // taş sesleri → ayarlar
+      ss.classList.remove('acik'); return true;
+    }
+    const cap=document.getElementById('cvAyarPop'); if(cap && cap.classList.contains('acik')){ cap.classList.remove('acik'); return true; }
+    const dp=document.getElementById('davetPop'); if(dp && getComputedStyle(dp).display!=='none' && dp.classList.contains('acik')){ if(typeof davetKapat==='function') davetKapat(); else dp.classList.remove('acik'); return true; }
+    if(acik('analizEkran')){ const ak=document.getElementById('anKapat'); if(ak){ ak.click(); return true; } }
+    const ark=document.getElementById('arkadasEkran'); if(ark && ark.classList.contains('acik')){ arkadasKapat(); return true; }
+    const lis=document.getElementById('lisansEkran'); if(lis && !lis.classList.contains('gizli')){ lis.classList.add('gizli'); return true; }
     const le=document.getElementById('liderEkran');
     if(le && le.style.display!=='none'){ le.style.display='none'; return true; }
     if(typeof inceleAktif!=='undefined' && inceleAktif){
