@@ -905,3 +905,56 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   cvAyarPop, davetPop, analiz ekranı, arkadaşlar, lisanslar. Oyun içinde ayarlar açıkken artık oyundan çıkmıyor.
 - Ordular: Gerçekçi V (gercek5, kaynağı belirsizdi) kaldırıldı. Sıra: klasik (ücretsiz), Çizgi Film, Kristal, sonra diğerleri.
   Arenalar: harp ve retro (ücretsiz), Gül Ağacı, sonra diğerleri. Seçimler kimlikle saklandığı için sıra değişimi güvenli.
+
+### 8.45 2B görünüm: inceleme ve hamle hissi (8 Ekim 2026, telefonda doğrulandı)
+- **İncelemede 2B/3B geçişi tahtayı bozuyordu.** Üç sebep: (1) `duzKatmanKur` Motor'u okuyordu; incelemede Motor
+  sıfırlanmış/canlı konumdaydı → plakalar yanlış konum (çoğu zaman başlangıç). Artık `duzGorunenKonum()` gösterilen
+  konumu `konumGecmisi`'nden okur; `konumGoster` 2B'de katmanı da yeniler. (2) `kameraGuncelle` incelemede yalnız
+  bakış hedefini kaydırıyordu; tam tepeden (pitch 1.55) bu kamerayı dikeyin ötesine eğip tahtayı 180° çeviriyordu →
+  2B'de kamera hedefle birlikte kaydırılır. (3) Düz tahta panelin üstüne sığmıyordu → `inceleGorunumAyarla` 2B'de
+  `window._duzIncKadraj` (uzaklık + kayma) ölçer, tahta üst çubuk ile panel arasına sığar.
+- `dahaIyiOkGoster` Motor'u başlangıçta bırakıyordu (incelemeden çıkınca tahta başa dönüyordu) → canlı konuma geri getirir.
+- **2B hamle hissi:** eskiden 2B'de animasyon yoktu, katman her hamlede baştan kuruluyordu (ışınlanma; animasyon
+  kapalıyken yeme fark edilmiyordu). `duzKaydir`: plaka kayar ve hafif kabarır, yenen taş ezilip söner, karede kırmızı
+  dalga (`duzYemeDalgasi`), rokta kale de kayar. Plaka geometri/malzemesi ortak (eskiden her hamlede 32 yeni geometri
+  + malzeme sızıyordu). Bulmacada 2B katman yenilenmiyordu ve oyuncunun yediği 3B taş kalıyordu → düzeltildi.
+
+### 8.46 Varsayılan Yüksek · 60 Hz, Yüksek'te yenileme hızı seçimi (8 Ekim 2026)
+- Sahibin kararı: satrançta 120 Hz'in farkı az, tüketimi belirgin. Varsayılan kademe artık herkes için **Yüksek**
+  (çekirdek sayısına göre seçim kaldırıldı); Yüksek'in yenileme hızı ayrı ayar `yuksekHz` ('60' varsayılan | 'maks'),
+  `localStorage.yuksekHz`. `tamHizMi()` / `cizimHz()` / `yuksekHzAyarla()`; `kareMs` ve `yenilemeUygula` buna bakar.
+  Yüksek'in diğer özellikleri (2× çözünürlük, 2048 gölge, bloom, yansıma, her karede parçacık, sürekli çizim) aynı.
+- Ayarlar > Grafik altında "Yenileme hızı" (yalnız Yüksek seçiliyken ve ekran >60 Hz ise görünür).
+  İlk açılış sorusunda Yüksek · 60 Hz önceden seçili; "Yüksek · <maks> Hz" ayrı seçenek (ısınma uyarısı onda).
+- Ölçüm (telefon, oyun tahtası boşta): Yüksek 60 → ~56 çizim/sn, Orta → ~14. Bu cihazda sistem ayarı
+  `peak_refresh_rate=60` olduğu için "maks" seçilse de ekran 60'ta kalıyor (Android izin vermiyor; kod değil).
+
+### 8.47 Oyun içi Seçenekler: tekrarlar kalktı, Grafik eklendi (8 Ekim 2026)
+- "Görünüm ve Araçlar" ızgarasında, üst barda o an GÖRÜNEN düğmenin karşılığı gizlenir (her açılışta ölçülür:
+  `offsetParent`/genişlik; yön ve oyun türüne göre bar değişiyor). Sesli Oynama kısayolu `data-ust="btnSesKomut"`.
+  Hepsi gizlenirse bölüm de gizlenir (`#secAraclar.bos`). Dikeyde şu an yalnız "Yeni Oyun" kalıyor.
+- `#secGrafik`: Yüksek/Orta/Düşük + (Yüksek ve ekran >60 Hz ise) Yenileme hızı 60 / maks. Hamle canlandırılırken
+  (`kilit`) grafik değişimi bekletilir — tahta yeniden kurulursa hareket eden taş kayboluyordu.
+  `grafikYenidenKur` incelemede/geçmişte gösterilen konumu geri kurar (eskiden canlı konuma atlardı).
+
+### 8.48 Çıkış penceresi, son hamle vurgusu, esir yığını (8 Ekim 2026, telefonda doğrulandı)
+- **Sol alt düğme (`nMenu`)** artık doğrudan çıkmıyor: `#cikisPop` küçük penceresi — Yeni Oyun (`#btnYeni`'ye tıklar,
+  çevrimiçide gizli) / Menüye Dön (`#btnMenu`). Geri tuşu önce bu pencereyi kapatır (`cikisPopKapat`). Seçenekler
+  ızgarasındaki Yeni Oyun kaldırıldı (dikeyde ızgara boşaldığı için "Görünüm ve Araçlar" bölümü gizleniyor).
+- **Notasyon:** tarafın son hamlesi `.son` (altın, kalın), oyunun en son hamlesi `.enSon` (altı çizili), eskiler soluk.
+  Dikey şeritler ve yatay listeler.
+- **Esir yığını (`esirGrup`, `esirYiginiKur`, `esireGonder`, `esirDogur`):** yenen taşlar tahta dışında, alan tarafın
+  kenarında (z=±5.1, ölçek .6) birikir — dikeyde "senin aldıkların" altta, rakibinkiler üstte. Yığın her zaman
+  `konumGecmisi`'nden türetilir (`esirListesi`, alınış sırasıyla; standart dizilişten başlamayan geçmişte sıfırdan sayar,
+  bulmacada ve oyun dışında boş) → taslariDiz / konumGoster / 2B geçişinde yeniden kurulur. Canlı yemede: animasyon
+  kapalı 3B'de taşın kendisi yay çizip dönerek uçar; savaş sahnesinde parçalanan taşın küçüğü kareden doğup uçar;
+  2B'de plaka uçar (kabarıp küçülerek). DİKKAT: sayaçta toplam alanı `_n` — `n` at demek (ilk sürümde çakıştı).
+  Yatayda boşluk iki yanda: yığın tahtanın yanında sütun (x=±5.1); beyazın aldıkları ekran solunda (BEYAZ listesi
+  tarafı), siyahınkiler sağda. Ekran dönünce `resize` ile yeniden kurulur (`esirKonum`, `_esirDikey`).
+
+### 8.49 Karar değişti: varsayılan Yüksek · ekranın en yükseği (8 Ekim 2026)
+- 8.46'daki "varsayılan 60 Hz" geri alındı (sahibin kararı). `yuksekHz` kayıt yoksa 'maks'; yalnız '60' açıkça
+  seçilirse 60. "maks" sabit 120 DEĞİL: `enYuksekMod()` aynı çözünürlükteki en hızlı modu ister (90 Hz ekranda 90,
+  144'te 144); ekran 60 Hz ise seçenek gizli. Isınma koruması sıcakta yine 60'a indirir.
+- İlk açılışta "Yüksek · En akıcı · <maks> Hz · Önerilen" önceden seçili; ikinci seçenek "Yüksek · 60 Hz · daha az
+  ısınma". Varsayılan seçenekten kırmızı ısınma uyarısı kaldırıldı (önerilen seçenekte uyarı çelişiyordu).

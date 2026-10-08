@@ -955,6 +955,13 @@ body.dikeyAktif #notPanelSag{display:none!important}
 .notSerit .shm{white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.85);cursor:pointer;flex:0 0 auto}
 .notSerit .shm.bakilan{color:#E8DDBB;border-bottom:1px solid var(--brass)}
 .notSerit .shm.bos{opacity:.3}
+/* Son hamleler ayırt edilsin: eskiler soluk, tarafın son hamlesi altın, oyunun en son hamlesi altı çizili */
+.notSerit .shm:not(.son):not(.bakilan):not(.bos){opacity:.62}
+.notSerit .shm.son{color:#E8B64C;font-weight:800}
+.notSerit .shm.enSon{border-bottom:2px solid #E8B64C;padding-bottom:1px}
+#notListe .hm.son,#notListeS .hm.son{color:#E8B64C;font-weight:800}
+#notListe .hm.enSon,#notListeS .hm.enSon{box-shadow:inset 0 -2px 0 #E8B64C}
+#notListe .sat:not(.son),#notListeS .sat:not(.son){opacity:.7}
 .seritSaat{flex:0 0 auto;font-weight:800;font-size:14px;color:#E8DDBB;
   padding-left:12px;margin-left:8px;border-left:1px solid rgba(150,150,160,.3);
   min-width:52px;text-align:center;letter-spacing:.5px}
@@ -1189,6 +1196,18 @@ body.azHareket #son.acik *{animation:none!important}
 #secSesDetay{display:none;margin-top:4px}
 #secSesDetay.acik{display:block}
 #secAraclar{display:none}
+#secAraclar.bos{display:none!important}
+#cikisPop{position:fixed;inset:0;z-index:60;display:none}
+#cikisPop.acik{display:block}
+#cikisPop .cpKutu{position:absolute;min-width:200px;background:#12151d;border:1px solid var(--line);border-radius:14px;
+  padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.55);animation:cpAc .16s ease-out}
+#cikisPop button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;border-radius:10px;
+  color:#E8DDBB;font:600 15px Manrope,sans-serif;padding:13px 14px;text-align:left;cursor:pointer}
+#cikisPop button+button{border-top:1px solid rgba(122,110,84,.25);border-radius:0 0 10px 10px}
+#cikisPop button:active{background:rgba(196,160,80,.14)}
+#cikisPop svg{width:20px;height:20px;color:#E8B64C;flex:0 0 auto}
+@keyframes cpAc{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#secGrafik small{display:block;font-size:10.5px;opacity:.75;margin-top:2px}
 #secAraclar .araIzgara{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
 #secAraclar .araIzgara button{padding:10px 4px;border-radius:10px;border:1px solid var(--line);
   background:#0a0c12;color:var(--txt);font-family:inherit;font-size:10.5px;cursor:pointer;
@@ -2833,8 +2852,24 @@ function perdeBittiginde(fn){
         <button data-vekil="btnTasAd"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.4 0z"/><circle cx="8" cy="8" r="1.4"/></svg></b>Taş Adları</button>
         <button data-vekil="btnSahne"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="9" width="17" height="11" rx="1.5"/><path d="m3.8 9 15.6-4.4.6 2.4L4.4 11.3M8 6.8l2.6 3.3M13 5.4l2.6 3.3"/></svg></b>Savaş Sahnesi</button>
         <button data-vekil="btnYardim"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2 1-1.2 1.8v.5"/><path d="M12 17.2v.1"/></svg></b>Nasıl Oynanır</button>
-        <button data-vekil="btnYeni"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="6.5" r="2.6"/><path d="M9.6 9.6h4.8M10.3 9.8 9.4 16h5.2l-.9-6.2M7.5 19.5h9M8.6 16h6.8l1 3.5h-8.8z"/></svg></b>Yeni Oyun</button>
-        <button id="secSesKisayol"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5M9 20.5h6"/></svg></b>Sesli Oynama</button>
+        <button id="secSesKisayol" data-ust="btnSesKomut"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5M9 20.5h6"/></svg></b>Sesli Oynama</button>
+      </div>
+      <div style="height:12px"></div>
+    </div>
+    <!-- Grafik (8 Ekim 2026): oyun sürerken kalite ve Yüksek'in yenileme hızı -->
+    <div id="secGrafik">
+      <div style="font-size:11px;color:var(--dim);letter-spacing:.12em">GRAFİK</div>
+      <div class="sesSecGrup" id="secGrafikKademe">
+        <button data-g="yuksek">Yüksek<br><small>En iyi görüntü</small></button>
+        <button data-g="orta">Orta<br><small>Dengeli</small></button>
+        <button data-g="dusuk">Düşük<br><small>En az ısınma</small></button>
+      </div>
+      <div id="secGrafikHzBlok">
+        <div style="font-size:11px;color:var(--dim);letter-spacing:.1em;margin-top:10px">YENİLEME HIZI</div>
+        <div class="sesSecGrup" id="secGrafikHz">
+          <button data-hz="maks"><span class="secMaksHz"></span> Hz<br><small>En akıcı</small></button>
+          <button data-hz="60">60 Hz<br><small>Daha az ısınma</small></button>
+        </div>
       </div>
       <div style="height:12px"></div>
     </div>
@@ -3783,21 +3818,24 @@ function ortamHaritasi(){
   }catch(e){ _ortamHarita=false; }
   return _ortamHarita||null;
 }
-// Grafik kademesi: 'dusuk' | 'orta' | 'yuksek'. Cihaza göre otomatik başlar, menüden değişir.
+// Grafik kademesi: 'dusuk' | 'orta' | 'yuksek'. Varsayılan Yüksek (60 Hz), menüden değişir.
+/* 8 Ekim 2026 (sahibin isteği): eskiden çekirdek sayısına göre Düşük/Orta/Yüksek seçiliyordu ve
+   Yüksek her zaman ekranın en yüksek yenileme hızındaydı. Artık herkes Yüksek'le başlar; Yüksek'in
+   yenileme hızı ayrı seçilir (yuksekHz) ve varsayılanı 60 Hz: satranç tahtasında 120 Hz'in farkı
+   azdır, ısınma ve pil tüketimi ise belirgindir. */
 let grafikKademe = (()=>{
   try{
     // Kullanıcı elle seçtiyse ona uy
     const secim = localStorage.getItem('grafikKademe');
     if(secim && ['dusuk','orta','yuksek'].includes(secim)) return secim;
-    const n = navigator.hardwareConcurrency||4;
-    const bellek = navigator.deviceMemory||4; // tarayıcıda çoğu zaman tanımsız → 4
-    // Eşikler GEVŞETİLDİ: gölge/bloom görsel kaliteyi belirleyen ana unsur,
-    // gereksiz yere düşük kademeye düşmek oyunu ucuz gösteriyordu.
-    if(n>=6) return 'yuksek';
-    if(n>=3) return 'orta';
-    return 'dusuk';
-  }catch(e){ return 'orta'; }
+  }catch(e){}
+  return 'yuksek';
 })();
+// Yüksek kademede yenileme hızı: 'maks' (varsayılan; ekranın en yükseği 120/90/144 Hz) | '60'
+/* 8 Ekim 2026 (sahibin ikinci kararı): varsayılan yeniden ekranın en yükseği. "maks" sabit 120 değildir:
+   Android'den aynı çözünürlükteki en hızlı mod istenir (enYuksekMod), 90 Hz ekranda 90 olur.
+   Isınma koruması (isiKoruma) telefon ısınınca yine 60'a iner. */
+let yuksekHz = (()=>{ try{ return localStorage.getItem('yuksekHz')==='60' ? '60' : 'maks'; }catch(e){ return 'maks'; } })();
 const KADEME={
   dusuk:{ pixelRatio:1,   golge:true,  golgeBoyut:512,  bloom:false, yansima:false, doku:true, parcacikMs:0,  hz:60 },
   orta: {  pixelRatio:1.5, golge:true,  golgeBoyut:1024, bloom:true,  yansima:false, doku:true, parcacikMs:66, hz:60 },
@@ -3806,6 +3844,7 @@ const KADEME={
      Android'den en hızlı ekran modu da istenir). 60 = en çok ~60 çizim/sn (az ısınma).
      4 Ekim 2026: 3 Ekim'deki ısınma düzeltmesi her kademeyi 60'a sabitlemişti; 120 Hz
      ekranda akıcılık gözle görülür düştü (sahibin denemesi). Yüksek yeniden tam hız.
+     8 Ekim 2026: Yüksek'in hz değeri kullanıcı seçimidir (yuksekHz, varsayılan 60) → cizimHz().
    surekli: her karede çiz (3 Ekim öncesi davranış). Yalnız "gerekince çiz" yetmedi: boştayken
      telefon CPU/GPU hızını düşürüyor, hareket başlayınca ilk anlar takılıyordu; parçacıklar da
      30 adımda ilerliyordu. Isınma korumasında Yüksek, Orta gibi davranır (kareMs/isiKoruma). */
@@ -5004,6 +5043,7 @@ function taslariDiz(animasyonlu){
   }
   if(tasAdiGoster) tasAdlariGuncelle();
   if(duzGorunum) duzKatmanKur();
+  esirYiginiKur();
   if(typeof isikDikeyAyar==='function') isikDikeyAyar(); // ışığı garantiye al (başta karanlık kalmasın)
 }
 
@@ -5949,6 +5989,19 @@ function kameraGuncelle(){
   if(typeof inceleAktif!=='undefined' && inceleAktif){
     const yatay = innerWidth > innerHeight;
     const kaydir = yatay ? 0.55 : 1.15;
+    if(typeof duzGorunum!=='undefined' && duzGorunum){
+      /* 2B (tam tepeden): yalnız hedefi kaydırmak kamerayı dikeyin ötesine eğip tahtayı 180° ters
+         çeviriyordu. Kamera hedefle birlikte, ekranın alt yönüne (oyuncunun tarafı) kaydırılır;
+         uzaklık ve kayma inceleGorunumAyarla'nın ölçtüğü kadrajdan gelir (tahta boş alana sığar). */
+      const K=window._duzIncKadraj;
+      const kay=K?K.kay:kaydir, uz=K?K.uzak:kamUzak;
+      const dx=Math.sin(kamYaw)*kay, dz=Math.cos(kamYaw)*kay;
+      camera.position.set(
+        kamHedef.x+dx+Math.sin(kamYaw)*Math.cos(kamPitch)*uz,
+        kamHedef.y+Math.sin(kamPitch)*uz,
+        kamHedef.z+dz+Math.cos(kamYaw)*Math.cos(kamPitch)*uz);
+      camera.lookAt(kamHedef.x+dx, kamHedef.y, kamHedef.z+dz);
+    } else
     camera.lookAt(kamHedef.x, kamHedef.y, kamHedef.z + kaydir);
   } else camera.lookAt(kamHedef);
   // Raycaster kameranın world matrisini kullanır. Güncellemezsek dokunma ışını
@@ -6573,7 +6626,9 @@ async function hamleOyna(h, ai=false, uzaktan=false){
       kilit=true; vurguTemizle();
       const sald=tasMesh[h.from], hedefV=kareKonum(h.to);
       Motor.yap(h);
+      if(tasMesh[h.to] && tasMesh[h.to]!==sald){ const yen=tasMesh[h.to]; if(yen.parent) yen.parent.remove(yen); tasMesh[h.to]=null; }
       if(sald){ sald.position.set(hedefV.x,0,hedefV.z); tasMesh[h.to]=sald; tasMesh[h.from]=null; }
+      if(duzGorunum) duzKatmanKur();
       bulmacaAdim++;
       if(Motor.durum()==='mat'){
         Ses.cal('sah'); bulmacaSonuc(true); return;
@@ -6590,6 +6645,7 @@ async function hamleOyna(h, ai=false, uzaktan=false){
             if(tasMesh[rh.to]){ const yen=tasMesh[rh.to]; if(yen&&yen.parent) yen.parent.remove(yen); tasMesh[rh.to]=null; }
             Motor.yap(rh);
             if(rsald){ rsald.position.set(rhedef.x,0,rhedef.z); tasMesh[rh.to]=rsald; tasMesh[rh.from]=null; }
+            if(duzGorunum) duzKatmanKur();
             Ses.cal('hamle');
             bulmacaAdim++;
             kilit=false; // sıra tekrar oyuncuda
@@ -6694,11 +6750,16 @@ async function hamleOyna(h, ai=false, uzaktan=false){
       if(duzdaydi){
         if(tasGrup) tasGrup.visible=false;
         if(duzGrup) duzGrup.visible=true;
+      } else {
+        // 3B: taş sahnede parçalandı; küçüğü esir yığınına süzülür (2B'de plakayı duzKaydir uçurur)
+        esirDogur(kurbTip, saldRenk==='w'?'b':'w', alinanKare);
       }
     } else {
-      // Sahne kapalı: hızlı yeme (ses + taşı kaldır)
+      // Sahne kapalı: hızlı yeme (ses + taş esir yığınına uçar; 2B'de plakayı duzKaydir uçurur)
       Ses.yeme(saldTip,kurbTip);
-      tasGrup.remove(kurb); nesneyiSerbestBirak(kurb, false);
+      tasGrup.remove(kurb);
+      if(duzGorunum) nesneyiSerbestBirak(kurb, false);
+      else esireGonder(kurb, saldRenk==='w'?'b':'w');
     }
     tasMesh[alinanKare]=null;
   }
@@ -6714,8 +6775,9 @@ async function hamleOyna(h, ai=false, uzaktan=false){
       sald.position.y=Math.sin(e*Math.PI)*.25;
     });
   } else if(duzGorunum){
-    // 2B modda: animasyon yok, ses çal, anında güncelle (kasma olmasın)
+    // 2B modda: plaka kayar, yenen taş ezilip kaybolur (katman sonda duzKatmanKur ile kesinleşir)
     Ses.hamle(saldTip);
+    try{ await duzKaydir(h.from, h.to, kurb ? alinanKare : -1); }catch(e){}
   }
   sald.position.copy(hedefV);
   tasMesh[h.from]=null; tasMesh[h.to]=sald;
@@ -6730,7 +6792,7 @@ async function hamleOyna(h, ai=false, uzaktan=false){
     if(kale){
       const kb=kale.position.clone(), kv=kareKonum(kaleYeni);
       if(!duzGorunum) await tween(.3,(e)=>{ kale.position.lerpVectors(kb,kv,e); });
-      else kale.position.copy(kv);
+      else { kale.position.copy(kv); try{ await duzKaydir(kaleEski, kaleYeni, -1); }catch(e){} }
       tasMesh[kaleEski]=null; tasMesh[kaleYeni]=kale;
     }
   }
@@ -8892,7 +8954,40 @@ function menuKur(){
     g('secOnHamle', onHamleAcik);
     // Berabere butonu sadece çevrimiçide
     const bb=document.getElementById('secBerabereBtn'); if(bb) bb.style.display=cevrimiciAktif?'block':'none';
+    /* Üst barda zaten görünen araçları ızgarada tekrar gösterme (8 Ekim 2026, sahibin isteği).
+       Görünürlük her açılışta ölçülür: yön (dikey/yatay) ve oyun türüne göre bar değişiyor. */
+    const izg=document.querySelector('#secAraclar .araIzgara');
+    if(izg){
+      let kalan=0;
+      izg.querySelectorAll('button').forEach(v=>{
+        const ust=document.getElementById(v.dataset.vekil||v.dataset.ust);
+        const bardaVar=!!(ust && ust.offsetParent!==null && ust.getBoundingClientRect().width>0);
+        v.style.display=bardaVar?'none':''; if(!bardaVar) kalan++;
+      });
+      const sa=document.getElementById('secAraclar'); if(sa) sa.classList.toggle('bos', kalan===0);
+    }
+    // Grafik
+    document.querySelectorAll('#secGrafikKademe button').forEach(b=>b.classList.toggle('secili', b.dataset.g===grafikKademe));
+    document.querySelectorAll('#secGrafikHz button').forEach(b=>b.classList.toggle('secili', b.dataset.hz===yuksekHz));
+    const mh=maksHz();
+    document.querySelectorAll('#secGrafikHz .secMaksHz').forEach(s=>s.textContent=mh);
+    const hzB=document.getElementById('secGrafikHzBlok'); if(hzB) hzB.style.display=(grafikKademe==='yuksek' && mh>60)?'':'none';
   };
+  /* Grafik değişimi tahtayı yeniden kurar; bir hamle canlandırılırken (kilit) kurulursa hareket eden
+     taş yeni tahtada kaybolur. Hamle bitene kadar bekletilir. */
+  const grafikUygula=(k)=>{
+    if(typeof kilit!=='undefined' && kilit && !oyunBitti){ setTimeout(()=>grafikUygula(k),150); return; }
+    grafikAyarla(k); togGuncelle();
+  };
+  document.querySelectorAll('#secGrafikKademe button').forEach(b=>{
+    b.onclick=()=>{
+      document.querySelectorAll('#secGrafikKademe button').forEach(x=>x.classList.toggle('secili', x===b));
+      grafikUygula(b.dataset.g);
+    };
+  });
+  document.querySelectorAll('#secGrafikHz button').forEach(b=>{
+    b.onclick=()=>{ yuksekHzAyarla(b.dataset.hz); togGuncelle(); };
+  });
   const bs=document.getElementById('btnSecenekler');
   if(bs) bs.onclick=()=>{ secModal.style.display='flex'; togGuncelle(); };
   const sk=document.getElementById('secenekKapat');
@@ -9158,6 +9253,12 @@ function grafikYenidenKur(){
   bloomKur();
   arenaKur(aktifArena);
   if(typeof taslariDiz==='function' && tasGrup) taslariDiz();
+  /* Oyun içinden değiştirilebildiği için (8 Ekim 2026): incelemede / geçmişte gezinirken gösterilen
+     konuma geri dön; taslariDiz canlı konumu kurar. */
+  try{
+    if(typeof inceleAktif!=='undefined' && inceleAktif) konumGoster(inceleIdx);
+    else if(typeof gozdenGecir!=='undefined' && gozdenGecir>=0) konumGoster(gozdenGecir);
+  }catch(e){}
 }
 function yardimGoster(){
   document.getElementById('yardimKapla').classList.add('acik');
@@ -9233,26 +9334,57 @@ function duzPlakaTexture(t, beyazMi){
   DUZ_TEX_CACHE[anahtar]=tex;
   return tex;
 }
+/* Plaka geometrisi ve taş başına malzeme ortak (8 Ekim 2026): eskiden her hamlede 32 yeni
+   geometri + malzeme üretiliyor, hiç serbest bırakılmıyordu (sızıntı + çöp toplama takılması). */
+let _duzGeo=null; const DUZ_MAT_CACHE={};
 function duzSembolPlaka(t, beyazMi){
-  const tex=duzPlakaTexture(t, beyazMi);
-  const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false});
-  const plaka=new THREE.Mesh(new THREE.PlaneGeometry(.92,.92), mat);
+  const anahtar=(beyazMi?'w':'b')+t;
+  if(!_duzGeo) _duzGeo=new THREE.PlaneGeometry(.92,.92);
+  let mat=DUZ_MAT_CACHE[anahtar];
+  if(!mat){
+    mat=DUZ_MAT_CACHE[anahtar]=new THREE.MeshBasicMaterial({map:duzPlakaTexture(t, beyazMi),transparent:true,depthWrite:false});
+    mat.userData.paylasilanDoku=true;
+  }
+  const plaka=new THREE.Mesh(_duzGeo, mat);
+  plaka.userData.paylasilanGeo=true;
   plaka.rotation.x=-Math.PI/2;
+  plaka.renderOrder=2.5; // inceleme kare boyamasının (2) üstünde, "daha iyi" okunun (3) altında
   return plaka;
+}
+let duzMesh=new Array(64).fill(null); // kare -> 2B plaka
+/* 2B katman EKRANDA GÖSTERİLEN konumu çizer. İncelemede ve hamle geçmişinde gezinirken Motor
+   canlı (ya da sıfırlanmış) konumdadır; eskiden Motor okunduğu için incelemede 2B/3B geçişi
+   tahtayı yanlış konumla (çoğu zaman başlangıç dizilişiyle) kuruyordu. */
+function duzGorunenKonum(){
+  let idx=null;
+  if(typeof inceleAktif!=='undefined' && inceleAktif) idx=inceleIdx;
+  else if(typeof gozdenGecir!=='undefined' && gozdenGecir>=0) idx=gozdenGecir;
+  if(idx!==null && idx>=0 && !konumGecmisi[idx]) idx=konumGecmisi.length-1; // konumGoster ile aynı güvenlik
+  if(idx!==null && idx>=0 && konumGecmisi[idx]) return konumGecmisi[idx];
+  const k=[];
+  if(idx!==null){
+    const arka=['r','n','b','q','k','b','n','r'];
+    for(let f=0;f<8;f++){ k[f]={t:arka[f],c:'b'}; k[8+f]={t:'p',c:'b'}; k[48+f]={t:'p',c:'w'}; k[56+f]={t:arka[f],c:'w'}; }
+    return k;
+  }
+  for(let i=0;i<64;i++) k[i]=Motor.tasAl(i);
+  return k;
 }
 function duzKatmanKur(){
   duzKatmanTemizle();
   if(!duzGorunum) return;
   duzGrup=new THREE.Group(); duzGrup.userData.arena=true; scene.add(duzGrup);
   const siyahTaraf = oyuncuSiyahMi();
+  const konum = duzGorunenKonum();
   for(let i=0;i<64;i++){
-    const p=Motor.tasAl(i); if(!p) continue;
+    const p=konum[i]; if(!p) continue;
     const v=kareKonum(i);
     const plaka=duzSembolPlaka(p.t, p.c==='w');
     plaka.position.set(v.x, .06, v.z);
+    plaka.userData.tas={t:p.t, c:p.c};
     // Siyah tarafta kamera 180° dönük; semboller doğru görünsün diye plakayı çevir
     if(siyahTaraf) plaka.rotation.z=Math.PI;
-    duzGrup.add(plaka);
+    duzGrup.add(plaka); duzMesh[i]=plaka;
   }
   // 3D taşları gizle
   if(tasGrup) tasGrup.visible=false;
@@ -9260,9 +9392,170 @@ function duzKatmanKur(){
   cizimIste();
 }
 function duzKatmanTemizle(){
-  if(duzGrup){ scene.remove(duzGrup); duzGrup=null; }
+  if(duzGrup){
+    scene.remove(duzGrup);
+    // Ortak geometri/malzemeye dokunma; yalnız animasyonda kopyalanan malzemeler bırakılır
+    for(const p of duzGrup.children) if(p.material && p.material.userData.duzKopya) p.material.dispose();
+    duzGrup=null;
+  }
+  duzMesh.fill(null);
   if(tasGrup) tasGrup.visible=true;
   cizimIste();
+}
+/* 2B hamle animasyonu (8 Ekim 2026): eskiden 2B'de hiç hareket yoktu; katman hamle sonunda
+   baştan kurulduğu için taş ışınlanıyor, yenen taş sessizce kayboluyordu (savaş animasyonu da
+   kapalıysa yeme fark edilmiyordu). Şimdi plaka kayıp hafifçe kabararak oturur; yenen taş
+   kırmızı bir dalgayla ezilip kaybolur. Tahta yine hamle sonunda duzKatmanKur ile kesinleşir. */
+async function duzKaydir(from, to, yenenKare){
+  const p=duzMesh[from]; if(!p || !duzGrup) return;
+  const v=kareKonum(to);
+  const bas=p.position.clone(), hedef=new THREE.Vector3(v.x, p.position.y, v.z);
+  const kurb=(yenenKare!=null && yenenKare>=0 && yenenKare!==from) ? duzMesh[yenenKare] : null;
+  if(kurb) duzYemeDalgasi(kurb.position.x, kurb.position.z);
+  p.renderOrder=2.6; // kayarken diğer plakaların üstünden geçsin
+  const sure=Math.min(.30, .17+bas.distanceTo(hedef)*.02);
+  let vurdu=false;
+  await tween(sure,(e,k)=>{
+    p.position.lerpVectors(bas,hedef,e);
+    const s=1+Math.sin(k*Math.PI)*.16; p.scale.set(s,s,1);
+    // Saldıran yaklaşınca yenen taş yerinden fırlayıp esir yığınına uçar
+    if(kurb && !vurdu && k>.5){ vurdu=true; if(typeof sarsinti!=='undefined') sarsinti=Math.max(sarsinti,.05);
+      esireGonder(kurb, kurb.userData.tas ? kurb.userData.tas.c : 'b'); }
+    cizimIste();
+  });
+  p.position.copy(hedef); p.scale.set(1,1,1); p.renderOrder=2.5;
+  if(kurb && !vurdu) esireGonder(kurb, kurb.userData.tas ? kurb.userData.tas.c : 'b');
+  if(kurb) duzMesh[yenenKare]=null;
+  duzMesh[from]=null; duzMesh[to]=p;
+}
+/* ===== ESİR YIĞINI (8 Ekim 2026) =====
+   Yenen taşlar tahtanın dışındaki boş alanda birikir: bir rengin kaybettiği taşlar, onları alan tarafın
+   kenarında durur (beyazın aldıkları beyaz tarafta, z+). Yığın HER ZAMAN konum geçmişinden türetilir
+   (yeni oyun, geri/ileri, inceleme, 2B/3B ve grafik değişiminde doğru kalır); canlı yemede taş oraya uçar. */
+let esirGrup=null;
+const ESIR_OLCEK=.6, ESIR_ARA=.5, ESIR_Z=5.1;
+function standartDizilis(){
+  const k=[], arka=['r','n','b','q','k','b','n','r'];
+  for(let f=0;f<8;f++){ k[f]={t:arka[f],c:'b'}; k[8+f]={t:'p',c:'b'}; k[48+f]={t:'p',c:'w'}; k[56+f]={t:arka[f],c:'w'}; }
+  return k;
+}
+/* {w:[...], b:[...]}: o rengin KAYBETTİĞİ taş tipleri, alınış sırasıyla */
+function esirListesi(){
+  const L={w:[],b:[]};
+  if(typeof bulmacaModu!=='undefined' && bulmacaModu) return L;
+  if(!(typeof oyunAktif!=='undefined' && oyunAktif) && !(typeof inceleAktif!=='undefined' && inceleAktif)) return L;
+  let idx = (typeof inceleAktif!=='undefined' && inceleAktif) ? inceleIdx
+          : ((typeof gozdenGecir!=='undefined' && gozdenGecir>=0) ? gozdenGecir : konumGecmisi.length-1);
+  idx=Math.min(idx, konumGecmisi.length-1);
+  // toplam "_n" (n = at olduğu için ayrı ad)
+  const say=k=>{ const c={w:{_n:0},b:{_n:0}}; for(let i=0;i<64;i++){ const p=k&&k[i]; if(p){ c[p.c][p.t]=(c[p.c][p.t]||0)+1; c[p.c]._n++; } } return c; };
+  let once=say(standartDizilis());
+  for(let j=0;j<=idx;j++){
+    const simdi=say(konumGecmisi[j]);
+    for(const r of ['w','b']){
+      const fark=once[r]._n-simdi[r]._n;
+      if(fark===1){ for(const t of ['q','r','b','n','p']) if((simdi[r][t]||0)<(once[r][t]||0)){ L[r].push(t); break; } }
+      else if(fark>1){ L.w=[]; L.b=[]; }   // geçmiş standart dizilişten başlamıyor (kaydedilmiş oyundan devam): baştan say
+    }
+    once=simdi;
+  }
+  return L;
+}
+/* Kaybeden rengin i. esirinin yeri.
+   Dikey: boşluk tahtanın üstünde/altında → alan tarafın kenarında, oyuncunun bakışına göre soldan sağa.
+   Yatay: boşluk iki yanda (üst/alt ekran dışına düşüyordu) → beyazın aldıkları ekranın SOLUNDA (BEYAZ listesi
+   tarafı), siyahınkiler SAĞINDA; oyuncuya yakın uçtan uzağa doğru sütun. */
+function esirKonum(kaybedenRenk, i){
+  const siyah = (typeof oyuncuSiyahMi==='function' && oyuncuSiyahMi());
+  const yon = siyah ? -1 : 1;   // siyah tarafta kamera 180° dönük: ekran yönleri dünya ekseninde ters
+  if(typeof dikeyMi==='function' && !dikeyMi()){
+    const x = (kaybedenRenk==='b' ? -1 : 1) * ESIR_Z * yon;
+    return new THREE.Vector3(x, 0, yon*(3.5 - i*ESIR_ARA));
+  }
+  const z = kaybedenRenk==='b' ? ESIR_Z : -ESIR_Z;
+  return new THREE.Vector3(-yon*(3.5 - i*ESIR_ARA), 0, z);
+}
+/* Ekran dönünce yığın yeni yerleşime taşınsın */
+let _esirDikey=null;
+addEventListener('resize', ()=>setTimeout(()=>{
+  try{ const d=dikeyMi(); if(d!==_esirDikey){ _esirDikey=d; if(esirGrup && esirGrup.children.length) esirYiginiKur(); } }catch(e){}
+}, 350));
+function esirParca(t, c){
+  if(duzGorunum){
+    const pl=duzSembolPlaka(t, c==='w'); pl.userData.tas={t,c};
+    if(oyuncuSiyahMi()) pl.rotation.z=Math.PI;
+    return pl;
+  }
+  const g=tasYap(t,c); g.userData.tas={t,c}; return g;
+}
+function esirOlcek(m, s){ if(m.userData.paylasilanGeo) m.scale.set(s,s,1); else m.scale.set(s,s,s); }
+function esirGrubuHazirla(){
+  if(!esirGrup){ esirGrup=new THREE.Group(); esirGrup.userData.esir=true; }
+  if(esirGrup.parent!==scene) scene.add(esirGrup);
+  return esirGrup;
+}
+function esirTemizle(){
+  if(!esirGrup) return;
+  for(const m of [...esirGrup.children]){ esirGrup.remove(m); if(!m.userData.paylasilanGeo) nesneyiSerbestBirak(m,false); }
+}
+function esirYiginiKur(){
+  try{
+    if(typeof scene==='undefined' || !scene) return;
+    esirGrubuHazirla(); esirTemizle();
+    const L=esirListesi();
+    for(const r of ['w','b']) L[r].forEach((t,i)=>{
+      const m=esirParca(t,r); const v=esirKonum(r,i);
+      m.position.set(v.x, m.userData.paylasilanGeo ? .06 : 0, v.z); esirOlcek(m, ESIR_OLCEK);
+      esirGrup.add(m);
+    });
+    cizimIste();
+  }catch(e){}
+}
+/* Canlı yeme: verilen nesne (3B taş ya da 2B plaka) yay çizerek yığındaki yerine uçar ve küçülür.
+   Hedef, konum geçmişinden hesaplanan listenin sonu (konumKaydet hamleden hemen sonra çalışır). */
+function esireGonder(m, kaybedenRenk){
+  try{
+    esirGrubuHazirla();
+    const i=Math.max(0, esirListesi()[kaybedenRenk].length-1);
+    const hedef=esirKonum(kaybedenRenk, i);
+    const duz=!!m.userData.paylasilanGeo;
+    if(duz) hedef.y=.06;
+    if(m.parent) m.parent.remove(m);
+    esirGrup.add(m);
+    const bas=m.position.clone(), s0=m.scale.x, s1=ESIR_OLCEK, ry0=m.rotation.y;
+    if(duz) m.renderOrder=2.7;
+    const yay = duz ? 0 : 1.35;
+    tween(.62,(e,k)=>{
+      m.position.x=bas.x+(hedef.x-bas.x)*e;
+      m.position.z=bas.z+(hedef.z-bas.z)*e;
+      m.position.y=bas.y+(hedef.y-bas.y)*e + Math.sin(k*Math.PI)*yay;
+      // 2B'de yükseklik görünmez: uçuşu kabarıp küçülerek hissettir
+      const sk=s0+(s1-s0)*e + (duz ? Math.sin(k*Math.PI)*.25 : 0);
+      esirOlcek(m, sk);
+      if(!duz) m.rotation.y=ry0+k*Math.PI*2;
+      cizimIste();
+    },()=>{ m.position.copy(hedef); esirOlcek(m,s1); if(!duz) m.rotation.y=ry0; if(duz) m.renderOrder=2.5; cizimIste(); });
+  }catch(e){}
+}
+/* Savaş sahnesinde yenen taş parçalandığı için yerine küçüğü yerden doğup yığına süzülür */
+function esirDogur(t, c, kare){
+  try{
+    const m=esirParca(t,c); const v=kareKonum(kare);
+    m.position.set(v.x, m.userData.paylasilanGeo ? .06 : 0, v.z); esirOlcek(m,.05);
+    esirGrubuHazirla().add(m);
+    esireGonder(m, c);
+  }catch(e){}
+}
+/* Yenen karede kısa kırmızı dalga (2B'de yemenin görünür işareti) */
+function duzYemeDalgasi(x, z){
+  try{
+    const m=new THREE.Mesh(new THREE.RingGeometry(.30,.42,40),
+      new THREE.MeshBasicMaterial({color:0xFF3B25, transparent:true, opacity:.9, depthWrite:false, toneMapped:false, side:THREE.DoubleSide}));
+    m.rotation.x=-Math.PI/2; m.position.set(x,.075,z); m.renderOrder=2.7;
+    m.userData.arena=true; scene.add(m);
+    tween(.45,(e,k)=>{ const s=1+k*.55; m.scale.set(s,s,1); m.material.opacity=.9*(1-k); cizimIste(); },
+      ()=>{ scene.remove(m); m.geometry.dispose(); m.material.dispose(); });
+  }catch(e){}
 }
 
 function tasEtiketSprite(ad, beyazMi){
@@ -9296,13 +9589,9 @@ function tasAdlariGuncelle(){
   }
   if(!tasAdiGoster) return;
   if(duzGorunum){
-    // 2D mod: her plakaya yatık etiket (plakalar kare sırasıyla eklenmiş)
-    const siyahTaraf=oyuncuSiyahMi();
-    let idx=0;
-    for(let i=0;i<64;i++){
-      const p=Motor.tasAl(i); if(!p) continue;
-      const plaka=duzGrup.children[idx]; idx++;
-      if(!plaka) continue;
+    // 2D mod: her plakaya yatık etiket (taş bilgisi plakada; incelemede Motor başka konumda olabilir)
+    for(const plaka of duzGrup.children){
+      const p=plaka.userData.tas; if(!p) continue;
       const spr=tasEtiketSprite(TAS_ADI[p.t]||'', p.c==='w');
       spr.position.set(0, .5, 0);
       plaka.add(spr);
@@ -9344,6 +9633,10 @@ function duzGorunumDegistir(){
     duzKatmanTemizle();
   }
   duzSimgeGuncelle();
+  esirYiginiKur();   // yığın da 2B plaka / 3B taş olarak yeniden kurulsun
+  /* İncelemede tahtayı panelin üstüne taşıyan kaydırma eski kamera açısına göre ölçülmüştü
+     (ve yalnız artar); yeni açıda sıfırdan ölç. */
+  if(typeof inceleAktif!=='undefined' && inceleAktif){ _incKay=0; cizimIste(); setTimeout(inceleGorunumAyarla, 80); }
 }
 // Oyuncu siyah tarafta mı? (çevrimiçi veya AI'ya karşı siyah)
 function oyuncuSiyahMi(){
@@ -9637,14 +9930,15 @@ function odaAyarSor(r, katil){
 /* Ayar özetleri: çevrimiçi satırı + kurulumdaki grafik ipucu */
 function ayarOzetYaz(){
   const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
-  const hz=(grafikKademe==='yuksek') ? maksHz() : 60;
+  const hz=cizimHz();
   const ad={dusuk:'Düşük',orta:'Orta',yuksek:'Yüksek'}[grafikKademe]||'Orta';
   const icerik=(window.IKON&&IKON.ayar?'<span class="caIk">'+IKON.ayar+'</span>':'')+
     '<span>'+c('Animasyon')+': <b>'+c(sahneAyari?'Açık':'Kapalı')+'</b> · '+c('Grafik')+': <b>'+c(ad)+'</b> ('+hz+' Hz)</span>';
   ['cvAyarSatir','kurAyarSatir'].forEach(id=>{ const r=document.getElementById(id); if(r) r.innerHTML=icerik; });
   const g=document.getElementById('grafikIpucu');
-  if(g) g.textContent=c('Yüksek')+': '+maksHz()+' Hz · '+c('Orta')+' / '+c('Düşük')+': 60 Hz, '+c('daha az ısınma')+'. '+
-    c('Yüksek, telefonun ısınmasına ve şarjın daha hızlı bitmesine sebep olabilir.');
+  const mh=maksHz();
+  if(g) g.textContent=c('Yüksek')+': '+cizimHz()+' Hz'+(cizimHz()<mh ? ' ('+c('Ayarlar\'da en fazla')+' '+mh+' Hz)' : '')+' · '+
+    c('Orta')+' / '+c('Düşük')+': 60 Hz, '+c('daha az ısınma')+'.';
 }
 function cvAnimNotYaz(){
   ayarOzetYaz();
@@ -10374,9 +10668,11 @@ function notasyonPaneliYaz(){
       if(!bk || !bk.classList.contains('baslikK')){ bk=document.createElement('span'); bk.className='baslikK'; el.parentNode.insertBefore(bk, el); }
       if(bk.textContent!==etiket) bk.textContent=etiket;
       let h='';
+      const sonI=idx[idx.length-1], enSon=oyunKaydi.length-1;
       idx.slice(-8).forEach(i=>{
         const k=oyunKaydi[i];
-        h+='<span class="shm'+(gozdenGecir===i?' bakilan':'')+'" data-i="'+i+'">'+
+        /* Son hamle vurgusu (8 Ekim 2026): tarafın son hamlesi altın, oyunun en son hamlesi ayrıca altı çizili */
+        h+='<span class="shm'+(gozdenGecir===i?' bakilan':'')+(i===sonI?' son':'')+(i===enSon?' enSon':'')+'" data-i="'+i+'">'+
            (Math.floor(i/2)+1)+'.'+k.notasyon+'</span>';
       });
       if(idx.length===0) h+='<span class="shm bos">—</span>';
@@ -10392,10 +10688,11 @@ function notasyonPaneliYaz(){
     const uret=(renk)=>{
       let h=''; const sec=[];
       oyunKaydi.forEach((k,i)=>{ if(k.renk===renk) sec.push(i); });
+      const sonI=sec[sec.length-1], enSon=oyunKaydi.length-1;
       sec.slice(-10).forEach(i=>{
         const k=oyunKaydi[i];
-        h+='<div class="sat"><span class="no">'+(Math.floor(i/2)+1)+'.</span>'+
-           '<span class="hm '+(k.kalite||'')+(gozdenGecir===i?' bakilan':'')+'" data-i="'+i+'">'+k.notasyon+'</span></div>';
+        h+='<div class="sat'+(i===sonI?' son':'')+'"><span class="no">'+(Math.floor(i/2)+1)+'.</span>'+
+           '<span class="hm '+(k.kalite||'')+(gozdenGecir===i?' bakilan':'')+(i===sonI?' son':'')+(i===enSon?' enSon':'')+'" data-i="'+i+'">'+k.notasyon+'</span></div>';
       });
       return h;
     };
@@ -10436,6 +10733,9 @@ function konumGoster(idx){
     const g=tasYap(p.t,p.c); const v=kareKonum(i); g.position.set(v.x,0,v.z);
     tasGrup.add(g); tasMesh[i]=g;
   }
+  // 2B görünümde plakalar da gösterilen konuma gelsin (eskiden incelemede eski konumda kalıyordu)
+  if(duzGorunum) duzKatmanKur();
+  esirYiginiKur();
 }
 function gozdenGecirGit(idx){
   if(!oyunKaydi.length) return;
@@ -10466,6 +10766,7 @@ function gozdenGecirGit(idx){
 window.geriTusu=function(){
   const acik=(id)=>{ const e=document.getElementById(id); return e && (e.classList.contains('acik') || (!e.classList.contains('gizli') && getComputedStyle(e).display!=='none')); };
   try{
+    if(window.cikisPopKapat && window.cikisPopKapat()) return true;
     // -1. Yeni pencereler / ekranlar (premium, rapor, liderlik, inceleme, yardım, oyun kurulum)
     const pm=document.getElementById('premiumModal');
     if(pm){ pm.remove(); if(typeof pmBekleyen!=='undefined') pmBekleyen=null; return true; }
@@ -10883,7 +11184,10 @@ function dahaIyiOkGoster(idx){
   Motor.reset();
   for(let j=0;j<idx;j++){ const hh=Motor.legal(Motor.turn).find(m=>Motor.notasyon(m)===oyunKaydi[j].notasyon); if(hh) Motor.yap(hh); }
   const sfH=Motor.legal(Motor.turn).find(m=>Motor.notasyon(m)===k._sfNot);
+  /* Motor'u CANLI son konuma geri getir (hamleVurgula'daki gibi). Sıfırda bırakmak 2B katmanı ve
+     incelemeden çıkışta tahtayı başlangıç dizilişine döndürüyordu. */
   Motor.reset();
+  for(const kk of oyunKaydi){ const hh=Motor.legal(Motor.turn).find(m=>Motor.notasyon(m)===kk.notasyon); if(!hh) break; Motor.yap(hh); }
   if(!sfH) return;
   const fv=kareKonum(sfH.from), tv=kareKonum(sfH.to);
   dahaIyiOkGrup=new THREE.Group();
@@ -10953,8 +11257,24 @@ function inceleGorunumAyarla(){
     if(typeof camera==='undefined' || !camera) return;
     const hud=document.getElementById('inceleHUD');
     camera.clearViewOffset();
+    window._duzIncKadraj=null;
     if(!hud || !hud.classList.contains('acik')){ _incKay=0; document.body.classList.remove('incelemede'); cizimIste(); return; }
     document.body.classList.add('incelemede');
+    if(typeof duzGorunum!=='undefined' && duzGorunum){
+      /* 2B (8 Ekim 2026): tam ekran genişliğindeki düz tahta üst çubuk ile panel arasına sığmıyordu
+         (üst ve alt sıralar örtülüyordu). Tahta (koordinatlarıyla ~9 birim) o boşluğa sığacak
+         uzaklıktan çekilir ve boşluğun ortasına kaydırılır; kamera kameraGuncelle'de kurulur. */
+      _incKay=0;
+      const H=innerHeight, ustEl=document.getElementById('hud');
+      const ust=(ustEl ? ustEl.getBoundingClientRect().bottom : 64)+4;
+      const alt=hud.getBoundingClientRect().top-4;
+      const bant=Math.max(120, alt-ust), tanY=Math.tan(camera.fov/2*Math.PI/180), S=9;
+      const uzak=Math.max(S*H/(bant*2*tanY), S/(2*tanY*innerWidth/H));
+      const pxBirim=H/(2*uzak*tanY);
+      window._duzIncKadraj={uzak, kay:-(((ust+alt)/2)-H/2)/pxBirim};
+      cizimIste();
+      return;
+    }
     camera.updateMatrixWorld();
     const H=innerHeight; let alt=-1e9, ust=1e9;
     for(const x of [-4.4,4.4]) for(const z of [-4.4,4.4]) for(const y of [0,1.1]){
@@ -11532,9 +11852,20 @@ function tahtaGorunur(){
      orada her kare çizim bulanıklığı her karede yeniden hesaplatıp akıcılığı düşürür. */
   return !!(_hudEl && _hudEl.classList.contains('acik'));
 }
-function kareMs(){ return (isiKoruma || (KADEME[grafikKademe] && KADEME[grafikKademe].hz)) ? 15.5 : 0; }
+/* Ekranın en yüksek yenileme hızında mı çiziliyor: yalnız Yüksek + "en yüksek" seçimi (ısınmada değil) */
+function tamHizMi(){ return grafikKademe==='yuksek' && yuksekHz==='maks' && !isiKoruma; }
+/* Ayarda gösterilen çizim hızı (Hz) */
+function cizimHz(){ return (grafikKademe==='yuksek' && yuksekHz==='maks') ? maksHz() : 60; }
+function kareMs(){ return tamHizMi() ? 0 : 15.5; }
 function maksHz(){ try{ if(window.AndroidEkran && AndroidEkran.maksHz) return Math.round(AndroidEkran.maksHz()); }catch(e){} return 60; }
-function yenilemeUygula(){ try{ if(window.AndroidEkran && AndroidEkran.yenileme) AndroidEkran.yenileme(grafikKademe==='yuksek' && !isiKoruma); }catch(e){} }
+function yenilemeUygula(){ try{ if(window.AndroidEkran && AndroidEkran.yenileme) AndroidEkran.yenileme(tamHizMi()); }catch(e){} }
+/* Yüksek kademenin yenileme hızı: '60' | 'maks' */
+function yuksekHzAyarla(v){
+  yuksekHz = (v==='60') ? '60' : 'maks';
+  try{ localStorage.setItem('yuksekHz', yuksekHz); }catch(e){}
+  yenilemeUygula(); cizimIste();
+  if(typeof ayarOzetYaz==='function') ayarOzetYaz();
+}
 window.isiDurumu=function(durum){
   const yeni=(+durum)>=2; if(yeni===isiKoruma) return;
   isiKoruma=yeni; yenilemeUygula(); cizimIste();
@@ -13598,6 +13929,16 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['En iyi görüntü']=CEVM['En iyi görüntü']||{en:'Best visuals',ru:'Лучшее качество',ar:'أفضل صورة',fr:'Meilleur rendu',de:'Beste Darstellung',it:'Massima qualità',zh:'最佳画面'};
   CEVM['Dengeli']=CEVM['Dengeli']||{en:'Balanced',ru:'Сбалансировано',ar:'متوازن',fr:'Équilibré',de:'Ausgewogen',it:'Bilanciato',zh:'均衡'};
   CEVM['Efektler kapalı, en az ısınma']=CEVM['Efektler kapalı, en az ısınma']||{en:'Effects off, least heat',ru:'Без эффектов, меньше нагрев',ar:'بلا مؤثرات، أقل سخونة',fr:'Effets coupés, moins de chauffe',de:'Effekte aus, am wenigsten Wärme',it:'Effetti disattivati, meno calore',zh:'关闭特效，发热最少'};
+  CEVM['Yenileme hızı']=CEVM['Yenileme hızı']||{en:'Refresh rate',ru:'Частота обновления',ar:'معدل التحديث',fr:"Fréquence d'affichage",de:'Bildwiederholrate',it:'Frequenza di aggiornamento',zh:'刷新率'};
+  CEVM['YENİLEME HIZI']=CEVM['YENİLEME HIZI']||{en:'REFRESH RATE',ru:'ЧАСТОТА ОБНОВЛЕНИЯ',ar:'معدل التحديث',fr:"FRÉQUENCE D'AFFICHAGE",de:'BILDWIEDERHOLRATE',it:'FREQUENZA DI AGGIORNAMENTO',zh:'刷新率'};
+  CEVM['En az ısınma']=CEVM['En az ısınma']||{en:'Least heat',ru:'Меньше нагрев',ar:'أقل سخونة',fr:'Moins de chauffe',de:'Am wenigsten Wärme',it:'Meno calore',zh:'发热最少'};
+  CEVM['Daha akıcı, daha çok ısınır']=CEVM['Daha akıcı, daha çok ısınır']||{en:'Smoother, more heat',ru:'Плавнее, сильнее нагрев',ar:'أكثر سلاسة، سخونة أكثر',fr:'Plus fluide, plus de chauffe',de:'Flüssiger, mehr Wärme',it:'Più fluido, più calore',zh:'更流畅，发热更多'};
+  CEVM['Daha az ısınma ve pil tüketimi']=CEVM['Daha az ısınma ve pil tüketimi']||{en:'Less heat and battery use',ru:'Меньше нагрев и расход батареи',ar:'سخونة واستهلاك بطارية أقل',fr:'Moins de chauffe et de batterie',de:'Weniger Wärme und Akkuverbrauch',it:'Meno calore e consumo di batteria',zh:'发热和耗电更少'};
+  CEVM['Daha az ısınma']=CEVM['Daha az ısınma']||{en:'Less heat',ru:'Меньше нагрев',ar:'سخونة أقل',fr:'Moins de chauffe',de:'Weniger Wärme',it:'Meno calore',zh:'发热更少'};
+  CEVM['Önerilen']=CEVM['Önerilen']||{en:'Recommended',ru:'Рекомендуется',ar:'موصى به',fr:'Recommandé',de:'Empfohlen',it:'Consigliato',zh:'推荐'};
+  CEVM['Önerilen · daha az ısınma ve pil tüketimi']=CEVM['Önerilen · daha az ısınma ve pil tüketimi']||{en:'Recommended · less heat and battery use',ru:'Рекомендуется · меньше нагрев и расход батареи',ar:'موصى به · سخونة واستهلاك بطارية أقل',fr:'Recommandé · moins de chauffe et de batterie',de:'Empfohlen · weniger Wärme und Akkuverbrauch',it:'Consigliato · meno calore e consumo di batteria',zh:'推荐 · 发热和耗电更少'};
+  CEVM['Ekranın en yükseği']=CEVM['Ekranın en yükseği']||{en:'Screen maximum',ru:'Максимум экрана',ar:'أقصى ما تدعمه الشاشة',fr:"Maximum de l'écran",de:'Bildschirm-Maximum',it:'Massimo dello schermo',zh:'屏幕最高'};
+  CEVM["Ayarlar'da en fazla"]=CEVM["Ayarlar'da en fazla"]||{en:'up to',ru:'в настройках до',ar:'في الإعدادات حتى',fr:"jusqu'à",de:'in den Einstellungen bis',it:'nelle impostazioni fino a',zh:'设置中最高'};
   CEVM['daha az ısınma']=CEVM['daha az ısınma']||{en:'less heat',ru:'меньше нагрев',ar:'سخونة أقل',fr:'moins de chauffe',de:'weniger Wärme',it:'meno calore',zh:'发热更少'};
   CEVM['Tamam']=CEVM['Tamam']||{en:'Done',ru:'Готово',ar:'تم',fr:'OK',de:'Fertig',it:'Fatto',zh:'完成'};
   CEVM['Telefon ısındı: efektler azaltıldı']=CEVM['Telefon ısındı: efektler azaltıldı']||{en:'Phone is warm: effects reduced',ru:'Телефон нагрелся: эффекты уменьшены',ar:'الهاتف ساخن: تم تقليل المؤثرات',fr:'Téléphone chaud : effets réduits',de:'Handy warm: Effekte reduziert',it:'Telefono caldo: effetti ridotti',zh:'手机发热：已减少特效'};
@@ -16249,11 +16590,24 @@ function devPanelAc(){
       {id:1, ad:'Açık',   alt:c('Süre uyarısı, teklif ve bildirimlerde')},
       {id:0, ad:'Kapalı', alt:c('Hiç titreşmez')}
     ], titresimAcik?1:0, v=>titresimAyarla(v===1));
+    /* Yüksek'in yenileme hızı alt seçeneği yalnız Yüksek seçiliyken ve ekran 60 Hz'ten hızlıysa görünür */
+    let hzKutu=null;
+    const hzKutuGoster=()=>{ if(hzKutu) hzKutu.style.display=(grafikKademe==='yuksek')?'':'none'; };
     grup('Grafik', [
-      {id:'yuksek', ad:'Yüksek', alt:c('En iyi görüntü')+' · '+hz+' Hz', uyari:c('Telefonun ısınmasına ve şarjın daha hızlı bitmesine sebep olabilir.')},
+      {id:'yuksek', ad:'Yüksek', alt:c('En iyi görüntü')},
       {id:'orta',   ad:'Orta',   alt:c('Dengeli')+' · 60 Hz'},
       {id:'dusuk',  ad:'Düşük',  alt:c('Efektler kapalı, en az ısınma')+' · 60 Hz'}
-    ], grafikKademe, k=>grafikAyarla(k));
+    ], grafikKademe, k=>{ grafikAyarla(k); hzKutuGoster(); });
+    if(hz>60){
+      const n0=l.children.length;
+      grup('Yenileme hızı', [
+        {id:'maks', ad:hz+' Hz', alt:c('Ekranın en yükseği')+' · '+c('En akıcı')},
+        {id:'60',   ad:'60 Hz', alt:c('Daha az ısınma ve pil tüketimi')}
+      ], yuksekHz, v=>yuksekHzAyarla(v));
+      hzKutu=document.createElement('div'); hzKutu.className='ssAltGrup';
+      while(l.children.length>n0) hzKutu.appendChild(l.children[n0]);
+      l.appendChild(hzKutu); hzKutuGoster();
+    }
     const t=document.createElement('button'); t.type='button'; t.className='ssTamam'; t.textContent=c('Tamam');
     t.onclick=()=>sayfa.classList.remove('acik'); l.appendChild(t);
     sayfa.classList.add('acik');
@@ -16337,15 +16691,18 @@ function devPanelAc(){
     const ac=document.createElement('div'); ac.className='ssAcikla';
     ac.textContent=c('Oyun tahtasının saniyede kaç kez çizileceğini seç. Sonra Ayarlar\'dan değiştirebilirsin.');
     l.appendChild(ac);
-    const hz=maksHz(); let secim=null; const dugmeler=[];
-    const devam=document.createElement('button'); devam.type='button'; devam.className='ssTamam'; devam.disabled=true;
+    /* 8 Ekim 2026: varsayılan Yüksek · ekranın en yüksek hızı önceden seçili; Yüksek · 60 Hz ayrı seçenek */
+    const hz=maksHz(); let secim=(hz>60)?'yuksekMaks':'yuksek'; const dugmeler=[];
+    const devam=document.createElement('button'); devam.type='button'; devam.className='ssTamam';
     devam.textContent=c('Devam');
-    [
-      {id:'yuksek', ad:'Yüksek', alt:c('En akıcı')+' · '+hz+' Hz', uyari:c('Telefonun ısınmasına ve şarjın daha hızlı bitmesine sebep olabilir.')},
+    const secenekler=[
+      {id:'yuksek', ad:'Yüksek', alt:c('En iyi görüntü')+' · 60 Hz'+(hz>60?' · '+c('daha az ısınma'):'')},
       {id:'orta',   ad:'Orta',   alt:c('Dengeli')+' · 60 Hz'},
       {id:'dusuk',  ad:'Düşük',  alt:c('Efektler kapalı, en az ısınma')+' · 60 Hz'}
-    ].forEach(o=>{
-      const b=document.createElement('button'); b.type='button'; b.className='ssSec';
+    ];
+    if(hz>60) secenekler.unshift({id:'yuksekMaks', ad:'Yüksek', alt:c('En akıcı')+' · '+hz+' Hz · '+c('Önerilen')});
+    secenekler.forEach(o=>{
+      const b=document.createElement('button'); b.type='button'; b.className='ssSec'+(o.id===secim?' secili':'');
       b.innerHTML='<span class="ssAd"><span></span><small></small>'+(o.uyari?'<em class="ssUyari"></em>':'')+'</span><span class="ssTik">✓</span>';
       b.querySelector('.ssAd span').textContent=c(o.ad); b.querySelector('.ssAd small').textContent=o.alt;
       if(o.uyari) b.querySelector('.ssUyari').textContent=o.uyari;
@@ -16354,7 +16711,8 @@ function devPanelAc(){
     });
     devam.onclick=()=>{
       if(!secim) return;
-      grafikAyarla(secim);
+      yuksekHzAyarla(secim==='yuksek' ? '60' : 'maks');
+      grafikAyarla(secim==='yuksekMaks' ? 'yuksek' : secim);
       try{ localStorage.setItem('grafikSecildi','1'); }catch(e){}
       sayfa.classList.remove('zorunlu'); sayfa.classList.remove('acik');
     };
@@ -16730,6 +17088,28 @@ const SOZLER=[
     new MutationObserver(esle).observe(asil,{attributes:true,attributeFilter:['style']}); esle();
   };
   vekil('nMenu','btnMenu','<svg '+SV+'><path d="M4.5 7h15M4.5 12h15M4.5 17h15"/></svg>','Menü',true);
+  /* Sol alt düğme (8 Ekim 2026): eskiden doğrudan menüye çıkıyordu. Artık küçük pencere: Yeni Oyun / Menüye Dön.
+     Yeni Oyun #btnYeni'ye, Menüye Dön #btnMenu'ye tıklar (asıl mantık aynı); Yeni Oyun gizliyse (çevrimiçi) çıkmaz. */
+  { const nm=document.getElementById('nMenu');
+    if(nm){
+      const pop=document.createElement('div'); pop.id='cikisPop';
+      pop.innerHTML='<div class="cpKutu"><button type="button" data-a="btnYeni"><svg '+SV+'><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4.5v4h4"/></svg><span>Yeni Oyun</span></button>'+
+        '<button type="button" data-a="btnMenu"><svg '+SV+'><path d="M10 5H5.5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1H10"/><path d="M14 8l4 4-4 4M18 12H9"/></svg><span>Menüye Dön</span></button></div>';
+      document.body.appendChild(pop);
+      const kapat=()=>pop.classList.remove('acik');
+      pop.onclick=e=>{ if(e.target===pop) kapat(); };
+      pop.querySelectorAll('button[data-a]').forEach(b=>b.onclick=()=>{ kapat(); const a=document.getElementById(b.dataset.a); if(a) a.click(); });
+      window.cikisPopKapat=()=>{ if(!pop.classList.contains('acik')) return false; kapat(); return true; };
+      nm.onclick=()=>{
+        const y=document.getElementById('btnYeni');
+        pop.querySelector('[data-a="btnYeni"]').style.display=(y && y.style.display==='none') ? 'none' : '';
+        const r=nm.getBoundingClientRect();
+        pop.querySelector('.cpKutu').style.bottom=Math.max(8, innerHeight-r.top+8)+'px';
+        pop.querySelector('.cpKutu').style.left=Math.max(8, r.left)+'px';
+        pop.classList.add('acik');
+      };
+    }
+  }
   const ay=document.querySelector('#btnSecenekler .sg svg');
   vekil('nAyar','btnSecenekler', ay?ay.outerHTML:'<svg '+SV+'><circle cx="12" cy="12" r="3"/></svg>','Ayarlar',false);
   /* Rakip şeridi üst çubuğun (iki sıra) altına */
