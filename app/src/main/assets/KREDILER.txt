@@ -71,10 +71,14 @@ CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
 Tüm ses efektleri CC0/telifsiz kaynaklardan sağlanmış ve oyuna
 göre işlenmiştir (kırpma, ses seviyesi eşitleme).
 
-Kaynaklar: BigSoundBank, Pixabay
+Kaynaklar: BigSoundBank, Pixabay, Freesound (yalnız CC0 kayıtlar)
 Lisans:    CC0 / telifsiz — ticari kullanıma uygun, atıf zorunlu değil
 BigSoundBank: https://bigsoundbank.com
 Pixabay:      https://pixabay.com/sound-effects/
+Freesound:    https://freesound.org — taş sesi kütüphanesi (satranç taşı, nal, kılıç,
+              zırh, taş, davul, fil borusu, at kişnemesi, top atışı, gong, çan, savaş
+              borusu, fanfar, tezahürat, kale kapısı); kayıt numaraları
+              ve sahipleri: sfx/kutu/KAYNAK.txt
 
 
 ────────────────────────────────────────────────────────────

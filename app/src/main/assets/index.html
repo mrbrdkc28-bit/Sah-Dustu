@@ -2117,6 +2117,16 @@ body:not(.incelemede) #yonBtn{display:none!important}
 #notPanel.dikey #nGeri,#notPanel.dikey #nIleri{padding:0 13px!important}
 #notPanel.dikey #notKontrol{gap:8px!important}
 
+/* ===== YATAY ÜST DÜĞMELER (8 Ekim 2026) =====
+   Yatayda düğme sırası tahtanın üstünü (2B'de 8. sırayı) örtüyordu. Artık tahtanın sağındaki boşluğa sığacak
+   genişlikte, sağa yaslı sarılır (tahta ~ekran yüksekliği kadar geniş, ortada). Gizle hapı Sahne'nin altını izler. */
+body:not(.dikeyAktif) #hud{align-items:flex-start}
+body:not(.dikeyAktif) #hud .hud-sag{flex-wrap:wrap;justify-content:flex-end;align-content:flex-start;gap:6px;
+  max-width:calc(50vw - 49vh - 10px - env(safe-area-inset-right,0px))}
+body:not(.dikeyAktif) #hud .hud-sag .hbtn-simge{padding:7px 8px}
+body:not(.dikeyAktif) #btnDuz{flex-direction:column;gap:2px;padding:4px 8px 3px}
+body:not(.dikeyAktif) #btnDuz i{display:block;font-style:normal;font-size:8.5px;font-weight:700;letter-spacing:.04em;color:var(--bone)}
+body:not(.dikeyAktif) #btnDuz .sg svg{width:18px;height:18px}
 /* ===== GİZLE / AÇ hapı + gizli araçlar (4 Ekim 2026) ===== */
 #gizleBtn{position:fixed;z-index:22;display:none;align-items:center;gap:5px;height:28px;padding:0 11px 0 9px;
   border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(12,14,22,.66);color:var(--bone);
@@ -2168,6 +2178,9 @@ body.dikeyAktif #hudOrta .hbtn-simge:not([style*="display: none"]):not([style*="
 .tsPaket.secili{background:linear-gradient(135deg,#F2C765,#C9912A);color:#1a1408;border-color:transparent}
 .tsPaket.yari{border-color:var(--brass);color:var(--brass)}
 .tsIpucu{font:500 12px Manrope,sans-serif;opacity:.65;margin:-2px 2px 8px}
+.tsOlayBas{font:700 12.5px Manrope,sans-serif;margin:12px 2px 6px;color:var(--brass)}
+html[data-tema="fildisi"] #secimSayfa .tsOlayBas{color:#6b5a36}
+.tsOlay .tsPaket{font-size:12.5px;padding-left:8px;padding-right:8px}
 .tsSatirT{display:grid;grid-template-columns:76px repeat(3,minmax(0,1fr));gap:6px;align-items:center;margin:6px 0}
 .tsBas span{font:700 10px Manrope,sans-serif;letter-spacing:.14em;opacity:.55;text-align:center}
 .tsTas{font:700 13px Manrope,sans-serif;white-space:nowrap}
@@ -2214,6 +2227,9 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
 .acUst::before{inset:-8px -8px 0 -8px;border-bottom:none;border-radius:7px 7px 0 0}
 .acAlt::before{inset:0 -8px -8px -8px;border-top:none;border-radius:0 0 7px 7px}
 #acTuval{position:absolute;left:0;top:0}
+#acResim{opacity:0;pointer-events:none}
+#acResim .acrIsikli{opacity:0}
+#acResim svg{display:block;width:100%;height:auto}
 #acFlas{position:absolute;inset:0;background:#fff3dc;opacity:0}
 #acMat{position:absolute;left:0;right:0;text-align:center;font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:clamp(18px,5vw,26px);
   letter-spacing:.38em;color:#E8B64C;opacity:0;text-shadow:0 0 18px rgba(232,120,40,.45)}
@@ -2249,7 +2265,8 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
 /* =====================================================================
    SİNEMATİK AÇILIŞ (5 Ekim 2026, sahibin isteği). Klasik açılış (taşlar + boya + logo) aynen oynar;
    bitince tahtanın iki yarısı üstten ve alttan gelip ortada kızgın, kıvılcımlı bir dikişle birleşir,
-   renkli taşlar sırayla tahtaya düşüp gerçek bir MAT kurar (siyah Şh8; Vg7#: Ff8, h6 piyonu, Af5 ve Kg1 korur).
+   renkli taşlar sırayla tahtaya düşüp gerçek bir MAT kurar. 8 Ekim 2026: mat her açılışta 17 konumluk havuzdan
+   rastgele seçilir (bir öncekinden farklı); ilk beş taşın düşüş sırası da karışır. İlki eski sabit mat (Şh8, Vg7#).
    Ayar: localStorage.acilisTur = 'sinematik' (varsayılan) | 'klasik'. Dokununca atlanır.
    Zamanlama dışarıya: window.ACILIS_MS (perde kapanışı), window.ACILIS_KURULUM_MS (3B kurulum —
    mat sonrası durgun anda yapılır, animasyon takılmasın). Giriş/menü açılışı perdenin KAPANMASINA bağlıdır.
@@ -2279,6 +2296,14 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
     const o=c.createOscillator(), g=c.createGain(); o.type='sine'; o.frequency.setValueAtTime(240*perde_,t); o.frequency.exponentialRampToValueAtTime(110*perde_,t+.08);
     g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.35,t+.004); g.gain.exponentialRampToValueAtTime(.0001,t+.22); o.connect(g).connect(c.destination); o.start(t); o.stop(t+.25);
     const n=gurultu(c,.05), f=c.createBiquadFilter(), gn=c.createGain(); f.type='bandpass'; f.frequency.value=2600; gn.gain.setValueAtTime(.25,t); gn.gain.exponentialRampToValueAtTime(.0001,t+.04); n.connect(f).connect(gn).connect(c.destination); n.start(t); }
+  /* Lamba düğmesi "tık"ı: çok kısa tiz çıtırtı + küçük gövde vuruşu (8 Ekim 2026) */
+  function anahtarTik(guc){ const c=sesKur(); if(!c) return; const t=c.currentTime;
+    const n=gurultu(c,.05), f=c.createBiquadFilter(), g=c.createGain(); f.type='bandpass'; f.frequency.value=3800; f.Q.value=1.4;
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.55*guc,t+.002); g.gain.exponentialRampToValueAtTime(.0001,t+.028);
+    n.connect(f).connect(g).connect(c.destination); n.start(t); n.stop(t+.05);
+    const o=c.createOscillator(), og=c.createGain(); o.type='triangle'; o.frequency.setValueAtTime(1500,t); o.frequency.exponentialRampToValueAtTime(420,t+.03);
+    og.gain.setValueAtTime(.0001,t); og.gain.exponentialRampToValueAtTime(.22*guc,t+.002); og.gain.exponentialRampToValueAtTime(.0001,t+.045);
+    o.connect(og).connect(c.destination); o.start(t); o.stop(t+.06); }
   function akor(){ const c=sesKur(); if(!c) return; const t=c.currentTime;
     [196,246.9,293.7,392].forEach((fr,i)=>{ const o=c.createOscillator(), g=c.createGain(); o.type='triangle'; o.frequency.value=fr;
       g.gain.setValueAtTime(.0001,t+i*.05); g.gain.exponentialRampToValueAtTime(.12,t+i*.05+.04); g.gain.exponentialRampToValueAtTime(.0001,t+2.2); o.connect(g).connect(c.destination); o.start(t+i*.05); o.stop(t+2.3); }); }
@@ -2326,7 +2351,7 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
         cx.globalCompositeOperation='source-over'; } }
     if(sok){ sok.t+=dt; const k=sok.t/.75; if(k>=1) sok=null; else { cx.globalCompositeOperation='lighter'; cx.strokeStyle='rgba(255,170,80,'+(.55*(1-k))+')'; cx.lineWidth=6*(1-k)+1;
       cx.beginPath(); cx.ellipse(sok.x,sok.y,sok.r*k,sok.r*k*.42,0,0,Math.PI*2); cx.stroke(); cx.globalCompositeOperation='source-over'; } }
-    if(matParilti>0){ const s=kare('h8'), pul=.6+.4*Math.sin(sim/110);
+    if(matParilti>0){ const s=kare(SK), pul=.6+.4*Math.sin(sim/110);
       const g=cx.createRadialGradient(s.x,s.y,2,s.x,s.y,s.s*1.15); g.addColorStop(0,'rgba(255,50,30,'+(.5*matParilti*pul)+')'); g.addColorStop(.55,'rgba(255,40,30,'+(.18*matParilti*pul)+')'); g.addColorStop(1,'rgba(255,40,30,0)');
       cx.fillStyle=g; cx.beginPath(); cx.arc(s.x,s.y,s.s*1.15,0,7); cx.fill(); }
     cx.globalCompositeOperation='lighter';
@@ -2366,7 +2391,35 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
     sok={x:TX+B/2,y,r:B*.95,t:0}; sars(9,420); gumbur(1);
     flasEl.animate([{opacity:.42},{opacity:0}],{duration:260,easing:'ease-out'}); });
   /* --- 3) taşlar: önce siyah şah, sonra renkli taşlar sıradaki yerlerinden yay çizerek düşer --- */
-  const yerlesim=[['♟︎','h6'],['♞︎','f5'],['♝︎','f8'],['♜︎','g1'],['♚︎','e3'],['♛︎','g7']];   // .aT sırası: piyon, at, fil, vezir, şah, kale
+  /* MAT HAVUZU: 'siyahŞah taş taş ... matlayan' (son taş mat verir). Hepsi araçla arandı ve oyunun motoruyla
+     doğrulandı: tam konum mat; matlayan konmadan önce siyah şahta değil; altı taşın her biri gerekli
+     (biri çıkarılınca mat bozulur); şahı tek taş çeker. Yeni konum eklenirse aynı kontrolden geçir. */
+  const MATLAR=[
+    'h8 Ph6 Nf5 Bf8 Rg1 Ke3 Qg7',
+    'f3 Pf2 Nd1 Bh6 Re6 Kh5 Qc6',
+    'b6 Pd5 Nb5 Bc6 Ra5 Ka4 Qe3',
+    'e5 Pd5 Nd6 Bc6 Rd8 Kg5 Qg7',
+    'c3 Pa2 Nb4 Bb3 Ra4 Kd1 Qa1',
+    'f5 Ph4 Nc5 Bh8 Qd2 Kh7 Rf4',
+    'd6 Pb5 Ne6 Bd4 Qg6 Kf8 Rd8',
+    'e3 Pc3 Nd3 Bc2 Qh1 Kc1 Re5',
+    'c4 Pc3 Nd1 Rd2 Qa7 Ka6 Bf7',
+    'g7 Pf7 Ng4 Rh5 Qe4 Ke8 Bf8',
+    'e7 Pf5 Nh5 Rd8 Qb8 Kg8 Bf8',
+    'f6 Pe6 Bf8 Rg3 Qh3 Ke4 Nh7',
+    'd3 Pd2 Bf3 Ra2 Qe6 Ke5 Nb4',
+    'b3 Pa3 Bb5 Ra1 Qe5 Kd1 Na5',
+    'c8 Nb8 Bd8 Ra8 Qf8 Ka6 Pd7',
+    'd7 Nd8 Be7 Rc8 Qa8 Kf8 Pc6',
+    'g5 Ng6 Bf3 Rh7 Qd3 Ke7 Ph4'
+  ];
+  const GLIF={P:'♟︎',N:'♞︎',B:'♝︎',R:'♜︎',K:'♚︎',Q:'♛︎'};
+  let matNo=Math.floor(Math.random()*MATLAR.length);
+  try{ const once=+localStorage.getItem('acilisMatSon'); if(MATLAR.length>1 && matNo===once) matNo=(matNo+1+Math.floor(Math.random()*(MATLAR.length-1)))%MATLAR.length;
+       localStorage.setItem('acilisMatSon', String(matNo)); }catch(e){}
+  const _m=MATLAR[matNo].split(' '), SK=_m[0];
+  const _ilk=_m.slice(1,-1).sort(()=>Math.random()-.5);   // ilk beş taşın düşüş sırası her açılışta farklı
+  const yerlesim=_ilk.concat(_m.slice(-1)).map(x=>[GLIF[x[0]], x.slice(1)]);   // son eleman: matlayan (büyük iniş)
   const kaynak={}; document.querySelectorAll('#acilisTaslar .aT').forEach(el=>{ kaynak[el.textContent.trim()[0]]=el; });
   function dus(el, hedefKare, gecikme, buyuk){
     const s=kare(hedefKare), r=el.getBoundingClientRect();
@@ -2379,11 +2432,37 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
     a.onfinish=()=>{ if(!aktif) return; toz(s.x,s.y+s.s*.32,'150,130,105'); kor(s.x,s.y+s.s*.3,buyuk?14:6,s.s*.6); tok(buyuk?.8:1); if(buyuk){ kivilcimSac(s.x,s.y,40,s.s*.4); sars(4,220); } };
     return k; }
   let siyahSah=null;
-  sonra(TSAH,()=>{ const s=kare('h8'); siyahSah=document.createElement('span'); siyahSah.className='aT kopya acSiyah'; siyahSah.textContent='♚︎';
+  sonra(TSAH,()=>{ const s=kare(SK); siyahSah=document.createElement('span'); siyahSah.className='aT kopya acSiyah'; siyahSah.textContent='♚︎';
     sahne.insertBefore(siyahSah,flasEl); const boy=s.s*.95; siyahSah.style.fontSize=boy+'px'; siyahSah.style.left=(s.x-boy*.5)+'px'; siyahSah.style.top=(s.y-boy*.56)+'px';
     siyahSah.animate([{transform:'translateY('+(-(s.y+boy))+'px)',opacity:0},{transform:'translateY(0)',opacity:1,offset:.85},{transform:'translateY(-3px)'},{transform:'translateY(0)'}],
       {duration:480,easing:'cubic-bezier(.5,0,.75,.4)',fill:'forwards'}).onfinish=()=>{ toz(s.x,s.y+s.s*.32,'90,80,70'); tok(.7); }; });
   yerlesim.forEach(([g,sq],i)=>{ const zamani=i<5?TTAS+i*ARA:TVEZ; sonra(zamani,()=>{ const el=kaynak[g[0]]; if(el) dus(el,sq,0,i===5); }); });
+  /* --- 3b) RESİM (8 Ekim 2026, sahibin isteği): taşlar inip mat kurulurken üstteki boşlukta, lamba ışığında
+     satranç oynayan baba ve çocuğu. Elle çizilmiş SVG siluet (dış dosya/lisans yok). Zamanlamaya dokunmaz:
+     ilk taş düşerken belirir, perdeyle birlikte kalkar. Üst kenar ile logo arasındaki boşluğu kullanır; taş
+     sırasının ARKASINDA durur (z-index:-1, perde içinde): bekleyen taşlar önde, düştükçe resim açığa çıkar.
+     Boşluk 90 px'ten azsa (küçük ekran) gösterilmez. --- */
+  const ACILIS_RESIM=`<svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><radialGradient id="acrIsik"><stop offset="0" stop-color="#F2B85A" stop-opacity=".36"/><stop offset=".45" stop-color="#C8862E" stop-opacity=".12"/><stop offset="1" stop-color="#C8862E" stop-opacity="0"/></radialGradient><linearGradient id="acrKoni" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A" stop-opacity=".32"/><stop offset="1" stop-color="#FFD58A" stop-opacity="0"/></linearGradient><linearGradient id="acrZemin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#E8B64C" stop-opacity="0"/><stop offset=".5" stop-color="#E8B64C" stop-opacity=".5"/><stop offset="1" stop-color="#E8B64C" stop-opacity="0"/></linearGradient><filter id="acrKenar" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="1.3" result="d"/><feFlood flood-color="#E8B64C" flood-opacity=".75"/><feComposite in2="d" operator="in" result="k"/><feMerge><feMergeNode in="k"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g class="acrIsikli"><ellipse cx="200" cy="130" rx="196" ry="106" fill="url(#acrIsik)"/><path d="M177 38 L223 38 L284 158 L116 158 Z" fill="url(#acrKoni)"/><ellipse cx="200" cy="39.5" rx="9" ry="2.4" fill="#FFE2A8" opacity=".95"/><rect x="30" y="222" width="340" height="1.4" fill="url(#acrZemin)"/><g filter="url(#acrKenar)" fill="#07080d" stroke="#07080d" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M68 98 h6 v124 h-6 Z M68 162 h70 v6 h-70 Z M130 168 h6 v54 h-6 Z"/><path fill="none" stroke-width="13" d="M104 160 L158 164 L157 213"/><path fill="none" stroke-width="7" d="M156 216 L174 217"/><path stroke="none" d="M117 92 C103 96 92 114 91 136 L94 162 L142 162 C145 147 146 125 141 110 C138 101 131 95 124 93 Z"/><path stroke="none" d="M119 84 h9 v12 h-9 Z"/><circle cx="127" cy="77" r="12"/><path stroke="none" d="M115 74 C116 63 130 60 137 68 C132 66 124 66 118 72 Z"/><path fill="none" stroke-width="10" d="M133 104 L149 126 L170 131"/><circle cx="172" cy="130" r="4.5"/><path fill="none" stroke-width="8" d="M118 110 L132 140 L152 146"/></g><path d="M174 124 h7 l-1.4-2 v-4.5 a2.6 2.6 0 1 0 -2.8 0 v4.5 Z" fill="#07080d" stroke="#FFD58A" stroke-opacity=".9" stroke-width="1"/><g filter="url(#acrKenar)" fill="#07080d" stroke="#07080d" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M324 116 h6 v106 h-6 Z M266 170 h64 v6 h-64 Z M266 176 h6 v46 h-6 Z"/><path stroke="none" d="M271 162 h52 a3 3 0 0 1 3 3 v5 h-58 v-5 a3 3 0 0 1 3 -3 Z"/><path fill="none" stroke-width="10" d="M300 160 L263 165 L263 199"/><path fill="none" stroke-width="6" d="M262 202 L251 203"/><path stroke="none" d="M288 118 C299 120 307 132 307 148 L305 163 L271 163 C269 150 270 136 275 127 C278 121 283 118 288 118 Z"/><path stroke="none" d="M280 110 h7 v10 h-7 Z"/><circle cx="283" cy="104" r="10"/><path stroke="none" d="M276 97 C279 89 291 90 294 98 C290 95 285 95 281 99 Z"/><path fill="none" stroke-width="7" d="M281 128 L259 148 L274 114"/><path fill="none" stroke-width="6.5" d="M292 128 L284 144 L260 151"/></g><g filter="url(#acrKenar)" fill="#07080d"><path d="M148 150 H252 a2 2 0 0 1 2 2 v4 a2 2 0 0 1 -2 2 H148 a2 2 0 0 1 -2 -2 v-4 a2 2 0 0 1 2 -2 Z"/><path d="M196 158 h8 v56 h-8 Z"/><ellipse cx="200" cy="217" rx="30" ry="5"/><path d="M160 150 L240 150 L232 140 L168 140 Z"/></g><g fill="#E8B64C" fill-opacity=".6"><path d="M168 140 h8 l-1 2.5 h-8 Z M184 140 h8 l-.5 2.5 h-8 Z M200 140 h8 l0 2.5 h-8 Z M216 140 h8 l.5 2.5 h-8 Z"/><path d="M175 142.5 h8 l-1 2.5 h-8 Z M191 142.5 h8 l-.5 2.5 h-8 Z M207 142.5 h8 l0 2.5 h-8 Z M223 142.5 h8 l.5 2.5 h-8 Z"/><path d="M166 145 h8 l-1 2.5 h-8 Z M182 145 h8 l-.5 2.5 h-8 Z M198 145 h8 l0 2.5 h-8 Z M214 145 h8 l.5 2.5 h-8 Z M230 145 h8 l.5 2.5 h-8 Z"/></g><g fill="#07080d" stroke="#FFD58A" stroke-opacity=".85" stroke-width="1" stroke-linejoin="round"><path d="M187 142 h9 l-1.5-2 v-6 h1.6 v-3 h-1.6 v1.4 h-1.5 v-1.4 h-1.5 v1.4 h-1.5 v-1.4 h-1.6 v3 h1.6 v6 Z"/><path d="M207 142 h9 l-1.6-2 v-9 h1.6 v-2.6 h-2 v-2 h-1.8 v2 h-2 v2.6 h1.6 v9 Z"/><path d="M222 142 h9 l-1.5-2 v-7.5 l2.2-3.5 l-2.2 1.2 l-1.2-2.4 l-1.2 2.4 l-1.2-2.4 l-1.2 2.4 l-2.2-1.2 l2.2 3.5 v7.5 Z"/></g></g><line x1="200" y1="0" x2="200" y2="22" stroke="#E8B64C" stroke-opacity=".55" stroke-width="1.2"/><path d="M186 22 H214 L224 38 H176 Z" fill="#0a0b10" stroke="#E8B64C" stroke-opacity=".75" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
+  sonra(TTAS-120,()=>{ try{
+    const lr=(logo||sira).getBoundingClientRect(), ust=34, bos=lr.top-12-ust;
+    if(bos<90) return;
+    const w=Math.min(W*.94, 440, bos*400/240), h=w*240/400;
+    const r=document.createElement('div'); r.id='acResim'; r.innerHTML=ACILIS_RESIM;
+    r.style.cssText='position:absolute;z-index:-1;left:'+Math.round((W-w)/2)+'px;top:'+Math.round(ust+(bos-h)/2)+'px;width:'+Math.round(w)+'px';
+    perde.insertBefore(r, perde.firstChild);
+    /* Önce karanlık odada yalnız lamba belirir; sonra lamba YANAR: hızlıca bir yanıp söner, kısa karanlıktan
+       sonra kalıcı açılır (eski ampul). Her yanışta düğme "tık"ı. Sahne (ışık, figürler, masa) ışıkla ortaya çıkar.
+       (8 Ekim 2026: yumuşak açılma da denendi, sahibi titreşimliyi seçti.) */
+    r.animate([{opacity:0},{opacity:1}],{duration:380,easing:'ease-out',fill:'forwards'});
+    const isikli=r.querySelector('.acrIsikli');
+    try{ localStorage.removeItem('acilisIsikSira'); }catch(e){}   // deneme sürümünden kalan sayaç
+    if(isikli) setTimeout(()=>{ if(!aktif) { isikli.style.opacity='1'; return; }
+      isikli.animate([{opacity:0,offset:0},{opacity:1,offset:.06},{opacity:1,offset:.15},{opacity:0,offset:.21},{opacity:0,offset:.44},
+        {opacity:1,offset:.5},{opacity:.7,offset:.57},{opacity:1,offset:.64},{opacity:1,offset:1}],{duration:1000,easing:'linear',fill:'forwards'});
+      anahtarTik(1);                                              // ilk yanış
+      setTimeout(()=>{ if(aktif) anahtarTik(.85); }, 470);        // yeniden yanış (offset .5'ten hemen önce)
+    }, 420);
+  }catch(e){} });
   /* --- 4) MAT: şah kızarır ve devrilir, yazı belirir --- */
   sonra(TMAT,()=>{ akor(); matEl.textContent=(typeof metniCevir==='function'?metniCevir('ŞAH MAT'):'ŞAH MAT'); matEl.classList.add('gor');
     const t0=performance.now(); const kz=()=>{ const e=Math.min(1,(performance.now()-t0)/400); matParilti=e; if(e<1&&aktif) requestAnimationFrame(kz); }; kz();
@@ -3893,8 +3972,10 @@ function kur(){
     camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
     renderer.setSize(innerWidth,innerHeight);
     if(bloomKatman) bloomKatman.setSize(innerWidth,innerHeight);
-    kamUzak=uygunUzaklik();
-    kamPitch=dikeyKamPitch();
+    /* 2B'de tam tepeden açı korunur (eskiden döndürünce 3B açısına dönüp düz plakalar yamuk görünüyordu) */
+    const _duz=(typeof duzGorunum!=='undefined' && duzGorunum);
+    kamUzak=_duz?duzUzaklik():uygunUzaklik();
+    kamPitch=_duz?1.55:dikeyKamPitch();
     isikDikeyAyar();
     panelYerlesimGuncelle();
     try{ if(typeof duzGorunum!=='undefined' && duzGorunum) duzKatmanKur(); }catch(e){}
@@ -5351,7 +5432,7 @@ const Ses=(()=>{
     const c=ac();
     if(c && c.state==='suspended'){ try{ c.resume(); }catch(e){} }   // her seferinde: sonradan askıya alınabilir
     if(acildiMi) return; acildiMi=true;
-    ON_YUKLE.forEach(tamponYukle); tsOnYukle();
+    ON_YUKLE.forEach(tamponYukle); tsOnYukle(); olayOnYukle();
   }
   function cal(ad){
     if(sessiz) return; // ses kapalıysa hiçbir efekt çalma
@@ -5379,7 +5460,13 @@ const Ses=(()=>{
      Taş taş seçimde her biri ayrı seçilebilir: TS.ozel değeri 'kt_nal_03' gibi olabilir.
      GERÇEK ve SAVAŞ paketleri bu kütüphanenin tarifidir: "anahtar:gecikme:kazanç + …" (yemede iki vuruş). */
   const KUTU=[['satranc','Satranç taşı','Satranç',19],['nal','Nal','Nal',11],['kilic','Kılıç','Kılıç',8],
-    ['zirh','Zırh','Zırh',9],['tas','Taş sürtme','Taş',7],['davul','Davul','Davul',5]];
+    ['zirh','Zırh','Zırh',9],['tas','Taş sürtme','Taş',7],['davul','Davul','Davul',5],
+    /* 8 Ekim 2026: fil borusu, at kişnemesi, top atışı (Freesound CC0, KAYNAK.txt). Kısa ad "Fil" değil: sözlükte
+       "Fil" taşın adı (Bishop) olarak çevrilir. */
+    ['fil','Fil borusu','Fil borusu',4],['kisneme','At kişnemesi','Kişneme',4],['top','Top atışı','Top atışı',4],
+    /* 8 Ekim 2026: olay sesleri için (başlama, şah, rok, mat) — yine Freesound CC0; taşlara da atanabilir */
+    ['gong','Gong','Gong',3],['can','Çan','Çan',4],['borazan','Savaş borusu','Boru',3],
+    ['fanfar','Zafer fanfarı','Fanfar',4],['tezahurat','Tezahürat','Tezahürat',3],['kapi','Kale kapısı','Kapı',4]];
   const PAKET_TARIF={
     gercek:{p_sec:'satranc_13:0:.55',p_hamle:'satranc_03',p_yeme:'satranc_16:0:.7+satranc_03:.11',
       n_sec:'satranc_14:0:.55',n_hamle:'satranc_05',n_yeme:'satranc_15:0:.7+satranc_05:.11',
@@ -5392,6 +5479,13 @@ const Ses=(()=>{
       b_sec:'kilic_04:0:.55',b_hamle:'=ordu_b_hamle',b_yeme:'kilic_08',
       r_sec:'zirh_06:0:.55',r_hamle:'tas_04',r_yeme:'tas_05+davul_04:.03:.8',
       q_sec:'kilic_01:0:.5',q_hamle:'zirh_07',q_yeme:'kilic_06+kilic_07:.15',
+      k_sec:'zirh_09:0:.55',k_hamle:'davul_04',k_yeme:'davul_03+kilic_05:.05:.8'},
+    /* DESTAN (8 Ekim 2026): Savaş'ın üstüne fil (fil borusu), at (kişneme), kale (top atışı) */
+    destan:{p_sec:'zirh_03:0:.55',p_hamle:'=ordu_p_hamle',p_yeme:'kilic_05',
+      n_sec:'kisneme_02:0:.5',n_hamle:'nal_02+nal_01:.13:.8',n_yeme:'nal_02+kisneme_03:.06:.7',
+      b_sec:'fil_02:0:.5',b_hamle:'=ordu_b_hamle',b_yeme:'fil_01:0:.75+kilic_08:.22:.7',
+      r_sec:'zirh_06:0:.55',r_hamle:'tas_04',r_yeme:'top_01:0:.85',
+      q_sec:'kilic_01:0:.5',q_hamle:'zirh_07',q_yeme:'top_02:0:.7+kilic_06:.12:.8',
       k_sec:'zirh_09:0:.55',k_hamle:'davul_04',k_yeme:'davul_03+kilic_05:.05:.8'}
   };
   function tarifCoz(tr){ return tr.split('+').map(x=>{ const a=x.split(':');
@@ -5411,6 +5505,16 @@ const Ses=(()=>{
     });
   }
   function tasSesi(t,an,kurb){ parcaCal(tasParcalar(t,an,tasKaynak(t,an),kurb)); }
+  /* OLAY SESLERİ (8 Ekim 2026): oyun başlangıcı, şah, rok, mat için seçilebilir ses. 'klasik' = eski davranış
+     (mat'ta klasik = başlama sesi). Diğer değerler kütüphane anahtarı ('gong_01'). localStorage.olaySesleri */
+  const OLAY={basla:'klasik',sah:'klasik',rok:'klasik',mat:'klasik'};
+  try{ const j=JSON.parse(localStorage.getItem('olaySesleri')||'null'); if(j) for(const k in OLAY) if(typeof j[k]==='string') OLAY[k]=j[k]; }catch(e){}
+  function olayOnYukle(){ try{ for(const k in OLAY) if(OLAY[k]!=='klasik') tamponYukle('kt_'+OLAY[k]); }catch(e){} }
+  function olayCal(tur, secim, zorla){
+    const sc=secim||OLAY[tur]||'klasik';
+    if(sc==='klasik'){ cal(tur==='mat'?'basla':tur); return; }
+    parcaCal([['kt_'+sc,0,.9]], zorla);
+  }
   function tsOnYukle(){ try{ for(const t of 'pnbrqk') for(const an of ['sec','hamle','yeme']){ const pk=tasKaynak(t,an); if(pk!=='klasik') tasParcalar(t,an,pk,'n').forEach(x=>tamponYukle(x[0])); } }catch(e){} }
   setTimeout(()=>{ try{ if(acildiMi) tsOnYukle(); }catch(e){} }, 1500);
   function eskiCal(ad){
@@ -5492,6 +5596,10 @@ const Ses=(()=>{
     tasSesPaket(pk){ TS.paket=pk; TS.ozel={}; tsKaydet(); tsOnYukle(); },
     tasSesOzel(tip,an,pk){ if(pk===TS.paket) delete TS.ozel[tip+'_'+an]; else TS.ozel[tip+'_'+an]=pk; tsKaydet(); tsOnYukle(); },
     tasSesSifirla(){ TS.paket='klasik'; TS.ozel={}; tsKaydet(); },
+    olay:(tur)=>olayCal(tur),
+    olayDinle:(tur,secim)=>olayCal(tur,secim,true),
+    get olayAyar(){ return Object.assign({},OLAY); },
+    olaySec(tur,secim){ if(!(tur in OLAY)) return; OLAY[tur]=secim; try{ localStorage.setItem('olaySesleri', JSON.stringify(OLAY)); }catch(e){} olayOnYukle(); },
     tasKaynak:(tip,an)=>tasKaynak(tip,an),
     son:()=>{ pat(196,.6,'triangle',.15,98); setTimeout(()=>pat(147,.9,'triangle',.15,73),350); }
   };
@@ -6094,6 +6202,9 @@ let insanRenk='w'; // AI'ya karşı oyuncunun rengi ('w'|'b'); 'rastgele' seçil
 let aktifInsanRenk='w'; // o anki oyunda insanın gerçek rengi (rastgele çözülmüş hali)
 let muzikAyari=true; // arka plan müziği açık/kapalı
 let sahneAyari=true; // taş yeme sinematik sahnesi açık/kapalı
+/* 8 Ekim 2026: kalıcı (eskiden her açılışta "açık" başlıyordu) */
+try{ if(localStorage.getItem('sahneAyari')==='0') sahneAyari=false; }catch(e){}
+function sahneKaydet(){ try{ localStorage.setItem('sahneAyari', sahneAyari?'1':'0'); }catch(e){} }
 let cvSahneUyarisi=false; // cevrimici: sahne farki uyarisi bir kez gosterilsin
 let cvSahneSabit=null; // süreli çevrimiçi maçta eşleşmenin animasyon ayarı (null: oyuncunun kendi ayarı)
 function sahneAcik(){ return (cevrimiciAktif && cvSahneSabit!==null) ? cvSahneSabit : sahneAyari; }
@@ -6570,7 +6681,7 @@ function sahGosterge(){
   sahIsik=new THREE.PointLight(0xFF3322,1.8,3.6);
   sahIsik.position.set(v.x,1.3,v.z);
   scene.add(sahIsik);
-  Ses.cal('sah');
+  Ses.olay('sah');
   anlatimGoster('ŞAH!');
 }
 
@@ -6631,7 +6742,7 @@ async function hamleOyna(h, ai=false, uzaktan=false){
       if(duzGorunum) duzKatmanKur();
       bulmacaAdim++;
       if(Motor.durum()==='mat'){
-        Ses.cal('sah'); bulmacaSonuc(true); return;
+        Ses.olay('mat'); bulmacaSonuc(true); return;
       }
       // Rakip cevabını otomatik oyna (varsa)
       Ses.cal('hamle');
@@ -6784,7 +6895,7 @@ async function hamleOyna(h, ai=false, uzaktan=false){
 
   // rok: kale de kaysın
   if(h.rok){
-    Ses.cal('rok');
+    Ses.olay('rok');
     const taban=saldRenk==='w'?56:0;
     const kaleEski=h.rok==='K'?taban+7:taban;
     const kaleYeni=h.rok==='K'?taban+5:taban+3;
@@ -6806,6 +6917,8 @@ async function hamleOyna(h, ai=false, uzaktan=false){
     anlatimGoster('Piyon vezir oldu.');
   }
 
+  try{ hamleTitret(Motor.sahTehdit(Motor.turn) ? 'sah' : (kurb ? 'yeme' : 'hamle'),
+                   !ai && !uzaktan && (mod==='ai' || cevrimiciAktif)); }catch(e){}
   hudGuncelle();
   if(tasAdiGoster) tasAdlariGuncelle();
   if(duzGorunum) duzKatmanKur();
@@ -7227,7 +7340,7 @@ function oyunSonu(d, terkKazanan){
   Ses.son();
   // Şah mat olunca: açılış sesi + şah yere yuvarlanır + "ŞAH MAT" + sesli anons
   if(d==='mat'){
-    Ses.sesAc(); setTimeout(()=>Ses.cal('basla'), 200);
+    Ses.sesAc(); setTimeout(()=>Ses.olay('mat'), 200);
     sahMatGorseli();
   }
   // İnsan kazandıysa: tam ekran altın vinyet parlaması
@@ -8725,9 +8838,10 @@ function menuKur(){
   document.querySelectorAll('#sahneler .mod').forEach(b=>{
     b.onclick=()=>{
       document.querySelectorAll('#sahneler .mod').forEach(x=>x.classList.remove('secili'));
-      b.classList.add('secili'); sahneAyari=(b.dataset.sahne==='1');
-      sahneSimgeGuncelle();
+      b.classList.add('secili'); sahneAyari=(b.dataset.sahne==='1'); sahneKaydet();
+      sahneSimgeGuncelle(); if(typeof cvAnimNotYaz==='function') cvAnimNotYaz();
     };
+    b.classList.toggle('secili', (b.dataset.sahne==='1')===sahneAyari);   // kayıtlı ayarı göster
   });
   // Grafik kalitesi: otomatik tespit edileni işaretle
   document.querySelectorAll('#grafikler .mod').forEach(b=>{
@@ -8893,7 +9007,8 @@ function menuKur(){
     if(cevrimiciAktif && cvSahneSabit!==null){
       kisaBilgi('Süreli maçta animasyon eşleşmeye göre sabit'); return;
     }
-    sahneAyari=!sahneAyari;
+    sahneAyari=!sahneAyari; sahneKaydet();
+    if(typeof cvAnimNotYaz==='function') cvAnimNotYaz();
     // Kurulumdaki butonları da senkronla
     document.querySelectorAll('#sahneler .mod').forEach(x=>{
       x.classList.toggle('secili', (x.dataset.sahne==='1')===sahneAyari);
@@ -9609,19 +9724,44 @@ function tasAdlariGuncelle(){
 }
 function tasAdiDegistir(){
   tasAdiGoster=!tasAdiGoster;
+  tahtaTercihi('tasAdi', tasAdiGoster);
   tasAdlariGuncelle();
   const b=document.getElementById('btnTasAd');
   if(b){ b.style.opacity=tasAdiGoster?'1':'.55'; b.title=tasAdiGoster?'Taş adlarını gizle':'Taş adlarını göster'; }
 }
 
+/* TAHTA TERCİHLERİ (8 Ekim 2026, sahibin isteği): 2B görünüm ve taş adları son kullanılan hâlde kalır —
+   sonraki oyunda ve uygulama kapanıp açılınca da. (Ses, Gizle, savaş sahnesi, grafik, ekran yönü ve
+   Seçenekler anahtarları kendi yerlerinde saklanıyor; sesli oynama bilerek dışarıda.) */
+/* 2B kamera uzaklığı: tahta ekranı doldurur. Yatayda üst düğmeler tahtanın sağındaki boşluğa taşındığı için
+   (CSS "YATAY ÜST DÜĞMELER") tahtayı küçültmeye gerek yok. */
+function duzUzaklik(){ return uygunUzaklik()*0.92; }
+function tahtaTercihi(ad, deger){
+  try{ if(deger===undefined) return localStorage.getItem('tahta_'+ad)==='1'; localStorage.setItem('tahta_'+ad, deger?'1':'0'); }catch(e){}
+  return false;
+}
+/* Oyun başlarken çağrılır (kamera kurulduktan SONRA): kayıtlı tercihleri uygular, 2B ise kamerayı tepeye alır */
+function tahtaTercihleriniUygula(){
+  try{
+    if(tahtaTercihi('duz')!==duzGorunum) duzGorunumDegistir();
+    else if(duzGorunum){
+      kamYaw=oyuncuSiyahMi()?Math.PI:0; kamPitch=1.55; kamUzak=duzUzaklik();
+      if(tepeIsik) tepeIsik.intensity=0.12*ISIK_OLCEK;
+      duzKatmanKur(); esirYiginiKur();
+    }
+    if(tahtaTercihi('tasAdi')!==tasAdiGoster) tasAdiDegistir();
+    duzSimgeGuncelle();
+  }catch(e){}
+}
 function duzGorunumDegistir(){
   duzGorunum=!duzGorunum;
+  tahtaTercihi('duz', duzGorunum);
   const siyahTaraf = oyuncuSiyahMi();
   if(duzGorunum){
     // 2D klasik: tam tepeden düz bak + yatık sembol katmanı
     kamYaw = siyahTaraf ? Math.PI : 0;
     kamPitch=1.55; // ~89°, tam tepeden
-    kamUzak=uygunUzaklik()*0.92; // tahta ekranı tam doldursun
+    kamUzak=duzUzaklik(); // tahta ekranı doldursun
     if(tepeIsik) tepeIsik.intensity=0.12*ISIK_OLCEK; // merkez parlamasını önle
     duzKatmanKur();
   } else {
@@ -9645,9 +9785,17 @@ function oyuncuSiyahMi(){
   if(mod==='ai') return aktifInsanRenk==='b';
   return false; // iki kişilik: beyaz taraf
 }
+/* 8 Ekim 2026: düğme geçilecek görünümü gösterir — 3B'deyken ızgara + "2B", 2B'deyken küp + "3B" (sahibin isteği) */
+const DUZ_IKON_2B='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9.3h16M4 14.7h16M9.3 4v16M14.7 4v16"/></svg>';
+const DUZ_IKON_3B='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/></svg>';
 function duzSimgeGuncelle(){
-  const b=document.getElementById('btnDuz');
-  if(b){ b.style.opacity=duzGorunum?'1':'.55'; b.title=duzGorunum?'3B görünüme dön':'Düz (2B) görünüm'; }
+  const b=document.getElementById('btnDuz'); if(!b) return;
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  b.style.opacity='1';
+  const sg=b.querySelector('.sg'), et=b.querySelector('i');
+  if(sg) sg.innerHTML=duzGorunum?DUZ_IKON_3B:DUZ_IKON_2B;
+  if(et) et.textContent=c(duzGorunum?'3B':'2B');
+  b.title=c(duzGorunum?'3B görünüme geç':'2B görünüme geç');
 }
 
 /* Küçük bilgi balonu (3 Ekim 2026): simgesi tek başına anlaşılmayan düğmelere
@@ -9726,7 +9874,7 @@ function cevrimiciOyunBaslat(rakipAd){
   if(cvSahneSabit!==null) setTimeout(()=>kisaBilgi(cvSahneSabit?'Süreli maç: animasyon açık':'Süreli maç: animasyon kapalı'),900);
   sahneSimgeGuncelle();
   Ses.sesAc();
-  setTimeout(()=>Ses.cal('basla'),60);
+  setTimeout(()=>Ses.olay('basla'),60);
   document.getElementById('menu').classList.add('gizli');
   document.getElementById('hud').classList.add('acik');
   wakeLockIste();
@@ -9741,6 +9889,7 @@ function cevrimiciOyunBaslat(rakipAd){
   // Siyah oyuncuysam tahtayı kendi tarafıma çevir
   const siyahMi=(Cevrimici.benimRenk==='b');
   kamYaw=siyahMi?Math.PI:0; kamPitch=dikeyKamPitch(); kamUzak=uygunUzaklik(); kamHedef.set(0,0,0);
+  tahtaTercihleriniUygula();
   // Bilgi şeridi: kiminle, hangi renk
   cevrimiciBilgiGoster(rakipAd);
   // Çevrimiçi modda "Yeni Oyun" mantıksız (tek taraflı sıfırlama); gizle
@@ -9894,7 +10043,7 @@ function odaAyarMetni(dk, inc, sahne){
 }
 /* Animasyon ayarını her yerde birlikte güncelle (kurulum düğmeleri, simge, çevrimiçi notu) */
 function sahneAyarla(acik){
-  sahneAyari=!!acik;
+  sahneAyari=!!acik; sahneKaydet();
   document.querySelectorAll('#sahneler .mod').forEach(x=>x.classList.toggle('secili',(x.dataset.sahne==='1')===sahneAyari));
   sahneSimgeGuncelle(); cvAnimNotYaz();
 }
@@ -10505,7 +10654,7 @@ function oyunaBasla(){
     ordu:aktifOrdu?aktifOrdu.id:'klasik', arena:aktifArena?aktifArena.id:ARENALAR[0].id,
     zor:aiZorluk, renk:insanRenk, sure:sureSecim, artis:(typeof sureArtis!=='undefined'?sureArtis:0)
   })); }catch(e){}
-  setTimeout(()=>Ses.cal('basla'),60);
+  setTimeout(()=>Ses.olay('basla'),60);
   document.getElementById('kurulumEkran').classList.remove('acik');
   document.getElementById('menu').classList.add('gizli');
   document.getElementById('hud').classList.add('acik');
@@ -10526,6 +10675,7 @@ function oyunaBasla(){
     aktifInsanRenk='w';
   }
   kamYaw=insanSiyahMi?Math.PI:0; kamPitch=dikeyKamPitch(); kamUzak=uygunUzaklik(); kamHedef.set(0,0,0);
+  tahtaTercihleriniUygula();
   yardimIlkGirisKontrol();
   // İnsan siyahsa, beyaz olan AI ilk hamleyi yapar (diziliş animasyonu bitsin diye bekle)
   if(mod==='ai' && insanSiyahMi){
@@ -11842,6 +11992,30 @@ function titresimAyarla(acik){
   try{ localStorage.setItem('titresim', acik?'1':'0'); }catch(e){}
   if(acik) try{ navigator.vibrate(40); }catch(e){}   // açınca küçük bir deneme titreşimi
 }
+/* HAMLE TİTREŞİMİ (8 Ekim 2026, sahibin isteği). hamleTitresim: 'kapali' | 'rakip' (yalnız rakibin hamlesi) |
+   'hepsi'. titresimGuc: 'hafif' | 'orta' | 'guclu'. Yeme çift vuruş, şah uzun çift vuruş: bakmadan hissedilir.
+   Ana Titreşim anahtarı kapalıysa hiçbiri çalışmaz (navigator.vibrate sarmalı). */
+let hamleTitresim='kapali', titresimGuc='orta';
+try{ const h=localStorage.getItem('hamleTitresim'); if(['kapali','rakip','hepsi'].includes(h)) hamleTitresim=h;
+     const g=localStorage.getItem('titresimGuc'); if(['hafif','orta','guclu'].includes(g)) titresimGuc=g; }catch(e){}
+const TITRESIM_MS={hafif:14, orta:28, guclu:50};
+function titresimDesen(tur){
+  const b=TITRESIM_MS[titresimGuc]||28;
+  if(tur==='sah') return [Math.round(b*1.6), 60, Math.round(b*1.6)];
+  if(tur==='yeme') return [b, 50, b];
+  return b;
+}
+/* benimMi: hamleyi bu telefondaki oyuncu yaptı (yapay zekâya ya da çevrimiçi rakibe karşı). İki kişilik yerel
+   oyunda iki taraf da "rakip" sayılır (sıra karşıdakine geçti). */
+function hamleTitret(tur, benimMi){
+  if(!titresimAcik || hamleTitresim==='kapali') return;
+  if(hamleTitresim==='rakip' && benimMi) return;
+  try{ navigator.vibrate(titresimDesen(tur)); }catch(e){}
+}
+function hamleTitresimAyarla(v){ hamleTitresim=v; try{ localStorage.setItem('hamleTitresim', v); }catch(e){}
+  if(v!=='kapali') try{ navigator.vibrate(titresimDesen('hamle')); }catch(e){} }
+function titresimGucAyarla(v){ titresimGuc=v; try{ localStorage.setItem('titresimGuc', v); }catch(e){}
+  try{ navigator.vibrate(titresimDesen('yeme')); }catch(e){} }
 /* Tahta ekranda görünüyor mu: oyun/inceleme ekranı ya da arkasında 3B sahne görünen Buzlu Cam menüsü.
    Diğer menülerde sahne tamamen örtülü; orada sürekli çizim boşuna ısıtır. */
 let _hudEl=null, _anEl=null;
@@ -12214,6 +12388,7 @@ function bulmacaGoster(){
   if(typeof kameraGuncelle==='function') kameraGuncelle();
   if(aktifArena) arenaKur(aktifArena);
   taslariDiz(false);
+  tahtaTercihleriniUygula();
   if(typeof panelYerlesimGuncelle==='function') panelYerlesimGuncelle();
   hudGuncelle();
   const tipAd={1:'Tek hamlede mat',2:'İki hamlede mat',3:'Üç hamlede mat'}[b.t];
@@ -13935,6 +14110,49 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Daha akıcı, daha çok ısınır']=CEVM['Daha akıcı, daha çok ısınır']||{en:'Smoother, more heat',ru:'Плавнее, сильнее нагрев',ar:'أكثر سلاسة، سخونة أكثر',fr:'Plus fluide, plus de chauffe',de:'Flüssiger, mehr Wärme',it:'Più fluido, più calore',zh:'更流畅，发热更多'};
   CEVM['Daha az ısınma ve pil tüketimi']=CEVM['Daha az ısınma ve pil tüketimi']||{en:'Less heat and battery use',ru:'Меньше нагрев и расход батареи',ar:'سخونة واستهلاك بطارية أقل',fr:'Moins de chauffe et de batterie',de:'Weniger Wärme und Akkuverbrauch',it:'Meno calore e consumo di batteria',zh:'发热和耗电更少'};
   CEVM['Daha az ısınma']=CEVM['Daha az ısınma']||{en:'Less heat',ru:'Меньше нагрев',ar:'سخونة أقل',fr:'Moins de chauffe',de:'Weniger Wärme',it:'Meno calore',zh:'发热更少'};
+  CEVM['Dokun: sesi seç']=CEVM['Dokun: sesi seç']||{en:'Tap: choose a sound',ru:'Нажмите: выберите звук',ar:'المس: اختر صوتًا',fr:'Touchez : choisissez un son',de:'Tippen: Ton wählen',it:'Tocca: scegli un suono',zh:'点按：选择声音'};
+  CEVM['ses']=CEVM['ses']||{en:'sounds',ru:'звуков',ar:'صوت',fr:'sons',de:'Töne',it:'suoni',zh:'个声音'};
+  CEVM["Olay sesleri"]=CEVM["Olay sesleri"]||{en:"Event sounds",ru:"Звуки событий",ar:"أصوات الأحداث",fr:"Sons d'événements",de:"Ereignisklänge",it:"Suoni degli eventi",zh:"事件音效"};
+  CEVM["Oyun başlangıcı"]=CEVM["Oyun başlangıcı"]||{en:"Game start",ru:"Начало партии",ar:"بداية اللعبة",fr:"Début de partie",de:"Spielbeginn",it:"Inizio partita",zh:"开局"};
+  CEVM["Şah çekme"]=CEVM["Şah çekme"]||{en:"Check",ru:"Шах",ar:"كش",fr:"Échec",de:"Schach",it:"Scacco",zh:"将军"};
+  CEVM["Rok yapma"]=CEVM["Rok yapma"]||{en:"Castling",ru:"Рокировка",ar:"التبييت",fr:"Roque",de:"Rochade",it:"Arrocco",zh:"王车易位"};
+  CEVM["Şah mat anı"]=CEVM["Şah mat anı"]||{en:"Checkmate",ru:"Мат",ar:"كش مات",fr:"Échec et mat",de:"Schachmatt",it:"Scacco matto",zh:"将死"};
+  CEVM["Gong"]=CEVM["Gong"]||{en:"Gong",ru:"Гонг",ar:"غونغ",fr:"Gong",de:"Gong",it:"Gong",zh:"锣"};
+  CEVM["Derin gong"]=CEVM["Derin gong"]||{en:"Deep gong",ru:"Глубокий гонг",ar:"غونغ عميق",fr:"Gong grave",de:"Tiefer Gong",it:"Gong profondo",zh:"低沉的锣"};
+  CEVM["Savaş borusu"]=CEVM["Savaş borusu"]||{en:"War horn",ru:"Боевой рог",ar:"بوق الحرب",fr:"Cor de guerre",de:"Kriegshorn",it:"Corno di guerra",zh:"战号"};
+  CEVM["Uzak boru"]=CEVM["Uzak boru"]||{en:"Distant horn",ru:"Далёкий рог",ar:"بوق بعيد",fr:"Cor lointain",de:"Fernes Horn",it:"Corno lontano",zh:"远处号角"};
+  CEVM["El çanı"]=CEVM["El çanı"]||{en:"Hand bell",ru:"Колокольчик",ar:"جرس يدوي",fr:"Clochette",de:"Handglocke",it:"Campanella",zh:"手铃"};
+  CEVM["Çan"]=CEVM["Çan"]||{en:"Bell",ru:"Колокол",ar:"جرس",fr:"Cloche",de:"Glocke",it:"Campana",zh:"钟"};
+  CEVM["Boru"]=CEVM["Boru"]||{en:"Horn",ru:"Рог",ar:"بوق",fr:"Cor",de:"Horn",it:"Corno",zh:"号角"};
+  CEVM["Kale kapısı"]=CEVM["Kale kapısı"]||{en:"Castle gate",ru:"Крепостные ворота",ar:"بوابة القلعة",fr:"Porte du château",de:"Burgtor",it:"Portone del castello",zh:"城门"};
+  CEVM["Demir kapı"]=CEVM["Demir kapı"]||{en:"Iron gate",ru:"Железные ворота",ar:"بوابة حديدية",fr:"Grille en fer",de:"Eisentor",it:"Cancello di ferro",zh:"铁门"};
+  CEVM["Ahşap kapı"]=CEVM["Ahşap kapı"]||{en:"Wooden door",ru:"Деревянная дверь",ar:"باب خشبي",fr:"Porte en bois",de:"Holztür",it:"Porta di legno",zh:"木门"};
+  CEVM["Zincir"]=CEVM["Zincir"]||{en:"Chain",ru:"Цепь",ar:"سلسلة",fr:"Chaîne",de:"Kette",it:"Catena",zh:"锁链"};
+  CEVM["Zafer fanfarı"]=CEVM["Zafer fanfarı"]||{en:"Victory fanfare",ru:"Победные фанфары",ar:"نفير النصر",fr:"Fanfare de victoire",de:"Siegesfanfare",it:"Fanfara di vittoria",zh:"胜利号角"};
+  CEVM["Trompet"]=CEVM["Trompet"]||{en:"Trumpet",ru:"Труба",ar:"بوق",fr:"Trompette",de:"Trompete",it:"Tromba",zh:"小号"};
+  CEVM["Fanfar"]=CEVM["Fanfar"]||{en:"Fanfare",ru:"Фанфары",ar:"نفير",fr:"Fanfare",de:"Fanfare",it:"Fanfara",zh:"号曲"};
+  CEVM["Tezahürat"]=CEVM["Tezahürat"]||{en:"Cheering",ru:"Овации",ar:"هتاف",fr:"Acclamations",de:"Jubel",it:"Acclamazioni",zh:"欢呼"};
+  CEVM["Kilise çanı"]=CEVM["Kilise çanı"]||{en:"Church bell",ru:"Церковный колокол",ar:"جرس الكنيسة",fr:"Cloche d'église",de:"Kirchenglocke",it:"Campana di chiesa",zh:"教堂钟"};
+  CEVM["Kapı"]=CEVM["Kapı"]||{en:"Gate",ru:"Ворота",ar:"بوابة",fr:"Porte",de:"Tor",it:"Porta",zh:"门"};
+  CEVM['Destan']=CEVM['Destan']||{en:'Epic',ru:'Эпос',ar:'ملحمة',fr:'Épopée',de:'Epos',it:'Epica',zh:'史诗'};
+  CEVM['Fil borusu']=CEVM['Fil borusu']||{en:'Elephant trumpet',ru:'Трубный зов слона',ar:'صوت الفيل',fr:"Barrissement d'éléphant",de:'Elefantentrompete',it:"Barrito d'elefante",zh:'象鸣'};
+  CEVM['At kişnemesi']=CEVM['At kişnemesi']||{en:'Horse neigh',ru:'Ржание коня',ar:'صهيل الحصان',fr:'Hennissement',de:'Pferdewiehern',it:'Nitrito',zh:'马嘶'};
+  CEVM['Kişneme']=CEVM['Kişneme']||{en:'Neigh',ru:'Ржание',ar:'صهيل',fr:'Hennissement',de:'Wiehern',it:'Nitrito',zh:'马嘶'};
+  CEVM['Top atışı']=CEVM['Top atışı']||{en:'Cannon shot',ru:'Пушечный выстрел',ar:'طلقة مدفع',fr:'Coup de canon',de:'Kanonenschuss',it:'Colpo di cannone',zh:'炮声'};
+  CEVM['Hamlelerde titreşim']=CEVM['Hamlelerde titreşim']||{en:'Vibrate on moves',ru:'Вибрация при ходах',ar:'الاهتزاز عند النقلات',fr:'Vibrer aux coups',de:'Vibration bei Zügen',it:'Vibrazione alle mosse',zh:'走棋振动'};
+  CEVM['Hamlelerde titreşmez']=CEVM['Hamlelerde titreşmez']||{en:'No vibration on moves',ru:'Без вибрации при ходах',ar:'لا اهتزاز عند النقلات',fr:'Pas de vibration aux coups',de:'Keine Vibration bei Zügen',it:'Nessuna vibrazione alle mosse',zh:'走棋不振动'};
+  CEVM['Rakibin hamlesinde']=CEVM['Rakibin hamlesinde']||{en:"On opponent's move",ru:'При ходе соперника',ar:'عند نقلة الخصم',fr:"Au coup de l'adversaire",de:'Beim Zug des Gegners',it:"Alla mossa dell'avversario",zh:'对手走棋时'};
+  CEVM['Sıra sana geçince haber verir']=CEVM['Sıra sana geçince haber verir']||{en:"Lets you know it's your turn",ru:'Сообщает, что ваш ход',ar:'ينبهك عندما يحين دورك',fr:"Vous prévient quand c'est votre tour",de:'Meldet, wenn du dran bist',it:'Ti avvisa quando tocca a te',zh:'轮到你时提醒'};
+  CEVM['Her hamlede']=CEVM['Her hamlede']||{en:'On every move',ru:'При каждом ходе',ar:'عند كل نقلة',fr:'À chaque coup',de:'Bei jedem Zug',it:'A ogni mossa',zh:'每步都振动'};
+  CEVM['Senin ve rakibin her hamlesi']=CEVM['Senin ve rakibin her hamlesi']||{en:"Your moves and your opponent's",ru:'Ваши ходы и ходы соперника',ar:'نقلاتك ونقلات خصمك',fr:"Vos coups et ceux de l'adversaire",de:'Deine und die Züge des Gegners',it:"Le tue mosse e quelle dell'avversario",zh:'你和对手的每一步'};
+  CEVM['Titreşim şiddeti']=CEVM['Titreşim şiddeti']||{en:'Vibration strength',ru:'Сила вибрации',ar:'شدة الاهتزاز',fr:'Intensité de vibration',de:'Vibrationsstärke',it:'Intensità vibrazione',zh:'振动强度'};
+  CEVM['Hafif']=CEVM['Hafif']||{en:'Light',ru:'Слабая',ar:'خفيف',fr:'Léger',de:'Leicht',it:'Leggera',zh:'轻'};
+  CEVM['Güçlü']=CEVM['Güçlü']||{en:'Strong',ru:'Сильная',ar:'قوي',fr:'Fort',de:'Stark',it:'Forte',zh:'强'};
+  CEVM['Belli belirsiz']=CEVM['Belli belirsiz']||{en:'Barely noticeable',ru:'Едва заметно',ar:'بالكاد يُلاحظ',fr:'À peine perceptible',de:'Kaum spürbar',it:'Appena percettibile',zh:'几乎察觉不到'};
+  CEVM['Kolayca hissedilir']=CEVM['Kolayca hissedilir']||{en:'Easy to feel',ru:'Хорошо ощутимо',ar:'سهل الإحساس به',fr:'Bien perceptible',de:'Gut spürbar',it:'Ben percepibile',zh:'容易感觉到'};
+  CEVM['3B']=CEVM['3B']||{en:'3D',ru:'3D',ar:'3D',fr:'3D',de:'3D',it:'3D',zh:'3D'};
+  CEVM['3B görünüme geç']=CEVM['3B görünüme geç']||{en:'Switch to 3D view',ru:'Перейти в 3D',ar:'التبديل إلى العرض ثلاثي الأبعاد',fr:'Passer en vue 3D',de:'Zur 3D-Ansicht',it:'Passa alla vista 3D',zh:'切换到3D视图'};
+  CEVM['2B görünüme geç']=CEVM['2B görünüme geç']||{en:'Switch to 2D view',ru:'Перейти в 2D',ar:'التبديل إلى العرض ثنائي الأبعاد',fr:'Passer en vue 2D',de:'Zur 2D-Ansicht',it:'Passa alla vista 2D',zh:'切换到2D视图'};
   CEVM['Önerilen']=CEVM['Önerilen']||{en:'Recommended',ru:'Рекомендуется',ar:'موصى به',fr:'Recommandé',de:'Empfohlen',it:'Consigliato',zh:'推荐'};
   CEVM['Önerilen · daha az ısınma ve pil tüketimi']=CEVM['Önerilen · daha az ısınma ve pil tüketimi']||{en:'Recommended · less heat and battery use',ru:'Рекомендуется · меньше нагрев и расход батареи',ar:'موصى به · سخونة واستهلاك بطارية أقل',fr:'Recommandé · moins de chauffe et de batterie',de:'Empfohlen · weniger Wärme und Akkuverbrauch',it:'Consigliato · meno calore e consumo di batteria',zh:'推荐 · 发热和耗电更少'};
   CEVM['Ekranın en yükseği']=CEVM['Ekranın en yükseği']||{en:'Screen maximum',ru:'Максимум экрана',ar:'أقصى ما تدعمه الشاشة',fr:"Maximum de l'écran",de:'Bildschirm-Maximum',it:'Massimo dello schermo',zh:'屏幕最高'};
@@ -16573,7 +16791,7 @@ function devPanelAc(){
       {id:0, ad:'Kapalı', alt:c('Tüm sesler kapalı')}
     ], (typeof Ses!=='undefined' && Ses.sessizMi)?0:1, v=>{ if(typeof sesAyarla==='function') sesAyarla(v===1); });
     /* Taş sesleri alt sayfası (4 Ekim 2026) */
-    { const PAD={klasik:'Klasik',ahsap:'Ahşap',ordu:'Ordu',gercek:'Gerçek',savas:'Savaş'};
+    { const PAD={klasik:'Klasik',ahsap:'Ahşap',ordu:'Ordu',gercek:'Gerçek',savas:'Savaş',destan:'Destan'};
       const ts=(typeof Ses!=='undefined' && Ses.tasSesAyar) ? Ses.tasSesAyar : {paket:'klasik',ozel:{}};
       const b=document.createElement('button'); b.type='button'; b.className='ssSec tsSatir';
       b.innerHTML='<span class="ssAd"><span></span><small></small></span><span class="tsOk">›</span>';
@@ -16586,10 +16804,27 @@ function devPanelAc(){
       {id:'klasik',    ad:'Klasik',    alt:c('Kısa: taşlar ve logo')}
     ], (()=>{ try{ return localStorage.getItem('acilisTur')||'sinematik'; }catch(e){ return 'sinematik'; } })(),
        v=>{ try{ localStorage.setItem('acilisTur', v); }catch(e){} });
+    /* Hamle titreşimi ve şiddet, yalnız Titreşim açıkken görünür */
+    let titKutu=null;
+    const titKutuGoster=()=>{ if(titKutu) titKutu.style.display=titresimAcik?'':'none'; };
     grup('Titreşim', [
       {id:1, ad:'Açık',   alt:c('Süre uyarısı, teklif ve bildirimlerde')},
       {id:0, ad:'Kapalı', alt:c('Hiç titreşmez')}
-    ], titresimAcik?1:0, v=>titresimAyarla(v===1));
+    ], titresimAcik?1:0, v=>{ titresimAyarla(v===1); titKutuGoster(); });
+    { const n0=l.children.length;
+      grup('Hamlelerde titreşim', [
+        {id:'kapali', ad:'Kapalı',               alt:c('Hamlelerde titreşmez')},
+        {id:'rakip',  ad:'Rakibin hamlesinde',   alt:c('Sıra sana geçince haber verir')},
+        {id:'hepsi',  ad:'Her hamlede',          alt:c('Senin ve rakibin her hamlesi')}
+      ], hamleTitresim, v=>hamleTitresimAyarla(v));
+      grup('Titreşim şiddeti', [
+        {id:'hafif', ad:'Hafif',  alt:c('Belli belirsiz')},
+        {id:'orta',  ad:'Orta',   alt:c('Dengeli')},
+        {id:'guclu', ad:'Güçlü',  alt:c('Kolayca hissedilir')}
+      ], titresimGuc, v=>titresimGucAyarla(v));
+      titKutu=document.createElement('div'); titKutu.className='ssAltGrup';
+      while(l.children.length>n0) titKutu.appendChild(l.children[n0]);
+      l.appendChild(titKutu); titKutuGoster(); }
     /* Yüksek'in yenileme hızı alt seçeneği yalnız Yüksek seçiliyken ve ekran 60 Hz'ten hızlıysa görünür */
     let hzKutu=null;
     const hzKutuGoster=()=>{ if(hzKutu) hzKutu.style.display=(grafikKademe==='yuksek')?'':'none'; };
@@ -16616,7 +16851,7 @@ function devPanelAc(){
   /* TAŞ SESLERİ sayfası: paket seçimi + 6 taş × (seçme, hamle, yeme). Hücreye dokun: sıradaki pakete geç ve dinle. */
   function tasSesleriAc(){
     const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
-    const PK=['klasik','ahsap','ordu','gercek','savas'], PAD={klasik:'Klasik',ahsap:'Ahşap',ordu:'Ordu',gercek:'Gerçek',savas:'Savaş'};
+    const PK=['klasik','ahsap','ordu','gercek','savas','destan'], PAD={klasik:'Klasik',ahsap:'Ahşap',ordu:'Ordu',gercek:'Gerçek',savas:'Savaş',destan:'Destan'};
     const ANAD={sec:'Seçme',hamle:'Hamle',yeme:'Yeme'};
     const kaynakAd=k=>{ if(PAD[k]) return c(PAD[k]); const m=/^kt_([a-z]+)_(\d\d)$/.exec(k)||[];
       const kt=Ses.kutu.find(x=>x[0]===m[1]); return kt ? c(kt[2])+' '+(+m[2]) : k; };
@@ -16656,7 +16891,7 @@ function devPanelAc(){
         b.textContent=c(PAD[k]); b.onclick=()=>{ Ses.tasSesPaket(k); Ses.dinle('n','hamle',k); ciz(); }; pk.appendChild(b); });
       l.appendChild(pk);
       g('Taş taş ayarla');
-      const ip=document.createElement('div'); ip.className='tsIpucu'; ip.textContent=c('Dokun: sesi seç (64 ses)'); l.appendChild(ip);
+      const ip=document.createElement('div'); ip.className='tsIpucu'; ip.textContent=c('Dokun: sesi seç')+' ('+(PK.length+Ses.kutu.reduce((t,k)=>t+k[3],0))+' '+c('ses')+')'; l.appendChild(ip);   /* sayı: paketler + kütüphane */
       const bas=document.createElement('div'); bas.className='tsSatirT tsBas';
       bas.innerHTML='<span></span><span>'+c('SEÇME')+'</span><span>'+c('HAMLE')+'</span><span>'+c('YEME')+'</span>'; l.appendChild(bas);
       TAS.forEach(([t,gl,ad])=>{
@@ -16670,9 +16905,24 @@ function devPanelAc(){
         });
         l.appendChild(r);
       });
+      /* OLAY SESLERİ: dokun = seç ve dinle */
+      g('Olay sesleri');
+      const OS=Ses.olayAyar, OLAY_SEC={
+        basla:['Oyun başlangıcı',[['klasik','Klasik'],['gong_01','Gong'],['gong_02','Derin gong'],['borazan_02','Savaş borusu'],['borazan_01','Uzak boru'],['davul_03','Davul']]],
+        sah:  ['Şah çekme',[['klasik','Klasik'],['can_04','El çanı'],['can_03','Çan'],['kilic_02','Kılıç'],['borazan_03','Boru'],['davul_04','Davul']]],
+        rok:  ['Rok yapma',[['klasik','Klasik'],['kapi_02','Kale kapısı'],['kapi_01','Demir kapı'],['kapi_03','Ahşap kapı'],['kapi_04','Zincir'],['tas_04','Taş']]],
+        mat:  ['Şah mat anı',[['klasik','Klasik'],['fanfar_02','Zafer fanfarı'],['fanfar_03','Trompet'],['fanfar_01','Fanfar'],['tezahurat_01','Tezahürat'],['gong_03','Gong'],['can_02','Kilise çanı']]]};
+      Object.entries(OLAY_SEC).forEach(([tur,[baslik,L]])=>{
+        const b=document.createElement('div'); b.className='tsOlayBas'; b.textContent=c(baslik); l.appendChild(b);
+        const w=document.createElement('div'); w.className='tsPaketler tsOlay';
+        L.forEach(([k,ad])=>{ const x=document.createElement('button'); x.type='button'; x.className='tsPaket'+(OS[tur]===k?' secili':'');
+          x.textContent=c(ad); x.onclick=()=>{ Ses.olaySec(tur,k); Ses.olayDinle(tur,k); const y=l.parentNode&&l.parentNode.scrollTop; ciz(); try{ l.parentNode.scrollTop=y; }catch(e){} };
+          w.appendChild(x); });
+        l.appendChild(w);
+      });
       const alt=document.createElement('div'); alt.className='tsAlt';
       const sf=document.createElement('button'); sf.type='button'; sf.className='tsIkincil'; sf.textContent=c('Varsayılana dön');
-      sf.onclick=()=>{ Ses.tasSesSifirla(); ciz(); };
+      sf.onclick=()=>{ Ses.tasSesSifirla(); ['basla','sah','rok','mat'].forEach(t=>Ses.olaySec(t,'klasik')); ciz(); };
       const gr=document.createElement('button'); gr.type='button'; gr.className='ssTamam'; gr.textContent=c('Tamam');
       gr.onclick=()=>ayarAc();
       alt.appendChild(sf); alt.appendChild(gr); l.appendChild(alt);

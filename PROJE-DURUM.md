@@ -958,3 +958,57 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   144'te 144); ekran 60 Hz ise seçenek gizli. Isınma koruması sıcakta yine 60'a indirir.
 - İlk açılışta "Yüksek · En akıcı · <maks> Hz · Önerilen" önceden seçili; ikinci seçenek "Yüksek · 60 Hz · daha az
   ısınma". Varsayılan seçenekten kırmızı ısınma uyarısı kaldırıldı (önerilen seçenekte uyarı çelişiyordu).
+
+### 8.50 Sinematik açılışta rastgele mat (8 Ekim 2026)
+- `MATLAR` (17 konum, ilki eski sabit Şh8/Vg7#): her açılışta rastgele, bir öncekinden farklı (`localStorage.acilisMatSon`);
+  ilk beş taşın düşüş sırası karışık, son taş matı verir (büyük iniş). Kızarma/devrilme `SK` karesinde.
+- Konumlar arama programıyla bulundu (beyaz P N B R Q K + siyah şah; tek taş şah çeker; altı taşın her biri gerekli;
+  şahlar bitişik değil) ve telefonda oyunun `Motor`'uyla doğrulandı: tam konum `durum()==='mat'`, matlayan olmadan
+  `sahTehdit('b')===false`. Matlayan taşlar: vezir 5, kale 3, fil 3, at 3, piyon 3. YENİ KONUM EKLERKEN aynı kontrol.
+
+### 8.51 Tahta tercihleri kalıcı (8 Ekim 2026)
+- Oyun içi tahta ayarları son kullanıldığı gibi kalır (sonraki oyunda ve uygulama kapanıp açılınca):
+  2B görünüm `tahta_duz`, taş adları `tahta_tasAdi` (`tahtaTercihi()`), savaş sahnesi `sahneAyari` (eskiden HER AÇILIŞTA
+  açık başlıyordu; artık kayıtlı, kurulum düğmeleri de kayıtlıyı gösterir). Zaten kalıcı olanlar: ses `sesKapali`,
+  Gizle `araclarGizli`, ekran yönü `oyunYonu`, grafik, Seçenekler `oyunAyar`. Sesli oynama bilerek ayrı tutuldu.
+- `tahtaTercihleriniUygula()` kamera kurulduktan SONRA çağrılır: oyunaBasla, cevrimiciOyunBaslat, bulmacaGoster.
+- Ekran dönünce (`yerlesimTazele`) 2B'de tepe açısı korunur (eskiden 3B açısına dönüyordu). `duzUzaklik()` = 0.92.
+- **Yatay üst düğmeler:** tahtayı küçültmek yerine (sahibin tercihi) `.hud-sag` yatayda tahtanın sağındaki boşluğa
+  sığacak genişlikte sağa yaslı sarılır (`max-width: 50vw - 49vh - 10px`; CSS "YATAY ÜST DÜĞMELER"); 20:9 telefonda
+  iki sıra, Gizle hapı Sahne'nin altında, SİYAH paneliyle çakışmaz. 16:9 gibi daha kare ekranlarda üç sıra olabilir.
+- **2B/3B düğmesi** geçilecek görünümü gösterir: 3B'de ızgara + "2B", 2B'de küp + "3B" (`duzSimgeGuncelle`);
+  yatayda bu düğmenin yazısı da görünür. Eski "soluk = kapalı" görünümü kaldırıldı.
+
+### 8.52 Açılışta baba-çocuk resmi (8 Ekim 2026)
+- Sinematik açılışta taşlar düşmeye başlarken (TTAS-120) üst boşlukta, lamba ışığında satranç oynayan baba ve çocuk
+  siluet resmi belirir (1.5 sn), perdeyle birlikte kalkar. **Süre değişmedi** (ACILIS_MS 10930, telefonda ölçüldü).
+- Elle çizilmiş SVG, index.html'de `ACILIS_RESIM` olarak gömülü (~4.4 KB, dış dosya ve lisans yok). Düzenlenebilir
+  kaynak: `araclar/acilis-resim.svg` (yorumlu). Değiştirince tek satıra sıkıştırıp `ACILIS_RESIM`'e koy.
+- Kenar ışığı `feMorphology` süzgeciyle (siluet parçaları tek gövde gibi birleşir). Yerleşim: üst kenar (34 px) ile
+  logo arası, `z-index:-1` ile taş sırasının arkasında; boşluk <90 px ise gösterilmez. Klasik açılışta yok.
+- **Işıkla giriş:** resim iki katman — lamba (kablo + abajur) karanlıkta da görünür; `.acrIsikli` (ışık, figürler, masa,
+  tahta) lamba yanınca belirir. Titreşimli açılış: yanar → söner → ~0.27 sn karanlık → kalıcı yanar (1 sn). Her yanışta
+  `anahtarTik()` (WebAudio düğme sesi; ses kapalıysa çalmaz). Yumuşak açılma da denendi, sahibi titreşimliyi seçti.
+
+### 8.53 Hamle titreşimi + fil/at/top sesleri, Destan paketi (8 Ekim 2026)
+- **Titreşim** (Ayarlar): ana Açık/Kapalı'nın altında (yalnız açıkken görünür) "Hamlelerde titreşim": Kapalı (varsayılan) /
+  Rakibin hamlesinde / Her hamlede (`hamleTitresim`), "Titreşim şiddeti": Hafif 14 / Orta 28 / Güçlü 50 ms
+  (`titresimGuc`). Desen: hamle tek vuruş, yeme çift, şah uzun çift (`titresimDesen`). `hamleTitret()` hamleOyna'da taş
+  oturunca; "rakip" = yapay zekânın/çevrimiçi rakibin hamlesi (yerel iki kişilikte her hamle). Telefonda doğrulandı.
+- **Sesler:** sfx/kutu'ya fil_01-04 (fil borusu), kisneme_01-04, top_01-04 (~170 KB). Freesound CC0 HQ önizlemeden,
+  spektrograma bakılarak seçildi (yapay/gürültülü adaylar elendi), scratchpad fs/kes.py ile kesildi (baş sessizliği,
+  sönme, tepe .70-.75; hayvan sesleri ≤1.4 sn). Kaynaklar KAYNAK.txt; KREDILER.txt'ye Freesound eklendi (eksikti).
+  KUTU'da kısa ad "Fil" DEĞİL "Fil borusu" (sözlük "Fil"i taş adı Bishop diye çevirir).
+- **Destan paketi:** Savaş'ın üstüne fil seç/yeme = fil borusu, at seç/yeme = kişneme, kale yeme = top, vezir yeme = top+kılıç.
+  Savaş paketi değişmedi. Taş sesleri ipucundaki ses sayısı artık hesaplanıyor.
+
+### 8.54 Olay sesleri (başlama, şah, rok, mat) + ses düzeyi eşitleme (8 Ekim 2026)
+- Taş sesleri sayfasında "Olay sesleri": her olay için Klasik (eski davranış; mat'ta klasik = başlama sesi) + 5-6 seçenek,
+  dokun = seç ve dinle; "Varsayılana dön" bunları da sıfırlar. `Ses.olay(tur)`, `olaySec`, `olayDinle`, `olayAyar`;
+  localStorage.olaySesleri; seçilenler sesAc'ta önyüklenir. Çağrılar: sahGosterge (şah), rok, oyunSonu+bulmaca matı
+  (mat), oyunaBasla + cevrimiciOyunBaslat (başlama). Bulmaca "yanlış" uyarısı ve başarım sesi bilerek klasik.
+- Kütüphaneye 21 ses (Freesound CC0): gong 3, çan 4, borazan 3, fanfar 4, tezahürat 3, kapı 4 (KAYNAK.txt). Spektrograma
+  bakılarak seçildi; yavaş şişen gong, gürültü-boru, sentetik fanfar elendi; gong_03 ikinci vuruştan önce bitirildi.
+- **Ölçüm ve karar:** mevcut standart sesler — yeme 1.35-2.2 sn, şah 1.56, rok 1.47, başlama 1.6 sn; RMS yeme/şah
+  ≈ -19..-21 dB. Yeni hayvan/top sesleri UZUNLUK olarak uyumlu (1.0-1.4 sn) ama 4-10 dB YÜKSEKTİ → tümü RMS -20 dB'ye
+  eşitlendi (tepe ≤ .89). Olay sesleri: kapı ≤1.6, çan ≤1.8, gong/boru 2.2, fanfar/tezahürat ≤2.5 sn (oyun sonu).

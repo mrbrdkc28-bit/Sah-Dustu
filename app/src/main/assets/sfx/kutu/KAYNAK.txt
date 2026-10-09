@@ -16,3 +16,18 @@ zirh_01-06: #506148 "Lightmetal_armor" (mitchanary) · zirh_07-09: #180231 "armo
 tas_01-03: #321488 "Scraping Stone" (dslrguide) · tas_04: #558254 "Heavy Stone Push" (msavioti)
 tas_05-07: #347391 "stone_on_stone_ST.wav" (wilhelmsqueek)
 davul_01-02: #209546 "warriordrums.wav" (Sclolex) · davul_03-05: #342465 "Tribe Drum Loop" (PearceWilsonKing)
+— 8 Ekim 2026 eklenenler (yine Freesound.org, CC0; HQ önizlemeden kesit) —
+fil_01: #527845 "Elephant Trumpets Growls.flac" (D.jones) · fil_02: #819668 "Elephant sound" (ikbenraar)
+fil_03: #507467 "Angry Elephant.aiff" (Danjocross) · fil_04: #849573 "elephant-screaming-0-25" (PUMIQUXT)
+kisneme_01: #149024 "Horse_Whinny.wav" (foxen10) · kisneme_02: #269571 "horse neigh shortened.wav" (shadoWisp)
+kisneme_03: #347036 "horse's whinny" (Kubuzz) · kisneme_04: #826753 "Renill de cavall / Horse Neigh" (Salsero_classic)
+top_01: #187767 "Cannon Shot" (qubodup) · top_02: #448002 "cannon.mp3" (Kneeling)
+top_03: #621003 "Cannon explosion sound 4" (SamsterBirdies) · top_04: #184651 "Cannon5.wav" (Isaac200000)
+— 8 Ekim 2026 olay sesleri (Freesound.org, CC0; HQ önizlemeden kesit, RMS -20 dB) —
+gong_01: #486629 "Gong Brilliant Paiste 32"" (JensZygar) · gong_02: #735855 "French gong 2" (Logicogonist) · gong_03: #803159 "Temple Gong 2" (kerozenne)
+can_01: #144496 "Medieval Bell Bb3" (wuola) · can_02: #857938 "Church Bell — Bb5" (bassimat) · can_03: #99625 "bell003mono.wav" (tec_studio) · can_04: #503134 "Small Bell Ringing.wav" (se2001)
+borazan_01: #512490 "Distant War Horn.wav" (DeVern) · borazan_02: #539956 "war horn.wav" (adharca) · borazan_03: #345830 "Erebor-like Horns" (Vendarro)
+fanfar_01: #449069 "Fanfare.wav" (ricniclas) · fanfar_02: #456966 "Success Fanfare Trumpets.mp3" (FunWithSound) · fanfar_03: #855457 "Real Trumpet Fanfare 1" (qubodup) · fanfar_04: #350428 "Trumpet Fanfare" (bevibeldesign)
+tezahurat_01: #82800 "short cheering burst.aif" (payattention) · tezahurat_02: #651646 "Crowd Cheer 5" (Krizin) · tezahurat_03: #678543 "AF Crowd Cheer Clapping Natural Ending.wav" (mglennsound)
+kapi_01: #682775 "Metal gate closing.WAV" (thomasanthony321) · kapi_02: #336888 "Gate-Heavy-OpenClose-WAV.wav" (Omnisis) · kapi_03: #456763 "Gate door drawbridge wooden creaky opens close" (WavJunction.com) · kapi_04: #199282 "Big Metal Chain" (qubodup)
+(fil/kisneme/top da 8 Ekim'de RMS -20 dB'ye yeniden eşitlendi.)
