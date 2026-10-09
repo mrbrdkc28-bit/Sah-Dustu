@@ -1614,7 +1614,10 @@ class MainActivity : AppCompatActivity() {
             QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(PREMIUM_URUN).setProductType(BillingClient.ProductType.INAPP).build()
         )).build()
-        f.queryProductDetailsAsync(p) { sonuc, liste ->
+        // Billing 8: geri cagri artik QueryProductDetailsResult verir (liste onun icinde).
+        // Play, kapali test yuklemesinde en az 8.0.0 istedi (9 Ekim 2026).
+        f.queryProductDetailsAsync(p) { sonuc, urunSonucu ->
+            val liste = urunSonucu.productDetailsList
             if (sonuc.responseCode == BillingClient.BillingResponseCode.OK && liste.isNotEmpty()) {
                 premiumUrun = liste[0]
                 runOnUiThread { if (!webViewYok) webView.evaluateJavascript("window.premiumFiyatGeldi&&premiumFiyatGeldi()", null) }

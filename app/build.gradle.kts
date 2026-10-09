@@ -27,7 +27,7 @@ android {
         applicationId = "com.emre.sahdustu"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4
+        versionCode = 5
         versionName = "1.5"
     }
 
@@ -93,7 +93,7 @@ dependencies {
        bu projede kullanilmiyor. minSdk 23 istiyor -> projede 26. */
     implementation("com.google.android.gms:play-services-ads:24.0.0")
     // Google Play Faturalandırma: tek seferlik Premium (4 Ekim 2026)
-    implementation("com.android.billingclient:billing-ktx:7.1.1")
+    implementation("com.android.billingclient:billing-ktx:8.0.0")
     // Reklam onay penceresi (AEA/Ingiltere icin Google sarti).
     implementation("com.google.android.ump:user-messaging-platform:3.1.0")
     implementation("androidx.core:core-ktx:1.13.1")
