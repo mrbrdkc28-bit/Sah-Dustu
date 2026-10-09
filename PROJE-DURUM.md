@@ -1012,3 +1012,16 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - **Ölçüm ve karar:** mevcut standart sesler — yeme 1.35-2.2 sn, şah 1.56, rok 1.47, başlama 1.6 sn; RMS yeme/şah
   ≈ -19..-21 dB. Yeni hayvan/top sesleri UZUNLUK olarak uyumlu (1.0-1.4 sn) ama 4-10 dB YÜKSEKTİ → tümü RMS -20 dB'ye
   eşitlendi (tepe ≤ .89). Olay sesleri: kapı ≤1.6, çan ≤1.8, gong/boru 2.2, fanfar/tezahürat ≤2.5 sn (oyun sonu).
+
+### 8.55 Kapalı test incelemeye gönderildi (9 Ekim 2026)
+- Play Console: "Kapalı test - Alpha", sürüm **5 (1.5)**, ülke Türkiye, test kullanıcıları "Testerler" e-posta listesi
+  (32 kişi; Rabbine Dön'ün kapalı testiyle aynı liste), geri bildirim mrbrdkc28@gmail.com, Türkçe sürüm notları.
+  15 değişiklik (mağaza girişi, içerik beyanları dahil) 9 Ekim'de incelemeye gönderildi. Google PC'de Google Play
+  Games de AÇIK (sahibinin kararı) — PC kalite yönergelerine göre ayrıca incelenir.
+- Yükleme hatası: Play, Faturalandırma kütüphanesi en az 8.0.0 istedi → billing-ktx 8.0.0, queryProductDetailsAsync
+  geri çağrısı QueryProductDetailsResult (versionCode 4 kitaplıkta kaldı, kullanılmadı).
+- Hesapta **ödeme profili (satıcı hesabı) yok** → `chess64_premium` oluşturulamaz, testte Premium "yakında" der.
+- Tarayıcıda PC denemesi (fare): seçim/hamle, tekerlek yakınlaştırma, sağ tık sürükle döndürme çalışıyor. Sonraya kalan
+  küçük işler: "Nasıl oynanır" yalnız dokunmatiği anlatıyor (ve "tek parmakla sürükle: döndür" telefonda da yanlış —
+  tek parmak yalnız seçim); kareye yakın yatay pencerede üst düğmeler tek sütuna iner (`max-width: 50vw-49vh` çok küçülür).
+- Yerel deneme: `.claude/launch.json` "oyun-web" (python http.server 8765, assets/).
