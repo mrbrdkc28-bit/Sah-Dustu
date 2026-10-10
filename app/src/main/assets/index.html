@@ -2197,6 +2197,7 @@ body.dikeyAktif #hudOrta .hbtn-simge:not([style*="display: none"]):not([style*="
 .tsPaket.secili{background:linear-gradient(135deg,#F2C765,#C9912A);color:#1a1408;border-color:transparent}
 .tsPaket.yari{border-color:var(--brass);color:var(--brass)}
 .tsIpucu{font:500 12px Manrope,sans-serif;opacity:.65;margin:-2px 2px 8px}
+.tsPremNot{color:var(--brass);opacity:.95;font-weight:600}
 .tsOlayBas{font:700 12.5px Manrope,sans-serif;margin:12px 2px 6px;color:var(--brass)}
 html[data-tema="fildisi"] #secimSayfa .tsOlayBas{color:#6b5a36}
 .tsOlay .tsPaket{font-size:12.5px;padding-left:8px;padding-right:8px}
@@ -5467,7 +5468,9 @@ const Ses=(()=>{
   const TS={paket:'klasik', ozel:{}};
   try{ const j=JSON.parse(localStorage.getItem('tasSesleri')||'null'); if(j){ if(j.paket) TS.paket=j.paket; if(j.ozel) TS.ozel=j.ozel; } }catch(e){}
   function tsKaydet(){ try{ localStorage.setItem('tasSesleri', JSON.stringify(TS)); }catch(e){} }
-  function tasKaynak(t,an){ return TS.ozel[t+'_'+an] || TS.paket; }
+  function tasKaynak(t,an){ const k=TS.ozel[t+'_'+an] || TS.paket;
+    if(k!=='klasik'){ try{ if(typeof kilitli==='function' && kilitli('ses','hepsi')) return 'klasik'; }catch(e){} }   // Premium bitti: Klasik
+    return k; }
   function tasAnahtar(t,an,pk,kurb){
     if(pk==='ahsap') return 'ah_'+an+'_'+t;
     if(pk==='ordu')  return 'ordu_'+t+'_'+an;
@@ -14155,6 +14158,7 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Sinematik']={en:'Cinematic',ru:'Кинематографичная',ar:'سينمائي',fr:'Cinématique',de:'Filmisch',it:'Cinematica',zh:'电影式'};
   CEVM['Tahta birleşir, taşlar mat kurar']={en:'The board assembles, the pieces set up a mate',ru:'Доска собирается, фигуры ставят мат',ar:'تلتئم الرقعة وتصنع القطع كش مات',fr:'Le plateau se forme, les pièces font mat',de:'Das Brett fügt sich, die Figuren setzen matt',it:'La scacchiera si unisce, i pezzi danno matto',zh:'棋盘合拢，棋子摆出将杀'};
   CEVM['Kısa: taşlar ve logo']={en:'Short: pieces and logo',ru:'Коротко: фигуры и логотип',ar:'قصير: القطع والشعار',fr:'Court : pièces et logo',de:'Kurz: Figuren und Logo',it:'Breve: pezzi e logo',zh:'简短：棋子与标志'};
+  CEVM['Klasik dışındaki sesler Premium: dinleyebilirsin, seçmek için kilidi aç.']={en:'Sounds other than Classic are Premium: you can listen, unlock to choose.',ru:'Звуки, кроме «Классики», — Premium: слушать можно, для выбора разблокируйте.',ar:'الأصوات غير الكلاسيكية مميزة: يمكنك الاستماع، وافتحها للاختيار.',fr:'Les sons autres que Classique sont Premium : écoute libre, déverrouillez pour choisir.',de:'Klänge außer Klassisch sind Premium: anhören ja, zum Auswählen freischalten.',it:'I suoni diversi da Classico sono Premium: puoi ascoltarli, sblocca per sceglierli.',zh:'经典以外的音效为高级内容：可试听，解锁后可选择。'};
   CEVM['Arkadaşlar']={en:'Friends',ru:'Друзья',ar:'الأصدقاء',fr:'Amis',de:'Freunde',it:'Amici',zh:'好友'};
   CEVM['Satranç her şeydir.']={en:'Chess is everything.',ru:'Шахматы — это всё.',ar:'الشطرنج هو كل شيء.',fr:'Les échecs sont tout.',de:'Schach ist alles.',it:'Gli scacchi sono tutto.',zh:'国际象棋就是一切。'};
   CEVM['Oynat']={en:'Play',ru:'Пуск',ar:'تشغيل',fr:'Lire',de:'Abspielen',it:'Riproduci',zh:'播放'};
@@ -14764,6 +14768,7 @@ function kilitli(tur,id){
   if(tur==='ordu')  return BEDAVA_ORDU.indexOf(id)<0  && !odulAktif('ordu_'+id);
   if(tur==='arena') return BEDAVA_ARENA.indexOf(id)<0 && !odulAktif('arena_'+id);
   if(tur==='analiz') return true;             /* her açılışta reklam */
+  if(tur==='ses')    return id!=='klasik' && !odulAktif('ses_hepsi');   /* taş sesleri: Klasik ücretsiz, gerisi Premium (10 Ekim 2026) */
   return false;
 }
 let pmBekleyen=null, pmAnahtar=null;
@@ -16965,7 +16970,7 @@ function devPanelAc(){
       const g=x=>{ const h=document.createElement('div'); h.className='ssGrup'; h.textContent=x; l.appendChild(h); };
       const bs=document.createElement('div'); bs.className='tsSecBaslik'; bs.textContent=c(tAd)+' · '+c(ANAD[an]); l.appendChild(bs);
       const ip=document.createElement('div'); ip.className='tsIpucu'; ip.textContent=c('Dokun: seç ve dinle'); l.appendChild(ip);
-      const sec=(k)=>{ Ses.tasSesOzel(t,an,k); Ses.dinle(t,an,k); const y=l.parentNode&&l.parentNode.scrollTop; secimCiz(t,an,tAd); try{ l.parentNode.scrollTop=y; }catch(e){} };
+      const sec=(k)=>{ Ses.dinle(t,an,k); if(k!=='klasik' && typeof kilitli==='function' && kilitli('ses','hepsi')){ premiumKapi('ses','hepsi',()=>{ Ses.tasSesOzel(t,an,k); secimCiz(t,an,tAd); }); return; } Ses.tasSesOzel(t,an,k); const y=l.parentNode&&l.parentNode.scrollTop; secimCiz(t,an,tAd); try{ l.parentNode.scrollTop=y; }catch(e){} };
       g(c('Paketler'));
       const pk=document.createElement('div'); pk.className='tsPaketler';
       PK.forEach(k=>{ const b=document.createElement('button'); b.type='button'; b.className='tsPaket'+(su===k?' secili':'');
@@ -16992,9 +16997,11 @@ function devPanelAc(){
       g('Ses paketi');
       const pk=document.createElement('div'); pk.className='tsPaketler';
       PK.forEach(k=>{ const b=document.createElement('button'); b.type='button'; b.className='tsPaket'+(ts.paket===k&&!Object.keys(ts.ozel).length?' secili':(ts.paket===k?' yari':''));
-        b.textContent=c(PAD[k]); b.onclick=()=>{ Ses.tasSesPaket(k); Ses.dinle('n','hamle',k); ciz(); }; pk.appendChild(b); });
+        b.textContent=c(PAD[k]); b.onclick=()=>{ Ses.dinle('n','hamle',k); const uygula=()=>{ Ses.tasSesPaket(k); ciz(); };
+          if(k!=='klasik' && typeof kilitli==='function' && kilitli('ses','hepsi')) premiumKapi('ses','hepsi',uygula); else uygula(); }; pk.appendChild(b); });
       l.appendChild(pk);
       g('Taş taş ayarla');
+      if(typeof kilitli==='function' && kilitli('ses','hepsi')){ const pn=document.createElement('div'); pn.className='tsIpucu tsPremNot'; pn.textContent=c('Klasik dışındaki sesler Premium: dinleyebilirsin, seçmek için kilidi aç.'); l.appendChild(pn); }
       const ip=document.createElement('div'); ip.className='tsIpucu'; ip.textContent=c('Dokun: sesi seç')+' ('+(PK.length+Ses.kutu.reduce((t,k)=>t+k[3],0))+' '+c('ses')+')'; l.appendChild(ip);   /* sayı: paketler + kütüphane */
       const bas=document.createElement('div'); bas.className='tsSatirT tsBas';
       bas.innerHTML='<span></span><span>'+c('SEÇME')+'</span><span>'+c('HAMLE')+'</span><span>'+c('YEME')+'</span>'; l.appendChild(bas);
