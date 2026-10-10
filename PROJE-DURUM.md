@@ -1036,3 +1036,4 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - **Sohbet baloncuğu:** rakip mesajı 5 sn rakip şeridinin yanında (dikeyde üstünde, yatayda altında) "Ad: mesaj";
   sonra sohbet düğmesine uçup okunmamış rozetine eklenir (rozet zıplar). Dokununca sohbet açılır; sohbet açılınca iptal.
   `sohbetBaloncukGoster/Ucur/Iptal`. Ses/titreşim eskisi gibi.
+8.57 (10 Ekim 2026) Sohbet dil testi: Türkçe karakter, Arapça (sağdan sola), Çince, Rusça, Yunanca, emoji, uzun metin, HTML denemesi sorunsuz. Düzeltilenler: arayüz İngilizceyken mesajlar otomatik çevriliyordu ("Tamam"→"Done") — artık sohbet mesajları ve rakip adı çevrilmez (data-cevirme, dir=auto); rakip adı HTML olarak değil düz metin olarak basılıyor; hazır ifadeler Türkçe aslıyla gidiyor (hazir:true), alıcı kendi dilinde görüyor.
