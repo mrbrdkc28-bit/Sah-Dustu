@@ -1025,3 +1025,14 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   küçük işler: "Nasıl oynanır" yalnız dokunmatiği anlatıyor (ve "tek parmakla sürükle: döndür" telefonda da yanlış —
   tek parmak yalnız seçim); kareye yakın yatay pencerede üst düğmeler tek sütuna iner (`max-width: 50vw-49vh` çok küçülür).
 - Yerel deneme: `.claude/launch.json` "oyun-web" (python http.server 8765, assets/).
+
+### 8.56 Çıkış penceresi + geri tuşu, yatay çevrimiçi çakışma, sohbet baloncuğu (10 Ekim 2026)
+- **Geri tuşu oyun sürerken** artık sormadan çıkmıyor: `cikisPopAc('geri')` ortada karartmalı pencere — Oyuna devam et /
+  Yeni Oyun (yerel) / Teslim Ol (ikinci adımda uygulama içi onay; `window.teslimOlUygula`, eski confirm() yerine) /
+  Menüye Dön ("oyun sürer" çevrimiçide). Sol alt düğme aynı pencereyi düğmenin üstünde açar (`cikisPopAc('menu')`).
+- **Yatay çevrimiçi çakışma** (sahibi bildirdi): rakip şeridi `#cevrimiciSerit` sağ üstte, oraya taşınan düğmelerin 2. sırası
+  üstündeydi → yatayda sol üst, hud-sol'un altı (`seritKonumla`). 11 düğmede (Sesli+Sohbet+Berabere) 3. sıradaki Menü ile
+  Gizle hapı çakışıyordu → hap düğme grubunun en altının altına.
+- **Sohbet baloncuğu:** rakip mesajı 5 sn rakip şeridinin yanında (dikeyde üstünde, yatayda altında) "Ad: mesaj";
+  sonra sohbet düğmesine uçup okunmamış rozetine eklenir (rozet zıplar). Dokununca sohbet açılır; sohbet açılınca iptal.
+  `sohbetBaloncukGoster/Ucur/Iptal`. Ses/titreşim eskisi gibi.

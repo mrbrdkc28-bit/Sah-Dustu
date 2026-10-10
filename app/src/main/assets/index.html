@@ -357,6 +357,19 @@ h1 span{color:var(--brass)}
   padding:7px 16px;font-size:12px;color:var(--bone);display:none;backdrop-filter:blur(8px);
   white-space:nowrap}
 #cevrimiciSerit.acik{display:block}
+/* Yatay: rakip şeridi sol üste, sıra göstergesinin altına (10 Ekim 2026). Sağ üstte, oraya taşınan düğmelerin
+   ikinci sırasının üstüne biniyordu. top değeri JS'te (seritKonumla) hud-sol'un altına göre ayarlanır. */
+body:not(.dikeyAktif) #cevrimiciSerit{top:56px;left:14px;right:auto;text-align:left;margin-left:env(safe-area-inset-left,0px);margin-right:0}
+/* Sohbet baloncuğu: rakibin adının yanında 5 sn (10 Ekim 2026) */
+#sohbetBaloncukBildirim{position:fixed;z-index:23;display:none;max-width:300px;padding:9px 13px;border-radius:14px;
+  background:rgba(14,16,26,.95);border:1px solid rgba(232,182,76,.45);color:#EDE6D3;box-shadow:0 8px 24px rgba(0,0,0,.45);
+  font:500 13.5px/1.35 Manrope,sans-serif;cursor:pointer;word-break:break-word;transform-origin:center}
+#sohbetBaloncukBildirim.acik{display:block}
+#sohbetBaloncukBildirim b{display:block;color:#E8B64C;font-weight:800;font-size:11.5px;letter-spacing:.03em;margin-bottom:2px}
+#sohbetBaloncukBildirim::after{content:'';position:absolute;left:50%;width:10px;height:10px;background:inherit;
+  border:inherit;transform:translateX(-50%) rotate(45deg)}
+#sohbetBaloncukBildirim[data-yon="alt"]::after{top:-6px;border-right:0;border-bottom:0}
+#sohbetBaloncukBildirim[data-yon="ust"]::after{bottom:-6px;border-left:0;border-top:0}
 #cevrimiciSerit .cvsRenk{color:var(--brass);font-weight:700}
 #cevrimiciSerit .cvsKod{color:var(--dim);font-size:11px}
 #cevrimiciEkran{position:fixed;inset:0;z-index:32;display:none;flex-direction:column;
@@ -1203,9 +1216,15 @@ body.azHareket #son.acik *{animation:none!important}
   padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.55);animation:cpAc .16s ease-out}
 #cikisPop button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;border-radius:10px;
   color:#E8DDBB;font:600 15px Manrope,sans-serif;padding:13px 14px;text-align:left;cursor:pointer}
-#cikisPop button+button{border-top:1px solid rgba(122,110,84,.25);border-radius:0 0 10px 10px}
+
 #cikisPop button:active{background:rgba(196,160,80,.14)}
 #cikisPop svg{width:20px;height:20px;color:#E8B64C;flex:0 0 auto}
+#cikisPop.orta{background:rgba(4,5,9,.55)}
+#cikisPop.orta .cpKutu{left:50%;top:50%;bottom:auto;transform:translate(-50%,-50%);animation:cpOrta .18s ease-out;min-width:240px}
+@keyframes cpOrta{from{opacity:0;transform:translate(-50%,-46%)}to{opacity:1;transform:translate(-50%,-50%)}}
+#cikisPop button+button{border-top:1px solid rgba(122,110,84,.25)}
+#cikisPop button.cpTehlike,#cikisPop button.cpTehlike svg{color:#E8705E}
+#cikisPop .cpSoru{font:600 14px Manrope,sans-serif;color:#E8DDBB;padding:12px 14px 8px;max-width:260px}
 @keyframes cpAc{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 #secGrafik small{display:block;font-size:10.5px;opacity:.75;margin-top:2px}
 #secAraclar .araIzgara{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
@@ -9124,6 +9143,14 @@ function menuKur(){
     }
   };
   const secTeslimB=document.getElementById('secTeslimBtn');
+  /* Onaysız teslim (10 Ekim 2026): çıkış penceresi kendi onay adımını gösterip bunu çağırır */
+  window.teslimOlUygula=()=>{
+    if(!oyunAktif || oyunBitti) return;
+    if(cevrimiciAktif){ Cevrimici.sonucBildir('terk', Cevrimici.rakipRengi()); }
+    const teslimEden = mod==='ai' ? aktifInsanRenk : (cevrimiciAktif ? Cevrimici.benimRenk : Motor.turn);
+    teslimSonu=true;
+    oyunSonu('terk', teslimEden==='w'?'b':'w');
+  };
   if(secTeslimB) secTeslimB.onclick=()=>{
     secModal.style.display='none';
     if(!confirm('Teslim olmak istediğinize emin misiniz?')) return;
@@ -9139,7 +9166,7 @@ function menuKur(){
   // ===== SOHBET =====
   const sohModal=document.getElementById('sohbetModal');
   const bsoh=document.getElementById('btnSohbet');
-  if(bsoh) bsoh.onclick=()=>{ sohModal.style.display='flex'; okunmamisSohbet=0; sohbetRozetGuncelle();
+  if(bsoh) bsoh.onclick=()=>{ sohModal.style.display='flex'; okunmamisSohbet=0; try{ sohbetBaloncukIptal(); }catch(e){} sohbetRozetGuncelle();
     setTimeout(()=>{const a=document.getElementById('sohbetAkis');if(a)a.scrollTop=a.scrollHeight;},50); };
   const sohKapat=document.getElementById('sohbetKapat');
   if(sohKapat) sohKapat.onclick=()=>{ sohModal.style.display='none'; };
@@ -10004,6 +10031,14 @@ function terkGeriSayimGoster(sn){
 function terkGeriSayimGizle(){
   const e=document.getElementById('terkGeriSayim'); if(e) e.classList.remove('acik');
 }
+/* Yatayda rakip şeridi sıra göstergesinin (hud-sol) hemen altına; dikeyde CSS'teki yer (inline stil temizlenir) */
+function seritKonumla(){
+  const s=document.getElementById('cevrimiciSerit'); if(!s) return;
+  if(document.body.classList.contains('dikeyAktif')){ s.style.top=''; return; }
+  const sol=document.querySelector('#hud .hud-sol'); const r=sol && sol.getBoundingClientRect();
+  s.style.top = (r && r.height) ? Math.round(r.bottom+8)+'px' : '';
+}
+addEventListener('resize', ()=>{ setTimeout(seritKonumla, 300); setTimeout(seritKonumla, 800); });
 function cevrimiciBilgiGoster(rakipAd){
   let s=document.getElementById('cevrimiciSerit');
   if(!s){ s=document.createElement('div'); s.id='cevrimiciSerit'; document.body.appendChild(s); }
@@ -10015,6 +10050,7 @@ function cevrimiciBilgiGoster(rakipAd){
   s.innerHTML='<span class="cvsAvatar"></span><span class="cvsRenk">'+renkAd+'</span> · '+bayrak+(rakipAd||'Rakip')+
     ' <span class="cvsKod">#'+(Cevrimici.odaId||'')+'</span>';
   s.classList.add('acik');
+  seritKonumla();
   /* Rakibin fotoğraflı avatarı: oda verisindeki uid ile profilinden çek */
   try{
     const rakipUid = Cevrimici.benimRenk==='w' ? v.siyah : v.beyaz;
@@ -10139,10 +10175,62 @@ function sohbetAkisYaz(mesajlar){
     try{ Ses.cal('sec_p'); }catch(e){}
     // Titreşim (kısa)
     if(navigator.vibrate) try{ navigator.vibrate(60); }catch(e){}
-    // Kalıcı okunmamış rozeti (sohbet açılana kadar durur)
-    okunmamisSohbet++;
-    sohbetRozetGuncelle();
+    /* 10 Ekim 2026 (sahibin isteği): mesaj önce rakibin adının yanında 5 sn baloncukta görünür, sonra sohbet
+       düğmesine uçup okunmamış sayısına eklenir (sohbet açılana kadar kalıcı rozet). */
+    sohbetBaloncukGoster(sonMesaj.metin);
   }
+}
+/* ===== SOHBET BALONCUĞU ===== */
+let _sbBekleyen=0, _sbZaman=null;
+function sohbetBaloncukGoster(metin){
+  let b=document.getElementById('sohbetBaloncukBildirim');
+  if(!b){
+    b=document.createElement('div'); b.id='sohbetBaloncukBildirim';
+    b.innerHTML='<b></b><span></span>';
+    b.onclick=()=>{ const s=document.getElementById('btnSohbet'); if(s) s.click(); };   // dokun: sohbeti aç
+    document.body.appendChild(b);
+  }
+  _sbBekleyen++;
+  const ad=(typeof sonRakipAd!=='undefined' && sonRakipAd) ? sonRakipAd : ((typeof metniCevir==='function')?metniCevir('Rakip'):'Rakip');
+  const m=String(metin||'');
+  b.querySelector('b').textContent=ad;
+  b.querySelector('span').textContent=m.length>140 ? m.slice(0,137)+'…' : m;
+  b.getAnimations().forEach(a=>a.cancel());
+  b.style.transform=''; b.style.opacity='';
+  b.classList.add('acik');
+  /* Rakibin adının yazdığı şeridin yanına: şerit ekranın alt yarısındaysa üstüne, üst yarısındaysa altına */
+  const serit=document.getElementById('cevrimiciSerit');
+  const sr=serit && serit.classList.contains('acik') ? serit.getBoundingClientRect() : null;
+  b.style.top=''; b.style.bottom=''; b.style.left='';
+  const w=Math.min(innerWidth-24, 300); b.style.maxWidth=w+'px';
+  const bw=b.offsetWidth;
+  if(sr && sr.width){
+    const orta=sr.left+sr.width/2;
+    b.style.left=Math.round(Math.max(12, Math.min(innerWidth-bw-12, orta-bw/2)))+'px';
+    if(sr.top>innerHeight/2){ b.style.bottom=Math.round(innerHeight-sr.top+8)+'px'; b.dataset.yon='ust'; }
+    else { b.style.top=Math.round(sr.bottom+8)+'px'; b.dataset.yon='alt'; }
+  } else { b.style.left=Math.round((innerWidth-bw)/2)+'px'; b.style.top='96px'; b.dataset.yon='alt'; }
+  b.animate([{opacity:0,transform:'translateY(6px) scale(.96)'},{opacity:1,transform:'none'}],{duration:220,easing:'ease-out'});
+  clearTimeout(_sbZaman);
+  _sbZaman=setTimeout(sohbetBaloncukUcur, 5000);
+}
+/* 5 sn sonra baloncuk sohbet düğmesine küçülerek uçar, okunmamış sayısı artar */
+function sohbetBaloncukUcur(){
+  const b=document.getElementById('sohbetBaloncukBildirim'); if(!b || !b.classList.contains('acik')) return;
+  const hedef=document.getElementById('btnSohbet');
+  const ekle=()=>{ okunmamisSohbet+=_sbBekleyen; _sbBekleyen=0; sohbetRozetGuncelle();
+    const r=document.getElementById('sohbetRozet'); if(r) r.animate([{transform:'scale(1)'},{transform:'scale(1.5)'},{transform:'scale(1)'}],{duration:320,easing:'ease-out'}); };
+  const hr=hedef && hedef.offsetParent ? hedef.getBoundingClientRect() : null;
+  if(!hr){ b.classList.remove('acik'); ekle(); return; }
+  const br=b.getBoundingClientRect();
+  const dx=(hr.left+hr.width/2)-(br.left+br.width/2), dy=(hr.top+hr.height/2)-(br.top+br.height/2);
+  const a=b.animate([{transform:'none',opacity:1},{transform:'translate('+dx+'px,'+dy+'px) scale(.12)',opacity:.2}],{duration:480,easing:'cubic-bezier(.5,0,.75,.4)',fill:'forwards'});
+  a.onfinish=()=>{ b.classList.remove('acik'); a.cancel(); ekle(); };
+}
+/* Sohbet açılınca (ya da oyun bitince) baloncuk ve bekleyen sayı iptal: mesajlar okunmuş sayılır */
+function sohbetBaloncukIptal(){
+  clearTimeout(_sbZaman); _sbBekleyen=0;
+  const b=document.getElementById('sohbetBaloncukBildirim'); if(b){ b.getAnimations().forEach(a=>a.cancel()); b.classList.remove('acik'); }
 }
 let okunmamisSohbet=0;
 function sohbetRozetGuncelle(){
@@ -10965,6 +11053,8 @@ window.geriTusu=function(){
     if(acik('bulmacaZorluk')){ const e=document.getElementById('bulmacaZorluk'); e.classList.remove('acik'); e.style.display='none'; return true; }
     // 6. Oyun içindeysek (HUD açık) → geri tuşu SEÇENEKLER menüsünü açar
     if(acik('hud') && oyunAktif){
+      /* 10 Ekim 2026: oyun sürerken geri tuşu sormadan çıkmaz; çıkış penceresi açılır (devam/yeni/teslim/menü) */
+      if(!oyunBitti && window.cikisPopAc){ window.cikisPopAc('geri'); return true; }
       // Çevrimiçi oyunsa: oyunu arka planda tutup menüye dön (oyuna dön kartı çıkar)
       if(cevrimiciAktif){
         if(typeof menuyeDon==='function'){ menuyeDon(); return true; }
@@ -14134,6 +14224,11 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["Tezahürat"]=CEVM["Tezahürat"]||{en:"Cheering",ru:"Овации",ar:"هتاف",fr:"Acclamations",de:"Jubel",it:"Acclamazioni",zh:"欢呼"};
   CEVM["Kilise çanı"]=CEVM["Kilise çanı"]||{en:"Church bell",ru:"Церковный колокол",ar:"جرس الكنيسة",fr:"Cloche d'église",de:"Kirchenglocke",it:"Campana di chiesa",zh:"教堂钟"};
   CEVM["Kapı"]=CEVM["Kapı"]||{en:"Gate",ru:"Ворота",ar:"بوابة",fr:"Porte",de:"Tor",it:"Porta",zh:"门"};
+  CEVM["Oyuna devam et"]=CEVM["Oyuna devam et"]||{en:"Continue game",ru:"Продолжить игру",ar:"متابعة اللعب",fr:"Reprendre la partie",de:"Weiterspielen",it:"Continua la partita",zh:"继续对局"};
+  CEVM["Teslim Ol"]=CEVM["Teslim Ol"]||{en:"Resign",ru:"Сдаться",ar:"استسلام",fr:"Abandonner",de:"Aufgeben",it:"Abbandona",zh:"认输"};
+  CEVM["Teslim olmak istediğine emin misin?"]=CEVM["Teslim olmak istediğine emin misin?"]||{en:"Are you sure you want to resign?",ru:"Вы уверены, что хотите сдаться?",ar:"هل أنت متأكد أنك تريد الاستسلام؟",fr:"Voulez-vous vraiment abandonner ?",de:"Willst du wirklich aufgeben?",it:"Sei sicuro di voler abbandonare?",zh:"确定要认输吗？"};
+  CEVM["Evet, teslim ol"]=CEVM["Evet, teslim ol"]||{en:"Yes, resign",ru:"Да, сдаться",ar:"نعم، استسلم",fr:"Oui, abandonner",de:"Ja, aufgeben",it:"Sì, abbandona",zh:"是的，认输"};
+  CEVM["Menüye dön · oyun sürer"]=CEVM["Menüye dön · oyun sürer"]||{en:"Back to menu · game continues",ru:"В меню · партия продолжается",ar:"العودة للقائمة · اللعبة مستمرة",fr:"Retour au menu · la partie continue",de:"Zum Menü · Partie läuft weiter",it:"Torna al menu · la partita continua",zh:"返回菜单 · 对局继续"};
   CEVM['Destan']=CEVM['Destan']||{en:'Epic',ru:'Эпос',ar:'ملحمة',fr:'Épopée',de:'Epos',it:'Epica',zh:'史诗'};
   CEVM['Fil borusu']=CEVM['Fil borusu']||{en:'Elephant trumpet',ru:'Трубный зов слона',ar:'صوت الفيل',fr:"Barrissement d'éléphant",de:'Elefantentrompete',it:"Barrito d'elefante",zh:'象鸣'};
   CEVM['At kişnemesi']=CEVM['At kişnemesi']||{en:'Horse neigh',ru:'Ржание коня',ar:'صهيل الحصان',fr:'Hennissement',de:'Pferdewiehern',it:'Nitrito',zh:'马嘶'};
@@ -17338,27 +17433,52 @@ const SOZLER=[
     new MutationObserver(esle).observe(asil,{attributes:true,attributeFilter:['style']}); esle();
   };
   vekil('nMenu','btnMenu','<svg '+SV+'><path d="M4.5 7h15M4.5 12h15M4.5 17h15"/></svg>','Menü',true);
-  /* Sol alt düğme (8 Ekim 2026): eskiden doğrudan menüye çıkıyordu. Artık küçük pencere: Yeni Oyun / Menüye Dön.
-     Yeni Oyun #btnYeni'ye, Menüye Dön #btnMenu'ye tıklar (asıl mantık aynı); Yeni Oyun gizliyse (çevrimiçi) çıkmaz. */
+  /* ÇIKIŞ PENCERESİ (8 Ekim 2026, 10 Ekim genişletildi): sol alt düğme ve oyun ekranında telefonun GERİ tuşu
+     (eskiden geri tuşu sormadan menüye çıkıyordu). Seçenekler duruma göre: Oyuna devam et · Yeni Oyun (yerel) ·
+     Teslim Ol (oyun sürerken; ikinci adımda onay) · Menüye Dön (çevrimiçide oyun arka planda sürer).
+     Yeni Oyun #btnYeni'ye, Menüye Dön #btnMenu'ye tıklar (asıl mantık aynı). */
   { const nm=document.getElementById('nMenu');
-    if(nm){
-      const pop=document.createElement('div'); pop.id='cikisPop';
-      pop.innerHTML='<div class="cpKutu"><button type="button" data-a="btnYeni"><svg '+SV+'><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4.5v4h4"/></svg><span>Yeni Oyun</span></button>'+
-        '<button type="button" data-a="btnMenu"><svg '+SV+'><path d="M10 5H5.5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1H10"/><path d="M14 8l4 4-4 4M18 12H9"/></svg><span>Menüye Dön</span></button></div>';
-      document.body.appendChild(pop);
-      const kapat=()=>pop.classList.remove('acik');
-      pop.onclick=e=>{ if(e.target===pop) kapat(); };
-      pop.querySelectorAll('button[data-a]').forEach(b=>b.onclick=()=>{ kapat(); const a=document.getElementById(b.dataset.a); if(a) a.click(); });
-      window.cikisPopKapat=()=>{ if(!pop.classList.contains('acik')) return false; kapat(); return true; };
-      nm.onclick=()=>{
-        const y=document.getElementById('btnYeni');
-        pop.querySelector('[data-a="btnYeni"]').style.display=(y && y.style.display==='none') ? 'none' : '';
-        const r=nm.getBoundingClientRect();
-        pop.querySelector('.cpKutu').style.bottom=Math.max(8, innerHeight-r.top+8)+'px';
-        pop.querySelector('.cpKutu').style.left=Math.max(8, r.left)+'px';
-        pop.classList.add('acik');
-      };
+    const pop=document.createElement('div'); pop.id='cikisPop';
+    pop.innerHTML='<div class="cpKutu"></div>';
+    document.body.appendChild(pop);
+    const kutu=pop.querySelector('.cpKutu');
+    const c=t=>(typeof metniCevir==='function')?metniCevir(t):t;
+    const IK={
+      devam:'<svg '+SV+'><path d="M8 5.5v13l10-6.5z"/></svg>',
+      yeni:'<svg '+SV+'><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4.5v4h4"/></svg>',
+      teslim:'<svg '+SV+'><path d="M6 21V4"/><path d="M6 4.5h11l-2.5 4 2.5 4H6"/></svg>',
+      menu:'<svg '+SV+'><path d="M10 5H5.5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1H10"/><path d="M14 8l4 4-4 4M18 12H9"/></svg>'};
+    const kapat=()=>{ pop.classList.remove('acik','orta'); };
+    pop.onclick=e=>{ if(e.target===pop) kapat(); };
+    window.cikisPopKapat=()=>{ if(!pop.classList.contains('acik')) return false; kapat(); return true; };
+    const dugme=(ik,metin,fn,sinif)=>{ const b=document.createElement('button'); b.type='button'; if(sinif) b.className=sinif;
+      b.innerHTML=ik+'<span></span>'; b.querySelector('span').textContent=metin; b.onclick=fn; kutu.appendChild(b); };
+    function secenekler(){
+      kutu.innerHTML='';
+      const y=document.getElementById('btnYeni');
+      const surerken = (typeof oyunAktif!=='undefined' && oyunAktif) && !oyunBitti && !(typeof bulmacaModu!=='undefined' && bulmacaModu);
+      if(pop.classList.contains('orta')) dugme(IK.devam, c('Oyuna devam et'), kapat);
+      if(!cevrimiciAktif && !(y && y.style.display==='none')) dugme(IK.yeni, c('Yeni Oyun'), ()=>{ kapat(); y && y.click(); });
+      if(surerken) dugme(IK.teslim, c('Teslim Ol'), onay, 'cpTehlike');
+      dugme(IK.menu, cevrimiciAktif && surerken ? c('Menüye dön · oyun sürer') : c('Menüye Dön'),
+        ()=>{ kapat(); const m=document.getElementById('btnMenu'); m && m.click(); });
     }
+    function onay(){
+      kutu.innerHTML='';
+      const s=document.createElement('div'); s.className='cpSoru'; s.textContent=c('Teslim olmak istediğine emin misin?'); kutu.appendChild(s);
+      dugme(IK.teslim, c('Evet, teslim ol'), ()=>{ kapat(); window.teslimOlUygula && window.teslimOlUygula(); }, 'cpTehlike');
+      dugme(IK.devam, c('Vazgeç'), secenekler);
+    }
+    /* nereden: 'menu' = sol alt düğmenin üstünde; 'geri' = ekranın ortasında (karartmalı) */
+    window.cikisPopAc=(nereden)=>{
+      kutu.style.left=''; kutu.style.bottom='';
+      pop.classList.toggle('orta', nereden==='geri');
+      secenekler();
+      if(nereden!=='geri' && nm){ const r=nm.getBoundingClientRect();
+        kutu.style.bottom=Math.max(8, innerHeight-r.top+8)+'px'; kutu.style.left=Math.max(8, r.left)+'px'; }
+      pop.classList.add('acik');
+    };
+    if(nm) nm.onclick=()=>window.cikisPopAc('menu');
   }
   const ay=document.querySelector('#btnSecenekler .sg svg');
   vekil('nAyar','btnSecenekler', ay?ay.outerHTML:'<svg '+SV+'><circle cx="12" cy="12" r="3"/></svg>','Ayarlar',false);
@@ -17407,7 +17527,10 @@ const SOZLER=[
       if(!sah || !hud.classList.contains('acik')) return;
       const r=sah.getBoundingClientRect(); if(!r.width) return;
       const w=b.offsetWidth||64;
-      b.style.top=(r.bottom+6)+'px';
+      /* Düğmeler sarılınca (yatay çevrimiçi: 11 düğme, 3 sıra) Sahne'nin altı başka düğmeye denk gelebiliyordu
+         (10 Ekim 2026: Menü ile üst üste). Hap, düğme grubunun EN ALTININ altına konur. */
+      const sag=sah.parentElement && sah.parentElement.getBoundingClientRect();
+      b.style.top=(Math.max(r.bottom, sag ? sag.bottom : 0)+6)+'px';
       b.style.left=Math.max(6, Math.min(innerWidth-w-6, r.left+r.width/2-w/2))+'px';
     }catch(e){}
   }
