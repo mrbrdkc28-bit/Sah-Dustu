@@ -1047,3 +1047,7 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   (Stockfish→GarboChess, Cburnett→Chessnut, ogg→m4a, Google girişi gizli, Premium açık). Paket kimliği com.emre.sahdustu.
   Bekleyen: GitHub deposu + Codemagic bağlantısı + App Store Connect uygulama kaydı (sahibin onayı/hesabı gerekir).
 - Bekleyen: oyunun en altındaki silik simgeler (telefon bağlı değilken incelenemedi; büyük olasılıkla #esirler, alınan taşlar şeridi).
+- Dikeyde alınan taşlar SEN/RAKİP şeritlerinde (.seritEsir: büyükten küçüğe, öndeyse altın "+n"; puan gizliyse gizli).
+  En alttaki "Beyaz: — Eşit Siyah: —" şeridi (#esirler) dikeyde kaldırıldı: silik duruyor, düğme sanılıyordu. Yatay değişmedi.
+- iOS: sesli oynama gizlendi (ios-ek.js: #btnSesKomut, #secSesBlok, #sesDurumBar, #sesKurModal). iOS'ta satın alma/reklam
+  yok (Premium açık) — StoreKit köprüsü ve AdMob sonra eklenebilir (sahibe anlatıldı).

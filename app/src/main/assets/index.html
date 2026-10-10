@@ -975,6 +975,13 @@ body.dikeyAktif #notPanelSag{display:none!important}
 #notListe .hm.son,#notListeS .hm.son{color:#E8B64C;font-weight:800}
 #notListe .hm.enSon,#notListeS .hm.enSon{box-shadow:inset 0 -2px 0 #E8B64C}
 #notListe .sat:not(.son),#notListeS .sat:not(.son){opacity:.7}
+.seritEsir{flex:0 0 auto;display:inline-flex;align-items:center;margin:0 8px 0 4px;max-width:42%;overflow:hidden;white-space:nowrap}
+.seritEsir:empty{display:none}
+.seritEsir i{font-style:normal;font-size:15px;line-height:1;margin-right:-3px;font-family:"Noto Sans Symbols 2","Segoe UI Symbol","DejaVu Sans",serif}
+.seritEsir i.eB{color:#f1ead8;text-shadow:0 0 1px rgba(0,0,0,.9)}           /* alınan BEYAZ taşlar */
+.seritEsir i.eS{color:#15161b;text-shadow:0 0 1.5px rgba(255,255,255,.75)}   /* alınan SİYAH taşlar */
+.seritEsir b{margin-left:7px;font-size:12px;font-weight:800;color:#E8B64C}
+body.dikeyAktif #esirler{display:none!important}
 .seritSaat{flex:0 0 auto;font-weight:800;font-size:14px;color:#E8DDBB;
   padding-left:12px;margin-left:8px;border-left:1px solid rgba(150,150,160,.3);
   min-width:52px;text-align:center;letter-spacing:.5px}
@@ -6728,6 +6735,22 @@ function hudGuncelle(){
   if(um){ um.textContent=ustun; um.className = fark>0?'beyaz':fark<0?'siyah':''; }
   const uma=document.getElementById('ustunlukAlt');
   if(uma){ uma.textContent=ustun; uma.className = fark>0?'beyaz':fark<0?'siyah':''; }
+  /* (10 Ekim 2026) Dikeyde alınan taşlar SEN/RAKİP şeritlerinde: en alttaki silik "Beyaz: — Eşit Siyah: —"
+     şeridi düğme sanılıyordu (basınca bir şey olmuyordu). Her taraf kendi aldığı taşları görür, öndeyse "+n". */
+  try{
+    const benim = (typeof cevrimiciAktif!=='undefined' && cevrimiciAktif) ? Cevrimici.benimRenk : (mod==='ai' ? aktifInsanRenk : 'w');
+    const SIRA='qrbnp';
+    const yaz=(seritId, renk)=>{
+      const serit=document.getElementById(seritId); if(!serit) return;
+      let el=serit.querySelector('.seritEsir');
+      if(!el){ el=document.createElement('span'); el.className='seritEsir'; const saat=serit.querySelector('.seritSaat'); serit.insertBefore(el, saat||null); }
+      const alinan=(renk==='w'?ist.esirB:ist.esirS).slice().sort((a,b)=>SIRA.indexOf(a)-SIRA.indexOf(b));
+      const ust = renk==='w' ? fark : -fark;
+      el.innerHTML = alinan.map(t=>'<i class="'+(renk==='w'?'eS':'eB')+'">'+SEMBOL[t]+'︎</i>').join('') + (ust>0?'<b>+'+ust+'</b>':'');
+      el.style.visibility = puanGizli ? 'hidden' : '';
+    };
+    yaz('notSeritUst', benim==='w'?'b':'w'); yaz('notSeritAlt', benim);
+  }catch(e){}
   if(typeof puanGorunumGuncelle==='function') puanGorunumGuncelle();
   // Sesli oynama: sıra bize geçtiyse (oto mikrofon modunda) dinlemeyi başlat
   try{ if(window.SesOyun) window.SesOyun.siraDegisti(); }catch(e){}
