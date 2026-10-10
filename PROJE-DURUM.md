@@ -1037,13 +1037,3 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   sonra sohbet düğmesine uçup okunmamış rozetine eklenir (rozet zıplar). Dokununca sohbet açılır; sohbet açılınca iptal.
   `sohbetBaloncukGoster/Ucur/Iptal`. Ses/titreşim eskisi gibi.
 8.57 (10 Ekim 2026) Sohbet dil testi: Türkçe karakter, Arapça (sağdan sola), Çince, Rusça, Yunanca, emoji, uzun metin, HTML denemesi sorunsuz. Düzeltilenler: arayüz İngilizceyken mesajlar otomatik çevriliyordu ("Tamam"→"Done") — artık sohbet mesajları ve rakip adı çevrilmez (data-cevirme, dir=auto); rakip adı HTML olarak değil düz metin olarak basılıyor; hazır ifadeler Türkçe aslıyla gidiyor (hazir:true), alıcı kendi dilinde görüyor.
-
-### 8.45 Taş sesleri Premium + iOS kopyası (10 Ekim 2026)
-- kilitli('ses',id): Klasik ücretsiz; diğer 4 paket ve 59 kütüphane sesi Premium (reklam ödülü anahtarı 'ses_hepsi', 24 sa).
-  Dinlemek serbest, seçmek premiumKapi('ses','hepsi'). Ses.tasKaynak kilitliyken 'klasik' döner (Premium/ödül biterse oyunda Klasik).
-  Sayfada kilitliyken altın renkli bilgi satırı. Tarayıcıda kilit taklidiyle denendi (pencere açılıyor, seçim değişmiyor).
-- iOS: Desktop\chess64-ios (ayrı git deposu). Swift kabuk (WKWebView, chess64:// şeması), XcodeGen project.yml,
-  codemagic.yaml (Rabbine Dön düzeni: "Ucuzcum ASC", app_store imzalama), README. www = araclar/www-hazirla.py çıktısı
-  (Stockfish→GarboChess, Cburnett→Chessnut, ogg→m4a, Google girişi gizli, Premium açık). Paket kimliği com.emre.sahdustu.
-  Bekleyen: GitHub deposu + Codemagic bağlantısı + App Store Connect uygulama kaydı (sahibin onayı/hesabı gerekir).
-- Bekleyen: oyunun en altındaki silik simgeler (telefon bağlı değilken incelenemedi; büyük olasılıkla #esirler, alınan taşlar şeridi).
