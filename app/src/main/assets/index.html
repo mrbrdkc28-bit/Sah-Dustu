@@ -9183,8 +9183,10 @@ function menuKur(){
   /* Hazır mesajlar: dokun → anında gönder */
   document.querySelectorAll('#sohbetHizli .hizliMsg').forEach(b=>{
     b.onclick=()=>{
-      const metin=b.textContent.trim();
-      if(cevrimiciAktif && Cevrimici.sohbetGonder) Cevrimici.sohbetGonder(metin);
+      /* Ekrandaki (çevrilmiş) metin değil, Türkçe aslı gönderilir; alıcı kendi dilinde görür */
+      const tn=[...b.childNodes].find(n=>n.nodeType===3 && n.nodeValue.trim());
+      const metin=((typeof ORJ!=='undefined' && tn && ORJ.get(tn)) || b.textContent).trim();
+      if(cevrimiciAktif && Cevrimici.sohbetGonder) Cevrimici.sohbetGonder(metin, true);
     };
   });
   /* Emojiler: dokun → yazı kutusuna ekle */
@@ -10047,7 +10049,8 @@ function cevrimiciBilgiGoster(rakipAd){
   const v=Cevrimici.veri||{};
   const rakipUlke = Cevrimici.benimRenk==='w' ? (v.siyahUlke||'') : (v.beyazUlke||'');
   const bayrak = rakipUlke ? (ulkeBayrak(rakipUlke)+' ') : '';
-  s.innerHTML='<span class="cvsAvatar"></span><span class="cvsRenk">'+renkAd+'</span> · '+bayrak+(rakipAd||'Rakip')+
+  const adEl=document.createElement('span'); adEl.setAttribute('data-cevirme',''); adEl.dir='auto'; adEl.textContent=(rakipAd||'Rakip');
+  s.innerHTML='<span class="cvsAvatar"></span><span class="cvsRenk">'+renkAd+'</span> · '+bayrak+adEl.outerHTML+
     ' <span class="cvsKod">#'+(Cevrimici.odaId||'')+'</span>';
   s.classList.add('acik');
   seritKonumla();
@@ -10164,7 +10167,8 @@ function sohbetAkisYaz(mesajlar){
     if(window.sohbetSusturuldu && m.kim!==Cevrimici.benimRenk) return; // susturuldu
     const d=document.createElement('div');
     d.className='sohbetBaloncuk '+(m.kim===Cevrimici.benimRenk?'benim':'rakip');
-    d.textContent=m.metin;
+    d.setAttribute('data-cevirme',''); d.dir='auto';   // kullanıcı yazısı: çevrilmez, Arapça vb. sağdan sola
+    d.textContent = (m.hazir && typeof metniCevir==='function') ? metniCevir(m.metin) : m.metin;   // hazır ifade: alıcının dilinde
     akis.appendChild(d);
   });
   akis.scrollTop=akis.scrollHeight;
@@ -10177,7 +10181,7 @@ function sohbetAkisYaz(mesajlar){
     if(navigator.vibrate) try{ navigator.vibrate(60); }catch(e){}
     /* 10 Ekim 2026 (sahibin isteği): mesaj önce rakibin adının yanında 5 sn baloncukta görünür, sonra sohbet
        düğmesine uçup okunmamış sayısına eklenir (sohbet açılana kadar kalıcı rozet). */
-    sohbetBaloncukGoster(sonMesaj.metin);
+    sohbetBaloncukGoster((sonMesaj.hazir && typeof metniCevir==='function') ? metniCevir(sonMesaj.metin) : sonMesaj.metin);
   }
 }
 /* ===== SOHBET BALONCUĞU ===== */
@@ -10186,7 +10190,7 @@ function sohbetBaloncukGoster(metin){
   let b=document.getElementById('sohbetBaloncukBildirim');
   if(!b){
     b=document.createElement('div'); b.id='sohbetBaloncukBildirim';
-    b.innerHTML='<b></b><span></span>';
+    b.innerHTML='<b data-cevirme></b><span data-cevirme dir="auto"></span>';
     b.onclick=()=>{ const s=document.getElementById('btnSohbet'); if(s) s.click(); };   // dokun: sohbeti aç
     document.body.appendChild(b);
   }
@@ -13372,11 +13376,13 @@ const Cevrimici=(()=>{
 
   // ---- HAMLE GÖNDER (Firestore'a yaz) ----
   // ---- SOHBET GÖNDER ----
-  async function sohbetGonder(metin){
+  async function sohbetGonder(metin, hazir){
     if(!odaId || !hazirMi()) return;
     try{
+      /* hazir: hazır ifade — Türkçe aslı gider, alıcı kendi dilinde görür (10 Ekim 2026) */
+      const kayit={ kim:benimRenk, metin:metin, ts:Date.now() }; if(hazir) kayit.hazir=true;
       await fbDb.collection('oyunlar').doc(odaId).update({
-        sohbet: firebase.firestore.FieldValue.arrayUnion({ kim:benimRenk, metin:metin, ts:Date.now() })
+        sohbet: firebase.firestore.FieldValue.arrayUnion(kayit)
       });
     }catch(e){}
   }
@@ -14373,6 +14379,9 @@ function metniCevir(orij){
 function dugumIsle(n){
   const ana=n.parentNode;
   if(ana&&(ana.nodeName==='SCRIPT'||ana.nodeName==='STYLE'||ana.nodeName==='NOSCRIPT')) return;
+  /* Kullanıcı yazısı (sohbet mesajı, rakip adı) ÇEVRİLMEZ (10 Ekim 2026): arayüz İngilizceyken rakibin "Tamam"ı
+     "Done", "Vazgeç"i "Cancel" görünüyordu — sözlükle birebir eşleşen her mesaj değişiyordu. */
+  if(ana&&ana.closest&&ana.closest('[data-cevirme]')) return;
   if(!ORJ.has(n)) ORJ.set(n,n.nodeValue);
   const yeni=metniCevir(ORJ.get(n));
   if(n.nodeValue!==yeni){ BEKLENEN.set(n,yeni); n.nodeValue=yeni; }
