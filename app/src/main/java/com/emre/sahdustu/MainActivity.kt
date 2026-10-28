@@ -899,6 +899,12 @@ class MainActivity : AppCompatActivity() {
             fun goster(baslik: String, govde: String) {
                 runOnUiThread { gosterBildirim(baslik, govde) }
             }
+            /** Uzak bildirim (Ekim 2026): FCM adresini oyuna ver; oyun Firestore'a yazar.
+             *  Izin acilista zaten soruluyor (Android 13+); burada yalniz adres alinir. */
+            @JavascriptInterface
+            fun uzakIzinIste() { runOnUiThread { uzakJetonGonder() } }
+            @JavascriptInterface
+            fun uzakJeton() { runOnUiThread { uzakJetonGonder() } }
         }, "AndroidBildirim")
 
         // ===================== SESLI OYNAMA KOPRUSU =====================
@@ -1440,6 +1446,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val BILDIRIM_KANAL = "sah_dustu_sira"
+    /** Uzak oyun istegi bildirimleri (FCM). Sunucu bu kanal adini kullanir (functions/index.js). */
+    private val DAVET_KANAL = "davet"
+
+    private fun uzakJetonGonder() {
+        try {
+            com.google.firebase.messaging.FirebaseMessaging.getInstance().token
+                .addOnSuccessListener { jeton ->
+                    if (jeton.isNullOrEmpty()) return@addOnSuccessListener
+                    val j = jeton.replace("'", "")
+                    webView.evaluateJavascript(
+                        "if(window.bildirimJetonuGeldi)window.bildirimJetonuGeldi('android','$j');", null)
+                }
+        } catch (t: Throwable) {}
+    }
 
     private fun olusturBildirimKanali() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1452,6 +1472,9 @@ class MainActivity : AppCompatActivity() {
             }
             val mgr = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             mgr.createNotificationChannel(kanal)
+            mgr.createNotificationChannel(NotificationChannel(
+                DAVET_KANAL, getString(R.string.davet_kanal_ad), NotificationManager.IMPORTANCE_HIGH
+            ).apply { description = getString(R.string.davet_kanal_aciklama) })
         }
     }
 

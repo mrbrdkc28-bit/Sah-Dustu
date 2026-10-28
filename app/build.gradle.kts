@@ -104,4 +104,6 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    // Uzak bildirim: oyun istegi uygulama kapaliyken de gelsin (Ekim 2026)
+    implementation("com.google.firebase:firebase-messaging")
 }

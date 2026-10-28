@@ -2,5 +2,7 @@
 <resources>
     <string name="bildirim_kanal_ad">Am Zug</string>
     <string name="bildirim_kanal_aciklama">Benachrichtigt dich, wenn dein Gegner gezogen hat</string>
+    <string name="davet_kanal_ad">Spielanfragen</string>
+    <string name="davet_kanal_aciklama">Benachrichtigt dich, wenn dich jemand zu einer Partie einlädt</string>
     <string name="satin_alma_yakinda">Käufe folgen in Kürze</string>
 </resources>

@@ -3296,6 +3296,8 @@ let fbAuth=null, fbDb=null, fbKullanici=null;
         misafirMod=false;
         if(typeof bulutIstYukle==='function') await bulutIstYukle();
         if(typeof otomatikGiris==='function') otomatikGiris();
+        try{ if(typeof bildirimJetonuYaz==='function') bildirimJetonuYaz();
+             if(typeof AndroidBildirim!=='undefined' && AndroidBildirim.uzakJeton) AndroidBildirim.uzakJeton(); }catch(e){}
       } else {
         // Oturum yok: perde kapandıktan sonra giriş ekranını göster
         const perde=document.getElementById('acilisPerde');
@@ -10181,6 +10183,45 @@ function cvAnimNotYaz(){
                        : 'Rakibin animasyon izlerken iki saat de durur.';
   el.textContent=(typeof metniCevir==='function') ? metniCevir(m) : m;
 }
+/* ---- UZAK BİLDİRİM (Ekim 2026) ----
+   Kapalı uygulamaya oyun isteği bildirimi. Yerel kabuk bildirim adresini (Android: FCM, iOS: APNs)
+   window.bildirimJetonuGeldi(platform, jeton) ile verir; burada oyuncular/{uid}/ozel/bildirim'e yazılır.
+   Sunucu işlevi (functions/index.js) davet oluşunca bu adreslere gönderir. İzin, oyuncu Çevrimiçi'ne ilk
+   girdiğinde sorulur (bağlamı belli olsun diye açılışta değil). */
+let _bildirimJeton=null;
+function bildirimJetonuYaz(){
+  try{
+    if(!_bildirimJeton || typeof fbDb==='undefined' || !fbDb || typeof fbKullanici==='undefined' || !fbKullanici || misafirMod) return;
+    const {platform, jeton}=_bildirimJeton;
+    const imza=fbKullanici.uid+'|'+platform+'|'+jeton+'|'+uygDil;
+    if(window._bildirimYazilan===imza) return;
+    fbDb.collection('oyuncular').doc(fbKullanici.uid).collection('ozel').doc('bildirim').set({
+      [platform]: firebase.firestore.FieldValue.arrayUnion(jeton), dil: uygDil, ts: Date.now()
+    },{merge:true}).then(()=>{ window._bildirimYazilan=imza; }).catch(()=>{});
+  }catch(e){}
+}
+window.bildirimJetonuGeldi=function(platform, jeton){
+  if(!jeton || (platform!=='android' && platform!=='ios')) return;
+  _bildirimJeton={platform, jeton:String(jeton)};
+  bildirimJetonuYaz();
+};
+function bildirimIzniIste(){
+  try{
+    if(typeof AndroidBildirim!=='undefined' && AndroidBildirim.uzakIzinIste) AndroidBildirim.uzakIzinIste();
+    else if(window.IOS_UYGULAMA && window.webkit && webkit.messageHandlers && webkit.messageHandlers.ios)
+      webkit.messageHandlers.ios.postMessage({ad:'bildirimIzni', deger:''});
+  }catch(e){}
+}
+/* Çıkışta bu cihazın adresi hesaptan silinsin (başkasının hesabına bildirim gitmesin) */
+function bildirimJetonuSil(){
+  try{
+    if(!_bildirimJeton || typeof fbDb==='undefined' || !fbDb || !fbKullanici) return Promise.resolve();
+    window._bildirimYazilan=null;
+    return fbDb.collection('oyuncular').doc(fbKullanici.uid).collection('ozel').doc('bildirim').update({
+      [_bildirimJeton.platform]: firebase.firestore.FieldValue.arrayRemove(_bildirimJeton.jeton)
+    }).catch(()=>{});
+  }catch(e){ return Promise.resolve(); }
+}
 /* ---- LOBİ ekranı (Ekim 2026) ---- */
 let lobiVeri=[], lobiHepsi=false, lobiZam=null;
 const lobiDavetZamani={};   // aynı kişiye 10 dk'da en çok 1 istek
@@ -10255,6 +10296,7 @@ function lobiBaslat(){
 function cevrimiciAc(){
   cvAnimNotYaz();
   try{ lobiBaslat(); }catch(e){}
+  try{ bildirimIzniIste(); bildirimJetonuYaz(); }catch(e){}
   try{ varlikYaz(); }catch(e){}
   cevrimiciHata('');
   // İnternet kontrolü — bağlantı yoksa çevrimiçi mod anlamsız
@@ -12994,6 +13036,7 @@ function kayitModunaGec(){
   document.getElementById('btnGiris').style.display='none';
 }
 async function cikisYap(){
+  try{ if(typeof bildirimJetonuSil==='function') await bildirimJetonuSil(); }catch(e){}
   if(fbAuth){ try{ await fbAuth.signOut(); }catch(e){} }
   fbKullanici=null; misafirMod=false;
   /* DİNLEYİCİ SIZINTISI: davetleriDinle / isteklerıDinle abonelikleri eski
@@ -16956,6 +16999,7 @@ function devPanelAc(){
       await sorguyuSil(fbDb.collection('davetler').where('gonderen','==',uid));
       await sorguyuSil(fbDb.collection('davetler').where('hedef','==',uid));
       await sorguyuSil(fbDb.collection('bekleme').where('uid','==',uid));
+      await sorguyuSil(ben.collection('ozel'));   // bildirim adresleri
       await sorguyuSil(fbDb.collection('oyunlar').where('beyaz','==',uid));
       await sorguyuSil(fbDb.collection('oyunlar').where('siyah','==',uid));
       // 4) Profil belgesi (puan, istatistik, profil fotoğrafı)

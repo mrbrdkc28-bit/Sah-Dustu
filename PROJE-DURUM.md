@@ -1054,3 +1054,18 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
 - Doğrulama: `lintDebug` 0 hata (14 mevcut uyarı), `testDebugUnitTest` NO-SOURCE, `assembleDebug` ve imzalı
   `bundleRelease` başarılı. Telefonda 1.6 (6): e-posta arama alanı, aktif oyunda geri tuşu, Seçenekler açıkken geri
   tuşu ve incelemede Bitir sonrası sonuç ekranındaki Menü düğmesi doğrulandı. AAB: 93,23 MB.
+
+### 8.59 Sürüm 1.7 hazırlığı (28 Ekim 2026) — iOS ile ortak
+- **Animasyon eşleşmesi:** Süreli maçta animasyon açık/kapalı oyuncular artık eşleşir (önce aynı ayardaki aranır).
+  Taş yeme sahnesini izleyen taraf odaya `izliyor_w/b` (başlangıç anı, 0 = bitti) yazar; rakibin telefonu saati durdurur
+  ve "Rakip animasyon izliyor — süre durdu" gösterir. Aynı değere bir kez tepki, en çok 9 sn (sinyal takılırsa).
+  `cvSahneSabit` artık hep null: herkes kendi ayarıyla oynar.
+- **Lobi:** Çevrimiçi ekranının başında. `cevrimici` (son 60) + `oyuncular` profilleri; son 5 dk = çevrimiçi (yeşil),
+  diğerleri "Çevrimdışı · son görülme". "Oyun iste" = mevcut davet (seçili süre). "Lobide görün" → `lobiGizli`
+  (varsayılan görünür; kurallarda izinli). Aynı kişiye istemcide 10 dk'da 1 istek. Davet ömrü 2 → 10 dk.
+- **Uzak bildirim:** `functions/index.js` (`oyunIstegiBildir`, europe-west1): davet oluşunca `oyuncular/{uid}/ozel/bildirim`
+  adreslerine Android FCM / iOS APNs (doğrudan, .p8 gizli anahtar `APNS_ANAHTAR`, `APNS_ANAHTAR_ID`). Sunucuda da
+  gönderen→alıcı 10 dk sınırı (`bildirimSinir`). Android: `firebase-messaging`, `BildirimServisi`, kanal `davet`,
+  `AndroidBildirim.uzakJeton()`. Çıkışta cihaz adresi silinir; hesap silmede `ozel` silinir. Blaze planı gerekir.
+- **Arkadaş arama ortak:** iOS'taki harf duyarsız arama ortak koda alındı; e-posta özeti iki platformda `emailArama`
+  (iOS eskiden `epostaOzet` yazıyordu, kurallarda yoktu).

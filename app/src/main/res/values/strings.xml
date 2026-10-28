@@ -3,5 +3,7 @@
     <string name="app_name" translatable="false">Chess64</string>
     <string name="bildirim_kanal_ad">Game turn</string>
     <string name="bildirim_kanal_aciklama">Notifies you when your opponent moves</string>
+    <string name="davet_kanal_ad">Game requests</string>
+    <string name="davet_kanal_aciklama">Notifies you when a player invites you to a game</string>
     <string name="satin_alma_yakinda">Purchases are coming soon</string>
 </resources>

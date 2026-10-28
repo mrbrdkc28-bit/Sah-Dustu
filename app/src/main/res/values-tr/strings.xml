@@ -2,5 +2,7 @@
 <resources>
     <string name="bildirim_kanal_ad">Oyun Sırası</string>
     <string name="bildirim_kanal_aciklama">Rakip hamle yaptığında bildirim</string>
+    <string name="davet_kanal_ad">Oyun İstekleri</string>
+    <string name="davet_kanal_aciklama">Bir oyuncu seni oyuna davet ettiğinde bildirim</string>
     <string name="satin_alma_yakinda">Satın alma yakında eklenecek</string>
 </resources>

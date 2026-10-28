@@ -110,6 +110,11 @@ service cloud.firestore {
       // Hesap silme için.
       allow delete: if request.auth != null && request.auth.uid == userId;
 
+      // ÖZEL (Ekim 2026): bildirim adresleri (FCM / APNs) yalnız sahibine açık; sunucu işlevi admin ile okur.
+      match /ozel/{belge} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
       // ARKADAŞ İSTEKLERİ: gelen kutusu.
       // Okuma/silme: yalnız kutunun sahibi. Oluşturma: yalnız gönderen, kendi adına.
       match /istekler/{gonderenId} {

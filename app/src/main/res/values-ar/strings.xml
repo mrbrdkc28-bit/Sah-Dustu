@@ -2,5 +2,7 @@
 <resources>
     <string name="bildirim_kanal_ad">دور اللعب</string>
     <string name="bildirim_kanal_aciklama">إشعار عندما يلعب خصمك نقلته</string>
+    <string name="davet_kanal_ad">طلبات اللعب</string>
+    <string name="davet_kanal_aciklama">إشعار عندما يدعوك لاعب إلى مباراة</string>
     <string name="satin_alma_yakinda">عمليات الشراء قادمة قريبًا</string>
 </resources>

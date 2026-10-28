@@ -2,5 +2,7 @@
 <resources>
     <string name="bildirim_kanal_ad">Tour de jeu</string>
     <string name="bildirim_kanal_aciklama">Vous prévient quand votre adversaire a joué</string>
+    <string name="davet_kanal_ad">Demandes de partie</string>
+    <string name="davet_kanal_aciklama">Vous prévient quand un joueur vous invite à jouer</string>
     <string name="satin_alma_yakinda">Les achats arrivent bientôt</string>
 </resources>

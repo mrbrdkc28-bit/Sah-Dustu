@@ -2,5 +2,7 @@
 <resources>
     <string name="bildirim_kanal_ad">Ваш ход</string>
     <string name="bildirim_kanal_aciklama">Уведомление, когда соперник сделал ход</string>
+    <string name="davet_kanal_ad">Приглашения в игру</string>
+    <string name="davet_kanal_aciklama">Уведомление, когда игрок приглашает вас сыграть</string>
     <string name="satin_alma_yakinda">Покупки скоро появятся</string>
 </resources>
