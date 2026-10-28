@@ -1805,6 +1805,8 @@ html[data-tema="fildisi"] #girisForm input{background:#fffdf8;border-color:rgba(
 #cvAnimNot{margin:10px auto 0;max-width:320px}
 
 /* ===== ODA AYARI ONAYI + ODA BİLGİSİ (4 Ekim 2026) ===== */
+#rakipIzliyor{position:fixed;left:50%;top:max(64px,calc(env(safe-area-inset-top) + 56px));transform:translateX(-50%);z-index:60;background:rgba(10,12,18,.92);color:#e8c66a;border:1px solid rgba(232,198,106,.45);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;pointer-events:none;display:none;white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis}
+#rakipIzliyor.acik{display:block}
 #cvAyarPop{position:fixed;inset:0;z-index:72;background:rgba(6,7,11,.88);display:none;align-items:center;justify-content:center;padding:22px}
 #cvAyarPop.acik{display:flex}
 #cvAyarPop .caSure{font-family:'Cinzel',serif;font-weight:700;font-size:20px;color:var(--bone);margin:2px 0 10px}
@@ -2814,7 +2816,7 @@ function perdeBittiginde(fn){
       <button class="arkSekme" data-s="ara">Ara</button>
     </div>
     <div id="arkAraKutu" style="display:none">
-      <input id="arkAraGiris" placeholder="Kullanıcı adı veya e-posta" maxlength="254" inputmode="text" autocomplete="off">
+      <input id="arkAraGiris" placeholder="Kullanıcı adı veya e-posta" maxlength="254" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
       <button id="arkAraBtn">Ara</button>
     </div>
     <div id="arkListe"></div>
@@ -2907,7 +2909,7 @@ function perdeBittiginde(fn){
     <div id="cvSayac"></div>
     <div id="cvRakipYok">
       <div class="ryBaslik">Uygun rakip bulunamadı</div>
-      <div class="ryMetin">Bu süre ve animasyon ayarında şu an bekleyen başka oyuncu yok.</div>
+      <div class="ryMetin">Bu sürede şu an bekleyen başka oyuncu yok.</div>
       <div class="ryBot"></div>
       <button type="button" id="ryBotOyna" class="ryBirincil"></button>
       <button type="button" id="ryBekle" class="ryIkincil">Beklemeye devam et</button>
@@ -6880,6 +6882,11 @@ async function hamleOyna(h, ai=false, uzaktan=false){
         if(duzGrup) duzGrup.visible=false;
       }
       saatDurdur();               // <<< sure dursun
+      /* Çevrimiçi süreli maç (Ekim 2026): animasyonu izleyen taraf odaya "izliyorum" yazar; rakibin
+         telefonu da o sırada saati durdurur ve "Rakip animasyon izliyor" gösterir. Böylece animasyon
+         açık/kapalı oyuncular aynı maçta eşit koşulda oynar (izleyen bekler, izlemeyen düşünür). */
+      const _izSinyal = cevrimiciAktif && sureSecim>0 && typeof Cevrimici!=='undefined' && Cevrimici.izlemeYaz;
+      if(_izSinyal) Cevrimici.izlemeYaz(true);
       try{
         // ZAMAN AŞIMI: Sinematik sahne bir şekilde takılırsa (tween askıda kalırsa)
         // oyun sonsuza kadar kilitli kalmasın. 6 sn sonra devam et.
@@ -6888,7 +6895,7 @@ async function hamleOyna(h, ai=false, uzaktan=false){
           bekle(6000)
         ]);
       }catch(e){ /* sahne efekti hata verirse oyun kilitlenmesin */ }
-      finally{ saatSurdur(); }    // <<< sure devam etsin
+      finally{ saatSurdur(); if(_izSinyal) Cevrimici.izlemeYaz(false); }    // <<< sure devam etsin
       // Sahne bitti, düz moda geri dön
       if(duzdaydi){
         if(tasGrup) tasGrup.visible=false;
@@ -9912,8 +9919,9 @@ function cevrimiciOyunBaslat(rakipAd){
   sureArtis=(v.sureInc||0);
   /* Süreli maçta animasyon eşleşmeye göre SABİT: iki taraf da aynı ayarla oynar,
      saatler iki telefonda aynı yerde durur. Süresizde herkes kendi ayarıyla. */
-  cvSahneSabit = (sureSecim>0 && v.sahne!=null) ? (v.sahne===1) : null;
-  if(cvSahneSabit!==null) setTimeout(()=>kisaBilgi(cvSahneSabit?'Süreli maç: animasyon açık':'Süreli maç: animasyon kapalı'),900);
+  /* Ekim 2026: herkes kendi animasyon ayarıyla oynar; süreli maçta izleme sinyali saatleri eşit tutar. */
+  cvSahneSabit = null;
+  rakipIzlemeGuncelle(0); _rakipIzSon=0;
   sahneSimgeGuncelle();
   Ses.sesAc();
   setTimeout(()=>Ses.olay('basla'),60);
@@ -10144,8 +10152,8 @@ function ayarOzetYaz(){
 function cvAnimNotYaz(){
   ayarOzetYaz();
   const el=document.getElementById('cvAnimNot'); if(!el) return;
-  const m = sahneAyari ? 'Süreli maçta animasyonu açık oyuncularla eşleşirsin.'
-                       : 'Süreli maçta animasyonu kapalı oyuncularla eşleşirsin.';
+  const m = sahneAyari ? 'Süreli maçta animasyon izlerken iki saat de durur.'
+                       : 'Rakibin animasyon izlerken iki saat de durur.';
   el.textContent=(typeof metniCevir==='function') ? metniCevir(m) : m;
 }
 function cevrimiciAc(){
@@ -12046,6 +12054,30 @@ function saatYaz(){
 /* Sinematik sahne / hamle animasyonu sirasinda saat DURUR.
    Eskiden kill-cam 6 saniye surerken sure akmaya devam ediyordu. */
 let saatDurduran=0;
+let _rakipIzliyor=false, _rakipIzZam=null, _rakipIzSon=0;
+/* deger: rakibin izliyor_* alanı (başlangıç anı, 0 = izlemiyor). Aynı değere ikinci kez tepki verilmez:
+   rakip sahne ortasında koparsa alan açık kalır; saat yalnız bir kez, en çok 9 sn durur. */
+function rakipIzlemeGuncelle(deger){
+  deger = +deger || 0;
+  if(deger && deger===_rakipIzSon) return;
+  _rakipIzSon = deger;
+  const aktif = !!deger && cevrimiciAktif && sureSecim>0 && oyunAktif && !oyunBitti;
+  if(aktif===_rakipIzliyor) return;
+  _rakipIzliyor=aktif;
+  clearTimeout(_rakipIzZam);
+  let el=document.getElementById('rakipIzliyor');
+  if(!el){ el=document.createElement('div'); el.id='rakipIzliyor'; document.body.appendChild(el); }
+  if(aktif){
+    saatDurdur();
+    el.textContent=(typeof metniCevir==='function'?metniCevir:(x=>x))('Rakip animasyon izliyor — süre durdu');
+    el.classList.toggle('acik', !sahneOynuyorMu());
+    _rakipIzZam=setTimeout(()=>{ if(_rakipIzliyor){ _rakipIzliyor=false; saatSurdur(); el.classList.remove('acik'); } }, 9000);
+  }else{
+    saatSurdur();
+    el.classList.remove('acik');
+  }
+}
+function sahneOynuyorMu(){ return saatDurduran>1; }   // kendi sahnem de oynuyorsa yazı gereksiz
 function saatDurdur(){ saatDurduran++; }
 function saatSurdur(){ saatDurduran=Math.max(0,saatDurduran-1); }
 function saatTik(ham){
@@ -13249,10 +13281,6 @@ const Cevrimici=(()=>{
         /* ODA KURALI (4 Ekim 2026): odayı kuran odanın ayarlarını belirler (süre +
            animasyon). Süreli odada animasyon ayarı farklıysa sessizce değiştirme;
            oyuncuya sor (odaAyarSor). Süresiz odada şart yok. */
-        const oDk=(d.sureDk!=null?d.sureDk:3);
-        if(oDk>0 && (d.sahne===0||d.sahne===1) && d.sahne!==(sahneAyari?1:0)){
-          const e=new Error('SAHNE'); e.sahneFarki={ sahne:d.sahne, sure:oDk+'+'+(d.sureInc||0) }; throw e;
-        }
         tx.update(ref,{ siyah:ben, siyahAd:benAd, siyahPuan:(typeof bulutIst!=='undefined'&&bulutIst.puan)?bulutIst.puan:800, siyahUlke:(typeof bulutIst!=='undefined'&&bulutIst.ulke)?bulutIst.ulke:'', durum:'oynaniyor' });
         return true;
       });
@@ -13284,17 +13312,20 @@ const Cevrimici=(()=>{
       let eslesti=false;
       /* EŞLEŞME KURALI (4 Ekim 2026): süre aynı olmalı (eskiden bakılmıyordu; 3+0
          arayan 10+0 bekleyenle eşleşip onun süresiyle oynuyordu). Süreli maçta
-         animasyonlular animasyonlularla, animasyonsuzlar animasyonsuzlarla eşleşir;
+         (animasyon kuralı Ekim 2026'da kaldırıldı, aşağıya bkz.)
          süresizde herkes birbiriyle. */
       const benDk=(typeof cvSecilenSure!=='undefined'?cvSecilenSure.dk:3);
       const benInc=(typeof cvSecilenSure!=='undefined'?cvSecilenSure.inc:0);
       const benSahne=sahneAyari?1:0;
-      for(const doc of havuz.docs){
+      /* Ekim 2026: animasyon ayarı farklı olanlar da eşleşir (izleme sinyali saati iki tarafta durdurur);
+         yine de önce aynı ayardaki bekleyen denenir. */
+      const adaylar=havuz.docs.slice().sort((x,y)=>
+        (((x.data()||{}).sahne===1?1:0)===benSahne?0:1) - (((y.data()||{}).sahne===1?1:0)===benSahne?0:1));
+      for(const doc of adaylar){
         const d=doc.data();
         if(!d || d.uid===ben) continue; // kendi kaydım — atla
         const dDk=(d.sureDk!=null?d.sureDk:3), dInc=(d.sureInc||0);
         if(dDk!==benDk || dInc!==benInc) continue;
-        if(benDk>0 && (d.sahne===1?1:0)!==benSahne) continue;
         try{
           const sonuc=await fbDb.runTransaction(async (tx)=>{
             const s=await tx.get(doc.ref);
@@ -13372,7 +13403,14 @@ const Cevrimici=(()=>{
         durum='oynaniyor';
       }
       if(typeof cevrimiciGuncelle==='function') cevrimiciGuncelle(oyunVerisi);
+      if(typeof rakipIzlemeGuncelle==='function' && benimRenk)
+        rakipIzlemeGuncelle(oyunVerisi['izliyor_'+(benimRenk==='w'?'b':'w')]||0);
     }, err=>{ cevrimiciHata('Bağlantı hatası.'); });
+  }
+  /* İzleme sinyali: izliyor_w / izliyor_b (renk başına ayrı alan; iki taraf birbirinin yazısını ezmez) */
+  function izlemeYaz(acik){
+    if(!odaId || !hazirMi() || !benimRenk) return;
+    try{ fbDb.collection('oyunlar').doc(odaId).update({ ['izliyor_'+benimRenk]: acik ? Date.now() : 0 }).catch(()=>{}); }catch(e){}
   }
 
   // ---- SONUÇ BİLDİR (mat/süre/pat) ----
@@ -13534,28 +13572,35 @@ const Cevrimici=(()=>{
      Takma adlar benzersiz olmadığı için UID'nin son 6 hanesi etiket olarak gösterilir. */
   function kisaEtiket(uid){ return (uid||'').slice(-6).toUpperCase(); }
 
+  /* Arkadaş arama (Android + iOS ortak, Ekim 2026): kullanıcı adı büyük/küçük harfe duyarlı saklandığı için
+     yazılışın birkaç biçimi birlikte aranır ("emre" → "Emre"); '@' içeren arama e-posta özetiyle (emailArama)
+     tam eşleşme yapar. Sonuç yoksa nedeni window.arkAraMesaj'da (arkListeYaz gösterir). */
   async function arkadasAra(sorgu){
-    if(!hazirMi() || !sorgu) return [];
-    const q=sorgu.trim(); if(q.length<2) return [];
+    window.arkAraMesaj='';
+    if(!hazirMi()){ window.arkAraMesaj='Arkadaş aramak için giriş yapmalısın.'; return []; }
+    const q=String(sorgu||'').trim();
+    if(q.length<2){ window.arkAraMesaj='En az 2 harf yaz.'; return []; }
+    const sonuc=new Map();
+    const ekle=snap=>snap.forEach(d=>{
+      if(d.id===fbKullanici.uid || sonuc.has(d.id)) return;
+      const v=d.data()||{};
+      sonuc.set(d.id,{uid:d.id, ad:v.kullaniciAdi||'Oyuncu', puan:v.puan||800, etiket:kisaEtiket(d.id)});
+    });
     try{
-      let snap;
       if(q.includes('@')){
         const anahtar=await emailAramaAnahtari(q);
-        if(!anahtar) return [];
-        snap=await fbDb.collection('oyuncular').where('emailArama','==',anahtar).limit(1).get();
+        if(anahtar) ekle(await fbDb.collection('oyuncular').where('emailArama','==',anahtar).limit(5).get());
+        if(!sonuc.size) window.arkAraMesaj='Bu e-postayla bir oyuncu bulunamadı. Kullanıcı adıyla da deneyebilirsin.';
       }else{
-        snap=await fbDb.collection('oyuncular')
-          .where('kullaniciAdi','>=',q).where('kullaniciAdi','<=',q+'\uf8ff')
-          .limit(15).get();
+        const bas=t=>t.charAt(0).toLocaleUpperCase('tr')+t.slice(1);
+        const bicim=[...new Set([q, q.toLocaleLowerCase('tr'), q.toLowerCase(), bas(q.toLocaleLowerCase('tr')), bas(q), q.toLocaleUpperCase('tr')])];
+        const parca=await Promise.all(bicim.map(t=>fbDb.collection('oyuncular')
+          .where('kullaniciAdi','>=',t).where('kullaniciAdi','<=',t+'').limit(15).get().catch(()=>null)));
+        parca.forEach(sn=>{ if(sn) ekle(sn); });
+        if(!sonuc.size) window.arkAraMesaj='Bu adla başlayan bir oyuncu bulunamadı.';
       }
-      const sonuc=[];
-      snap.forEach(d=>{
-        if(d.id===fbKullanici.uid) return;
-        const v=d.data()||{};
-        sonuc.push({uid:d.id, ad:v.kullaniciAdi||'Oyuncu', puan:v.puan||800, etiket:kisaEtiket(d.id)});
-      });
-      return sonuc;
-    }catch(e){ return []; }
+    }catch(e){ window.arkAraMesaj='Arama yapılamadı. İnternet bağlantını kontrol et.'; }
+    return [...sonuc.values()].slice(0,20);
   }
   async function arkadasIstekGonder(hedefUid, benimAd){
     if(!hazirMi() || !hedefUid){ sonDavetHata='Bağlantı yok'; return false; }
@@ -13696,6 +13741,7 @@ const Cevrimici=(()=>{
 
   return {
     odaOlustur, odayaKatil, rastgeleEsles, ayril, hamleGonder, oyunIptal, sonucBildir,
+    izlemeYaz,
     arkadasAra, arkadasIstekGonder, arkadasIstekleriAl, arkadasKabul, arkadasReddet,
     arkadaslariAl, arkadasSil, oyunDavetGonder, davetleriDinle, davetDinlemeyiDurdur,
     davetSil, kisaEtiket, davetHatasi,
@@ -14327,6 +14373,11 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['ORDU']=CEVM['ORDU']||{en:'ARMY',ru:'АРМИЯ',ar:'الجيش',fr:'ARMÉE',de:'ARMEE',it:'ESERCITO',zh:'棋子'};
   CEVM['Önizleme oyun sürerken kullanılamaz']=CEVM['Önizleme oyun sürerken kullanılamaz']||{en:'Preview is not available during a game',ru:'Предпросмотр недоступен во время игры',ar:'المعاينة غير متاحة أثناء اللعب',fr:'Aperçu indisponible pendant une partie',de:'Vorschau während einer Partie nicht verfügbar',it:'Anteprima non disponibile durante una partita',zh:'对局进行中无法预览'};
   CEVM['Bu kombinasyonu seç']=CEVM['Bu kombinasyonu seç']||{en:'Choose this combination',ru:'Выбрать это сочетание',ar:'اختر هذه التركيبة',fr:'Choisir cette combinaison',de:'Diese Kombination wählen',it:'Scegli questa combinazione',zh:'选择此组合'};
+  CEVM['Arkadaş aramak için giriş yapmalısın.']=CEVM['Arkadaş aramak için giriş yapmalısın.']||{en:'Sign in to search for friends.',ru:'Войдите, чтобы искать друзей.',ar:'سجّل الدخول للبحث عن الأصدقاء.',fr:'Connectez-vous pour chercher des amis.',de:'Melde dich an, um Freunde zu suchen.',it:'Accedi per cercare amici.',zh:'登录后才能搜索好友。'};
+  CEVM['En az 2 harf yaz.']=CEVM['En az 2 harf yaz.']||{en:'Type at least 2 letters.',ru:'Введите минимум 2 буквы.',ar:'اكتب حرفين على الأقل.',fr:'Tapez au moins 2 lettres.',de:'Gib mindestens 2 Buchstaben ein.',it:'Scrivi almeno 2 lettere.',zh:'请至少输入 2 个字符。'};
+  CEVM['Bu e-postayla bir oyuncu bulunamadı. Kullanıcı adıyla da deneyebilirsin.']=CEVM['Bu e-postayla bir oyuncu bulunamadı. Kullanıcı adıyla da deneyebilirsin.']||{en:'No player found with this email. Try the username too.',ru:'Игрок с таким e-mail не найден. Попробуйте имя пользователя.',ar:'لم يُعثر على لاعب بهذا البريد. جرّب اسم المستخدم.',fr:'Aucun joueur avec cet e-mail. Essayez le nom d’utilisateur.',de:'Kein Spieler mit dieser E-Mail. Versuche den Benutzernamen.',it:'Nessun giocatore con questa email. Prova il nome utente.',zh:'未找到使用该邮箱的玩家，可尝试用户名。'};
+  CEVM['Bu adla başlayan bir oyuncu bulunamadı.']=CEVM['Bu adla başlayan bir oyuncu bulunamadı.']||{en:'No player found starting with this name.',ru:'Игроков с таким именем не найдено.',ar:'لم يُعثر على لاعب يبدأ اسمه بهذا.',fr:'Aucun joueur trouvé avec ce nom.',de:'Kein Spieler mit diesem Namen gefunden.',it:'Nessun giocatore trovato con questo nome.',zh:'未找到以此开头的玩家。'};
+  CEVM['Arama yapılamadı. İnternet bağlantını kontrol et.']=CEVM['Arama yapılamadı. İnternet bağlantını kontrol et.']||{en:'Search failed. Check your internet connection.',ru:'Поиск не удался. Проверьте интернет.',ar:'تعذّر البحث. تحقّق من اتصالك بالإنترنت.',fr:'Recherche impossible. Vérifiez votre connexion.',de:'Suche fehlgeschlagen. Prüfe deine Internetverbindung.',it:'Ricerca non riuscita. Controlla la connessione.',zh:'搜索失败，请检查网络连接。'};
   CEVM['Titreşim']=CEVM['Titreşim']||{en:'Vibration',ru:'Вибрация',ar:'الاهتزاز',fr:'Vibration',de:'Vibration',it:'Vibrazione',zh:'振动'};
   CEVM['Hamle, savaş ve uyarı sesleri']=CEVM['Hamle, savaş ve uyarı sesleri']||{en:'Move, battle and alert sounds',ru:'Звуки ходов, боя и предупреждений',ar:'أصوات النقلات والمعارك والتنبيهات',fr:'Sons des coups, combats et alertes',de:'Zug-, Kampf- und Warntöne',it:'Suoni di mosse, battaglie e avvisi',zh:'走子、战斗和提醒音效'};
   CEVM['Tüm sesler kapalı']=CEVM['Tüm sesler kapalı']||{en:'All sounds off',ru:'Все звуки выключены',ar:'كل الأصوات متوقفة',fr:'Tous les sons coupés',de:'Alle Töne aus',it:'Tutti i suoni disattivati',zh:'关闭所有声音'};
@@ -14334,6 +14385,10 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Hiç titreşmez']=CEVM['Hiç titreşmez']||{en:'Never vibrates',ru:'Без вибрации',ar:'لا يهتز أبدًا',fr:'Ne vibre jamais',de:'Vibriert nie',it:'Non vibra mai',zh:'从不振动'};
   CEVM['oyuncu çevrimiçi']=CEVM['oyuncu çevrimiçi']||{en:'players online',ru:'игроков онлайн',ar:'لاعبين متصلين',fr:'joueurs en ligne',de:'Spieler online',it:'giocatori online',zh:'名玩家在线'};
   CEVM['Uygun rakip bulunamadı']=CEVM['Uygun rakip bulunamadı']||{en:'No suitable opponent found',ru:'Подходящий соперник не найден',ar:'لم يُعثر على خصم مناسب',fr:'Aucun adversaire trouvé',de:'Kein passender Gegner gefunden',it:'Nessun avversario adatto',zh:'未找到合适的对手'};
+  CEVM['Süreli maçta animasyon izlerken iki saat de durur.']={en:'In timed games both clocks stop while you watch an animation.',ru:'В партиях на время обе часы останавливаются, пока вы смотрите анимацию.',ar:'في المباريات الموقوتة يتوقف الوقتان أثناء مشاهدتك للرسوم المتحركة.',fr:'En partie chronométrée, les deux pendules s’arrêtent pendant que vous regardez une animation.',de:'In Partien mit Bedenkzeit stehen beide Uhren, während du eine Animation ansiehst.',it:'Nelle partite a tempo entrambi gli orologi si fermano mentre guardi un’animazione.',zh:'限时对局中，你观看动画时双方计时都会暂停。'};
+  CEVM['Rakibin animasyon izlerken iki saat de durur.']={en:'Both clocks stop while your opponent watches an animation.',ru:'Обе часы останавливаются, пока соперник смотрит анимацию.',ar:'يتوقف الوقتان أثناء مشاهدة خصمك للرسوم المتحركة.',fr:'Les deux pendules s’arrêtent pendant que l’adversaire regarde une animation.',de:'Beide Uhren stehen, während dein Gegner eine Animation ansieht.',it:'Entrambi gli orologi si fermano mentre l’avversario guarda un’animazione.',zh:'对手观看动画时双方计时都会暂停。'};
+  CEVM['Bu sürede şu an bekleyen başka oyuncu yok.']={en:'No other player is waiting with this time control right now.',ru:'Сейчас нет других игроков с этим контролем времени.',ar:'لا يوجد لاعب آخر ينتظر بهذا الوقت الآن.',fr:'Aucun autre joueur n’attend avec ce temps pour le moment.',de:'Gerade wartet kein anderer Spieler mit dieser Bedenkzeit.',it:'Nessun altro giocatore in attesa con questo tempo al momento.',zh:'目前没有其他玩家以此时间等待。'};
+  CEVM['Rakip animasyon izliyor — süre durdu']={en:'Opponent is watching the animation — clock paused',ru:'Соперник смотрит анимацию — часы остановлены',ar:'الخصم يشاهد الرسوم المتحركة — توقف الوقت',fr:'L’adversaire regarde l’animation — pendule arrêtée',de:'Gegner sieht die Animation — Uhr angehalten',it:'L’avversario guarda l’animazione — orologio in pausa',zh:'对手正在观看动画 — 计时暂停'};
   CEVM['Bu süre ve animasyon ayarında şu an bekleyen başka oyuncu yok.']=CEVM['Bu süre ve animasyon ayarında şu an bekleyen başka oyuncu yok.']||{en:'No other player is waiting with this time control and animation setting right now.',ru:'Сейчас нет других игроков с этим контролем времени и настройкой анимации.',ar:'لا يوجد لاعب آخر ينتظر بهذا الوقت وإعداد الرسوم المتحركة الآن.',fr:'Aucun autre joueur n’attend avec ce temps et ce réglage d’animation.',de:'Gerade wartet kein anderer Spieler mit dieser Bedenkzeit und Animationseinstellung.',it:'Nessun altro giocatore in attesa con questo tempo e questa animazione.',zh:'目前没有其他玩家以此时间和动画设置等待。'};
   CEVM['Bota karşı oyna']=CEVM['Bota karşı oyna']||{en:'Play the bot',ru:'Играть с ботом',ar:'العب ضد الروبوت',fr:'Jouer contre le bot',de:'Gegen den Bot spielen',it:'Gioca contro il bot',zh:'与机器人对弈'};
   CEVM['Beklemeye devam et']=CEVM['Beklemeye devam et']||{en:'Keep waiting',ru:'Продолжить ожидание',ar:'استمر في الانتظار',fr:'Continuer d’attendre',de:'Weiter warten',it:'Continua ad aspettare',zh:'继续等待'};
@@ -14596,8 +14651,8 @@ function arkListeYaz(){
   el.innerHTML = veri.map(k=>arkSatirHtml(k, arkSekme)).join('');
   const mesaj = arkSekme==='liste' ? 'Henüz arkadaşın yok. "Ara" sekmesinden kullanıcı adı veya e-postayla ekleyebilirsin.'
               : arkSekme==='istek' ? 'Bekleyen arkadaşlık isteğin yok.'
-              : 'Kullanıcı adı veya e-posta yazıp ara.';
-  bos.textContent=mesaj;
+              : (window.arkAraMesaj || 'Kullanıcı adı veya e-posta yazıp ara.');
+  bos.textContent=(typeof metniCevir==='function')?metniCevir(mesaj):mesaj;
   bos.style.display = veri.length ? 'none' : 'block';
 }
 function arkadasOlaylariBagla(){
