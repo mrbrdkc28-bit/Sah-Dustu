@@ -14,7 +14,7 @@ admin.initializeApp();
 const db = admin.firestore();
 
 const APNS_ANAHTAR = defineSecret('APNS_ANAHTAR');       // .p8 dosyasının içeriği
-const APNS_ANAHTAR_ID = defineSecret('APNS_ANAHTAR_ID'); // 10 karakterlik Key ID
+const APNS_ANAHTAR_ID = 'AQKFN55HZS';   // Key ID (gizli değil): Apple Developer → Keys → "Ucuzcum Push" (takım geneli)
 const APPLE_TAKIM = 'PSZ843QLH4';
 const PAKET = 'com.emre.sahdustu';
 const SINIR_MS = 10 * 60 * 1000;
@@ -62,7 +62,7 @@ function apnsGonder(istemci, jwt, cihaz, yuk) {
 }
 
 exports.oyunIstegiBildir = onDocumentCreated(
-  { document: 'davetler/{davetId}', region: 'europe-west1', secrets: [APNS_ANAHTAR, APNS_ANAHTAR_ID] },
+  { document: 'davetler/{davetId}', region: 'europe-west1', secrets: [APNS_ANAHTAR] },
   async (olay) => {
     const d = olay.data && olay.data.data();
     if (!d || !d.hedef || !d.gonderen || d.hedef === d.gonderen) return;
@@ -104,7 +104,7 @@ exports.oyunIstegiBildir = onDocumentCreated(
     // iOS (APNs)
     const ios = (k.ios || []).filter(Boolean);
     if (ios.length) {
-      const anahtar = APNS_ANAHTAR.value(), anahtarId = APNS_ANAHTAR_ID.value();
+      const anahtar = APNS_ANAHTAR.value(), anahtarId = APNS_ANAHTAR_ID;
       if (anahtar && anahtarId) {
         const istemci = http2.connect('https://api.push.apple.com');
         try {
