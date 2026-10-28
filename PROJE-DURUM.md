@@ -1037,3 +1037,20 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   sonra sohbet düğmesine uçup okunmamış rozetine eklenir (rozet zıplar). Dokununca sohbet açılır; sohbet açılınca iptal.
   `sohbetBaloncukGoster/Ucur/Iptal`. Ses/titreşim eskisi gibi.
 8.57 (10 Ekim 2026) Sohbet dil testi: Türkçe karakter, Arapça (sağdan sola), Çince, Rusça, Yunanca, emoji, uzun metin, HTML denemesi sorunsuz. Düzeltilenler: arayüz İngilizceyken mesajlar otomatik çevriliyordu ("Tamam"→"Done") — artık sohbet mesajları ve rakip adı çevrilmez (data-cevirme, dir=auto); rakip adı HTML olarak değil düz metin olarak basılıyor; hazır ifadeler Türkçe aslıyla gidiyor (hazir:true), alıcı kendi dilinde görüyor.
+
+### 8.58 Oyun sonu, geri tuşu, e-posta araması ve AdMob (14 Ekim 2026)
+- Dikey oyun sonu ekranında inceleme bitirilince `body.incelemede` temizleniyor, kamera görünüm kayması sıfırlanıyor ve
+  sonuç ekranı en üste getiriliyor. Sonuç gövdesi kaydırılabilir, alt eylem alanı sabit; Menü düğmesi küçük ekranlarda da görünür.
+- Oyun içi Seçenekler açıkken Android geri tuşu Seçenekler'i kapatıp aynı basışta çıkış penceresini açıyor. Aktif oyunda
+  Oyuna devam et / Yeni Oyun veya Teslim Ol / Menüye Dön seçenekleri gösteriliyor.
+- Arkadaş araması kullanıcı adı yanında tam e-posta adresini de kabul ediyor. E-posta düz metin olarak oyuncu belgesine
+  yazılmıyor; küçük harfe çevrilmiş adresin SHA-256 değeri `emailArama` alanında tutuluyor. Eski kullanıcılar yeni sürümde
+  oturum açınca bu alan kendiliğinden eklenir; o ana kadar e-posta ile bulunamazlar. Firestore izin listesi güncellendi.
+- Kullanıcıya görünen uygulama adı `Chess64`; `SahDustu` yalnız paket/klasör kimliğidir (`com.emre.sahdustu`).
+- Merve AdMob hesabında `Chess64 Android` oluşturuldu. Uygulama kimliği
+  `ca-app-pub-6150501660747489~1976587686`, ödüllü reklam birimi `ca-app-pub-6150501660747489/3941985052`.
+  Debug derlemeleri Google test reklamını, release derlemeleri bu gerçek birimi kullanır.
+- Firestore kuralları `chess64-c6ff1` projesine 14 Ekim'de başarıyla yayımlandı; kural derlemesi başarılı.
+- Doğrulama: `lintDebug` 0 hata (14 mevcut uyarı), `testDebugUnitTest` NO-SOURCE, `assembleDebug` ve imzalı
+  `bundleRelease` başarılı. Telefonda 1.6 (6): e-posta arama alanı, aktif oyunda geri tuşu, Seçenekler açıkken geri
+  tuşu ve incelemede Bitir sonrası sonuç ekranındaki Menü düğmesi doğrulandı. AAB: 93,23 MB.

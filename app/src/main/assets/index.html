@@ -1302,6 +1302,19 @@ body.azHareket #son.acik *{animation:none!important}
 .krDogPuan{font-size:40px}
 #sonAlan{border-top:none;background:linear-gradient(180deg,transparent,rgba(6,7,11,.85) 40%);
   padding:14px 16px max(16px,env(safe-area-inset-bottom))}
+/* Dikeyde analizden oyun sonuna donuldugunde alt eylemler her ekran
+   yuksekliginde gorunur kalsin. Kaydirilan kisim yalnizca karnedir. */
+@media (orientation: portrait){
+  #son{height:100dvh;min-height:0;box-sizing:border-box}
+  #sonKart{height:100%;min-height:0;box-sizing:border-box}
+  #sonGovde{min-height:0;overflow-y:auto}
+  #sonAlan{position:relative;z-index:2;flex:0 0 auto;
+    padding:10px 14px max(12px,env(safe-area-inset-bottom));
+    background:linear-gradient(180deg,rgba(6,7,11,.2),rgba(6,7,11,.96) 34%)}
+  #tahtadaIncele{padding:13px 18px!important}
+  .sonIkili{margin-top:7px}
+  #son .btnlar{margin-top:7px}
+}
 /* Yatay telefon: tek sütunda başlık + düğmeler 392 px yüksekliğin çoğunu alıyor,
    karneye tek satır kalıyordu (düğmeler kartın üstüne biniyordu). İki sütun:
    solda başlık + karne (kaydırılabilir), sağda düğmeler dikeyde ortalı. */
@@ -2801,7 +2814,7 @@ function perdeBittiginde(fn){
       <button class="arkSekme" data-s="ara">Ara</button>
     </div>
     <div id="arkAraKutu" style="display:none">
-      <input id="arkAraGiris" placeholder="Takma ad yaz (en az 2 harf)" maxlength="20">
+      <input id="arkAraGiris" placeholder="Kullanıcı adı veya e-posta" maxlength="254" inputmode="text" autocomplete="off">
       <button id="arkAraBtn">Ara</button>
     </div>
     <div id="arkListe"></div>
@@ -11040,7 +11053,15 @@ window.geriTusu=function(){
     }
     // 0. Açık modalları kapat (seçenekler / sohbet / berabere bildirimi)
     const mStil=(id)=>{ const e=document.getElementById(id); return e && getComputedStyle(e).display!=='none'; };
-    if(mStil('secenekModal')){ document.getElementById('secenekModal').style.display='none'; return true; }
+    if(mStil('secenekModal')){
+      document.getElementById('secenekModal').style.display='none';
+      /* Tahtada geri tusunun asil beklentisi cikis secenekleridir. Ayarlar
+         aciksa ayni basista kapatip cikis penceresini goster. */
+      if(typeof oyunAktif!=='undefined' && oyunAktif && !oyunBitti && window.cikisPopAc){
+        window.cikisPopAc('geri');
+      }
+      return true;
+    }
     if(mStil('sohbetModal')){ document.getElementById('sohbetModal').style.display='none'; return true; }
     if(mStil('beraberBildirim')){ document.getElementById('beraberBildirim').style.display='none'; return true; }
     // 1. Oyun sonu ekranı açıksa → menüye dön
@@ -11720,7 +11741,12 @@ function tahtadaIncelemeBitir(){
   if(typeof Konus!=='undefined') Konus.sustur();
   const oz=document.getElementById('inceleOzet'); if(oz) oz.classList.remove('acik');
   document.getElementById('inceleHUD').classList.remove('acik');
-  document.getElementById('son').classList.add('acik');
+  document.body.classList.remove('incelemede');
+  try{ if(typeof camera!=='undefined' && camera) camera.clearViewOffset(); }catch(e){}
+  const son=document.getElementById('son');
+  son.classList.add('acik');
+  son.scrollTop=0;
+  const govde=document.getElementById('sonGovde'); if(govde) govde.scrollTop=0;
   taslariDiz(false); vurguTemizle();
 }
 
@@ -12586,6 +12612,16 @@ let bulutIst={
 };
 let misafirMod=false;
 
+/* Arkadas aramasinda e-posta adresini profilde acik metin tutmayiz. Ayni
+   normalize edilmis adres her cihazda ayni SHA-256 anahtarini uretir. */
+async function emailAramaAnahtari(email){
+  const temiz=String(email||'').trim().toLocaleLowerCase('en-US');
+  if(!temiz || !temiz.includes('@') || !window.crypto || !crypto.subtle) return '';
+  const veri=new TextEncoder().encode(temiz);
+  const ozet=await crypto.subtle.digest('SHA-256',veri);
+  return Array.from(new Uint8Array(ozet),b=>b.toString(16).padStart(2,'0')).join('');
+}
+
 function girisHataGoster(m){
   const _h=document.getElementById('girisHata'); if(_h) _h.style.color='';
   const e=document.getElementById('girisHata'); if(e) e.textContent=m;
@@ -12862,6 +12898,12 @@ async function bulutIstYukle(){
   try{
     const d=await fbDb.collection('oyuncular').doc(fbKullanici.uid).get();
     if(d.exists){ bulutIst=Object.assign(bulutIst, d.data()); }
+    const emailArama=await emailAramaAnahtari(fbKullanici.email);
+    if(emailArama && bulutIst.emailArama!==emailArama){
+      bulutIst.emailArama=emailArama;
+      try{ await fbDb.collection('oyuncular').doc(fbKullanici.uid).set({emailArama},{merge:true}); }
+      catch(e){ console.log('e-posta arama anahtari kaydedilemedi',e); }
+    }
     if(bulutIst.acikOda && !(typeof cevrimiciAktif!=='undefined' && cevrimiciAktif)){
       puanIsle(bulutIst.acikOda, false).then(dg=>{ if(dg!==null){ bulutIstKaydet(); girisDurumGuncelle(); } });
     }
@@ -12870,6 +12912,8 @@ async function bulutIstYukle(){
 async function bulutIstKaydet(){
   if(!fbDb||!fbKullanici||misafirMod) return;
   try{
+    const emailArama=await emailAramaAnahtari(fbKullanici.email);
+    if(emailArama) bulutIst.emailArama=emailArama;
     await fbDb.collection('oyuncular').doc(fbKullanici.uid).set(bulutIst,{merge:true});
   }catch(e){ console.log('istatistik kaydetme hatası',e); }
 }
@@ -13494,9 +13538,16 @@ const Cevrimici=(()=>{
     if(!hazirMi() || !sorgu) return [];
     const q=sorgu.trim(); if(q.length<2) return [];
     try{
-      const snap=await fbDb.collection('oyuncular')
-        .where('kullaniciAdi','>=',q).where('kullaniciAdi','<=',q+'\uf8ff')
-        .limit(15).get();
+      let snap;
+      if(q.includes('@')){
+        const anahtar=await emailAramaAnahtari(q);
+        if(!anahtar) return [];
+        snap=await fbDb.collection('oyuncular').where('emailArama','==',anahtar).limit(1).get();
+      }else{
+        snap=await fbDb.collection('oyuncular')
+          .where('kullaniciAdi','>=',q).where('kullaniciAdi','<=',q+'\uf8ff')
+          .limit(15).get();
+      }
       const sonuc=[];
       snap.forEach(d=>{
         if(d.id===fbKullanici.uid) return;
@@ -14543,9 +14594,9 @@ function arkListeYaz(){
   const el=document.getElementById('arkListe'), bos=document.getElementById('arkBos');
   const veri=arkVeri[arkSekme]||[];
   el.innerHTML = veri.map(k=>arkSatirHtml(k, arkSekme)).join('');
-  const mesaj = arkSekme==='liste' ? 'Henüz arkadaşın yok. "Ara" sekmesinden takma adla ekleyebilirsin.'
+  const mesaj = arkSekme==='liste' ? 'Henüz arkadaşın yok. "Ara" sekmesinden kullanıcı adı veya e-postayla ekleyebilirsin.'
               : arkSekme==='istek' ? 'Bekleyen arkadaşlık isteğin yok.'
-              : 'Takma ad yazıp ara.';
+              : 'Kullanıcı adı veya e-posta yazıp ara.';
   bos.textContent=mesaj;
   bos.style.display = veri.length ? 'none' : 'block';
 }

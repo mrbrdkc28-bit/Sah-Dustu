@@ -30,7 +30,7 @@
         android:theme="@style/Theme.SahDustu">
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-9870524422405873~4167469540"/>
+            android:value="ca-app-pub-6150501660747489~1976587686"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

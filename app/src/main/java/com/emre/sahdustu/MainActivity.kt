@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
     private val REKLAM_TEST = BuildConfig.DEBUG
     private val REKLAM_BIRIMI: String
         get() = if (REKLAM_TEST) "ca-app-pub-3940256099942544/5224354917"
-        else "ca-app-pub-9870524422405873/8050874239"
+        else "ca-app-pub-6150501660747489/3941985052"
     private var odulluReklam: RewardedAd? = null
     private var reklamDeneme = 0
     private var reklamSonHata = "-"
