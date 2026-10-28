@@ -385,6 +385,23 @@ body:not(.dikeyAktif) #cevrimiciSerit{top:56px;left:14px;right:auto;text-align:l
    misafir uyarısındaki GİRİŞ YAP düğmesi SÜRE kartlarının üstüne biniyordu. */
 #cevrimiciIcerik>*{flex-shrink:0}
 #cvSureBlok{width:100%;margin-bottom:4px}
+#cvLobiBlok{width:100%;margin-bottom:10px}
+.cvLobiBas{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.cvLobiGor{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dim)}
+.cvLobiGor input{accent-color:#3ecf6e;width:16px;height:16px;margin:0}
+#cvLobiListe{display:flex;flex-direction:column;gap:6px}
+.lobiSatir{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(127,127,127,.08);border:1px solid rgba(127,127,127,.18)}
+.lobiNokta{width:10px;height:10px;border-radius:50%;flex:0 0 10px;background:#3ecf6e;box-shadow:0 0 8px rgba(62,207,110,.7)}
+.lobiNokta.yok{background:transparent;box-shadow:none;border:1.5px solid var(--dim);opacity:.7}
+.lobiBilgi{flex:1;min-width:0}
+.lobiAd{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lobiAlt{font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lobiAlt .cvr{color:#3ecf6e}
+.lobiBtn{flex:0 0 auto;padding:7px 13px;border-radius:999px;border:1px solid transparent;background:var(--brass);color:var(--ink);font-size:12.5px;font-weight:600}
+.lobiBtn:disabled{opacity:.5}
+.lobiBos{font-size:13px;color:var(--dim);text-align:center;padding:12px}
+.cvLobiDaha{display:none;width:100%;margin-top:6px;padding:7px;border-radius:10px;background:none;border:1px dashed rgba(127,127,127,.35);color:var(--dim);font-size:12.5px}
+.cvLobiDaha.var{display:block}
 .cvSureBaslik{font-size:11px;letter-spacing:.3em;color:var(--dim);text-transform:uppercase;
   text-align:center;margin-bottom:10px}
 #cvSureler{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:100%}
@@ -2854,6 +2871,14 @@ function perdeBittiginde(fn){
   </div>
   <div id="cevrimiciIcerik">
     <div id="cevrimiciHata"></div>
+
+    <div id="cvLobiBlok">
+      <div class="cvLobiBas"><span class="cvSureBaslik">LOBİ</span>
+        <label class="cvLobiGor"><input type="checkbox" id="cvLobiGorun" checked> <span>Lobide görün</span></label></div>
+      <div id="cvLobiListe"></div>
+      <button type="button" id="cvLobiDaha" class="cvLobiDaha"></button>
+      <div class="blok-ipucu">Seçili süreyle oyun isteği gönderilir. Çevrimdışı oyuncuya bildirim gider.</div>
+    </div>
 
     <div id="cvSureBlok">
       <div class="cvSureBaslik">SÜRE</div>
@@ -10156,8 +10181,80 @@ function cvAnimNotYaz(){
                        : 'Rakibin animasyon izlerken iki saat de durur.';
   el.textContent=(typeof metniCevir==='function') ? metniCevir(m) : m;
 }
+/* ---- LOBİ ekranı (Ekim 2026) ---- */
+let lobiVeri=[], lobiHepsi=false, lobiZam=null;
+const lobiDavetZamani={};   // aynı kişiye 10 dk'da en çok 1 istek
+function lobiKac(t){ return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function lobiSonGorulme(ms){
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  const dk=Math.max(1,Math.round((Date.now()-ms)/60000));
+  if(dk<60) return c('son görülme')+' '+dk+' '+c('dk önce');
+  const sa=Math.round(dk/60); if(sa<24) return c('son görülme')+' '+sa+' '+c('saat önce');
+  return c('son görülme')+' '+Math.round(sa/24)+' '+c('gün önce');
+}
+function lobiCiz(){
+  const el=document.getElementById('cvLobiListe'); if(!el) return;
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  const goster=lobiHepsi?lobiVeri:lobiVeri.slice(0,6);
+  if(!lobiVeri.length){
+    el.innerHTML='<div class="lobiBos">'+lobiKac(c(Cevrimici.hazirMi()?'Lobide henüz kimse yok.':'Lobiyi görmek için giriş yapmalısın.'))+'</div>';
+  }else el.innerHTML=goster.map(k=>{
+    const bekle=lobiDavetZamani[k.uid] && Date.now()-lobiDavetZamani[k.uid]<10*60000;
+    return '<div class="lobiSatir"><span class="lobiNokta'+(k.cevrimici?'':' yok')+'"></span>'+
+      '<div class="lobiBilgi"><div class="lobiAd">'+lobiKac(k.ad)+'</div>'+
+      '<div class="lobiAlt">'+(k.cevrimici?'<span class="cvr">'+lobiKac(c('Çevrimiçi'))+'</span>':lobiKac(c('Çevrimdışı')+' · '+lobiSonGorulme(k.son)))+
+      ' · '+(k.puan||800)+(k.ulke?' · '+lobiKac(k.ulke):'')+'</div></div>'+
+      '<button class="lobiBtn" data-lobi="'+lobiKac(k.uid)+'"'+(bekle?' disabled':'')+'>'+lobiKac(c(bekle?'Gönderildi':'Oyun iste'))+'</button></div>';
+  }).join('');
+  const d=document.getElementById('cvLobiDaha');
+  if(d){ d.classList.toggle('var', lobiVeri.length>6); d.textContent=c(lobiHepsi?'Daha az göster':'Tümünü göster')+(lobiHepsi?'':' ('+lobiVeri.length+')'); }
+}
+async function lobiYukle(){
+  if(!Cevrimici.hazirMi()){ lobiVeri=[]; lobiCiz(); return; }
+  try{ lobiVeri=await Cevrimici.lobiListesi(); }catch(e){}
+  lobiCiz();
+}
+function lobiBaslat(){
+  const kut=document.getElementById('cvLobiGorun');
+  if(kut){
+    kut.checked=!(typeof bulutIst!=='undefined' && bulutIst && bulutIst.lobiGizli);
+    kut.onchange=async ()=>{
+      const gizli=!kut.checked;
+      if(typeof bulutIst!=='undefined' && bulutIst) bulutIst.lobiGizli=gizli;
+      const ok=await Cevrimici.lobiGizliYaz(gizli);
+      kisaBilgi(ok ? (gizli?'Lobide görünmüyorsun':'Lobide görünüyorsun') : 'Kaydedilemedi');
+    };
+  }
+  const daha=document.getElementById('cvLobiDaha');
+  if(daha) daha.onclick=()=>{ lobiHepsi=!lobiHepsi; lobiCiz(); };
+  const liste=document.getElementById('cvLobiListe');
+  if(liste) liste.onclick=async e=>{
+    const b=e.target.closest('button[data-lobi]'); if(!b || b.disabled) return;
+    const hedef=b.dataset.lobi;
+    const benimAd=(typeof bulutIst!=='undefined' && bulutIst && bulutIst.kullaniciAdi)||'Oyuncu';
+    b.disabled=true; b.textContent='...';
+    const kod=await Cevrimici.oyunDavetGonder(hedef, benimAd);
+    if(kod){
+      lobiDavetZamani[hedef]=Date.now(); lobiCiz();
+      const k=lobiVeri.find(x=>x.uid===hedef);
+      cvBeklemeGoster(k&&k.cevrimici ? 'Oyun isteği gönderildi — yanıt bekleniyor…'
+                                     : 'Oyun isteği gönderildi — bildirim gitti, yanıt bekleniyor…');
+    }else{
+      b.disabled=false; b.textContent=(typeof metniCevir==='function'?metniCevir:(x=>x))('Oyun iste');
+      cevrimiciHata((Cevrimici.davetHatasi && Cevrimici.davetHatasi()) || 'Gönderilemedi');
+    }
+  };
+  lobiYukle();
+  clearInterval(lobiZam);
+  lobiZam=setInterval(()=>{
+    const ek=document.getElementById('cevrimiciEkran');
+    if(ek && ek.classList.contains('acik') && !document.hidden) lobiYukle();
+    else { clearInterval(lobiZam); lobiZam=null; }
+  }, 30000);
+}
 function cevrimiciAc(){
   cvAnimNotYaz();
+  try{ lobiBaslat(); }catch(e){}
   try{ varlikYaz(); }catch(e){}
   cevrimiciHata('');
   // İnternet kontrolü — bağlantı yoksa çevrimiçi mod anlamsız
@@ -13407,6 +13504,35 @@ const Cevrimici=(()=>{
         rakipIzlemeGuncelle(oyunVerisi['izliyor_'+(benimRenk==='w'?'b':'w')]||0);
     }, err=>{ cevrimiciHata('Bağlantı hatası.'); });
   }
+  /* ---- LOBİ (Ekim 2026) ----
+     Son görülme cevrimici/{uid}.ts'den (uygulama açıkken 2 dk'da bir yazılır); son 5 dk = çevrimiçi.
+     Profilde lobiGizli:true olanlar listelenmez. */
+  async function lobiListesi(){
+    if(!hazirMi()) return [];
+    const ben=fbKullanici.uid;
+    const s=await fbDb.collection('cevrimici').orderBy('ts','desc').limit(60).get();
+    const son={}; const ids=[];
+    s.forEach(d=>{ if(d.id===ben) return; const t=d.get('ts'); son[d.id]=(t&&t.toMillis)?t.toMillis():0; ids.push(d.id); });
+    const prof={};
+    for(let i=0;i<ids.length;i+=10){
+      const parca=ids.slice(i,i+10);
+      try{
+        const q=await fbDb.collection('oyuncular').where(firebase.firestore.FieldPath.documentId(),'in',parca).get();
+        q.forEach(d=>{ prof[d.id]=d.data()||{}; });
+      }catch(e){}
+    }
+    const simdi=Date.now();
+    return ids.filter(id=>prof[id] && !prof[id].lobiGizli).map(id=>({
+      uid:id, ad:prof[id].kullaniciAdi||'Oyuncu', puan:prof[id].puan||800, ulke:prof[id].ulke||'',
+      son:son[id], cevrimici:(simdi-son[id])<5*60000
+    })).sort((a,b)=>(b.cevrimici-a.cevrimici)||(b.son-a.son));
+  }
+  async function lobiGizliYaz(gizli){
+    if(!hazirMi()) return false;
+    try{ await fbDb.collection('oyuncular').doc(fbKullanici.uid).set({lobiGizli:!!gizli},{merge:true}); return true; }
+    catch(e){ return false; }
+  }
+
   /* İzleme sinyali: izliyor_w / izliyor_b (renk başına ayrı alan; iki taraf birbirinin yazısını ezmez) */
   function izlemeYaz(acik){
     if(!odaId || !hazirMi() || !benimRenk) return;
@@ -13716,6 +13842,7 @@ const Cevrimici=(()=>{
     if(istekDinleyici){ try{ istekDinleyici(); }catch(e){} istekDinleyici=null; }
   }
   let davetDinleyici=null;
+  const DAVET_OMRU=10*60000;   // Ekim 2026: 2 dk -> 10 dk (çevrimdışı oyuncu bildirimle gelebilsin)
   function davetleriDinle(geriCagir){
     if(!hazirMi() || davetDinleyici) return;
     try{
@@ -13725,7 +13852,7 @@ const Cevrimici=(()=>{
           snap.docChanges().forEach(ch=>{
             if(ch.type!=='added') return;
             const v=ch.doc.data()||{};
-            if(Date.now()-(v.ts||0) > 120000){ try{ ch.doc.ref.delete(); }catch(e){} return; }
+            if(Date.now()-(v.ts||0) > DAVET_OMRU){ try{ ch.doc.ref.delete(); }catch(e){} return; }
             if(geriCagir) geriCagir({id:ch.doc.id, ...v});
           });
         }, ()=>{});
@@ -13741,7 +13868,7 @@ const Cevrimici=(()=>{
 
   return {
     odaOlustur, odayaKatil, rastgeleEsles, ayril, hamleGonder, oyunIptal, sonucBildir,
-    izlemeYaz,
+    izlemeYaz, lobiListesi, lobiGizliYaz,
     arkadasAra, arkadasIstekGonder, arkadasIstekleriAl, arkadasKabul, arkadasReddet,
     arkadaslariAl, arkadasSil, oyunDavetGonder, davetleriDinle, davetDinlemeyiDurdur,
     davetSil, kisaEtiket, davetHatasi,
@@ -14378,6 +14505,26 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Bu e-postayla bir oyuncu bulunamadı. Kullanıcı adıyla da deneyebilirsin.']=CEVM['Bu e-postayla bir oyuncu bulunamadı. Kullanıcı adıyla da deneyebilirsin.']||{en:'No player found with this email. Try the username too.',ru:'Игрок с таким e-mail не найден. Попробуйте имя пользователя.',ar:'لم يُعثر على لاعب بهذا البريد. جرّب اسم المستخدم.',fr:'Aucun joueur avec cet e-mail. Essayez le nom d’utilisateur.',de:'Kein Spieler mit dieser E-Mail. Versuche den Benutzernamen.',it:'Nessun giocatore con questa email. Prova il nome utente.',zh:'未找到使用该邮箱的玩家，可尝试用户名。'};
   CEVM['Bu adla başlayan bir oyuncu bulunamadı.']=CEVM['Bu adla başlayan bir oyuncu bulunamadı.']||{en:'No player found starting with this name.',ru:'Игроков с таким именем не найдено.',ar:'لم يُعثر على لاعب يبدأ اسمه بهذا.',fr:'Aucun joueur trouvé avec ce nom.',de:'Kein Spieler mit diesem Namen gefunden.',it:'Nessun giocatore trovato con questo nome.',zh:'未找到以此开头的玩家。'};
   CEVM['Arama yapılamadı. İnternet bağlantını kontrol et.']=CEVM['Arama yapılamadı. İnternet bağlantını kontrol et.']||{en:'Search failed. Check your internet connection.',ru:'Поиск не удался. Проверьте интернет.',ar:'تعذّر البحث. تحقّق من اتصالك بالإنترنت.',fr:'Recherche impossible. Vérifiez votre connexion.',de:'Suche fehlgeschlagen. Prüfe deine Internetverbindung.',it:'Ricerca non riuscita. Controlla la connessione.',zh:'搜索失败，请检查网络连接。'};
+  CEVM["LOBİ"]=CEVM["LOBİ"]||{"en": "LOBBY", "ru": "ЛОББИ", "ar": "الردهة", "fr": "SALON", "de": "LOBBY", "it": "LOBBY", "zh": "大厅"};
+  CEVM["Lobide görün"]=CEVM["Lobide görün"]||{"en": "Show me in lobby", "ru": "Показывать меня в лобби", "ar": "أظهرني في الردهة", "fr": "Me montrer dans le salon", "de": "In der Lobby anzeigen", "it": "Mostrami nella lobby", "zh": "在大厅中显示我"};
+  CEVM["Seçili süreyle oyun isteği gönderilir. Çevrimdışı oyuncuya bildirim gider."]=CEVM["Seçili süreyle oyun isteği gönderilir. Çevrimdışı oyuncuya bildirim gider."]||{"en": "Game requests use the selected time control. Offline players get a notification.", "ru": "Приглашение отправляется с выбранным контролем времени. Игроки офлайн получат уведомление.", "ar": "يُرسل طلب اللعب بالوقت المحدد. يصل إشعار إلى اللاعب غير المتصل.", "fr": "La demande utilise la cadence choisie. Les joueurs hors ligne reçoivent une notification.", "de": "Spielanfragen nutzen die gewählte Bedenkzeit. Offline-Spieler erhalten eine Benachrichtigung.", "it": "La richiesta usa il tempo selezionato. I giocatori offline ricevono una notifica.", "zh": "游戏邀请使用所选时间。离线玩家会收到通知。"};
+  CEVM["Lobide henüz kimse yok."]=CEVM["Lobide henüz kimse yok."]||{"en": "No one in the lobby yet.", "ru": "В лобби пока никого нет.", "ar": "لا أحد في الردهة بعد.", "fr": "Personne dans le salon pour l’instant.", "de": "Noch niemand in der Lobby.", "it": "Ancora nessuno nella lobby.", "zh": "大厅里还没有人。"};
+  CEVM["Lobiyi görmek için giriş yapmalısın."]=CEVM["Lobiyi görmek için giriş yapmalısın."]||{"en": "Sign in to see the lobby.", "ru": "Войдите, чтобы увидеть лобби.", "ar": "سجّل الدخول لرؤية الردهة.", "fr": "Connectez-vous pour voir le salon.", "de": "Melde dich an, um die Lobby zu sehen.", "it": "Accedi per vedere la lobby.", "zh": "登录后才能查看大厅。"};
+  CEVM["Çevrimiçi"]=CEVM["Çevrimiçi"]||{"en": "Online", "ru": "В сети", "ar": "متصل", "fr": "En ligne", "de": "Online", "it": "Online", "zh": "在线"};
+  CEVM["Çevrimdışı"]=CEVM["Çevrimdışı"]||{"en": "Offline", "ru": "Не в сети", "ar": "غير متصل", "fr": "Hors ligne", "de": "Offline", "it": "Offline", "zh": "离线"};
+  CEVM["son görülme"]=CEVM["son görülme"]||{"en": "last seen", "ru": "был(а)", "ar": "آخر ظهور", "fr": "vu", "de": "zuletzt", "it": "visto", "zh": "上次在线"};
+  CEVM["dk önce"]=CEVM["dk önce"]||{"en": "min ago", "ru": "мин назад", "ar": "دقيقة مضت", "fr": "min", "de": "Min. her", "it": "min fa", "zh": "分钟前"};
+  CEVM["saat önce"]=CEVM["saat önce"]||{"en": "h ago", "ru": "ч назад", "ar": "ساعة مضت", "fr": "h", "de": "Std. her", "it": "h fa", "zh": "小时前"};
+  CEVM["gün önce"]=CEVM["gün önce"]||{"en": "d ago", "ru": "дн назад", "ar": "يوم مضى", "fr": "j", "de": "Tg. her", "it": "g fa", "zh": "天前"};
+  CEVM["Oyun iste"]=CEVM["Oyun iste"]||{"en": "Challenge", "ru": "Вызвать", "ar": "تحدَّ", "fr": "Défier", "de": "Herausfordern", "it": "Sfida", "zh": "邀请对局"};
+  CEVM["Gönderildi"]=CEVM["Gönderildi"]||{"en": "Sent", "ru": "Отправлено", "ar": "أُرسل", "fr": "Envoyé", "de": "Gesendet", "it": "Inviato", "zh": "已发送"};
+  CEVM["Tümünü göster"]=CEVM["Tümünü göster"]||{"en": "Show all", "ru": "Показать всех", "ar": "عرض الكل", "fr": "Tout afficher", "de": "Alle anzeigen", "it": "Mostra tutti", "zh": "显示全部"};
+  CEVM["Daha az göster"]=CEVM["Daha az göster"]||{"en": "Show less", "ru": "Показать меньше", "ar": "عرض أقل", "fr": "Afficher moins", "de": "Weniger anzeigen", "it": "Mostra meno", "zh": "收起"};
+  CEVM["Lobide görünmüyorsun"]=CEVM["Lobide görünmüyorsun"]||{"en": "You are hidden from the lobby", "ru": "Вас не видно в лобби", "ar": "أنت مخفي من الردهة", "fr": "Vous êtes masqué du salon", "de": "Du bist in der Lobby verborgen", "it": "Sei nascosto nella lobby", "zh": "你已在大厅中隐藏"};
+  CEVM["Lobide görünüyorsun"]=CEVM["Lobide görünüyorsun"]||{"en": "You are visible in the lobby", "ru": "Вас видно в лобби", "ar": "أنت ظاهر في الردهة", "fr": "Vous êtes visible dans le salon", "de": "Du bist in der Lobby sichtbar", "it": "Sei visibile nella lobby", "zh": "你在大厅中可见"};
+  CEVM["Kaydedilemedi"]=CEVM["Kaydedilemedi"]||{"en": "Could not save", "ru": "Не удалось сохранить", "ar": "تعذّر الحفظ", "fr": "Échec de l’enregistrement", "de": "Speichern fehlgeschlagen", "it": "Impossibile salvare", "zh": "无法保存"};
+  CEVM["Oyun isteği gönderildi — yanıt bekleniyor…"]=CEVM["Oyun isteği gönderildi — yanıt bekleniyor…"]||{"en": "Game request sent — waiting for a reply…", "ru": "Приглашение отправлено — ждём ответа…", "ar": "أُرسل طلب اللعب — بانتظار الرد…", "fr": "Demande envoyée — en attente de réponse…", "de": "Spielanfrage gesendet — warte auf Antwort…", "it": "Richiesta inviata — in attesa di risposta…", "zh": "已发送邀请 — 等待回复…"};
+  CEVM["Oyun isteği gönderildi — bildirim gitti, yanıt bekleniyor…"]=CEVM["Oyun isteği gönderildi — bildirim gitti, yanıt bekleniyor…"]||{"en": "Game request sent — notification delivered, waiting for a reply…", "ru": "Приглашение отправлено — уведомление доставлено, ждём ответа…", "ar": "أُرسل طلب اللعب — وصل الإشعار، بانتظار الرد…", "fr": "Demande envoyée — notification transmise, en attente de réponse…", "de": "Spielanfrage gesendet — Benachrichtigung zugestellt, warte auf Antwort…", "it": "Richiesta inviata — notifica consegnata, in attesa di risposta…", "zh": "已发送邀请 — 已推送通知，等待回复…"};
   CEVM['Titreşim']=CEVM['Titreşim']||{en:'Vibration',ru:'Вибрация',ar:'الاهتزاز',fr:'Vibration',de:'Vibration',it:'Vibrazione',zh:'振动'};
   CEVM['Hamle, savaş ve uyarı sesleri']=CEVM['Hamle, savaş ve uyarı sesleri']||{en:'Move, battle and alert sounds',ru:'Звуки ходов, боя и предупреждений',ar:'أصوات النقلات والمعارك والتنبيهات',fr:'Sons des coups, combats et alertes',de:'Zug-, Kampf- und Warntöne',it:'Suoni di mosse, battaglie e avvisi',zh:'走子、战斗和提醒音效'};
   CEVM['Tüm sesler kapalı']=CEVM['Tüm sesler kapalı']||{en:'All sounds off',ru:'Все звуки выключены',ar:'كل الأصوات متوقفة',fr:'Tous les sons coupés',de:'Alle Töne aus',it:'Tutti i suoni disattivati',zh:'关闭所有声音'};

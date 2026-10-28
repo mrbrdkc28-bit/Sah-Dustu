@@ -43,7 +43,7 @@ service cloud.firestore {
     // Profilde değiştirilebilen alanlar. Listede olmayan bir alan (ör. elle
     // uydurulmuş hp_ haftalık puanı) yazılamaz. Haftalık alanın adı 'haftaAlan'da gelir.
     function izinliAlanlar() {
-      return ['kullaniciAdi', 'emailArama', 'ulke', 'avatar', 'avatarFoto', 'olusturma', 'puan',
+      return ['kullaniciAdi', 'emailArama', 'lobiGizli', 'ulke', 'avatar', 'avatarFoto', 'olusturma', 'puan',
               'basarimlar', 'enIyiDogruluk', 'toplamDogruluk', 'dogrulukSayi',
               'oyun', 'galibiyet', 'beraberlik', 'maglubiyet',
               'beyazOyun', 'beyazGalibiyet', 'beyazBeraberlik', 'beyazMaglubiyet',
