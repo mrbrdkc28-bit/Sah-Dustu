@@ -78,8 +78,9 @@ exports.oyunIstegiBildir = onDocumentCreated(
     if (!gec) { logger.info('sınır: bildirim atlandı', olay.params.davetId); return; }
 
     const kayit = await db.doc(`oyuncular/${d.hedef}/ozel/bildirim`).get();
-    if (!kayit.exists) return;
+    if (!kayit.exists) { logger.info('adres yok: alıcı bildirim adresi kaydetmemiş', { hedef: d.hedef }); return; }
     const k = kayit.data() || {};
+    logger.info('gönderiliyor', { hedef: d.hedef, android: (k.android || []).length, ios: (k.ios || []).length, dil: k.dil });
     const m = METIN[k.dil] || METIN.en;
     const ad = String(d.ad || 'Chess64').slice(0, 30);
     const baslik = m.b, govde = m.g(ad, sureMetni(d));
@@ -94,6 +95,8 @@ exports.oyunIstegiBildir = onDocumentCreated(
         data: { tur: 'davet', davet: olay.params.davetId },
         android: { priority: 'high', ttl: SINIR_MS, notification: { channelId: 'davet', tag: 'davet_' + d.gonderen } },
       });
+      logger.info('FCM sonuç', { basarili: sonuc.successCount, hatali: sonuc.failureCount,
+        hatalar: sonuc.responses.filter(x => x.error).map(x => x.error.code) });
       sonuc.responses.forEach((r, i) => {
         const kod = r.error && r.error.code;
         if (kod === 'messaging/registration-token-not-registered' || kod === 'messaging/invalid-registration-token')
@@ -114,6 +117,7 @@ exports.oyunIstegiBildir = onDocumentCreated(
             const r = await apnsGonder(istemci, jwt, cihaz, yuk);
             if (r.durum === 410 || (r.durum === 400 && /BadDeviceToken/.test(r.cevap))) silinecek.ios.push(cihaz);
             else if (r.durum !== 200) logger.warn('APNs', r.durum, r.cevap);
+            else logger.info('APNs gönderildi');
           }
         } finally { istemci.close(); }
       }

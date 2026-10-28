@@ -25,6 +25,8 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -490,13 +492,18 @@ class MainActivity : AppCompatActivity() {
            durum cubugunun ve gezinme cubugunun altinda kalirdi.
            Modern karsiligi WindowInsetsController ile "sürükleyici" tam ekran.
            Web katmani zaten hazir: viewport-fit=cover + CSS safe-area-inset. */
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        /* 1.7 (28 Ekim 2026): Play uyarisi "uctan uca icin desteği sonlandirilmis API" — setDecorFitsSystemWindows,
+           window.navigationBarColor ve temadaki cubuk renkleri yerine androidx enableEdgeToEdge(). */
+        kenardanKenaraUygula()
         /* Kamera deligi (kesik) tarafina da ciz: yatay modda o yanda siyah serit
-           kaliyordu. Arayuz CSS env(safe-area-inset-*) ile delikten uzak tutulur. */
+           kaliyordu. Arayuz CSS env(safe-area-inset-*) ile delikten uzak tutulur.
+           Android 11+ ALWAYS (SHORT_EDGES Android 15'te desteği sonlandirildi). */
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
             window.attributes = window.attributes.apply {
                 layoutInDisplayCutoutMode =
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R)
+                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+                    else @Suppress("DEPRECATION") WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
             }
         }
         WindowInsetsControllerCompat(window, window.decorView).apply {
@@ -1565,15 +1572,18 @@ class MainActivity : AppCompatActivity() {
         } catch (t: Throwable) {}
     }
 
+    private fun kenardanKenaraUygula() {
+        val stil = if (gezinmeAcik) SystemBarStyle.light(gezinmeRenk, gezinmeRenk)
+                   else SystemBarStyle.dark(gezinmeRenk)
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(0xFF06070B.toInt()), navigationBarStyle = stil)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) window.isNavigationBarContrastEnforced = false
+    }
+
     private fun gezinmeUygula() {
         if (!::kok.isInitialized) return
         kok.setBackgroundColor(gezinmeRenk)
-        /* Android 14 ve oncesi cubugu temadaki opak navigationBarColor (#06070B) ile
-           boyuyor; kapsayicinin rengi gorunmuyordu. 15+ bu ayari yok sayar (kenardan
-           kenara), orada kapsayici rengi gorunur. Ikisinde de ayni renk. */
-        @Suppress("DEPRECATION")
-        window.navigationBarColor = gezinmeRenk
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) window.isNavigationBarContrastEnforced = false
+        /* Cubuk rengi enableEdgeToEdge ile (Android 14 ve oncesinde cubuk bu renge boyanir; 15+ kapsayici rengi gorunur). */
+        kenardanKenaraUygula()
         WindowInsetsControllerCompat(window, window.decorView).apply {
             hide(WindowInsetsCompat.Type.statusBars())
             if (gezinmeGoster) show(WindowInsetsCompat.Type.navigationBars())
