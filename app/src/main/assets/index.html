@@ -402,6 +402,12 @@ body:not(.dikeyAktif) #cevrimiciSerit{top:56px;left:14px;right:auto;text-align:l
 .lobiBos{font-size:13px;color:var(--dim);text-align:center;padding:12px}
 .cvLobiDaha{display:none;width:100%;margin-top:6px;padding:7px;border-radius:10px;background:none;border:1px dashed rgba(127,127,127,.35);color:var(--dim);font-size:12.5px}
 .cvLobiDaha.var{display:block}
+#cvBildirimUyari{display:block;width:100%;text-align:left;margin:0 0 8px;padding:9px 12px;border-radius:12px;font-size:12.5px;line-height:1.35;
+  background:rgba(232,135,82,.12);border:1px solid rgba(232,135,82,.45);color:var(--txt)}
+#bildirimKart{position:fixed;inset:0;z-index:72;background:rgba(6,7,11,.88);display:none;align-items:center;justify-content:center;padding:22px}
+#bildirimKart.acik{display:flex}
+#bildirimKart .bkBtn{display:block;width:100%;margin-top:10px}
+#bildirimKart .bkNot{font-size:12px;color:var(--dim);margin-top:5px;text-align:center}
 .cvSureBaslik{font-size:11px;letter-spacing:.3em;color:var(--dim);text-transform:uppercase;
   text-align:center;margin-bottom:10px}
 #cvSureler{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:100%}
@@ -10253,6 +10259,87 @@ function bildirimJetonuSil(){
     }).catch(()=>{});
   }catch(e){ return Promise.resolve(); }
 }
+/* ---- BİLDİRİM AYAR UYARISI (Ekim 2026) ----
+   Kapalı uygulamaya oyun isteği gelsin diye: bildirim izni kapalıysa ya da telefon "Otomatik başlatma"
+   isteyen bir markadaysa (Xiaomi/Redmi/POCO, Oppo/realme/OnePlus, Vivo, Huawei/Honor — bu ayar okunamaz),
+   Çevrimiçi ekranında uyarı durur; dokununca kart açılır, düğmeler doğrudan ilgili ayar sayfasına götürür.
+   Kart ilk girişte bir kez kendiliğinden açılır. "Yaptım" otomatik başlatma uyarısını kalıcı kapatır. */
+function bildirimDurumAl(cb){
+  try{
+    if(typeof AndroidBildirim!=='undefined' && AndroidBildirim.durum){ cb(JSON.parse(AndroidBildirim.durum())); return; }
+    if(window.IOS_UYGULAMA && window.webkit && webkit.messageHandlers && webkit.messageHandlers.ios){
+      window._bildirimDurumCb=cb; webkit.messageHandlers.ios.postMessage({ad:'bildirimDurum', deger:''}); return;
+    }
+  }catch(e){}
+  cb(null);
+}
+window.bildirimDurumGeldi=function(d){ const cb=window._bildirimDurumCb; window._bildirimDurumCb=null; if(cb) cb(d||null); };
+function bildirimAyarAc(tur){
+  try{
+    if(typeof AndroidBildirim!=='undefined' && AndroidBildirim.ayarAc){ AndroidBildirim.ayarAc(tur); return; }
+    if(window.IOS_UYGULAMA && window.webkit && webkit.messageHandlers && webkit.messageHandlers.ios)
+      webkit.messageHandlers.ios.postMessage({ad:'bildirimAyar', deger:tur});
+  }catch(e){}
+}
+let _bildirimDurum=null;
+function bildirimSorunu(d){
+  if(!d) return null;
+  let otoTamam=false; try{ otoTamam=localStorage.getItem('c64_otoBaslatTamam')==='1'; }catch(e){}
+  const izin=!d.izin, oto=!!d.otoBaslatma && !otoTamam;
+  return (izin||oto) ? {izin, oto} : null;
+}
+function bildirimKartAc(){
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  const sorun=bildirimSorunu(_bildirimDurum)||{izin:false,oto:!!(_bildirimDurum&&_bildirimDurum.otoBaslatma)};
+  let pop=document.getElementById('bildirimKart');
+  if(!pop){
+    pop=document.createElement('div'); pop.id='bildirimKart';
+    pop.onclick=e=>{ if(e.target===pop) pop.classList.remove('acik'); };
+    document.body.appendChild(pop);
+  }
+  const satirlar=[];
+  if(sorun.izin) satirlar.push('<button class="sbtn dolu bkBtn" data-t="bildirim">'+lobiKac(c('Bildirimleri aç'))+'</button>');
+  if(sorun.oto) satirlar.push('<button class="sbtn dolu bkBtn" data-t="otobaslat">'+lobiKac(c('Otomatik başlatmayı aç'))+'</button>'+
+    '<div class="bkNot">'+lobiKac(c('Açılan listede Chess64\'ü bulup anahtarını aç.'))+'</div>');
+  pop.innerHTML='<div class="davetKart"><div class="davetBas">'+lobiKac(c('BİLDİRİMLER'))+'</div>'+
+    '<div class="caMetin">'+lobiKac(c('Uygulama kapalıyken oyun istekleri bildirim olarak gelsin diye telefonunda şu ayar gerekiyor:'))+'</div>'+
+    satirlar.join('')+
+    '<div class="caBtnlar">'+(sorun.oto?'<button class="sbtn bkYaptim">'+lobiKac(c('Yaptım'))+'</button>':'')+
+    '<button class="sbtn bkSonra">'+lobiKac(c('Sonra'))+'</button></div></div>';
+  pop.querySelectorAll('.bkBtn').forEach(b=>b.onclick=()=>bildirimAyarAc(b.dataset.t));
+  const y=pop.querySelector('.bkYaptim');
+  if(y) y.onclick=()=>{ try{ localStorage.setItem('c64_otoBaslatTamam','1'); }catch(e){} pop.classList.remove('acik'); bildirimUyariKontrol(); };
+  pop.querySelector('.bkSonra').onclick=()=>pop.classList.remove('acik');
+  pop.classList.add('acik');
+}
+function bildirimUyariKontrol(ilkGiris){
+  bildirimDurumAl(d=>{
+    _bildirimDurum=d;
+    const sorun=bildirimSorunu(d);
+    let u=document.getElementById('cvBildirimUyari');
+    const blok=document.getElementById('cvLobiBlok');
+    if(!u && blok){
+      u=document.createElement('button'); u.type='button'; u.id='cvBildirimUyari';
+      u.onclick=bildirimKartAc; blok.insertBefore(u, blok.firstChild);
+    }
+    if(u){
+      const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+      u.textContent='⚠ '+c('Oyun istekleri sana bildirim olarak gelmeyebilir. Düzeltmek için dokun.');
+      u.style.display=sorun?'':'none';
+    }
+    const pop=document.getElementById('bildirimKart');
+    if(!sorun && pop) pop.classList.remove('acik');
+    if(sorun && ilkGiris){
+      let goruldu=false; try{ goruldu=localStorage.getItem('c64_bildirimKartGoruldu')==='1'; }catch(e){}
+      if(!goruldu){ try{ localStorage.setItem('c64_bildirimKartGoruldu','1'); }catch(e){} setTimeout(bildirimKartAc, 600); }
+    }
+  });
+}
+/* Ayarlardan dönünce yeniden bak (izin açıldıysa uyarı kalksın) */
+document.addEventListener('visibilitychange', ()=>{
+  const ek=document.getElementById('cevrimiciEkran');
+  if(!document.hidden && ek && ek.classList.contains('acik')) setTimeout(()=>bildirimUyariKontrol(false), 400);
+});
 /* ---- LOBİ ekranı (Ekim 2026) ---- */
 let lobiVeri=[], lobiHepsi=false, lobiZam=null;
 const lobiDavetZamani={};   // aynı kişiye 10 dk'da en çok 1 istek
@@ -10328,6 +10415,7 @@ function cevrimiciAc(){
   cvAnimNotYaz();
   try{ lobiBaslat(); }catch(e){}
   try{ bildirimIzniIste(); bildirimJetonuYaz(); }catch(e){}
+  try{ if(Cevrimici.hazirMi()) bildirimUyariKontrol(true); }catch(e){}
   try{ varlikYaz(); }catch(e){}
   cevrimiciHata('');
   // İnternet kontrolü — bağlantı yoksa çevrimiçi mod anlamsız
@@ -14635,6 +14723,14 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["Kaydedilemedi"]=CEVM["Kaydedilemedi"]||{"en": "Could not save", "ru": "Не удалось сохранить", "ar": "تعذّر الحفظ", "fr": "Échec de l’enregistrement", "de": "Speichern fehlgeschlagen", "it": "Impossibile salvare", "zh": "无法保存"};
   CEVM["Oyun isteği gönderildi — yanıt bekleniyor…"]=CEVM["Oyun isteği gönderildi — yanıt bekleniyor…"]||{"en": "Game request sent — waiting for a reply…", "ru": "Приглашение отправлено — ждём ответа…", "ar": "أُرسل طلب اللعب — بانتظار الرد…", "fr": "Demande envoyée — en attente de réponse…", "de": "Spielanfrage gesendet — warte auf Antwort…", "it": "Richiesta inviata — in attesa di risposta…", "zh": "已发送邀请 — 等待回复…"};
   CEVM["Oyun isteği gönderildi — bildirim gitti, yanıt bekleniyor…"]=CEVM["Oyun isteği gönderildi — bildirim gitti, yanıt bekleniyor…"]||{"en": "Game request sent — notification delivered, waiting for a reply…", "ru": "Приглашение отправлено — уведомление доставлено, ждём ответа…", "ar": "أُرسل طلب اللعب — وصل الإشعار، بانتظار الرد…", "fr": "Demande envoyée — notification transmise, en attente de réponse…", "de": "Spielanfrage gesendet — Benachrichtigung zugestellt, warte auf Antwort…", "it": "Richiesta inviata — notifica consegnata, in attesa di risposta…", "zh": "已发送邀请 — 已推送通知，等待回复…"};
+  CEVM["Oyun istekleri sana bildirim olarak gelmeyebilir. Düzeltmek için dokun."]=CEVM["Oyun istekleri sana bildirim olarak gelmeyebilir. Düzeltmek için dokun."]||{"en": "Game requests may not reach you as notifications. Tap to fix.", "ru": "Приглашения в игру могут не приходить уведомлениями. Нажмите, чтобы исправить.", "ar": "قد لا تصلك طلبات اللعب كإشعارات. اضغط للإصلاح.", "fr": "Les demandes de partie peuvent ne pas vous parvenir en notification. Touchez pour corriger.", "de": "Spielanfragen kommen eventuell nicht als Benachrichtigung an. Zum Beheben tippen.", "it": "Le richieste di partita potrebbero non arrivarti come notifica. Tocca per risolvere.", "zh": "对局邀请可能无法以通知送达。点按以修复。"};
+  CEVM["BİLDİRİMLER"]=CEVM["BİLDİRİMLER"]||{"en": "NOTIFICATIONS", "ru": "УВЕДОМЛЕНИЯ", "ar": "الإشعارات", "fr": "NOTIFICATIONS", "de": "BENACHRICHTIGUNGEN", "it": "NOTIFICHE", "zh": "通知"};
+  CEVM["Uygulama kapalıyken oyun istekleri bildirim olarak gelsin diye telefonunda şu ayar gerekiyor:"]=CEVM["Uygulama kapalıyken oyun istekleri bildirim olarak gelsin diye telefonunda şu ayar gerekiyor:"]||{"en": "To get game requests as notifications while the app is closed, your phone needs this setting:", "ru": "Чтобы получать приглашения, когда приложение закрыто, нужна эта настройка телефона:", "ar": "لتصلك طلبات اللعب كإشعارات والتطبيق مغلق، يحتاج هاتفك إلى هذا الإعداد:", "fr": "Pour recevoir les demandes en notification quand l’app est fermée, ce réglage est nécessaire :", "de": "Damit Spielanfragen bei geschlossener App ankommen, braucht dein Telefon diese Einstellung:", "it": "Per ricevere le richieste come notifiche ad app chiusa, serve questa impostazione:", "zh": "要在应用关闭时收到对局邀请通知，手机需要以下设置："};
+  CEVM["Bildirimleri aç"]=CEVM["Bildirimleri aç"]||{"en": "Turn on notifications", "ru": "Включить уведомления", "ar": "تشغيل الإشعارات", "fr": "Activer les notifications", "de": "Benachrichtigungen einschalten", "it": "Attiva le notifiche", "zh": "开启通知"};
+  CEVM["Otomatik başlatmayı aç"]=CEVM["Otomatik başlatmayı aç"]||{"en": "Turn on Autostart", "ru": "Включить автозапуск", "ar": "تشغيل البدء التلقائي", "fr": "Activer le démarrage automatique", "de": "Autostart einschalten", "it": "Attiva l’avvio automatico", "zh": "开启自启动"};
+  CEVM["Açılan listede Chess64'ü bulup anahtarını aç."]=CEVM["Açılan listede Chess64'ü bulup anahtarını aç."]||{"en": "Find Chess64 in the list and switch it on.", "ru": "Найдите Chess64 в списке и включите.", "ar": "ابحث عن Chess64 في القائمة وشغّله.", "fr": "Trouvez Chess64 dans la liste et activez-le.", "de": "Suche Chess64 in der Liste und schalte es ein.", "it": "Trova Chess64 nell’elenco e attivalo.", "zh": "在列表中找到 Chess64 并打开开关。"};
+  CEVM["Yaptım"]=CEVM["Yaptım"]||{"en": "Done", "ru": "Готово", "ar": "تم", "fr": "C’est fait", "de": "Erledigt", "it": "Fatto", "zh": "已完成"};
+  CEVM["Sonra"]=CEVM["Sonra"]||{"en": "Later", "ru": "Позже", "ar": "لاحقًا", "fr": "Plus tard", "de": "Später", "it": "Più tardi", "zh": "稍后"};
   CEVM['Titreşim']=CEVM['Titreşim']||{en:'Vibration',ru:'Вибрация',ar:'الاهتزاز',fr:'Vibration',de:'Vibration',it:'Vibrazione',zh:'振动'};
   CEVM['Hamle, savaş ve uyarı sesleri']=CEVM['Hamle, savaş ve uyarı sesleri']||{en:'Move, battle and alert sounds',ru:'Звуки ходов, боя и предупреждений',ar:'أصوات النقلات والمعارك والتنبيهات',fr:'Sons des coups, combats et alertes',de:'Zug-, Kampf- und Warntöne',it:'Suoni di mosse, battaglie e avvisi',zh:'走子、战斗和提醒音效'};
   CEVM['Tüm sesler kapalı']=CEVM['Tüm sesler kapalı']||{en:'All sounds off',ru:'Все звуки выключены',ar:'كل الأصوات متوقفة',fr:'Tous les sons coupés',de:'Alle Töne aus',it:'Tutti i suoni disattivati',zh:'关闭所有声音'};

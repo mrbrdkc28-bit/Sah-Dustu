@@ -912,6 +912,23 @@ class MainActivity : AppCompatActivity() {
             fun uzakIzinIste() { runOnUiThread { uzakJetonGonder() } }
             @JavascriptInterface
             fun uzakJeton() { runOnUiThread { uzakJetonGonder() } }
+            /** Bildirim durumu (Ekim 2026): {"izin":bool,"marka":"xiaomi","otoBaslatma":bool}.
+             *  otoBaslatma: bu marka "Otomatik baslatma" kapaliyken kapali uygulamaya bildirim engelleyebilir
+             *  (ayarin kendisi okunamaz; Xiaomi/Oppo/Vivo/Huawei acik API vermiyor). */
+            @JavascriptInterface
+            fun durum(): String {
+                val izin = try {
+                    val nm = androidx.core.app.NotificationManagerCompat.from(this@MainActivity)
+                    val kanal = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).getNotificationChannel(DAVET_KANAL) else null
+                    nm.areNotificationsEnabled() && (kanal == null || kanal.importance != NotificationManager.IMPORTANCE_NONE)
+                } catch (t: Throwable) { true }
+                val marka = Build.MANUFACTURER.lowercase(Locale.ROOT)
+                return "{\"izin\":$izin,\"marka\":\"${marka.replace("\"", "")}\",\"otoBaslatma\":${otoBaslatmaMarkasi(marka)}}"
+            }
+            /** tur: "bildirim" (uygulamanin bildirim ayarlari) | "otobaslat" (uretici otomatik baslatma sayfasi) */
+            @JavascriptInterface
+            fun ayarAc(tur: String) { runOnUiThread { bildirimAyariAc(tur) } }
         }, "AndroidBildirim")
 
         // ===================== SESLI OYNAMA KOPRUSU =====================
@@ -1455,6 +1472,33 @@ class MainActivity : AppCompatActivity() {
     private val BILDIRIM_KANAL = "sah_dustu_sira"
     /** Uzak oyun istegi bildirimleri (FCM). Sunucu bu kanal adini kullanir (functions/index.js). */
     private val DAVET_KANAL = "davet"
+
+    private fun otoBaslatmaMarkasi(m: String) =
+        listOf("xiaomi", "redmi", "poco", "oppo", "realme", "oneplus", "vivo", "iqoo", "huawei", "honor").any { m.contains(it) }
+
+    private fun bildirimAyariAc(tur: String) {
+        val paket = packageName
+        val adaylar = mutableListOf<Intent>()
+        if (tur == "otobaslat") {
+            for ((p, c) in listOf(
+                "com.miui.securitycenter" to "com.miui.permcenter.autostart.AutoStartManagementActivity",
+                "com.coloros.safecenter" to "com.coloros.safecenter.permission.startup.StartupAppListActivity",
+                "com.oplus.safecenter" to "com.oplus.safecenter.permission.startup.StartupAppListActivity",
+                "com.vivo.permissionmanager" to "com.vivo.permissionmanager.activity.BgStartUpManagerActivity",
+                "com.huawei.systemmanager" to "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity",
+                "com.hihonor.systemmanager" to "com.hihonor.systemmanager.startupmgr.ui.StartupNormalAppListActivity"))
+                adaylar.add(Intent().setComponent(android.content.ComponentName(p, c)))
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            adaylar.add(Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, paket))
+        }
+        // Son care: uygulama bilgisi sayfasi (oradan Bildirimler / Otomatik baslatma)
+        adaylar.add(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            android.net.Uri.parse("package:$paket")))
+        for (n in adaylar) {
+            try { startActivity(n.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); return } catch (t: Throwable) {}
+        }
+    }
 
     private fun uzakJetonGonder() {
         try {
