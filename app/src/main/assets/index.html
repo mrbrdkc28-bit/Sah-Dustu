@@ -6186,8 +6186,35 @@ function kameraGuncelle(){
   return degisti;
 }
 const _kamSon=new Float32Array(16);
+/* KAMERA KORUMA (28 Ekim 2026): iki sahne üst üste binerse (çevrimiçide rakibin hamlesi benim sahnem
+   sürerken geliyordu; ya da sahne 6 sn sınırını aşıp oyun devam ediyordu) ikinci sahne kameranın YARI
+   YOLDAKİ konumunu "eski" diye kaydediyor, sonunda oraya dönüyordu → tahta kayık/eğik kalıyordu.
+   Artık asıl konum yalnız ilk sahnede alınır; eski sahnenin kalan adımları kameraya dokunmaz; son sahne
+   bitince kamera asıl konuma tam oturtulur (bu arada ekran döndüyse uzaklık/açı yeni yöne göre). */
+let _kcSayac=0, _kcDerin=0, _kcTemel=null;
+function _kcAsilKonumaDon(){
+  const t=_kcTemel; if(!t) return;
+  kamYaw=t.yaw; kamHedef.copy(t.hedef);
+  if(t.dikey===dikeyMi()){ kamPitch=t.pitch; kamUzak=t.uzak; }
+  else {
+    const duz=(typeof duzGorunum!=='undefined' && duzGorunum);
+    kamUzak=duz?duzUzaklik():uygunUzaklik(); kamPitch=duz?1.55:dikeyKamPitch();
+  }
+  if(typeof cizimIste==='function') cizimIste();
+}
 async function killCam(sald,kurb,tip,kurbTip,saldKare,kurbKare){
-  const eski={yaw:kamYaw,pitch:kamPitch,uzak:kamUzak,hedef:kamHedef.clone()};
+  const benim=++_kcSayac;
+  if(_kcDerin===0) _kcTemel={yaw:kamYaw,pitch:kamPitch,uzak:kamUzak,hedef:kamHedef.clone(),dikey:dikeyMi()};
+  _kcDerin++;
+  try{ await killCamAsil(sald,kurb,tip,kurbTip,saldKare,kurbKare,benim); }
+  finally{
+    _kcDerin=Math.max(0,_kcDerin-1);
+    if(_kcDerin===0){ _kcAsilKonumaDon(); _kcTemel=null; document.body.classList.remove('sinema'); }
+  }
+}
+async function killCamAsil(sald,kurb,tip,kurbTip,saldKare,kurbKare,benim){
+  const eski=_kcTemel;
+  const gec=()=>benim!==_kcSayac;   // daha yeni bir sahne başladıysa bu sahne kameraya dokunmaz
   document.body.classList.add('sinema');
   const anlatim=document.getElementById('anlatim');
   anlatim.textContent=ANLATIM[tip]; anlatim.classList.add('acik');
@@ -6235,6 +6262,7 @@ async function killCam(sald,kurb,tip,kurbTip,saldKare,kurbKare){
       sinemaUzak=u;
     } }
   await tween(.55,(e)=>{
+    if(gec()) return;
     kamUzak=eski.uzak+( (sinemaUzak)-eski.uzak)*e;
     kamPitch=eski.pitch+((sinemaPitch)-eski.pitch)*e;
     kamYaw=eski.yaw+(yeniYaw-eski.yaw)*e;
@@ -6243,12 +6271,12 @@ async function killCam(sald,kurb,tip,kurbTip,saldKare,kurbKare){
   await SAHNELER[tip](sald,kurb);
   anlatim.classList.remove('acik');
   await tween(.55,(e)=>{
+    if(gec()) return;
     kamUzak=sinemaUzak+(eski.uzak-sinemaUzak)*e;
     kamPitch=sinemaPitch+(eski.pitch-sinemaPitch)*e;
     kamYaw=yeniYaw+(eski.yaw-yeniYaw)*e;
     kamHedef.lerpVectors(orta,eski.hedef,e);
   });
-  document.body.classList.remove('sinema');
 }
 </script>
 <script>
@@ -10558,7 +10586,35 @@ function menuSahnesiniSifirla(){
   }catch(e){}
 }
 // Gelen hamleyi yerel motorda bulup oynat
+/* HAMLE SIRASI (28 Ekim 2026): rakibin hamlesi, bizim süren hamlemiz (taş yeme sahnesi dahil) bitmeden
+   gelirse eskiden hemen oynatılıyordu: iki sahne aynı anda kamerayı oynatıyor, tahta kayık kalıyordu.
+   Artık süren hamle bitince sırayla uygulanır (en çok 8 sn beklenir; takılırsa oyun kilitlenmesin). */
+let _hamleSuruyor=0, _hamleBekleyen=[];
+function _hamleBitti(){
+  _hamleSuruyor=Math.max(0,_hamleSuruyor-1);
+  if(_hamleSuruyor===0 && _hamleBekleyen.length){ const f=_hamleBekleyen.shift(); setTimeout(f,0); }
+}
+(function(){
+  const asil=hamleOyna;
+  hamleOyna=function(){
+    _hamleSuruyor++;
+    let p;
+    try{ p=asil.apply(this, arguments); }catch(e){ _hamleBitti(); throw e; }
+    Promise.resolve(p).then(_hamleBitti, _hamleBitti);
+    return p;
+  };
+})();
 function cevrimiciHamleUygula(sh){
+  if(_hamleSuruyor>0){
+    let yapildi=false;
+    const calis=()=>{ if(yapildi) return; yapildi=true; cevrimiciHamleUygulaAsil(sh); };
+    _hamleBekleyen.push(calis);
+    setTimeout(()=>{ if(!yapildi){ const i=_hamleBekleyen.indexOf(calis); if(i>=0) _hamleBekleyen.splice(i,1); calis(); } }, 8000);
+    return;
+  }
+  cevrimiciHamleUygulaAsil(sh);
+}
+function cevrimiciHamleUygulaAsil(sh){
   if(oyunBitti) return;
   // from/to ile legal hamleyi bul (terfi dahil)
   const adaylar=Motor.legal(Motor.turn).filter(m=>m.from===sh.from && m.to===sh.to);

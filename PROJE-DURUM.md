@@ -1069,3 +1069,9 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   `AndroidBildirim.uzakJeton()`. Çıkışta cihaz adresi silinir; hesap silmede `ozel` silinir. Blaze planı gerekir.
 - **Arkadaş arama ortak:** iOS'taki harf duyarsız arama ortak koda alındı; e-posta özeti iki platformda `emailArama`
   (iOS eskiden `epostaOzet` yazıyordu, kurallarda yoktu).
+- **Tahta kayması (çevrimiçi) düzeltildi:** Rakibin hamlesi bizim taş yeme sahnemiz sürerken gelince `hamleOyna` beklemeden
+  ikinci kez çalışıyor, iki `killCam` kamerayı aynı anda oynatıyordu; ikincisi kameranın yarı yoldaki konumunu "eski" diye
+  kaydedip oraya dönüyordu → tahta kayık/eğik kalıyordu (iki telefonda da olabilir). Düzeltme: (1) `hamleOyna` sayaçla sarıldı,
+  rakip hamlesi süren hamle bitince uygulanır (en çok 8 sn bekleme); (2) `killCam` asıl kamera konumunu yalnız ilk sahnede alır,
+  eski sahne kameraya dokunmaz, son sahne bitince asıl konuma oturtur (ekran döndüyse yeni yöne göre).
+  Tarayıcıda üst üste iki sahne + hamle sırası denendi: kamera tam asıl konuma döndü.
