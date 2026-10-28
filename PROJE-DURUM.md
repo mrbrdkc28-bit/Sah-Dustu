@@ -1079,3 +1079,5 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   bütçe uyarısı "Chess64 uyari" ₺50/ay, yalnız uyarı). Firestore kuralları yayımlandı (lobiGizli + ozel/bildirim).
   `oyunIstegiBildir` (v2, europe-west1) kuruldu; APNs .p8 gizli değer `APNS_ANAHTAR`, Key ID AQKFN55HZS kodda.
   Artifact temizlik kuralı: 1 günden eski imajlar silinir. Telefona 1.7 (7) imzalı APK kuruldu, açıldı.
+- **28 Ekim 2026 oturum sonu:** 1.7 (vc7) AAB hazır, Play'e yüklenmedi (sahibi yükleyecek). iOS 1.7 Codemagic'te derlenmedi.
+  Ayrıntılı sıradaki işler: chess64-ios/OTURUM-DEVIR.md "28 Ekim 2026 (akşam) — OTURUM SONU".
