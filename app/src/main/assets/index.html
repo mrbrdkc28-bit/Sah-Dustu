@@ -7507,9 +7507,12 @@ function oyunSonu(d, terkKazanan){
       kp=document.createElement('button'); kp.id='sonKapat'; kp.textContent='✕';
       kp.title='Kapat';
       (document.getElementById('sonKart')||document.getElementById('son')).appendChild(kp);
+      /* 28 Ekim 2026 (sahibin isteği): ✕ eskiden yalnız kartı kapatıp bitmiş oyunun tahtasında bırakıyordu
+         (gereksiz ara durak). Artık MENÜ düğmesiyle aynı: doğrudan menüye (çevrimiçide çevrimiçi ekranına). */
       kp.onclick=()=>{
-        document.getElementById('son').classList.remove('acik');
-        if(typeof menuyeDon==='function' && !cevrimiciAktif) return;
+        const m=document.getElementById('sonMenu');
+        if(m && typeof m.onclick==='function') m.onclick();
+        else document.getElementById('son').classList.remove('acik');
       };
     }
   }
@@ -9221,7 +9224,7 @@ function menuKur(){
   /* Onaysız teslim (10 Ekim 2026): çıkış penceresi kendi onay adımını gösterip bunu çağırır */
   window.teslimOlUygula=()=>{
     if(!oyunAktif || oyunBitti) return;
-    if(cevrimiciAktif){ Cevrimici.sonucBildir('terk', Cevrimici.rakipRengi()); }
+    if(cevrimiciAktif){ Cevrimici.sonucBildir('terk', Cevrimici.rakipRengi(), true); }
     const teslimEden = mod==='ai' ? aktifInsanRenk : (cevrimiciAktif ? Cevrimici.benimRenk : Motor.turn);
     teslimSonu=true;
     oyunSonu('terk', teslimEden==='w'?'b':'w');
@@ -9229,7 +9232,7 @@ function menuKur(){
   if(secTeslimB) secTeslimB.onclick=()=>{
     secModal.style.display='none';
     if(!confirm('Teslim olmak istediğinize emin misiniz?')) return;
-    if(cevrimiciAktif){ Cevrimici.sonucBildir('terk', Cevrimici.rakipRengi()); }
+    if(cevrimiciAktif){ Cevrimici.sonucBildir('terk', Cevrimici.rakipRengi(), true); }
     /* İkinci parametre KAZANAN renktir. Eskiden teslim olan tarafın rengi
        geçiliyordu: yapay zekâya teslim olan oyuncu galibiyet alıyor, çevrimiçi
        teslim olan kendi ekranında kazanmış görünüyordu. */
@@ -10684,6 +10687,9 @@ function cevrimiciSonucUygula(veri){
   } else if(tip==='mat'){
     baslik='ŞAH DÜŞTÜ';
     alt = benKazandim ? 'Meydanın hâkimi sensin.' : 'Şah düştü — rakibin kazandı.';
+  } else if(tip==='terk' && veri.teslim){
+    baslik = benKazandim ? 'RAKİP TESLİM OLDU' : 'TESLİM';
+    alt = benKazandim ? 'Kazandın — rakibin teslim oldu.' : 'Kaybettin — teslim oldun.';
   } else if(tip==='terk'){
     baslik = benKazandim ? 'RAKİP AYRILDI' : 'AYRILDIN';
     alt = benKazandim ? 'Kazandın — rakip oyuna dönmedi.' : 'Kaybettin — oyuna zamanında dönmedin.';
@@ -13639,11 +13645,11 @@ const Cevrimici=(()=>{
   }
 
   // ---- SONUÇ BİLDİR (mat/süre/pat) ----
-  async function sonucBildir(tip, kazananRenk){
+  async function sonucBildir(tip, kazananRenk, teslim){
     if(!odaId || !hazirMi()) return;
     try{
       await fbDb.collection('oyunlar').doc(odaId).update({
-        durum:'bitti', sonucTip:tip, kazanan:kazananRenk||null, bitisZamani: Date.now()
+        durum:'bitti', sonucTip:tip, kazanan:kazananRenk||null, bitisZamani: Date.now(), teslim: !!teslim
       });
     }catch(e){}
   }
@@ -13784,6 +13790,11 @@ const Cevrimici=(()=>{
       } else if(odaId && benimRenk==='w' && oyunVerisi && oyunVerisi.durum==='bekliyor'){
         // Hiç başlamamış odayı sil (kimse katılmadan iptal)
         await fbDb.collection('oyunlar').doc(odaId).delete();
+        /* Bu odaya gönderilmiş davet de silinsin (Ekim 2026): yoksa karşı taraf kabul edince "Oda bulunamadı" görüyordu */
+        try{
+          const dv=await fbDb.collection('davetler').where('gonderen','==',fbKullanici.uid).get();
+          for(const x of dv.docs){ if((x.data()||{}).oda===odaId) await x.ref.delete(); }
+        }catch(e){}
       }
     }catch(e){}
     odaId=null; benimRenk=null; durum='bos'; oyunVerisi=null;
@@ -14633,6 +14644,9 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Uygun rakip bulunamadı']=CEVM['Uygun rakip bulunamadı']||{en:'No suitable opponent found',ru:'Подходящий соперник не найден',ar:'لم يُعثر على خصم مناسب',fr:'Aucun adversaire trouvé',de:'Kein passender Gegner gefunden',it:'Nessun avversario adatto',zh:'未找到合适的对手'};
   CEVM['Süreli maçta animasyon izlerken iki saat de durur.']={en:'In timed games both clocks stop while you watch an animation.',ru:'В партиях на время обе часы останавливаются, пока вы смотрите анимацию.',ar:'في المباريات الموقوتة يتوقف الوقتان أثناء مشاهدتك للرسوم المتحركة.',fr:'En partie chronométrée, les deux pendules s’arrêtent pendant que vous regardez une animation.',de:'In Partien mit Bedenkzeit stehen beide Uhren, während du eine Animation ansiehst.',it:'Nelle partite a tempo entrambi gli orologi si fermano mentre guardi un’animazione.',zh:'限时对局中，你观看动画时双方计时都会暂停。'};
   CEVM['Rakibin animasyon izlerken iki saat de durur.']={en:'Both clocks stop while your opponent watches an animation.',ru:'Обе часы останавливаются, пока соперник смотрит анимацию.',ar:'يتوقف الوقتان أثناء مشاهدة خصمك للرسوم المتحركة.',fr:'Les deux pendules s’arrêtent pendant que l’adversaire regarde une animation.',de:'Beide Uhren stehen, während dein Gegner eine Animation ansieht.',it:'Entrambi gli orologi si fermano mentre l’avversario guarda un’animazione.',zh:'对手观看动画时双方计时都会暂停。'};
+  CEVM['RAKİP TESLİM OLDU']=CEVM['RAKİP TESLİM OLDU']||{en:'OPPONENT RESIGNED',ru:'СОПЕРНИК СДАЛСЯ',ar:'استسلم الخصم',fr:'ADVERSAIRE ABANDONNE',de:'GEGNER GIBT AUF',it:'L’AVVERSARIO SI ARRENDE',zh:'对手认输'};
+  CEVM['Kazandın — rakibin teslim oldu.']=CEVM['Kazandın — rakibin teslim oldu.']||{en:'You won — your opponent resigned.',ru:'Победа — соперник сдался.',ar:'فزت — استسلم خصمك.',fr:'Victoire — votre adversaire a abandonné.',de:'Gewonnen — dein Gegner hat aufgegeben.',it:'Hai vinto — l’avversario si è arreso.',zh:'你赢了 — 对手认输。'};
+  CEVM['Kaybettin — teslim oldun.']=CEVM['Kaybettin — teslim oldun.']||{en:'You lost — you resigned.',ru:'Поражение — вы сдались.',ar:'خسرت — لقد استسلمت.',fr:'Défaite — vous avez abandonné.',de:'Verloren — du hast aufgegeben.',it:'Hai perso — ti sei arreso.',zh:'你输了 — 你已认输。'};
   CEVM['Bu sürede şu an bekleyen başka oyuncu yok.']={en:'No other player is waiting with this time control right now.',ru:'Сейчас нет других игроков с этим контролем времени.',ar:'لا يوجد لاعب آخر ينتظر بهذا الوقت الآن.',fr:'Aucun autre joueur n’attend avec ce temps pour le moment.',de:'Gerade wartet kein anderer Spieler mit dieser Bedenkzeit.',it:'Nessun altro giocatore in attesa con questo tempo al momento.',zh:'目前没有其他玩家以此时间等待。'};
   CEVM['Rakip animasyon izliyor — süre durdu']={en:'Opponent is watching the animation — clock paused',ru:'Соперник смотрит анимацию — часы остановлены',ar:'الخصم يشاهد الرسوم المتحركة — توقف الوقت',fr:'L’adversaire regarde l’animation — pendule arrêtée',de:'Gegner sieht die Animation — Uhr angehalten',it:'L’avversario guarda l’animazione — orologio in pausa',zh:'对手正在观看动画 — 计时暂停'};
   CEVM['Bu süre ve animasyon ayarında şu an bekleyen başka oyuncu yok.']=CEVM['Bu süre ve animasyon ayarında şu an bekleyen başka oyuncu yok.']||{en:'No other player is waiting with this time control and animation setting right now.',ru:'Сейчас нет других игроков с этим контролем времени и настройкой анимации.',ar:'لا يوجد لاعب آخر ينتظر بهذا الوقت وإعداد الرسوم المتحركة الآن.',fr:'Aucun autre joueur n’attend avec ce temps et ce réglage d’animation.',de:'Gerade wartet kein anderer Spieler mit dieser Bedenkzeit und Animationseinstellung.',it:'Nessun altro giocatore in attesa con questo tempo e questa animazione.',zh:'目前没有其他玩家以此时间和动画设置等待。'};
@@ -15060,7 +15074,7 @@ function davetGoster(d){
   bekleyenDavet=d;
   document.getElementById('davetMetin').innerHTML =
     '<b>'+(d.ad||'Bir oyuncu')+'</b> seni oyuna davet ediyor.<br>'+
-    '<span style="color:var(--dim);font-size:13px">'+odaAyarMetni(+(d.sure!=null?d.sure:3), +(d.inc||0), d.sahne)+'</span>';
+    '<span style="color:var(--dim);font-size:13px">'+odaAyarMetni(+(d.sure!=null?d.sure:3), +(d.inc||0), null)+'</span>';   /* animasyon kişisel (Ekim 2026) */
   document.getElementById('davetPop').classList.add('acik');
 }
 function davetKapat(){

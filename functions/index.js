@@ -67,7 +67,13 @@ exports.oyunIstegiBildir = onDocumentCreated(
     const d = olay.data && olay.data.data();
     if (!d || !d.hedef || !d.gonderen || d.hedef === d.gonderen) return;
 
-    // Sunucu tarafı sınır: aynı gönderen → aynı alıcı 10 dk'da bir
+    // Önce adres: alıcının adresi yoksa gönderilecek bir şey yok, sınır da sayılmaz
+    const kayit = await db.doc(`oyuncular/${d.hedef}/ozel/bildirim`).get();
+    if (!kayit.exists) { logger.info('adres yok: alıcı bildirim adresi kaydetmemiş', { hedef: d.hedef }); return; }
+    const k = kayit.data() || {};
+    if (!(k.android || []).length && !(k.ios || []).length) { logger.info('adres yok: liste boş', { hedef: d.hedef }); return; }
+
+    // Sunucu tarafı sınır: aynı gönderen → aynı alıcı 10 dk'da bir (yalnız gerçekten gönderilecekse sayılır)
     const sinirRef = db.collection('bildirimSinir').doc(d.hedef + '_' + d.gonderen);
     const gec = await db.runTransaction(async tx => {
       const s = await tx.get(sinirRef);
@@ -76,10 +82,6 @@ exports.oyunIstegiBildir = onDocumentCreated(
       return true;
     });
     if (!gec) { logger.info('sınır: bildirim atlandı', olay.params.davetId); return; }
-
-    const kayit = await db.doc(`oyuncular/${d.hedef}/ozel/bildirim`).get();
-    if (!kayit.exists) { logger.info('adres yok: alıcı bildirim adresi kaydetmemiş', { hedef: d.hedef }); return; }
-    const k = kayit.data() || {};
     logger.info('gönderiliyor', { hedef: d.hedef, android: (k.android || []).length, ios: (k.ios || []).length, dil: k.dil });
     const m = METIN[k.dil] || METIN.en;
     const ad = String(d.ad || 'Chess64').slice(0, 30);
