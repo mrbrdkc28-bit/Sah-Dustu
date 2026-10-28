@@ -1075,3 +1075,7 @@ Bu konu bir kez yanlışlıkla "eksik" diye açıldı (7.7). **Lisanslar tamam.*
   rakip hamlesi süren hamle bitince uygulanır (en çok 8 sn bekleme); (2) `killCam` asıl kamera konumunu yalnız ilk sahnede alır,
   eski sahne kameraya dokunmaz, son sahne bitince asıl konuma oturtur (ekran döndüyse yeni yöne göre).
   Tarayıcıda üst üste iki sahne + hamle sırası denendi: kamera tam asıl konuma döndü.
+- **28 Ekim 2026 yayımlandı (Firebase, chess64-c6ff1):** proje Blaze'e geçti ("My Billing Account", Düdük Defteri ile aynı;
+  bütçe uyarısı "Chess64 uyari" ₺50/ay, yalnız uyarı). Firestore kuralları yayımlandı (lobiGizli + ozel/bildirim).
+  `oyunIstegiBildir` (v2, europe-west1) kuruldu; APNs .p8 gizli değer `APNS_ANAHTAR`, Key ID AQKFN55HZS kodda.
+  Artifact temizlik kuralı: 1 günden eski imajlar silinir. Telefona 1.7 (7) imzalı APK kuruldu, açıldı.
