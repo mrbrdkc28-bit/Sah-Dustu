@@ -405,8 +405,13 @@ body:not(.dikeyAktif) #cevrimiciSerit{top:56px;left:14px;right:auto;text-align:l
 .cvLobiGor input{accent-color:#3ecf6e;width:16px;height:16px;margin:0}
 #cvLobiListe{display:flex;flex-direction:column;gap:6px}
 .lobiSatir{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(127,127,127,.08);border:1px solid rgba(127,127,127,.18)}
-.lobiNokta{width:10px;height:10px;border-radius:50%;flex:0 0 10px;background:#3ecf6e;box-shadow:0 0 8px rgba(62,207,110,.7)}
-.lobiNokta.yok{background:transparent;box-shadow:none;border:1.5px solid var(--dim);opacity:.7}
+.lobiAv{position:relative;width:38px;height:38px;flex:0 0 38px;border-radius:50%;background:rgba(127,127,127,.16);
+  display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--brass)}
+.lobiAv img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.lobiNokta{position:absolute;right:-1px;bottom:-1px;width:11px;height:11px;border-radius:50%;background:#3ecf6e;
+  box-shadow:0 0 6px rgba(62,207,110,.7);border:2px solid var(--panel,#12141B);box-sizing:border-box}
+.lobiNokta.yok{background:#6f6a5c;box-shadow:none}
+.lobiBayrak{font-size:13px;font-weight:400}
 .lobiBilgi{flex:1;min-width:0}
 .lobiAd{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lobiAlt{font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -10374,6 +10379,8 @@ document.addEventListener('visibilitychange', ()=>{
 /* ---- LOBİ ekranı (Ekim 2026) ---- */
 let lobiVeri=[], lobiHepsi=false, lobiZam=null;
 const lobiDavetZamani={};   // aynı kişiye 10 dk'da en çok 1 istek
+/* Başkasından gelen profil fotoğrafı: yalnız base64 resim verisi kabul edilir (src'ye başka şey girmesin) */
+function guvenliFoto(f){ return (typeof f==='string' && /^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(f)) ? f : ''; }
 function lobiKac(t){ return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function lobiSonGorulme(ms){
   const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
@@ -10390,10 +10397,16 @@ function lobiCiz(){
     el.innerHTML='<div class="lobiBos">'+lobiKac(c(Cevrimici.hazirMi()?'Lobide henüz kimse yok.':'Lobiyi görmek için giriş yapmalısın.'))+'</div>';
   }else el.innerHTML=goster.map(k=>{
     const bekle=lobiDavetZamani[k.uid] && Date.now()-lobiDavetZamani[k.uid]<10*60000;
-    return '<div class="lobiSatir"><span class="lobiNokta'+(k.cevrimici?'':' yok')+'"></span>'+
-      '<div class="lobiBilgi"><div class="lobiAd">'+lobiKac(k.ad)+'</div>'+
+    /* Lobi satırı (30 Ekim 2026): seçtiği fotoğraf (yoksa simgesi ya da baş harfi), köşede çevrimiçi noktası,
+       adın yanında ülke bayrağı */
+    const foto=guvenliFoto(k.foto);
+    const av = foto ? '<img src="'+foto+'" alt="" loading="lazy">'
+             : '<span>'+lobiKac(k.avatar || (k.ad||'?').slice(0,1).toUpperCase())+'</span>';
+    const bay=bayrak(k.ulke);
+    return '<div class="lobiSatir"><div class="lobiAv">'+av+'<span class="lobiNokta'+(k.cevrimici?'':' yok')+'"></span></div>'+
+      '<div class="lobiBilgi"><div class="lobiAd">'+lobiKac(k.ad)+(bay?' <span class="lobiBayrak">'+lobiKac(bay)+'</span>':'')+'</div>'+
       '<div class="lobiAlt">'+(k.cevrimici?'<span class="cvr">'+lobiKac(c('Çevrimiçi'))+'</span>':lobiKac(c('Çevrimdışı')+' · '+lobiSonGorulme(k.son)))+
-      ' · '+(k.puan||800)+(k.ulke?' · '+lobiKac(k.ulke):'')+'</div></div>'+
+      ' · '+(k.puan||800)+'</div></div>'+
       '<button class="lobiBtn" data-lobi="'+lobiKac(k.uid)+'"'+(bekle?' disabled':'')+'>'+lobiKac(c(bekle?'Gönderildi':'Oyun iste'))+'</button></div>';
   }).join('');
   const d=document.getElementById('cvLobiDaha');
@@ -13788,6 +13801,7 @@ const Cevrimici=(()=>{
     const simdi=Date.now();
     return ids.filter(id=>prof[id] && !prof[id].lobiGizli).map(id=>({
       uid:id, ad:prof[id].kullaniciAdi||'Oyuncu', puan:prof[id].puan||800, ulke:prof[id].ulke||'',
+      foto:prof[id].avatarFoto||'', avatar:prof[id].avatar||'',
       son:son[id], cevrimici:(simdi-son[id])<5*60000
     })).sort((a,b)=>(b.cevrimici-a.cevrimici)||(b.son-a.son));
   }
@@ -15732,9 +15746,9 @@ async function liderYukle(){
       const benim=(doc.id===fbKullanici.uid);
       if(benim) sirada=true;
       const deger=(liderSekme==='hafta')?(d[alan]||0):(d.puan||800);
-      const ikon = d.avatarFoto
-        ? '<img src="'+d.avatarFoto+'" style="width:34px;height:34px;border-radius:50%;object-fit:cover">'
-        : '<span style="font-size:22px">'+(d.avatar||'♟')+'</span>';
+      const ikon = guvenliFoto(d.avatarFoto)
+        ? '<img src="'+guvenliFoto(d.avatarFoto)+'" style="width:34px;height:34px;border-radius:50%;object-fit:cover">'
+        : '<span style="font-size:22px">'+lobiKac(d.avatar||'♟')+'</span>';
       const madal = sira===1?'🥇':sira===2?'🥈':sira===3?'🥉':String(sira);
       html+='<div class="liderSatir'+(benim?' ben':'')+'" data-uid="'+doc.id+'" data-ad="'+lobiKac(d.kullaniciAdi||'')+'">'+
         '<div class="ldSira">'+madal+'</div>'+
