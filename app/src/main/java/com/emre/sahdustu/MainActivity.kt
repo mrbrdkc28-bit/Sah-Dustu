@@ -9,6 +9,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.VibrationAttributes
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
+import android.media.AudioAttributes
 import androidx.core.app.NotificationCompat
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
@@ -898,6 +903,36 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }, "AndroidEkran")
+
+        /* TİTREŞİM (30 Ekim 2026): WebView'in navigator.vibrate'i "türsüz" titreşim gönderiyor; Xiaomi/HyperOS bunu
+           "Dokunsal geri bildirim" ayarına bağlıyor, o kapalıyken oyun hiç titremiyordu. Burada titreşim medya/oyun
+           türüyle verilir (Android 13+: medya titreşimi ayarı; daha eskide oyun ses türü). desen: "[ms, ara, ms, ...]" */
+        webView.addJavascriptInterface(object {
+            @JavascriptInterface
+            fun titret(desen: String) {
+                try {
+                    val sureler = desen.trim().removePrefix("[").removeSuffix("]").split(',')
+                        .mapNotNull { it.trim().toDoubleOrNull()?.toLong() }.map { it.coerceIn(0L, 5000L) }
+                    if (sureler.isEmpty() || sureler.all { it == 0L }) return
+                    val titresim: Vibrator = if (Build.VERSION.SDK_INT >= 31)
+                        (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
+                    else @Suppress("DEPRECATION") (getSystemService(Context.VIBRATOR_SERVICE) as Vibrator)
+                    if (!titresim.hasVibrator()) return
+                    // Dalga biçimi: [bekle, titret, ara, titret, ...] — ilk eleman 0 bekleme
+                    val zaman = LongArray(sureler.size + 1)
+                    for (i in sureler.indices) zaman[i + 1] = sureler[i]
+                    val etki = VibrationEffect.createWaveform(zaman, -1)
+                    if (Build.VERSION.SDK_INT >= 33) {
+                        titresim.vibrate(etki, VibrationAttributes.createForUsage(VibrationAttributes.USAGE_MEDIA))
+                    } else {
+                        @Suppress("DEPRECATION")
+                        titresim.vibrate(etki, AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_GAME)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
+                    }
+                } catch (t: Throwable) {}
+            }
+        }, "AndroidTitresim")
 
         // Bildirim koprusu: JS'ten "sira sende" bildirimi goster
         olusturBildirimKanali()

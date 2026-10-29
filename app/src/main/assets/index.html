@@ -412,6 +412,37 @@ body:not(.dikeyAktif) #cevrimiciSerit{top:56px;left:14px;right:auto;text-align:l
   box-shadow:0 0 6px rgba(62,207,110,.7);border:2px solid var(--panel,#12141B);box-sizing:border-box}
 .lobiNokta.yok{background:#6f6a5c;box-shadow:none}
 .lobiBayrak{font-size:13px;font-weight:400}
+/* Oyuncu fotoğrafı büyütme ve oyuncu kartı (30 Ekim 2026) */
+[data-oy-av],[data-oy-uid]{cursor:pointer}
+.arkAvatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+#fotoBuyut{position:fixed;inset:0;z-index:99995;background:rgba(4,5,9,.86);display:flex;align-items:center;justify-content:center;
+  animation:fbAc .16s ease-out}
+#fotoBuyut .fbIc{width:min(72vw,300px);height:min(72vw,300px);border-radius:50%;overflow:hidden;background:#1B2030;
+  border:2px solid var(--brass);display:flex;align-items:center;justify-content:center;font-size:min(36vw,150px);color:var(--brass);
+  box-shadow:0 18px 50px rgba(0,0,0,.6)}
+#fotoBuyut .fbIc img{width:100%;height:100%;object-fit:cover}
+@keyframes fbAc{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
+#oyuncuKart{position:fixed;inset:0;z-index:99990;background:rgba(4,5,9,.8);display:flex;align-items:center;justify-content:center;padding:18px}
+#oyuncuKart .okKutu{background:var(--panel,#12141B);border:1px solid rgba(201,162,78,.4);border-radius:16px;padding:18px;width:100%;max-width:360px;
+  max-height:86vh;overflow:auto;color:var(--bone);box-shadow:0 14px 44px rgba(0,0,0,.6)}
+#oyuncuKart .okUst{display:flex;align-items:center;gap:12px}
+#oyuncuKart .okAv{width:64px;height:64px;flex:0 0 64px;border-radius:50%;overflow:hidden;background:rgba(127,127,127,.16);
+  display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--brass);border:1px solid rgba(201,162,78,.5)}
+#oyuncuKart .okAv img{width:100%;height:100%;object-fit:cover}
+#oyuncuKart .okAd{font:700 18px 'Cinzel',serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#oyuncuKart .okPuan{color:var(--brass);font-weight:700;font-size:14px;margin-top:2px}
+#oyuncuKart .okIst{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:16px 0 4px}
+#oyuncuKart .okIst div{background:rgba(127,127,127,.09);border-radius:10px;padding:8px 2px;text-align:center}
+#oyuncuKart .okIst b{display:block;font-size:16px}
+#oyuncuKart .okIst span{font-size:10px;color:var(--dim);letter-spacing:.04em}
+#oyuncuKart .okBas{font:700 11px Manrope,sans-serif;letter-spacing:.14em;color:var(--brass);margin:16px 2px 8px}
+#oyuncuKart .okSatir{display:flex;align-items:center;gap:8px;padding:7px 4px;border-top:1px solid rgba(127,127,127,.14);font-size:13px}
+#oyuncuKart .okSatir .rozet{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px}
+#oyuncuKart .okSatir .rG{background:#2f7d4f;color:#fff}#oyuncuKart .okSatir .rB{background:#6f6a5c;color:#fff}#oyuncuKart .okSatir .rM{background:#9c3b30;color:#fff}
+#oyuncuKart .okSatir .okTarih{margin-left:auto;color:var(--dim);font-size:12px}
+#oyuncuKart .okBos{color:var(--dim);font-size:13px;padding:10px 2px}
+#oyuncuKart .okKapat{display:block;width:100%;margin-top:14px;padding:11px;border-radius:10px;border:1px solid rgba(122,110,84,.5);
+  background:transparent;color:var(--bone);font:700 14px Manrope,sans-serif;cursor:pointer}
 .lobiBilgi{flex:1;min-width:0}
 .lobiAd{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lobiAlt{font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -10381,6 +10412,75 @@ let lobiVeri=[], lobiHepsi=false, lobiZam=null;
 const lobiDavetZamani={};   // aynı kişiye 10 dk'da en çok 1 istek
 /* Başkasından gelen profil fotoğrafı: yalnız base64 resim verisi kabul edilir (src'ye başka şey girmesin) */
 function guvenliFoto(f){ return (typeof f==='string' && /^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(f)) ? f : ''; }
+/* OYUNCU FOTOĞRAFI VE KARTI (30 Ekim 2026, sahibin isteği): listelerde (lobi, arkadaşlar, liderlik) fotoğrafa
+   basınca fotoğraf büyür, ada basınca oyuncunun kartı (puan, istatistik, son oyunlar) açılır. Listeler çizilirken
+   oyuncunun görsel bilgisi oyOnbellek'e yazılır; öğeler data-oy-av / data-oy-uid taşır, tek bir dinleyici yakalar. */
+const oyOnbellek={};
+function oyKaydet(uid, v){ if(uid) oyOnbellek[uid]=Object.assign(oyOnbellek[uid]||{}, v); }
+function oyAvatarHtml(v){
+  const f=guvenliFoto(v&&v.foto);
+  return f ? '<img src="'+f+'" alt="">' : '<span>'+lobiKac((v&&v.avatar) || ((v&&v.ad)||'?').slice(0,1).toUpperCase())+'</span>';
+}
+function fotoBuyut(uid){
+  const v=oyOnbellek[uid]||{};
+  let m=document.getElementById('fotoBuyut'); if(m) m.remove();
+  m=document.createElement('div'); m.id='fotoBuyut';
+  m.innerHTML='<div class="fbIc">'+oyAvatarHtml(v)+'</div>';
+  m.onclick=()=>m.remove();
+  document.body.appendChild(m);
+}
+async function oyuncuKartAc(uid){
+  if(!uid) return;
+  const c=t=>(typeof metniCevir==='function')?metniCevir(t):t;
+  let m=document.getElementById('oyuncuKart'); if(m) m.remove();
+  m=document.createElement('div'); m.id='oyuncuKart';
+  const on=oyOnbellek[uid]||{};
+  m.innerHTML='<div class="okKutu"><div class="okUst"><div class="okAv" data-oy-av="'+lobiKac(uid)+'">'+oyAvatarHtml(on)+'</div>'+
+    '<div style="min-width:0"><div class="okAd">'+lobiKac(on.ad||'…')+'</div><div class="okPuan"></div></div></div>'+
+    '<div class="okIcerik"><div class="okBos">'+lobiKac(c('Yükleniyor…'))+'</div></div>'+
+    '<button type="button" class="okKapat">'+lobiKac(c('Kapat'))+'</button></div>';
+  m.onclick=e=>{ if(e.target===m || e.target.classList.contains('okKapat')) m.remove(); };
+  document.body.appendChild(m);
+  const ic=m.querySelector('.okIcerik');
+  if(typeof fbDb==='undefined' || !fbDb || !fbKullanici){ ic.innerHTML='<div class="okBos">'+lobiKac(c('Profil yüklenemedi.'))+'</div>'; return; }
+  let v=null;
+  try{ const d=await fbDb.collection('oyuncular').doc(uid).get(); v=d.exists ? (d.data()||{}) : null; }catch(e){}
+  if(!document.body.contains(m)) return;
+  if(!v){ ic.innerHTML='<div class="okBos">'+lobiKac(c('Profil yüklenemedi.'))+'</div>'; return; }
+  oyKaydet(uid, {ad:v.kullaniciAdi||'Oyuncu', foto:v.avatarFoto||'', avatar:v.avatar||'', ulke:v.ulke||''});
+  const bay=bayrak(v.ulke||'');
+  m.querySelector('.okAv').innerHTML=oyAvatarHtml(oyOnbellek[uid]);
+  m.querySelector('.okAd').innerHTML=lobiKac(v.kullaniciAdi||'Oyuncu')+(bay?' <span style="font-size:15px;font-family:sans-serif">'+lobiKac(bay)+'</span>':'');
+  m.querySelector('.okPuan').textContent=(v.puan||800)+' '+c('puan');
+  const sayi=x=>(+x||0);
+  let h='<div class="okIst">'+
+    '<div><b>'+sayi(v.oyun)+'</b><span>'+lobiKac(c('Oyun'))+'</span></div>'+
+    '<div><b>'+sayi(v.galibiyet)+'</b><span>'+lobiKac(c('Galibiyet'))+'</span></div>'+
+    '<div><b>'+sayi(v.beraberlik)+'</b><span>'+lobiKac(c('Beraberlik'))+'</span></div>'+
+    '<div><b>'+sayi(v.maglubiyet)+'</b><span>'+lobiKac(c('Mağlubiyet'))+'</span></div>'+
+    '<div><b>'+sayi(v.enIyiSeri)+'</b><span>'+lobiKac(c('En iyi seri'))+'</span></div></div>';
+  h+='<div class="okBas">'+lobiKac(c('SON OYUNLAR'))+'</div>';
+  const son=(Array.isArray(v.sonOyunlar)?v.sonOyunlar:[]).slice(0,10);
+  if(!son.length) h+='<div class="okBos">'+lobiKac(c('Henüz oyun yok.'))+'</div>';
+  else son.forEach(o=>{
+    const sn=o&&o.sonuc==='G'?'G':o&&o.sonuc==='B'?'B':'M';
+    const ad=sn==='G'?'Galibiyet':sn==='B'?'Beraberlik':'Mağlubiyet';
+    let tarih=''; try{ if(o.tarih) tarih=new Date(+o.tarih).toLocaleDateString(undefined,{day:'numeric',month:'short'}); }catch(e){}
+    h+='<div class="okSatir"><span class="rozet r'+sn+'">'+sn+'</span><span>'+(o&&o.renk==='w'?'♙':'♟')+'</span>'+
+       '<span>'+lobiKac(c(ad))+'</span><span style="color:var(--dim)">· '+sayi(o&&o.hamle)+' '+lobiKac(c('hamle'))+'</span>'+
+       '<span class="okTarih">'+lobiKac(tarih)+'</span></div>';
+  });
+  ic.innerHTML=h;
+  try{ if(typeof agacTara==='function') agacTara(m); }catch(e){}
+}
+/* Tek dinleyici: fotoğraf → büyüt, ad → kart. Liderlikte uzun basış (şikâyet) sonrası gelen tıklama yok sayılır. */
+document.addEventListener('click', e=>{
+  if(window.__uzunBas && Date.now()-window.__uzunBas<900) return;
+  const av=e.target.closest && e.target.closest('[data-oy-av]');
+  if(av){ e.stopPropagation(); fotoBuyut(av.getAttribute('data-oy-av')); return; }
+  const ad=e.target.closest && e.target.closest('[data-oy-uid]');
+  if(ad){ e.stopPropagation(); oyuncuKartAc(ad.getAttribute('data-oy-uid')); }
+}, true);
 function lobiKac(t){ return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function lobiSonGorulme(ms){
   const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
@@ -10399,12 +10499,13 @@ function lobiCiz(){
     const bekle=lobiDavetZamani[k.uid] && Date.now()-lobiDavetZamani[k.uid]<10*60000;
     /* Lobi satırı (30 Ekim 2026): seçtiği fotoğraf (yoksa simgesi ya da baş harfi), köşede çevrimiçi noktası,
        adın yanında ülke bayrağı */
+    oyKaydet(k.uid, {ad:k.ad, foto:k.foto, avatar:k.avatar, ulke:k.ulke});
     const foto=guvenliFoto(k.foto);
     const av = foto ? '<img src="'+foto+'" alt="" loading="lazy">'
              : '<span>'+lobiKac(k.avatar || (k.ad||'?').slice(0,1).toUpperCase())+'</span>';
     const bay=bayrak(k.ulke);
-    return '<div class="lobiSatir"><div class="lobiAv">'+av+'<span class="lobiNokta'+(k.cevrimici?'':' yok')+'"></span></div>'+
-      '<div class="lobiBilgi"><div class="lobiAd">'+lobiKac(k.ad)+(bay?' <span class="lobiBayrak">'+lobiKac(bay)+'</span>':'')+'</div>'+
+    return '<div class="lobiSatir"><div class="lobiAv" data-oy-av="'+lobiKac(k.uid)+'">'+av+'<span class="lobiNokta'+(k.cevrimici?'':' yok')+'"></span></div>'+
+      '<div class="lobiBilgi"><div class="lobiAd" data-oy-uid="'+lobiKac(k.uid)+'">'+lobiKac(k.ad)+(bay?' <span class="lobiBayrak">'+lobiKac(bay)+'</span>':'')+'</div>'+
       '<div class="lobiAlt">'+(k.cevrimici?'<span class="cvr">'+lobiKac(c('Çevrimiçi'))+'</span>':lobiKac(c('Çevrimdışı')+' · '+lobiSonGorulme(k.son)))+
       ' · '+(k.puan||800)+'</div></div>'+
       '<button class="lobiBtn" data-lobi="'+lobiKac(k.uid)+'"'+(bekle?' disabled':'')+'>'+lobiKac(c(bekle?'Gönderildi':'Oyun iste'))+'</button></div>';
@@ -12466,9 +12567,16 @@ let isiKoruma=false;
 let titresimAcik=true;
 try{ titresimAcik = localStorage.getItem('titresim')!=='0'; }catch(e){}
 try{
-  if(navigator.vibrate && !navigator.__titresimSarili){
-    const _vib=navigator.vibrate.bind(navigator);
-    navigator.vibrate=function(d){ return titresimAcik ? _vib(d) : false; };
+  if(!navigator.__titresimSarili){
+    const _vib=navigator.vibrate ? navigator.vibrate.bind(navigator) : null;
+    /* Android: titreşim uygulamanın kendi köprüsünden (AndroidTitresim) gider; WebView'inki Xiaomi'de
+       "Dokunsal geri bildirim" kapalıyken çalışmıyordu (30 Ekim 2026). iOS kabuğu kendi navigator.vibrate'ini verir. */
+    const kopru=(typeof AndroidTitresim!=='undefined' && AndroidTitresim && AndroidTitresim.titret) ? AndroidTitresim : null;
+    navigator.vibrate=function(d){
+      if(!titresimAcik) return false;
+      if(kopru){ try{ kopru.titret(JSON.stringify(Array.isArray(d)?d:[d])); return true; }catch(e){} }
+      return _vib ? _vib(d) : false;
+    };
     navigator.__titresimSarili=true;
   }
 }catch(e){}
@@ -14071,7 +14179,8 @@ const Cevrimici=(()=>{
         for(let i=0;i<r.length;i+=10){
           const parca=r.slice(i,i+10);
           const ps=await fbDb.collection('oyuncular').where(FP,'in',parca.map(x=>x.uid)).get();
-          ps.forEach(d=>{ const v=d.data()||{}; const k=parca.find(x=>x.uid===d.id); if(k && v.kullaniciAdi) k.ad=v.kullaniciAdi; });
+          ps.forEach(d=>{ const v=d.data()||{}; const k=parca.find(x=>x.uid===d.id); if(!k) return;
+            if(v.kullaniciAdi) k.ad=v.kullaniciAdi; k.foto=v.avatarFoto||''; k.avatar=v.avatar||''; k.ulke=v.ulke||''; });
         }
       }catch(e){}
       return r;
@@ -14755,6 +14864,10 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["En az 3 karakter olmalı."]=CEVM["En az 3 karakter olmalı."]||{en:"Must be at least 3 characters.",ru:"Не менее 3 символов.",ar:"يجب ألا يقل عن 3 أحرف.",fr:"Au moins 3 caractères.",de:"Mindestens 3 Zeichen.",it:"Almeno 3 caratteri.",zh:"至少 3 个字符。"};
   CEVM["Kullanıcı adın değişti"]=CEVM["Kullanıcı adın değişti"]||{en:"Your username was changed",ru:"Имя пользователя изменено",ar:"تم تغيير اسم المستخدم",fr:"Ton nom d'utilisateur a été modifié",de:"Dein Benutzername wurde geändert",it:"Nome utente modificato",zh:"用户名已更改"};
   CEVM["Kaydedilemedi. Tekrar dene."]=CEVM["Kaydedilemedi. Tekrar dene."]||{en:"Could not save. Try again.",ru:"Не удалось сохранить. Попробуйте снова.",ar:"تعذّر الحفظ. حاول مرة أخرى.",fr:"Échec de l'enregistrement. Réessaie.",de:"Speichern fehlgeschlagen. Versuch es erneut.",it:"Salvataggio non riuscito. Riprova.",zh:"保存失败，请重试。"};
+  CEVM["Profil yüklenemedi."]=CEVM["Profil yüklenemedi."]||{en:"Could not load profile.",ru:"Не удалось загрузить профиль.",ar:"تعذّر تحميل الملف الشخصي.",fr:"Impossible de charger le profil.",de:"Profil konnte nicht geladen werden.",it:"Impossibile caricare il profilo.",zh:"无法加载资料。"};
+  CEVM["Henüz oyun yok."]=CEVM["Henüz oyun yok."]||{en:"No games yet.",ru:"Пока нет партий.",ar:"لا توجد مباريات بعد.",fr:"Aucune partie pour le moment.",de:"Noch keine Partien.",it:"Ancora nessuna partita.",zh:"还没有对局。"};
+  CEVM["En iyi seri"]=CEVM["En iyi seri"]||{en:"Best streak",ru:"Лучшая серия",ar:"أفضل سلسلة",fr:"Meilleure série",de:"Beste Serie",it:"Serie migliore",zh:"最佳连胜"};
+  CEVM["Yükleniyor…"]=CEVM["Yükleniyor…"]||{en:"Loading…",ru:"Загрузка…",ar:"جارٍ التحميل…",fr:"Chargement…",de:"Wird geladen…",it:"Caricamento…",zh:"加载中…"};
   CEVM['Destan']=CEVM['Destan']||{en:'Epic',ru:'Эпос',ar:'ملحمة',fr:'Épopée',de:'Epos',it:'Epica',zh:'史诗'};
   CEVM['Fil borusu']=CEVM['Fil borusu']||{en:'Elephant trumpet',ru:'Трубный зов слона',ar:'صوت الفيل',fr:"Barrissement d'éléphant",de:'Elefantentrompete',it:"Barrito d'elefante",zh:'象鸣'};
   CEVM['At kişnemesi']=CEVM['At kişnemesi']||{en:'Horse neigh',ru:'Ржание коня',ar:'صهيل الحصان',fr:'Hennissement',de:'Pferdewiehern',it:'Nitrito',zh:'马嘶'};
@@ -15095,8 +15208,10 @@ function arkSatirHtml(k, tur){
                              '<button class="arkBtn ret" data-red="'+k.uid+'">✕</button>';
   else                   btn='<button class="arkBtn" data-ekle="'+k.uid+'">+ Ekle</button>';
   const alt = (tur==='ara') ? ('#'+(k.etiket||'')+' · '+(k.puan||800)+' puan') : ('#'+Cevrimici.kisaEtiket(k.uid));
-  return '<div class="arkSatir"><div class="arkAvatar">'+bas+'</div>'+
-    '<div class="arkBilgi"><div class="arkAd">'+lobiKac(k.ad||'Oyuncu')+'</div>'+
+  oyKaydet(k.uid, {ad:k.ad, foto:k.foto, avatar:k.avatar, ulke:k.ulke});
+  const fotoA=guvenliFoto(k.foto);
+  return '<div class="arkSatir"><div class="arkAvatar" data-oy-av="'+lobiKac(k.uid)+'">'+(fotoA?'<img src="'+fotoA+'" alt="">':bas)+'</div>'+
+    '<div class="arkBilgi"><div class="arkAd" data-oy-uid="'+lobiKac(k.uid)+'">'+lobiKac(k.ad||'Oyuncu')+(bayrak(k.ulke||'')?' <span style="font-size:12px">'+lobiKac(bayrak(k.ulke))+'</span>':'')+'</div>'+
     '<div class="arkAlt">'+alt+'</div></div>'+btn+'</div>';
 }
 function arkListeYaz(){
@@ -15749,11 +15864,12 @@ async function liderYukle(){
       const ikon = guvenliFoto(d.avatarFoto)
         ? '<img src="'+guvenliFoto(d.avatarFoto)+'" style="width:34px;height:34px;border-radius:50%;object-fit:cover">'
         : '<span style="font-size:22px">'+lobiKac(d.avatar||'♟')+'</span>';
+      oyKaydet(doc.id, {ad:d.kullaniciAdi||'Oyuncu', foto:d.avatarFoto||'', avatar:d.avatar||'', ulke:d.ulke||''});
       const madal = sira===1?'🥇':sira===2?'🥈':sira===3?'🥉':String(sira);
       html+='<div class="liderSatir'+(benim?' ben':'')+'" data-uid="'+doc.id+'" data-ad="'+lobiKac(d.kullaniciAdi||'')+'">'+
         '<div class="ldSira">'+madal+'</div>'+
-        '<div class="ldAv">'+ikon+'</div>'+
-        '<div class="ldAd">'+lobiKac(d.kullaniciAdi||'Oyuncu')+' <span style="font-size:12px">'+bayrak(d.ulke)+'</span></div>'+
+        '<div class="ldAv" data-oy-av="'+lobiKac(doc.id)+'">'+ikon+'</div>'+
+        '<div class="ldAd" data-oy-uid="'+lobiKac(doc.id)+'">'+lobiKac(d.kullaniciAdi||'Oyuncu')+' <span style="font-size:12px">'+bayrak(d.ulke)+'</span></div>'+
         '<div class="ldPuan">'+deger+'</div>'+
       '</div>';
     });
@@ -15762,7 +15878,7 @@ async function liderYukle(){
     liste.querySelectorAll('.liderSatir').forEach(s=>{
       if(s.dataset.uid===fbKullanici.uid) return;
       let zam=null;
-      const bas=()=>{ zam=setTimeout(()=>raporSor(s.dataset.uid,s.dataset.ad),650); };
+      const bas=()=>{ zam=setTimeout(()=>{ window.__uzunBas=Date.now(); raporSor(s.dataset.uid,s.dataset.ad); },650); };
       const birak=()=>{ clearTimeout(zam); };
       s.addEventListener('touchstart',bas); s.addEventListener('touchend',birak); s.addEventListener('touchmove',birak);
       s.addEventListener('mousedown',bas); s.addEventListener('mouseup',birak); s.addEventListener('mouseleave',birak);
