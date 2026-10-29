@@ -10958,8 +10958,18 @@ function cevrimiciIstatistikGuncelle(sonuc){
     if(bulutIst.anlikSeri>(bulutIst.enIyiSeri||0)) bulutIst.enIyiSeri=bulutIst.anlikSeri; }
   else if(sonuc==='B'){ bulutIst.beraberlik=(bulutIst.beraberlik||0)+1; bulutIst[rOn+'Beraberlik']=(bulutIst[rOn+'Beraberlik']||0)+1; bulutIst.anlikSeri=0; }
   else { bulutIst.maglubiyet=(bulutIst.maglubiyet||0)+1; bulutIst[rOn+'Maglubiyet']=(bulutIst[rOn+'Maglubiyet']||0)+1; bulutIst.anlikSeri=0; }
+  /* Son oyunlar: sonucu rakip bildirdiğinde (rakip teslim oldu, rakibin cihazında süre bitti, rakip ayrıldı) oyun
+     eskiden listeye hiç yazılmıyordu; oyuncu kartında ve Profilim'de görünmüyordu (30 Ekim 2026). */
+  if(!Array.isArray(bulutIst.sonOyunlar)) bulutIst.sonOyunlar=[];
+  let kayit=null;
+  try{
+    kayit={sonuc:sonuc, renk:oyuncuRenk, hamle:(typeof ist!=='undefined'&&ist.hamle)||oyunKaydi.length,
+           puanDegisim:0, tarih:Date.now(), hamleler:oyunKaydi.map(k=>k.notasyon)};
+    bulutIst.sonOyunlar.unshift(kayit);
+    if(bulutIst.sonOyunlar.length>20) bulutIst.sonOyunlar=bulutIst.sonOyunlar.slice(0,20);
+  }catch(e){}
   basarimKontrol();
-  cevrimiciPuanVeKaydet(null);
+  cevrimiciPuanVeKaydet(kayit);
   girisDurumGuncelle();
 }
 /* Çevrimiçi oyun bitince önce puanı işle, sonra istatistiği kaydet. Sıra önemli:

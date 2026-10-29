@@ -905,8 +905,9 @@ class MainActivity : AppCompatActivity() {
         }, "AndroidEkran")
 
         /* TİTREŞİM (30 Ekim 2026): WebView'in navigator.vibrate'i "türsüz" titreşim gönderiyor; Xiaomi/HyperOS bunu
-           "Dokunsal geri bildirim" ayarına bağlıyor, o kapalıyken oyun hiç titremiyordu. Burada titreşim medya/oyun
-           türüyle verilir (Android 13+: medya titreşimi ayarı; daha eskide oyun ses türü). desen: "[ms, ara, ms, ...]" */
+           "Dokunsal geri bildirim" ayarına bağlıyor, o kapalıyken oyun hiç titremiyordu. Medya türü de denendi: sistem
+           "tamamlandı" dedi ama Xiaomi'de hissedilmedi. ALARM türü (Sükun ve Rabbine Dön'deki gibi) her zaman hissediliyor.
+           Oyundaki Titreşim anahtarı kapalıysa buraya hiç gelinmez. desen: "[ms, ara, ms, ...]" */
         webView.addJavascriptInterface(object {
             @JavascriptInterface
             fun titret(desen: String) {
@@ -923,11 +924,11 @@ class MainActivity : AppCompatActivity() {
                     for (i in sureler.indices) zaman[i + 1] = sureler[i]
                     val etki = VibrationEffect.createWaveform(zaman, -1)
                     if (Build.VERSION.SDK_INT >= 33) {
-                        titresim.vibrate(etki, VibrationAttributes.createForUsage(VibrationAttributes.USAGE_MEDIA))
+                        titresim.vibrate(etki, VibrationAttributes.createForUsage(VibrationAttributes.USAGE_ALARM))
                     } else {
                         @Suppress("DEPRECATION")
                         titresim.vibrate(etki, AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_GAME)
+                            .setUsage(AudioAttributes.USAGE_ALARM)
                             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
                     }
                 } catch (t: Throwable) {}
