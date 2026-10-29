@@ -205,6 +205,20 @@ canvas{display:block}
   border:2px solid var(--brass);font-size:32px;cursor:pointer;display:flex;
   align-items:center;justify-content:center;color:var(--bone)}
 #istProfilBilgi #istAd{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--bone)}
+#istAdSatir{display:flex;align-items:center;gap:6px;min-width:0}
+#istAdSatir #istAd{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+#istAdDuzenle{flex:none;background:none;border:none;color:var(--brass);font-size:16px;line-height:1;padding:4px 6px;cursor:pointer;opacity:.85}
+/* Kullanıcı adı değiştirme penceresi (30 Ekim 2026) */
+#adDegModal{position:fixed;inset:0;z-index:99990;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px}
+#adDegModal .adKutu{background:#12141B;border:1px solid rgba(201,162,78,.35);border-radius:14px;padding:20px;max-width:340px;width:100%}
+#adDegModal .adBas{font:800 15px Manrope,sans-serif;color:#E8DDBB;margin-bottom:12px}
+#adDegModal input{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:9px;border:1px solid rgba(122,110,84,.5);background:#0A0C12;color:#EDE6D3;font:600 15px Manrope,sans-serif;outline:none}
+#adDegModal input:focus{border-color:var(--brass)}
+#adDegModal .adHata{min-height:18px;font:500 12.5px Manrope,sans-serif;color:#E8705E;margin:6px 2px 10px}
+#adDegModal .adBtn{display:flex;gap:10px}
+#adDegModal .adBtn button{flex:1;padding:11px;border-radius:9px;font:700 14px Manrope,sans-serif;cursor:pointer}
+#adDegModal .adBtn [data-k=v]{border:1px solid rgba(122,110,84,.5);background:transparent;color:#C9C2B2}
+#adDegModal .adBtn [data-k=k]{border:1px solid var(--brass);background:linear-gradient(135deg,#F2C765,#C9912A);color:#1a1408}
 #istProfilBilgi #istPuan{font-size:13px;color:var(--brass);margin-top:2px}
 #avatarSecici{display:none;flex-wrap:wrap;gap:8px;padding:0 16px 14px}
 #avatarSecici.acik{display:flex}
@@ -2570,7 +2584,7 @@ function perdeBittiginde(fn){
   <div id="istProfil">
     <button id="istAvatar" title="Avatar değiştir">♞</button>
     <div id="istProfilBilgi">
-      <div id="istAd">Oyuncu</div>
+      <div id="istAdSatir"><div id="istAd">Oyuncu</div><button id="istAdDuzenle" type="button" aria-label="Kullanıcı adını değiştir" title="Kullanıcı adını değiştir">✎</button></div>
       <div id="istPuan">800 puan</div>
       <button id="istUlke" title="Ülke seç" style="background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 0;text-align:left">🏳️ Ülke seç</button>
     </div>
@@ -13272,10 +13286,50 @@ function istEkraniAc(){
   istRender();
   document.getElementById('istEkran').classList.add('acik');
 }
+/* KULLANICI ADI DEĞİŞTİRME (30 Ekim 2026, sahibin isteği). Adlar benzersiz değildir (arama ad + #etiket ile);
+   3–20 karakter, < > ve denetim karakterleri atılır, boşluklar sadeleşir. Firestore kuralları kullaniciAdi'na izin verir. */
+function adDegistirAc(){
+  if(!fbKullanici || misafirMod || !fbDb) return;
+  const c=t=>(typeof metniCevir==='function')?metniCevir(t):t;
+  let m=document.getElementById('adDegModal'); if(m) m.remove();
+  m=document.createElement('div'); m.id='adDegModal';
+  m.innerHTML='<div class="adKutu"><div class="adBas"></div><input type="text" maxlength="20" autocomplete="off" autocapitalize="words" spellcheck="false">'+
+    '<div class="adHata"></div><div class="adBtn"><button type="button" data-k="v"></button><button type="button" data-k="k"></button></div></div>';
+  const kut=m.firstChild, inp=kut.querySelector('input'), hata=kut.querySelector('.adHata'), kb=kut.querySelector('[data-k=k]');
+  kut.querySelector('.adBas').textContent=c('Kullanıcı adını değiştir');
+  inp.value=bulutIst.kullaniciAdi||'';
+  kut.querySelector('[data-k=v]').textContent=c('Vazgeç');
+  kb.textContent=c('Kaydet');
+  const kapat=()=>m.remove();
+  kut.querySelector('[data-k=v]').onclick=kapat;
+  m.onclick=e=>{ if(e.target===m) kapat(); };
+  const kaydet=async()=>{
+    const ad=inp.value.replace(/[\u0000-\u001f\u007f<>]/g,'').replace(/\s+/g,' ').trim();
+    if(ad.length<3){ hata.textContent=c('En az 3 karakter olmalı.'); return; }
+    if(ad===bulutIst.kullaniciAdi){ kapat(); return; }
+    kb.disabled=true; hata.textContent='';
+    try{
+      await fbDb.collection('oyuncular').doc(fbKullanici.uid).update({kullaniciAdi:ad});
+      bulutIst.kullaniciAdi=ad;
+      kapat();
+      istProfilDoldur();
+      try{ girisDurumGuncelle(); }catch(e){}
+      if(typeof kisaBilgi==='function') kisaBilgi(c('Kullanıcı adın değişti'));
+    }catch(e){
+      kb.disabled=false;
+      hata.textContent=c(navigator.onLine ? 'Kaydedilemedi. Tekrar dene.' : 'İnternet bağlantısı yok.');
+    }
+  };
+  kb.onclick=kaydet;
+  inp.onkeydown=e=>{ if(e.key==='Enter') kaydet(); };
+  document.body.appendChild(m);
+  setTimeout(()=>{ try{ inp.focus(); inp.select(); }catch(e){} },50);
+}
 function istEkraniKapat(){ document.getElementById('istEkran').classList.remove('acik'); }
 function istProfilDoldur(){
   const ad=bulutIst.kullaniciAdi || (fbKullanici&&fbKullanici.email?fbKullanici.email.split('@')[0]:'Oyuncu');
   document.getElementById('istAd').textContent=ad;
+  { const du=document.getElementById('istAdDuzenle'); if(du) du.onclick=adDegistirAc; }
   document.getElementById('istPuan').textContent=(bulutIst.puan||800)+' puan';
   if(typeof avatarUygula==='function') avatarUygula(document.getElementById('istAvatar'));
   else document.getElementById('istAvatar').textContent=bulutIst.avatar||'♞';
@@ -13459,7 +13513,7 @@ function girisDurumGuncelle(){
   cubuk.onclick=(e)=>{ if(e.target.classList.contains('cikis'))return; if(typeof istEkraniAc==='function') istEkraniAc(); };
   if(fbKullanici && !misafirMod){
     const ad=bulutIst.kullaniciAdi || (fbKullanici.email ? fbKullanici.email.split('@')[0] : 'Oyuncu');
-    cubuk.innerHTML='<span>'+((typeof avatarMiniHtml==='function')?avatarMiniHtml(18):(bulutIst.avatar||'♞'))+' '+ad+' · '+(bulutIst.puan||800)+' puan</span>'+
+    cubuk.innerHTML='<span>'+((typeof avatarMiniHtml==='function')?avatarMiniHtml(18):(bulutIst.avatar||'♞'))+' '+lobiKac(ad)+' · '+(bulutIst.puan||800)+' puan</span>'+
       '<span class="cikis" onclick="cikisYap()">Çıkış</span>';
   } else if(misafirMod){
     cubuk.innerHTML='<span>Misafir</span><span class="cikis" onclick="cikisYap()">Giriş yap</span>';
@@ -13997,6 +14051,15 @@ const Cevrimici=(()=>{
       const snap=await fbDb.collection('oyuncular').doc(fbKullanici.uid)
         .collection('arkadaslar').limit(60).get();
       const r=[]; snap.forEach(d=>r.push({uid:d.id, ...(d.data()||{})}));
+      /* Listedeki ad, eklendiği andaki kopyadır; arkadaş adını değiştirdiyse güncel adı profilden al */
+      try{
+        const FP=firebase.firestore.FieldPath.documentId();
+        for(let i=0;i<r.length;i+=10){
+          const parca=r.slice(i,i+10);
+          const ps=await fbDb.collection('oyuncular').where(FP,'in',parca.map(x=>x.uid)).get();
+          ps.forEach(d=>{ const v=d.data()||{}; const k=parca.find(x=>x.uid===d.id); if(k && v.kullaniciAdi) k.ad=v.kullaniciAdi; });
+        }
+      }catch(e){}
       return r;
     }catch(e){ return []; }
   }
@@ -14674,6 +14737,10 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["Teslim olmak istediğine emin misin?"]=CEVM["Teslim olmak istediğine emin misin?"]||{en:"Are you sure you want to resign?",ru:"Вы уверены, что хотите сдаться?",ar:"هل أنت متأكد أنك تريد الاستسلام؟",fr:"Voulez-vous vraiment abandonner ?",de:"Willst du wirklich aufgeben?",it:"Sei sicuro di voler abbandonare?",zh:"确定要认输吗？"};
   CEVM["Evet, teslim ol"]=CEVM["Evet, teslim ol"]||{en:"Yes, resign",ru:"Да, сдаться",ar:"نعم، استسلم",fr:"Oui, abandonner",de:"Ja, aufgeben",it:"Sì, abbandona",zh:"是的，认输"};
   CEVM["Menüye dön · oyun sürer"]=CEVM["Menüye dön · oyun sürer"]||{en:"Back to menu · game continues",ru:"В меню · партия продолжается",ar:"العودة للقائمة · اللعبة مستمرة",fr:"Retour au menu · la partie continue",de:"Zum Menü · Partie läuft weiter",it:"Torna al menu · la partita continua",zh:"返回菜单 · 对局继续"};
+  CEVM["Kullanıcı adını değiştir"]=CEVM["Kullanıcı adını değiştir"]||{en:"Change username",ru:"Изменить имя пользователя",ar:"تغيير اسم المستخدم",fr:"Changer le nom d'utilisateur",de:"Benutzernamen ändern",it:"Cambia nome utente",zh:"更改用户名"};
+  CEVM["En az 3 karakter olmalı."]=CEVM["En az 3 karakter olmalı."]||{en:"Must be at least 3 characters.",ru:"Не менее 3 символов.",ar:"يجب ألا يقل عن 3 أحرف.",fr:"Au moins 3 caractères.",de:"Mindestens 3 Zeichen.",it:"Almeno 3 caratteri.",zh:"至少 3 个字符。"};
+  CEVM["Kullanıcı adın değişti"]=CEVM["Kullanıcı adın değişti"]||{en:"Your username was changed",ru:"Имя пользователя изменено",ar:"تم تغيير اسم المستخدم",fr:"Ton nom d'utilisateur a été modifié",de:"Dein Benutzername wurde geändert",it:"Nome utente modificato",zh:"用户名已更改"};
+  CEVM["Kaydedilemedi. Tekrar dene."]=CEVM["Kaydedilemedi. Tekrar dene."]||{en:"Could not save. Try again.",ru:"Не удалось сохранить. Попробуйте снова.",ar:"تعذّر الحفظ. حاول مرة أخرى.",fr:"Échec de l'enregistrement. Réessaie.",de:"Speichern fehlgeschlagen. Versuch es erneut.",it:"Salvataggio non riuscito. Riprova.",zh:"保存失败，请重试。"};
   CEVM['Destan']=CEVM['Destan']||{en:'Epic',ru:'Эпос',ar:'ملحمة',fr:'Épopée',de:'Epos',it:'Epica',zh:'史诗'};
   CEVM['Fil borusu']=CEVM['Fil borusu']||{en:'Elephant trumpet',ru:'Трубный зов слона',ar:'صوت الفيل',fr:"Barrissement d'éléphant",de:'Elefantentrompete',it:"Barrito d'elefante",zh:'象鸣'};
   CEVM['At kişnemesi']=CEVM['At kişnemesi']||{en:'Horse neigh',ru:'Ржание коня',ar:'صهيل الحصان',fr:'Hennissement',de:'Pferdewiehern',it:'Nitrito',zh:'马嘶'};
@@ -15006,7 +15073,7 @@ async function arkYukleIstek(){
   if(arkSekme==='istek') arkListeYaz();
 }
 function arkSatirHtml(k, tur){
-  const bas=(k.ad||'?').slice(0,1).toUpperCase();
+  const bas=lobiKac((k.ad||'?').slice(0,1).toUpperCase());
   let btn='';
   if(tur==='liste')      btn='<button class="arkBtn dolu" data-oyna="'+k.uid+'">Oyna</button>'+
                              '<button class="arkBtn ret" data-sil="'+k.uid+'">✕</button>';
@@ -15015,7 +15082,7 @@ function arkSatirHtml(k, tur){
   else                   btn='<button class="arkBtn" data-ekle="'+k.uid+'">+ Ekle</button>';
   const alt = (tur==='ara') ? ('#'+(k.etiket||'')+' · '+(k.puan||800)+' puan') : ('#'+Cevrimici.kisaEtiket(k.uid));
   return '<div class="arkSatir"><div class="arkAvatar">'+bas+'</div>'+
-    '<div class="arkBilgi"><div class="arkAd">'+(k.ad||'Oyuncu')+'</div>'+
+    '<div class="arkBilgi"><div class="arkAd">'+lobiKac(k.ad||'Oyuncu')+'</div>'+
     '<div class="arkAlt">'+alt+'</div></div>'+btn+'</div>';
 }
 function arkListeYaz(){
@@ -15186,7 +15253,7 @@ let bekleyenDavet=null;
 function davetGoster(d){
   bekleyenDavet=d;
   document.getElementById('davetMetin').innerHTML =
-    '<b>'+(d.ad||'Bir oyuncu')+'</b> seni oyuna davet ediyor.<br>'+
+    '<b>'+lobiKac(d.ad||'Bir oyuncu')+'</b> seni oyuna davet ediyor.<br>'+
     '<span style="color:var(--dim);font-size:13px">'+odaAyarMetni(+(d.sure!=null?d.sure:3), +(d.inc||0), null)+'</span>';   /* animasyon kişisel (Ekim 2026) */
   try{ davetSecimCiz(); }catch(e){}
   document.getElementById('davetPop').classList.add('acik');
@@ -15669,10 +15736,10 @@ async function liderYukle(){
         ? '<img src="'+d.avatarFoto+'" style="width:34px;height:34px;border-radius:50%;object-fit:cover">'
         : '<span style="font-size:22px">'+(d.avatar||'♟')+'</span>';
       const madal = sira===1?'🥇':sira===2?'🥈':sira===3?'🥉':String(sira);
-      html+='<div class="liderSatir'+(benim?' ben':'')+'" data-uid="'+doc.id+'" data-ad="'+String(d.kullaniciAdi||'').replace(/"/g,'')+'">'+
+      html+='<div class="liderSatir'+(benim?' ben':'')+'" data-uid="'+doc.id+'" data-ad="'+lobiKac(d.kullaniciAdi||'')+'">'+
         '<div class="ldSira">'+madal+'</div>'+
         '<div class="ldAv">'+ikon+'</div>'+
-        '<div class="ldAd">'+(d.kullaniciAdi||'Oyuncu')+' <span style="font-size:12px">'+bayrak(d.ulke)+'</span></div>'+
+        '<div class="ldAd">'+lobiKac(d.kullaniciAdi||'Oyuncu')+' <span style="font-size:12px">'+bayrak(d.ulke)+'</span></div>'+
         '<div class="ldPuan">'+deger+'</div>'+
       '</div>';
     });
