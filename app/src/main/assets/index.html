@@ -7533,8 +7533,10 @@ function oyunSonu(d, terkKazanan){
     const beraberlikMi = (d==='pat'||d==='berabere'||d==='yetersiz'||d==='3tekrar'||d==='50hamle');
     const benKazandim = !beraberlikMi &&
       ((kazanan==='Beyaz' && Cevrimici.benimRenk==='w') || (kazanan==='Siyah' && Cevrimici.benimRenk==='b'));
-    // Süre bitince ben kaybettim demektir (kendi saatim bitti); onu bildir
-    if(d==='sure'){ Cevrimici.sonucBildir('sure', Cevrimici.rakipRengi()); }
+    /* Süre: kazanan, saati biten tarafın (sırası gelenin) karşısıdır. Eskiden "süre bittiyse benim saatim bitti"
+       sayılıp hep rakip kazanan yazılıyordu; ama iki cihaz iki saati de sayar ve rakibin saati BENİM cihazımda önce
+       sıfırlanabilir — o zaman kazanan ben iken rakip yazılıyor, puan bende düşüyordu (30 Ekim 2026). */
+    if(d==='sure'){ Cevrimici.sonucBildir('sure', kazanan==='Beyaz' ? 'w' : 'b'); }
     else if(d==='mat'){ Cevrimici.sonucBildir('mat', benKazandim?Cevrimici.benimRenk:Cevrimici.rakipRengi()); }
     else if(beraberlikMi){ Cevrimici.sonucBildir('berabere', null); }
   }
