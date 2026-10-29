@@ -528,6 +528,18 @@ body:not(.dikeyAktif) #cevrimiciSerit{top:56px;left:14px;right:auto;text-align:l
 .davetBas{font-family:'Cinzel',serif;font-weight:700;letter-spacing:.16em;
   font-size:13px;color:var(--brass);margin-bottom:12px}
 #davetMetin{color:var(--bone);font-size:15px;line-height:1.6;margin-bottom:18px}
+/* Davet edilen de ordusunu ve arenasını seçer (30 Ekim 2026) */
+#davetSecim{margin:-8px 0 16px;text-align:left}
+#davetSecim .dsBaslik{font:700 11px Manrope,sans-serif;letter-spacing:.14em;color:var(--brass);margin:10px 2px 6px}
+#davetSecim .dsSatir{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#davetSecim .dsSatir::-webkit-scrollbar{display:none}
+#davetSecim .dsKart{flex:0 0 86px;position:relative;padding:0;border:1px solid rgba(122,110,84,.35);border-radius:10px;
+  background:#0E1018;overflow:hidden;cursor:pointer;color:var(--bone);font-family:inherit}
+#davetSecim .dsKart img{display:block;width:100%;height:58px;object-fit:cover}
+#davetSecim .dsKart span{display:block;font:600 10.5px/1.25 Manrope,sans-serif;padding:4px 4px 5px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;text-align:center}
+#davetSecim .dsKart.secili{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass)}
+#davetSecim .dsKart.kilitKart img{opacity:.55}
 .davetBtnlar{display:flex;gap:10px;justify-content:center}
 #cvBekleme{position:absolute;inset:0;background:rgba(6,7,11,.92);display:none;flex-direction:column;
   align-items:center;justify-content:center;gap:18px;z-index:5}
@@ -2865,6 +2877,7 @@ function perdeBittiginde(fn){
   <div class="davetKart">
     <div class="davetBas">OYUN DAVETİ</div>
     <div id="davetMetin"></div>
+    <div id="davetSecim"></div>
     <div class="davetBtnlar">
       <button id="davetKabul" class="sbtn dolu">KABUL ET</button>
       <button id="davetRet" class="sbtn">REDDET</button>
@@ -15175,7 +15188,44 @@ function davetGoster(d){
   document.getElementById('davetMetin').innerHTML =
     '<b>'+(d.ad||'Bir oyuncu')+'</b> seni oyuna davet ediyor.<br>'+
     '<span style="color:var(--dim);font-size:13px">'+odaAyarMetni(+(d.sure!=null?d.sure:3), +(d.inc||0), null)+'</span>';   /* animasyon kişisel (Ekim 2026) */
+  try{ davetSecimCiz(); }catch(e){}
   document.getElementById('davetPop').classList.add('acik');
+}
+/* Davet penceresinde ordu ve arena seçimi (30 Ekim 2026, sahibin isteği): davet edilen kişi de kendi taşlarını
+   ve tahtasını seçebilsin. Seçim kişiseldir (rakip kendi seçtiğini görür); Çevrimiçi ekranındaki seçimle aynı
+   değişkenler (aktifOrdu/aktifArena). Kilitli olanlar aynı Premium/reklam penceresini açar. */
+function davetSecimCiz(){
+  const k=document.getElementById('davetSecim'); if(!k) return;
+  const c=t=>(typeof metniCevir==='function')?metniCevir(t):t;
+  if(aktifOrdu && kilitli('ordu', aktifOrdu.id)) aktifOrdu=ORDULAR[0];
+  if(!aktifArena || kilitli('arena', aktifArena.id)) aktifArena=ARENALAR[0];
+  k.innerHTML='';
+  const satir=(baslik, liste, aktifId, tur, gorsel, sec)=>{
+    const b=document.createElement('div'); b.className='dsBaslik'; b.textContent=c(baslik); k.appendChild(b);
+    const s=document.createElement('div'); s.className='dsSatir';
+    liste.forEach(o=>{
+      const el=document.createElement('button'); el.type='button'; el.className='dsKart'+(o.id===aktifId?' secili':'');
+      el.innerHTML='<img src="'+gorsel(o)+'" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'"><span></span>';
+      el.querySelector('span').textContent=c(o.ad);
+      el.dataset.kTur=tur; el.dataset.kId=o.id;
+      el.onclick=()=>premiumKapi(tur, o.id, ()=>{
+        s.querySelectorAll('.dsKart').forEach(x=>x.classList.remove('secili')); el.classList.add('secili'); sec(o); cvSecimEsitle();
+      });
+      s.appendChild(el);
+    });
+    k.appendChild(s);
+    const sl=s.querySelector('.secili'); if(sl) setTimeout(()=>{ s.scrollLeft=Math.max(0, sl.offsetLeft-s.clientWidth/2+sl.offsetWidth/2); },0);
+  };
+  satir('ORDUN', ORDULAR, aktifOrdu&&aktifOrdu.id, 'ordu', o=>'onizleme/ordu_'+o.id+'.webp', o=>{ aktifOrdu=o; });
+  satir('ARENA', ARENALAR, aktifArena&&aktifArena.id, 'arena', a=>'onizleme/arena_'+a.id+'.webp', a=>{ aktifArena=a; });
+  try{ rozetGuncelle(); }catch(e){}
+}
+/* Çevrimiçi ekranındaki ordu/arena kartlarını o anki seçime göre işaretle */
+function cvSecimEsitle(){
+  [['cvOrdular',aktifOrdu],['cvArenalar',aktifArena]].forEach(([id,o])=>{
+    const l=document.getElementById(id); if(!l || !o) return;
+    l.querySelectorAll('.arena').forEach(x=>x.classList.toggle('secili', x.dataset.kId===o.id));
+  });
 }
 function davetKapat(){
   document.getElementById('davetPop').classList.remove('acik');
