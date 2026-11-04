@@ -4,7 +4,7 @@ service cloud.firestore {
 
     function yol(p) { return path('/databases/' + database + '/documents/' + p); }
 
-    // Profil fotoğrafı: 64x64 JPEG ~3-5 KB. 40.000 karakterden büyüğü reddedilir.
+    // Profil fotoğrafı: 256x256 JPEG ~10-25 KB (eski kayıtlar 64x64). 40.000 karakterden büyüğü reddedilir.
     function fotoGecerli(yeni) {
       return !('avatarFoto' in yeni)
           || yeni.avatarFoto == null

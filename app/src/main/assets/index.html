@@ -415,12 +415,23 @@ body:not(.dikeyAktif) #cevrimiciSerit{top:56px;left:14px;right:auto;text-align:l
 /* Oyuncu fotoğrafı büyütme ve oyuncu kartı (30 Ekim 2026) */
 [data-oy-av],[data-oy-uid]{cursor:pointer}
 .arkAvatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
-#fotoBuyut{position:fixed;inset:0;z-index:99995;background:rgba(4,5,9,.86);display:flex;align-items:center;justify-content:center;
+#fotoBuyut{position:fixed;inset:0;z-index:99995;background:rgba(4,5,9,.86);display:flex;flex-direction:column;gap:14px;padding:18px;align-items:center;justify-content:center;
   animation:fbAc .16s ease-out}
 #fotoBuyut .fbIc{width:min(72vw,300px);height:min(72vw,300px);border-radius:50%;overflow:hidden;background:#1B2030;
   border:2px solid var(--brass);display:flex;align-items:center;justify-content:center;font-size:min(36vw,150px);color:var(--brass);
   box-shadow:0 18px 50px rgba(0,0,0,.6)}
 #fotoBuyut .fbIc img{width:100%;height:100%;object-fit:cover}
+#fotoBuyut .fbIc.kucuk{width:150px;height:150px}
+#fotoBuyut .fbAd{font:700 19px 'Cinzel',serif;color:#F4EEDF;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#fotoBuyut .fbEylem{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%;max-width:340px}
+#fotoBuyut .fbEylem .oyBtn,#fotoBuyut .oyArkKutu{flex:1 1 140px}
+#fotoBuyut .oyArkKutu:empty{display:none}
+.oyBtn{display:block;width:100%;padding:11px 12px;border-radius:10px;border:1px solid rgba(201,162,78,.55);background:rgba(10,12,18,.55);
+  color:#F4EEDF;font:700 14px Manrope,sans-serif;cursor:pointer}
+.oyBtn.dolu{background:linear-gradient(135deg,#F2C765,#C9912A);border-color:transparent;color:#1a1408}
+.oyBtn:disabled{opacity:.72;cursor:default}
+#oyuncuKart .okArk{margin-top:14px}
+#oyuncuKart .okArk:empty{display:none}
 @keyframes fbAc{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
 #oyuncuKart{position:fixed;inset:0;z-index:99990;background:rgba(4,5,9,.8);display:flex;align-items:center;justify-content:center;padding:18px}
 #oyuncuKart .okKutu{background:var(--panel,#12141B);border:1px solid rgba(201,162,78,.4);border-radius:16px;padding:18px;width:100%;max-width:360px;
@@ -1420,7 +1431,7 @@ body.azHareket #son.acik *{animation:none!important}
    siyah şerit kalktı). Tam ekran katmanlarda o kenara SAYDAM kenarlık eklenir:
    arka plan kenara kadar uzanır, yazı/düğmeler eskisi gibi delikten uzak kalır.
    Delik olmayan kenarda env() 0'dır, hiçbir şey değişmez. */
-#yukleniyor,#acilisPerde,#istEkran,#girisEkran,#menu,#lisansEkran,#kurulumEkran,#arkadasEkran,
+#yukleniyor,#acilisPerde,#istEkran,#ogrenEkran,#girisEkran,#menu,#lisansEkran,#kurulumEkran,#arkadasEkran,
 #istekBildirim,#davetPop,#cevrimiciEkran,#hud,#secenekModal,#sesKurModal,#sohbetModal,#terfiModal,
 #yardimKapla,#inceleHUD,#analizEkran,#son,#liderEkran{
   border-top:env(safe-area-inset-top,0px) solid transparent;
@@ -1464,7 +1475,7 @@ html[data-tema] #menu .anaBaslik{margin-top:26px}
   display:flex;align-items:flex-end;justify-content:flex-end;padding:3px}
 #secimSayfa .ssRenk i{width:10px;height:10px;border-radius:3px;display:block}
 html[data-tema="fildisi"] #menu{background:radial-gradient(90% 40% at 50% 8%,#fffdf8,transparent 70%),linear-gradient(180deg,#f3ede2,#e8dfcf)!important}
-html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk){--panel:#fbf8f1;--card:#fbf8f1;--line:rgba(120,95,50,.18);--bone:#1f1b14;--txt:#2b261d;--dim:#776f61;--brass:#A87618;color:#2b261d;background:radial-gradient(90% 40% at 50% 0%,#fffdf8,transparent 70%),linear-gradient(180deg,#f3ede2,#e8dfcf)!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran){--panel:#fbf8f1;--card:#fbf8f1;--line:rgba(120,95,50,.18);--bone:#1f1b14;--txt:#2b261d;--dim:#776f61;--brass:#A87618;color:#2b261d;background:radial-gradient(90% 40% at 50% 0%,#fffdf8,transparent 70%),linear-gradient(180deg,#f3ede2,#e8dfcf)!important}
 html[data-tema="fildisi"] .anaBaslik h1{color:#1c1914}
 html[data-tema="fildisi"] .anaBaslik h1 span{color:#B07E22}
 html[data-tema="fildisi"] .anaKart:not(.oyna){background:#fbf8f1;border-color:rgba(120,95,50,.16);box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 6px 16px rgba(90,70,30,.08)}
@@ -1479,20 +1490,20 @@ html[data-tema="fildisi"] .anaKart.oyna .kartIkon{background:rgba(232,182,76,.14
 html[data-tema="fildisi"] #profilCubuk{background:rgba(255,255,255,.75);color:#2a261f;border-color:rgba(0,0,0,.08)}
 html[data-tema="fildisi"] #menu [onclick*="lisansEkran"],html[data-tema="fildisi"] #menu [onclick*="gizlilik"],html[data-tema="fildisi"] #menu [onclick*="Gizlilik"]{color:#6f685b}
 html[data-tema="fildisi"] #altSecim button{border-color:rgba(120,95,50,.25);color:#3a342a;background:rgba(255,255,255,.6)}
-html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#E8E2D2"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="232, 226, 210"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#cfc9ba"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="207, 201, 186"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#C9C2B2"]{color:#2b261d!important}
-html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#a9a493"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#7d7868"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#8a8578"]{color:#6f685b!important}
-html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="color:#E8B0A0"]{color:#A8402C!important}
-html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="#3a382f"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="58, 56, 47"]{border-color:rgba(120,95,50,.25)!important}
-html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk) [style*="rgba(255,255,255,.02)"]{background:#fbf8f1!important;border:1px solid rgba(120,95,50,.12)}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#E8E2D2"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="232, 226, 210"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#cfc9ba"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="207, 201, 186"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#C9C2B2"]{color:#2b261d!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#a9a493"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#7d7868"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#8a8578"]{color:#6f685b!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#E8B0A0"]{color:#A8402C!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="#3a382f"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="58, 56, 47"]{border-color:rgba(120,95,50,.25)!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="rgba(255,255,255,.02)"]{background:#fbf8f1!important;border:1px solid rgba(120,95,50,.12)}
 html[data-tema="fildisi"] #bulmacaZorluk .bzSec span{color:#6f685b}
 html[data-tema="gece"] #menu{background:radial-gradient(70% 32% at 50% 15%,rgba(232,182,76,.20),rgba(232,182,76,.06) 55%,transparent 80%),radial-gradient(120% 60% at 50% 100%,rgba(40,48,78,.35),transparent 70%),linear-gradient(180deg,#0c0f19,#080a11 55%,#06070b)!important}
-html[data-tema="gece"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk){--panel:#10131d;--line:rgba(232,182,76,.13);background:radial-gradient(90% 36% at 50% 0%,rgba(232,182,76,.10),transparent 70%),linear-gradient(180deg,#0c0f19,#06070b)!important}
+html[data-tema="gece"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran){--panel:#10131d;--line:rgba(232,182,76,.13);background:radial-gradient(90% 36% at 50% 0%,rgba(232,182,76,.10),transparent 70%),linear-gradient(180deg,#0c0f19,#06070b)!important}
 html[data-tema="gece"] .anaKart:not(.oyna){background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.008) 60%),#10131d;border-color:rgba(232,182,76,.11);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.3)}
 html[data-tema="gece"] .anaKart:not(.oyna) .kartIkon{background:linear-gradient(160deg,rgba(232,182,76,.16),rgba(232,182,76,.06));border-color:rgba(232,182,76,.22)}
 html[data-tema="gece"] .anaKart:not(.oyna) .kartAlt{color:#a29d90}
 html[data-tema="gece"] .anaBaslik h1{text-shadow:0 0 28px rgba(232,182,76,.18)}
 html[data-tema="obsidyen"] #menu{background:radial-gradient(80% 30% at 50% 0%,rgba(255,255,255,.05),transparent 70%),#050506!important}
-html[data-tema="obsidyen"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk){--panel:#0e0e10;--line:rgba(255,255,255,.09);background:radial-gradient(80% 30% at 50% 0%,rgba(255,255,255,.04),transparent 70%),#050506!important}
+html[data-tema="obsidyen"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran){--panel:#0e0e10;--line:rgba(255,255,255,.09);background:radial-gradient(80% 30% at 50% 0%,rgba(255,255,255,.04),transparent 70%),#050506!important}
 html[data-tema="obsidyen"] .anaBaslik h1{font-size:36px;letter-spacing:.24em;color:#f1ede4}
 html[data-tema="obsidyen"] .anaBaslik::after{content:"";display:block;width:54px;height:1px;margin:16px auto 0;background:linear-gradient(90deg,transparent,#E8B64C,transparent)}
 html[data-tema="obsidyen"] .kartlar{gap:0;margin-top:30px}
@@ -1505,7 +1516,7 @@ html[data-tema="obsidyen"] .anaKart:not(.oyna) .kartAlt{color:#8d887e}
 html[data-tema="obsidyen"] .anaKart:not(.oyna) .kartOk{color:#E8B64C;opacity:.8}
 html[data-tema="obsidyen"] #altSecim button{border:none;border-bottom:1px solid rgba(232,182,76,.4);border-radius:0;background:none;color:#cfc9ba}
 html[data-tema="zumrut"] #menu{background:radial-gradient(80% 36% at 50% 12%,rgba(78,150,108,.28),transparent 75%),linear-gradient(180deg,#0d2a1f,#081a13 55%,#05110c)!important}
-html[data-tema="zumrut"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk){--panel:#0b241b;--line:rgba(201,168,92,.22);--bone:#efe6cf;--dim:#9fb3a5;background:radial-gradient(80% 36% at 50% 0%,rgba(78,150,108,.22),transparent 75%),linear-gradient(180deg,#0d2a1f,#05110c)!important}
+html[data-tema="zumrut"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran){--panel:#0b241b;--line:rgba(201,168,92,.22);--bone:#efe6cf;--dim:#9fb3a5;background:radial-gradient(80% 36% at 50% 0%,rgba(78,150,108,.22),transparent 75%),linear-gradient(180deg,#0d2a1f,#05110c)!important}
 html[data-tema="zumrut"] .anaKart:not(.oyna){background:linear-gradient(180deg,rgba(255,255,255,.035),transparent),rgba(9,32,24,.85);border-color:rgba(201,168,92,.24);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.3)}
 html[data-tema="zumrut"] .anaKart:not(.oyna) .kartIkon{background:rgba(201,168,92,.12);border-color:rgba(201,168,92,.28)}
 html[data-tema="zumrut"] .anaKart:not(.oyna) .kartAlt{color:#9fb3a5}
@@ -1515,7 +1526,7 @@ html[data-tema="zumrut"] .anaKart:not(.oyna) .kartIkon{color:#d8b866}
 html[data-tema="zumrut"] #profilCubuk{background:rgba(6,26,19,.75);border-color:rgba(201,168,92,.25)}
 html[data-tema="zumrut"] #altSecim button{border-color:rgba(201,168,92,.35);color:#e6dcc0;background:rgba(201,168,92,.07)}
 html[data-tema="bordo"] #menu{background:radial-gradient(80% 36% at 50% 10%,rgba(170,40,64,.38),transparent 75%),linear-gradient(180deg,#2a0b14,#17070c 55%,#0c0407)!important}
-html[data-tema="bordo"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk){--panel:#260a12;--line:rgba(232,182,76,.18);--bone:#f3e6d4;--dim:#bfa3a7;background:radial-gradient(80% 36% at 50% 0%,rgba(170,40,64,.30),transparent 75%),linear-gradient(180deg,#2a0b14,#0c0407)!important}
+html[data-tema="bordo"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran){--panel:#260a12;--line:rgba(232,182,76,.18);--bone:#f3e6d4;--dim:#bfa3a7;background:radial-gradient(80% 36% at 50% 0%,rgba(170,40,64,.30),transparent 75%),linear-gradient(180deg,#2a0b14,#0c0407)!important}
 html[data-tema="bordo"] .anaKart:not(.oyna){background:linear-gradient(180deg,rgba(255,255,255,.04),transparent),rgba(38,10,18,.82);border-color:rgba(232,182,76,.20);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.3)}
 html[data-tema="bordo"] .anaKart:not(.oyna) .kartIkon{background:rgba(232,182,76,.11);border-color:rgba(232,182,76,.26)}
 html[data-tema="bordo"] .anaKart:not(.oyna) .kartAlt{color:#bfa3a7}
@@ -1526,7 +1537,7 @@ html[data-tema="bordo"] #altSecim button{border-color:rgba(232,182,76,.32);color
 /* Buzlu Cam: menünün zemini AÇIK — arkada canlı 3B tahta görünür, kartlar buzlu cam
    (sahibi bu görünümü beğendi). Sahne menüde de zaten çizildiği için ek yük yok. */
 html[data-tema="cam"] #menu{background:none!important}
-html[data-tema="cam"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk){--panel:#161a26;--line:rgba(255,255,255,.12);background:linear-gradient(180deg,#0e1018,#06070b)!important}
+html[data-tema="cam"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran){--panel:#161a26;--line:rgba(255,255,255,.12);background:linear-gradient(180deg,#0e1018,#06070b)!important}
 html[data-tema="cam"] #menu .anaBaslik h1{text-shadow:0 4px 30px rgba(0,0,0,.6)}
 html[data-tema="cam"] #menu .anaKart:not(.oyna){background:rgba(22,25,36,.42);border-color:rgba(255,255,255,.13);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 8px 22px rgba(0,0,0,.3)}
 html[data-tema="cam"] #menu .anaKart:not(.oyna) .kartIkon{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14)}
@@ -1615,7 +1626,12 @@ html[data-tema="fildisi"] #cevrimiciEkran #cvGirisBtn[style]{background:linear-g
 
 /* ===== PROFİL (3 Ekim 2026): Oyun Kur ile aynı dil ===== */
 #istProfil{gap:16px;padding:8px 16px 16px}
-#istAvatar{width:66px;height:66px;font-size:34px;border-width:2px;
+/* Uzun adda satır daralınca fotoğraf ince bir çizgiye sıkışıp görünmez oluyordu (4 Kasım 2026): boyutu sabit,
+   ad kendi alanında kısalır, dar ekranda Arkadaşlar düğmesi yalnız simge olur. */
+#istProfilBilgi{flex:1 1 auto;min-width:0}
+#istArkadas{flex:none}
+@media (max-width:440px){ #istArkadas{font-size:0;gap:0;width:40px;padding:0;justify-content:center} }
+#istAvatar{flex:0 0 66px;padding:0;overflow:hidden;width:66px;height:66px;font-size:34px;border-width:2px;
   background:radial-gradient(circle at 35% 30%,rgba(232,182,76,.22),transparent 60%),var(--panel);
   box-shadow:0 6px 16px rgba(0,0,0,.18)}
 #istProfilBilgi #istAd{font-size:19px;letter-spacing:.06em}
@@ -2112,6 +2128,56 @@ body.incelemede #yonBtn{transform:translateY(-98px) scale(.86);transition:transf
   background:linear-gradient(135deg,#F2C765,#C9912A);color:#1a1408;font:800 14px Manrope,sans-serif;letter-spacing:.04em;
   box-shadow:0 8px 20px rgba(201,145,42,.32),inset 0 1px 0 rgba(255,255,255,.35)}
 #inceleKontrol .ibtn.dolu svg{width:15px;height:15px}
+/* ===== ÖĞREN ===== */
+#ogrenEkran,#ogrenEkran *,#ogrenPanel,#ogrenPanel *{box-sizing:border-box}
+#ogrenEkran{position:fixed;inset:0;z-index:60;display:none;overflow-y:auto;overflow-x:hidden;background:var(--ink,#0a0c12);padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 28px}
+#ogrenEkran.acik{display:block}
+#ogrenEkran .ogUst{display:flex;align-items:center;gap:12px;font:700 20px 'Cinzel',serif;letter-spacing:.14em;color:var(--bone)}
+#ogrenEkran #ogGeri{background:none;border:none;color:var(--brass);font-size:30px;line-height:1;padding:2px 10px 6px 4px;cursor:pointer}
+#ogrenEkran .ogAlt{color:var(--dim);font-size:14px;margin:6px 2px 12px}
+#ogrenEkran .ogIlerle{height:6px;border-radius:3px;background:rgba(127,127,127,.2);overflow:hidden;margin-bottom:6px}
+#ogrenEkran .ogIlerle i{display:block;height:100%;background:linear-gradient(90deg,#C9912A,#F2C765)}
+#ogrenEkran .ogBolum{font:700 11px Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);margin:18px 2px 8px}
+#ogrenEkran .ogDers{display:flex;align-items:center;gap:12px;width:100%;padding:11px 14px;margin-bottom:8px;border-radius:14px;cursor:pointer;
+  border:1px solid rgba(185,154,91,.3);background:var(--panel,#12141B);color:var(--bone);font:600 15px Manrope,sans-serif;text-align:start}
+#ogrenEkran .ogDers b{flex:0 0 28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;
+  background:rgba(232,182,76,.14);color:var(--brass)}
+#ogrenEkran .ogDers.tamam b{background:#2f7d4f;color:#fff}
+#ogrenEkran .ogDers span{flex:1;min-width:0}
+#ogrenEkran .ogDers em{font-style:normal;color:var(--dim);font-size:20px}
+body.ogrende .notSerit,body.ogrende #notPanel,body.ogrende #notPanelSag{display:none!important}
+#ogrenPanel{position:fixed;left:0;right:0;bottom:0;z-index:40;display:none;flex-direction:column;gap:8px;padding:10px 14px calc(env(safe-area-inset-bottom,0px) + 12px);
+  border-radius:22px 22px 0 0;background:linear-gradient(180deg,#121319,#090a0e);box-shadow:0 -1px 0 rgba(232,182,76,.2),0 -16px 36px rgba(0,0,0,.45);color:#EDE6D6}
+#ogrenPanel.acik{display:flex}
+#ogrenPanel .opUst{display:flex;align-items:center;gap:8px}
+#ogrenPanel .opAd{flex:1;min-width:0;font:700 15px 'Cinzel',serif;letter-spacing:.04em;color:#E8B64C;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ogrenPanel .opSayac{font:600 12px Manrope,sans-serif;color:#9FA8B5}
+#ogrenPanel #opKapat,#ogrenPanel #opSes{flex:none;width:34px;height:34px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#EDE6D6;
+  display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
+#ogrenPanel #opSes svg{width:18px;height:18px}
+#ogrenPanel .opMetin{font-size:14.5px;line-height:1.45;height:88px;overflow-y:auto}
+#ogrenPanel .opMetin.dogru{color:#7FD08B}
+#ogrenPanel .opMetin.yanlis{color:#F0A36B}
+#ogrenPanel .opDugmeler{display:flex;gap:8px;justify-content:flex-end;min-height:42px}
+#ogrenPanel .opBtn{flex:1;height:42px;border-radius:12px;border:1px solid rgba(232,182,76,.45);background:transparent;color:#EDE6D6;font:700 14px Manrope,sans-serif;cursor:pointer}
+#ogrenPanel .opBtn.dolu{background:linear-gradient(135deg,#F2C765,#C9912A);border-color:transparent;color:#1a1408}
+@media (orientation:landscape) and (max-height:560px){
+  #ogrenPanel{left:auto;top:0;width:250px;border-radius:18px 0 0 18px}
+  #ogrenPanel .opMetin{flex:1;height:auto}
+}
+/* Tahtaya yer (4 Kasım 2026): panel ekranın yarısını kaplıyor, 2B tahta genişliğin %75'ine düşüyordu.
+   Özet tek satır, grafik ve düğmeler daha ince; yorum kartı sabit yükseklikte (uzun yorum kendi içinde kayar),
+   böylece hamle değiştikçe panel boyu oynamaz ve tahta zıplamaz. */
+#inceleHUD{gap:7px;padding:9px 12px 9px}
+#inceleOzet.acik{flex-wrap:nowrap;margin-bottom:0;gap:5px}
+#inceleOzet .ozetKutu{padding:3px 9px;gap:5px;font-size:12.5px}
+#inceleOzet .ozetAd{display:none}
+#inceleOzet .ozetSem{font-size:13px;min-width:0}
+#igKutu{height:30px}
+#inceleGrafik .igUst{margin-bottom:3px}
+#inceleYorum{height:92px;min-height:0;padding:9px 12px;overflow-y:auto;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+#inceleKontrol .ibtn{flex-basis:42px;height:42px}
+#inceleKontrol .ibtn.dolu{border-radius:21px}
 #inceleKontrol .ibtn:active{transform:scale(.94);opacity:1}
 
 /* ===== OYUN SONU — premium karne (4 Ekim 2026) =====
@@ -2255,7 +2321,7 @@ body:not(.dikeyAktif) #btnDuz .sg svg{width:18px;height:18px}
 #gizleBtn svg{width:15px;height:15px}
 #gizleBtn:active{transform:scale(.94)}
 body:has(#hud.acik) #gizleBtn{display:inline-flex}
-body.incelemede #gizleBtn,body:has(#son.acik) #gizleBtn,body:has(#bulmacaSerit.acik) #gizleBtn,body:has(#menu:not(.gizli)) #gizleBtn{display:none!important}
+body.incelemede #gizleBtn,body.ogrende #gizleBtn,body:has(#son.acik) #gizleBtn,body:has(#bulmacaSerit.acik) #gizleBtn,body:has(#menu:not(.gizli)) #gizleBtn{display:none!important}
 body.araclarGizli #gizleBtn{background:rgba(232,182,76,.16);border-color:rgba(232,182,76,.45);color:#F2D79A}
 body.araclarGizli:not(.incelemede) #hud,body.araclarGizli:not(.incelemede) #esirler,
 body.araclarGizli:not(.incelemede) #notKontrol{visibility:hidden!important}
@@ -2711,6 +2777,15 @@ function perdeBittiginde(fn){
       <div class="kartMetin">
         <div class="kartAd">Çevrimiçi Oyna</div>
         <div class="kartAlt">Gerçek rakiplere karşı</div>
+      </div>
+      <div class="kartOk">›</div>
+    </button>
+
+    <button class="anaKart" id="ogrenKart">
+      <div class="kartIkon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5 12 4l9 3.5-9 3.5z"/><path d="M7 9.5V15c0 1.3 2.2 2.5 5 2.5s5-1.2 5-2.5V9.5"/><path d="M21 7.5V13"/></svg></div>
+      <div class="kartMetin">
+        <div class="kartAd">Öğren</div>
+        <div class="kartAlt">Satrancı sıfırdan öğren</div>
       </div>
       <div class="kartOk">›</div>
     </button>
@@ -3394,7 +3469,7 @@ let fbAuth=null, fbDb=null, fbKullanici=null;
 
 // Tahta: 64'lük dizi. null veya {t:'p|n|b|r|q|k', c:'w|b'}
 const Motor = (() => {
-  let board, turn, castle, ep, halfmove, history;
+  let board, turn, castle, ep, halfmove, history, ilkKonum;
 
   function reset(){
     board = new Array(64).fill(null);
@@ -3405,7 +3480,7 @@ const Motor = (() => {
       board[48+f]     = {t:'p',     c:'w'};
       board[56+f]     = {t:arka[f], c:'w'};
     }
-    turn='w'; castle={wK:true,wQ:true,bK:true,bQ:true}; ep=-1; halfmove=0; history=[];
+    turn='w'; castle={wK:true,wQ:true,bK:true,bQ:true}; ep=-1; halfmove=0; history=[]; ilkKonum=konumAnahtari();
   }
   function fenYukle(fen){
     // FEN'den konum kur: "rnbqkbnr/pppppppp/... w KQkq - 0 1"
@@ -3437,7 +3512,7 @@ const Motor = (() => {
         ep = sat_*8 + sut_;
       } else ep = -1;
       halfmove = parseInt(parca[4],10); if(!isFinite(halfmove) || halfmove<0) halfmove=0;
-      history=[];
+      history=[]; ilkKonum=konumAnahtari();
       return true;
     }catch(e){ reset(); return false; }
   }
@@ -3673,18 +3748,22 @@ const Motor = (() => {
     }
     return false;
   }
-  /* Konum üç kez tekrarlandı mı? history içine her hamlede konum anahtarı yazılır. */
+  /* Konum üç kez tekrarlandı mı? history içine her hamlede konum anahtarı yazılır.
+     ESKİ HATA (4 Kasım 2026): durum() hamle geçmişe yazıldıktan SONRA çağrıldığı için mevcut konum iki kez
+     sayılıyor, oyun konum 2. kez gelince "üç tekrar" diye bitiyordu. Başlangıç konumu da hiç sayılmıyordu. */
   function ucTekrar(){
-    if(!history || history.length<8) return false;
     const simdi = konumAnahtari();
-    let say=1;                       // mevcut konum da sayılır
+    let say = ilkKonum===simdi ? 1 : 0;
     for(const h of history) if(h===simdi) say++;
+    if(history[history.length-1]!==simdi) say++;   // geçmişe henüz yazılmamışsa mevcut konumu da say
     return say>=3;
   }
   function konumAnahtari(){
     let s='';
     for(let i=0;i<64;i++){ const p=board[i]; s += p ? (p.c==='w'?p.t.toUpperCase():p.t) : '.'; }
-    return s+'|'+turn+'|'+(castle.wK?'K':'')+(castle.wQ?'Q':'')+(castle.bK?'k':'')+(castle.bQ?'q':'')+'|'+ep;
+    return s+'|'+turn+'|'+(castle.wK?'K':'')+(castle.wQ?'Q':'')+(castle.bK?'k':'')+(castle.bQ?'q':'')+'|'+
+      // Geçerken alma yalnız gerçekten oynanabiliyorsa konumu farklı yapar (FIDE 9.2)
+      (ep>=0 && legalHamleler(turn).some(m=>m.enpassant) ? ep : -1);
   }
   /* ESKİ DURUM: yalnızca 'devam' | 'mat' | 'pat' dönüyordu. Arayüzde
      'yetersiz', '3tekrar' ve '50hamle' ekranları YAZILMIŞ ama bu değerleri
@@ -4247,17 +4326,21 @@ function parcacikGuncelle(dt,t){
 // Tahta kenarı koordinat etiketleri (a-h, 1-8) — canvas dokulu küçük plakalar
 function koordinatlarEkle(grup, renkHex, yuk){
   if(yuk===undefined) yuk=-0.018;
+  /* Arena rengi açık kenarda okunmuyordu (Öğren'de sahibi buldu, 4 Kasım 2026). Koyu yazı + açık kontur
+     her zeminde okunur; renkHex parametresi bu yüzden artık kullanılmıyor. */
   const yap=(metin)=>{
     const cv=document.createElement('canvas'); cv.width=64; cv.height=64;
     const ctx=cv.getContext('2d');
     ctx.clearRect(0,0,64,64);
-    ctx.font='bold 44px Georgia,serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillStyle=renkHex;
+    ctx.font='900 50px Georgia,serif';
+    ctx.lineJoin='round'; ctx.lineWidth=9; ctx.strokeStyle='#FFF6DF';
+    ctx.strokeText(metin,32,34);
+    ctx.fillStyle='#241505';
     ctx.fillText(metin,32,34);
     const t=new THREE.CanvasTexture(cv);
     const mat=new THREE.MeshBasicMaterial({map:t, transparent:true, depthWrite:false});
-    const p=new THREE.Mesh(new THREE.PlaneGeometry(0.42,0.42), mat);
+    const p=new THREE.Mesh(new THREE.PlaneGeometry(0.5,0.5), mat);
     p.rotation.x=-Math.PI/2;
     return p;
   };
@@ -6226,7 +6309,7 @@ function kameraGuncelle(){
   /* İnceleme modunda alt bilgi şeridi ~3 satır yer kaplıyor; tahta onun
      altında sıkışıyordu. Kamera hedefini ileri kaydırarak tahtayı ekranda
      yukarı taşı — üstteki boş alan kullanılmış olur. */
-  if(typeof inceleAktif!=='undefined' && inceleAktif){
+  if((typeof inceleAktif!=='undefined' && inceleAktif) || (window._duzIncKadraj && ogrenModu)){
     const yatay = innerWidth > innerHeight;
     const kaydir = yatay ? 0.55 : 1.15;
     if(typeof duzGorunum!=='undefined' && duzGorunum){
@@ -6879,6 +6962,7 @@ async function hamleOyna(h, ai=false, uzaktan=false){
     gozdenGecir=-1; secili=-1; legalSet=[];
     taslariDiz(false); vurguTemizle();
   }
+  if(ogrenModu && !ai && !uzaktan){ ogrenHamle(h); return; }
   // Bulmaca modu: hamleyi çözümle karşılaştır
   if(bulmacaModu && !ai){
     const b=BULMACALAR[bulmacaIndex];
@@ -8751,7 +8835,7 @@ function hamleBaslat(h){
 }
 function hamleOnayAsamasi(h){
   // 2) Hamle onayı açık (yerel oyunlarda) → onay iste
-  if(hamleOnayi && !cevrimiciAktif){
+  if(hamleOnayi && !cevrimiciAktif && !ogrenModu){
     const bar=document.getElementById('onayBar');
     bar.style.display='flex';
     // hamleyi görsel olarak önizle (sadece vurgu)
@@ -9031,6 +9115,7 @@ function menuKur(){
   const bm=document.getElementById('btnMisafir'); if(bm) bm.onclick=misafirDevam;
   const ib=document.getElementById('istKart'); if(ib) ib.onclick=()=>istEkraniAc();
   const bb=document.getElementById('bulmacaKart'); if(bb) bb.onclick=()=>bulmacaBaslat();
+  const og=document.getElementById('ogrenKart'); if(og) og.onclick=()=>ogrenAc();
   const ok=document.getElementById('oynaKart'); if(ok) ok.onclick=()=>kurulumAc();
   const hk=document.getElementById('hizliKart'); if(hk) hk.onclick=()=>{
     let a=null; try{ a=JSON.parse(localStorage.getItem('sonAyar')||'null'); }catch(e){}
@@ -9738,6 +9823,7 @@ function standartDizilis(){
 function esirListesi(){
   const L={w:[],b:[]};
   if(typeof bulmacaModu!=='undefined' && bulmacaModu) return L;
+  if(typeof ogrenModu!=='undefined' && ogrenModu) return L;
   if(!(typeof oyunAktif!=='undefined' && oyunAktif) && !(typeof inceleAktif!=='undefined' && inceleAktif)) return L;
   let idx = (typeof inceleAktif!=='undefined' && inceleAktif) ? inceleIdx
           : ((typeof gozdenGecir!=='undefined' && gozdenGecir>=0) ? gozdenGecir : konumGecmisi.length-1);
@@ -9961,6 +10047,7 @@ function duzGorunumDegistir(){
 // Oyuncu siyah tarafta mı? (çevrimiçi veya AI'ya karşı siyah)
 function oyuncuSiyahMi(){
   if(bulmacaModu) return BULMACALAR[bulmacaIndex].r==='b';
+  if(ogrenModu) return false;
   if(cevrimiciAktif) return Cevrimici.benimRenk==='b';
   if(mod==='ai') return aktifInsanRenk==='b';
   return false; // iki kişilik: beyaz taraf
@@ -10218,9 +10305,12 @@ function cevrimiciBilgiGoster(rakipAd){
         if(!d.exists) return;
         const p=d.data();
         const hedef=s.querySelector('.cvsAvatar'); if(!hedef) return;
-        hedef.innerHTML = p.avatarFoto
-          ? '<img src="'+p.avatarFoto+'" style="width:20px;height:20px;border-radius:50%;object-fit:cover;vertical-align:-5px;margin-right:5px">'
-          : '<span style="margin-right:4px">'+(p.avatar||'')+'</span>';
+        const rFoto=guvenliFoto(p.avatarFoto);
+        oyKaydet(rakipUid, {ad:p.kullaniciAdi||rakipAd||'Oyuncu', foto:p.avatarFoto||'', avatar:p.avatar||'', ulke:p.ulke||''});
+        hedef.setAttribute('data-oy-av', rakipUid);
+        hedef.innerHTML = rFoto
+          ? '<img src="'+rFoto+'" style="width:20px;height:20px;border-radius:50%;object-fit:cover;vertical-align:-5px;margin-right:5px">'
+          : '<span style="margin-right:4px">'+lobiKac(p.avatar||'')+'</span>';
       }).catch(()=>{});
     }
   }catch(e){}
@@ -10424,10 +10514,65 @@ function oyAvatarHtml(v){
 function fotoBuyut(uid){
   const v=oyOnbellek[uid]||{};
   let m=document.getElementById('fotoBuyut'); if(m) m.remove();
+  const c=t=>(typeof metniCevir==='function')?metniCevir(t):t;
+  const kartAcik=!!document.getElementById('oyuncuKart');
   m=document.createElement('div'); m.id='fotoBuyut';
-  m.innerHTML='<div class="fbIc">'+oyAvatarHtml(v)+'</div>';
-  m.onclick=()=>m.remove();
+  m.innerHTML='<div class="fbIc">'+oyAvatarHtml(v)+'</div>'+
+    (v.ad?'<div class="fbAd">'+lobiKac(v.ad)+'</div>':'')+
+    '<div class="fbEylem">'+(kartAcik?'':'<button type="button" class="oyBtn fbKart">'+lobiKac(c('Profili gör'))+'</button>')+
+    '<span class="oyArkKutu"></span></div>';
+  m.onclick=e=>{
+    if(e.target.closest('.fbKart')){ m.remove(); oyuncuKartAc(uid); return; }
+    if(e.target.closest('.fbEylem')) return;
+    m.remove();
+  };
   document.body.appendChild(m);
+  /* Eski profil fotoğrafları 64×64: kocaman gösterilince bulanıklaşıyordu, onları küçük tut */
+  const im=m.querySelector('.fbIc img');
+  if(im){ const ayar=()=>{ if(im.naturalWidth && im.naturalWidth<128) m.querySelector('.fbIc').classList.add('kucuk'); };
+    if(im.complete) ayar(); else im.onload=ayar; }
+  oyArkadasDugme(uid, m.querySelector('.oyArkKutu'), v.ad);
+}
+/* Arkadaş ekleme düğmesi (4 Kasım 2026, sahibin isteği): foto büyütme ve oyuncu kartında.
+   Duruma göre: + Arkadaş ekle / Kabul et (o bana istek göndermişse) / Arkadaşsınız / İstek gönderildi. */
+const arkIstekGonderilen={};
+async function oyArkadasDugme(uid, kutu){
+  if(!kutu || !uid || typeof fbDb==='undefined' || !fbDb || !fbKullanici || uid===fbKullanici.uid) return;
+  if(typeof misafirMod!=='undefined' && misafirMod) return;
+  const c=t=>(typeof metniCevir==='function')?metniCevir(t):t;
+  const benimAd=(bulutIst&&bulutIst.kullaniciAdi)||'Oyuncu';
+  const ben=fbDb.collection('oyuncular').doc(fbKullanici.uid);
+  let durum='ekle', istekAd='';
+  try{
+    if((await ben.collection('arkadaslar').doc(uid).get()).exists) durum='arkadas';
+    else{
+      const ist=await ben.collection('istekler').doc(uid).get();
+      if(ist.exists){ durum='kabul'; istekAd=(ist.data()||{}).ad||''; }
+      else if(arkIstekGonderilen[uid]) durum='gitti';
+    }
+  }catch(e){}
+  if(!document.body.contains(kutu)) return;
+  const yaz=(metin,kapali)=>{
+    kutu.innerHTML='<button type="button" class="oyBtn dolu"'+(kapali?' disabled':'')+'>'+lobiKac(c(metin))+'</button>';
+    return kutu.firstChild;
+  };
+  if(durum==='arkadas'){ yaz('✓ Arkadaşsınız',true); return; }
+  if(durum==='gitti'){ yaz('✓ İstek gönderildi',true); return; }
+  const etiket = durum==='kabul' ? 'İsteği kabul et' : '+ Arkadaş ekle';
+  const b=yaz(etiket,false);
+  b.onclick=async ()=>{
+    b.disabled=true; b.textContent='…';
+    let ok=false;
+    if(durum==='kabul'){
+      try{ await Cevrimici.arkadasKabul(uid, istekAd, benimAd); ok=true; }catch(e){}
+    }else{
+      ok=await Cevrimici.arkadasIstekGonder(uid, benimAd);
+      if(ok) arkIstekGonderilen[uid]=true;
+    }
+    if(ok){ b.textContent=c(durum==='kabul'?'✓ Arkadaşsınız':'✓ İstek gönderildi'); return; }
+    b.disabled=false; b.textContent=c(etiket);
+    if(typeof anlatimGoster==='function') anlatimGoster(c('Gönderilemedi'),3200);
+  };
 }
 async function oyuncuKartAc(uid){
   if(!uid) return;
@@ -10437,10 +10582,12 @@ async function oyuncuKartAc(uid){
   const on=oyOnbellek[uid]||{};
   m.innerHTML='<div class="okKutu"><div class="okUst"><div class="okAv" data-oy-av="'+lobiKac(uid)+'">'+oyAvatarHtml(on)+'</div>'+
     '<div style="min-width:0"><div class="okAd">'+lobiKac(on.ad||'…')+'</div><div class="okPuan"></div></div></div>'+
+    '<div class="oyArkKutu okArk"></div>'+
     '<div class="okIcerik"><div class="okBos">'+lobiKac(c('Yükleniyor…'))+'</div></div>'+
     '<button type="button" class="okKapat">'+lobiKac(c('Kapat'))+'</button></div>';
   m.onclick=e=>{ if(e.target===m || e.target.classList.contains('okKapat')) m.remove(); };
   document.body.appendChild(m);
+  oyArkadasDugme(uid, m.querySelector('.okArk'));
   const ic=m.querySelector('.okIcerik');
   if(typeof fbDb==='undefined' || !fbDb || !fbKullanici){ ic.innerHTML='<div class="okBos">'+lobiKac(c('Profil yüklenemedi.'))+'</div>'; return; }
   let v=null;
@@ -11152,6 +11299,7 @@ function cvBeklemeGoster(metin, kod, ayar){
   }
 }
 function kurulumAc(){
+  mod='ai';   // Oyun Kur her açılışta yapay zekâ ile başlar (4 Kasım 2026, sahibin isteği)
   kurulumSecimEsitle();
   document.getElementById('kurulumEkran').classList.add('acik');
 }
@@ -11524,6 +11672,9 @@ window.geriTusu=function(){
     if(acik('istEkran')){ istEkraniKapat(); return true; }
     // 3. Çevrimiçi ekran açıksa → kapat
     if(acik('cevrimiciEkran')){ if(typeof cevrimiciKapat==='function') cevrimiciKapat(); return true; }
+    // Öğren: dersten listeye, listeden menüye
+    if(typeof ogrenModu!=='undefined' && ogrenModu){ ogrenBitir(); return true; }
+    if(acik('ogrenEkran')){ ogrenKapat(); return true; }
     // 4. Bulmaca modundaysa → bulmacadan çık
     if(typeof bulmacaModu!=='undefined' && bulmacaModu){ if(typeof bulmacaBitir==='function'){ bulmacaBitir(); return true; } }
     // 5. Bulmaca zorluk seçimi açıksa → kapat
@@ -11632,7 +11783,11 @@ function inceleKapsamCiz(){
   });
 }
 
-async function tahtadaIncelemeBaslat(){
+/* Profilden açılan geçmiş oyun: "Bitir" profile döner. Eskiden oyun sonu ekranı açılıyor, üzerinde önceki
+   maçın (ya da varsayılan "ŞAH DÜŞTÜ") başlığı kalıyordu; beraberliği inceleyip çıkınca bile o yazıyordu. */
+let gecmisIncelemede=false;
+async function tahtadaIncelemeBaslat(gecmis){
+  gecmisIncelemede=(gecmis===true);
   // Oyun sonu ekranını gizle, tahtayı göster, HUD'u aç
   document.getElementById('son').classList.remove('acik');
   document.getElementById('inceleHUD').classList.add('acik');
@@ -11669,6 +11824,7 @@ async function tahtadaIncelemeBaslat(){
     inceleAnalizVar=true;
     inceleOzetDoldur();
   }
+  if(!inceleAktif) return;   // analiz sürerken incelemeden çıkıldıysa
   malzemeOlaylariHesapla();
   inceleKapsamCiz();
   inceleGrafikCiz();
@@ -11972,11 +12128,15 @@ let _incKay=0;
 function inceleGorunumAyarla(){
   try{
     if(typeof camera==='undefined' || !camera) return;
-    const hud=document.getElementById('inceleHUD');
+    /* Öğren paneli de altta durur: kısa ekranlarda tahtanın altını örtmesin diye aynı kadraj kullanılır
+       (yatayda panel yanda olduğu için kadraj gerekmez). */
+    const ogrenP=ogrenModu ? document.getElementById('ogrenPanel') : null;
+    const ogrenAltta=!!(ogrenP && ogrenP.classList.contains('acik') && ogrenP.getBoundingClientRect().top>1);
+    const hud=ogrenAltta ? ogrenP : document.getElementById('inceleHUD');
     camera.clearViewOffset();
     window._duzIncKadraj=null;
     if(!hud || !hud.classList.contains('acik')){ _incKay=0; document.body.classList.remove('incelemede'); cizimIste(); return; }
-    document.body.classList.add('incelemede');
+    if(!ogrenAltta) document.body.classList.add('incelemede');
     if(typeof duzGorunum!=='undefined' && duzGorunum){
       /* 2B (8 Ekim 2026): tam ekran genişliğindeki düz tahta üst çubuk ile panel arasına sığmıyordu
          (üst ve alt sıralar örtülüyordu). Tahta (koordinatlarıyla ~9 birim) o boşluğa sığacak
@@ -12195,6 +12355,16 @@ function tahtadaIncelemeBitir(){
   document.getElementById('inceleHUD').classList.remove('acik');
   document.body.classList.remove('incelemede');
   try{ if(typeof camera!=='undefined' && camera) camera.clearViewOffset(); }catch(e){}
+  if(gecmisIncelemede){
+    gecmisIncelemede=false;
+    if(typeof _analizSuruyor!=='undefined' && _analizSuruyor) _analizIptal=true;
+    oyunKaydi=[]; konumGecmisi=[]; Motor.reset();
+    vurguTemizle();
+    document.getElementById('hud').classList.remove('acik');
+    document.getElementById('menu').classList.remove('gizli');
+    document.getElementById('istEkran').classList.add('acik');
+    return;
+  }
   const son=document.getElementById('son');
   son.classList.add('acik');
   son.scrollTop=0;
@@ -12959,6 +13129,7 @@ function bulmacaTipBaslat(tip){
   bulmacaListePos=_ilk>=0?_ilk:0;
   bulmacaIndex=bulmacaListe[bulmacaListePos];
   bulmacaModu=true;
+  mod='2p';   // mod 'ai' kalırsa siyahın oynadığı bulmacada tahtaya dokunulamıyor
   bulmacaOncekiOrdu=aktifOrdu;
   const nap=ORDULAR.find(o=>o.id==='napolyon');
   if(nap) aktifOrdu=nap;
@@ -13082,6 +13253,233 @@ function bulmacaBitir(){
   });
   document.getElementById('hud').classList.remove('acik');
   document.getElementById('menu').classList.remove('gizli');
+}
+
+/* ÖĞREN (4 Kasım 2026, sahibin isteği): satrancı sıfırdan öğreten dersler. Bulmaca modu gibi canlı tahtayı kullanır:
+   her adım FEN'den kurulur; görevde oyuncunun hamlesi kurala göre (h: kabul edilen hamleler, mat: mat eden herhangi
+   bir hamle) denetlenir. Metinler Türkçe yazılır, ekrana basılınca dil gözcüsü çevirir (CEVM). Ücretsizdir. */
+let ogrenModu=false;
+const OGREN_BAS='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+const OGREN=[
+ {b:'Temeller', d:[
+  {id:'tahta', ad:'Tahta ve kareler', a:[
+    {f:OGREN_BAS, m:'Satranç 64 karelik bir tahtada oynanır. Sütunlar a-h harfleriyle, sıralar 1-8 rakamlarıyla adlandırılır. Her karenin bir adı vardır: e4 gibi.'},
+    {f:OGREN_BAS, m:'İki tarafın 16\'şar taşı vardır. Önce beyaz oynar, sonra sırayla birer hamle yapılır.'}]},
+  {id:'amac', ad:'Oyunun amacı', a:[
+    {f:'6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1', m:'Amaç rakibin şahını mat etmektir: şah saldırı altındadır ve kurtuluş yolu yoktur. Şah tahtadan alınmaz, mat olunca oyun biter.'},
+    {f:'6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1', m:'Şimdi sen dene: kaleni d8\'e sür ve mat et.', h:['d1d8'], ok:'Mat! Siyah şah kendi piyonlarının arkasında kaldı, kaçacak yeri yok.', no:'Kaleyi d sütunundan yukarı, d8\'e sür.'}]}
+ ]},
+ {b:'Taşlar', d:[
+  {id:'piyon', ad:'Piyon', a:[
+    {f:'4k3/8/8/8/8/8/4P3/4K3 w - - 0 1', m:'Piyon yalnız ileri gider, geri dönemez. İlk hamlesinde iki kare gidebilir. Piyonunu e4\'e sür.', h:['e2e4'], ok:'Harika. Bundan sonra bu piyon birer kare ilerler.', no:'İki kare ileri, e4\'e sür.'},
+    {f:'4k3/8/8/3p4/4P3/8/8/4K3 w - - 0 1', m:'Piyon çapraz ileriye doğru taş alır, önündeki taşı alamaz. d5\'teki piyonu al.', h:['e4d5'], ok:'Doğru. Düz gider, çapraz alır.', no:'Çapraz ileriye, d5\'e git.'}]},
+  {id:'kale', ad:'Kale', a:[
+    {f:'4k3/8/8/8/3R4/8/8/4K3 w - - 0 1', sec:'d4', m:'Kale düz gider: yatay ve dikey, istediği kadar kare. Başka bir taşın üzerinden atlayamaz.'},
+    {f:'4k3/8/1p6/8/8/8/8/1R2K3 w - - 0 1', m:'b6\'daki piyonu kaleyle al.', h:['b1b6'], ok:'Doğru. Yol boştu, kale sonuna kadar gitti.', no:'Kaleyi b sütunundan yukarı sür.'}]},
+  {id:'fil', ad:'Fil', a:[
+    {f:'4k3/8/8/8/3B4/8/8/4K3 w - - 0 1', sec:'d4', m:'Fil çapraz gider ve hep aynı renk karelerde kalır. Her iki tarafın biri açık, biri koyu kare fili vardır.'},
+    {f:'4k3/8/8/5p2/8/8/8/1B2K3 w - - 0 1', m:'f5\'teki piyonu filinle al.', h:['b1f5'], ok:'Doğru. Fil uzun çaprazda çok güçlüdür.', no:'Fil çapraz gider: b1\'den f5\'e.'}]},
+  {id:'vezir', ad:'Vezir', a:[
+    {f:'4k3/8/8/8/3Q4/8/8/4K3 w - - 0 1', sec:'d4', m:'Vezir en güçlü taştır: kale ve fil gibi hem düz hem çapraz gider.'},
+    {f:'4k3/8/5n2/8/8/8/8/Q3K3 w - - 0 1', m:'f6\'daki atı vezirle al.', h:['a1f6'], ok:'Doğru. Vezir tahtanın öbür ucundan bile vurur.', no:'Çaprazdan f6\'ya git.'}]},
+  {id:'at', ad:'At', a:[
+    {f:'4k3/8/8/8/3N4/8/8/4K3 w - - 0 1', sec:'d4', m:'At L şeklinde gider: iki kare düz, bir kare yana. Taşların üzerinden atlayabilen tek taştır.'},
+    {f:'4k3/8/8/3p4/8/2N5/PP6/4K3 w - - 0 1', m:'c3\'teki atla d5\'teki piyonu al.', h:['c3d5'], ok:'Doğru. Atın gittiği kare hep ters renktedir.', no:'L çiz: c3\'ten d5\'e.'}]},
+  {id:'sah', ad:'Şah', a:[
+    {f:'4k3/8/8/8/3K4/8/8/8 w - - 0 1', sec:'d4', m:'Şah her yöne yalnız bir kare gider. Saldırı altındaki bir kareye giremez.'},
+    {f:'4k3/8/8/8/8/8/r7/4K3 w - - 0 1', m:'Siyah kale 2. sırayı tutuyor, o sıraya giremezsin. Şahını yana götür.', h:['e1d1','e1f1'], ok:'Doğru. Şah asla tehlikeli kareye gitmez.', no:'Yan kareye, d1 ya da f1\'e git.'}]}
+ ]},
+ {b:'Kurallar', d:[
+  {id:'sahcek', ad:'Şah çekme', a:[
+    {f:'r3k3/8/8/8/8/8/1R6/K7 w - - 0 1', m:'Şah çekildi! Üç yol var: araya gir, çeken taşı al ya da kaç. Önce araya gir: kaleni a2\'ye koy.', h:['b2a2'], ok:'Doğru. Yol kapandı, şah kurtuldu.', no:'Kaleyi a2\'ye, araya koy.'},
+    {f:'r3k3/8/8/8/4B3/8/8/K7 w - - 0 1', m:'Şimdi çeken taşı al: filinle a8\'deki kaleyi al.', h:['e4a8'], ok:'Doğru. Tehdit tahtadan kalktı.', no:'Fili çaprazdan a8\'e götür.'},
+    {f:'r3k3/8/8/8/8/8/7P/K7 w - - 0 1', m:'Araya girecek taş yok. Şahını a sütunundan çıkar.', h:['a1b1','a1b2'], ok:'Doğru. Şah çekilince önce şahı kurtarmak zorunludur.', no:'Şahı b1 ya da b2\'ye götür.'}]},
+  {id:'matpat', ad:'Mat ve pat', a:[
+    {f:'7k/5Q2/6K1/8/8/8/8/8 b - - 0 1', m:'Pat: sırası gelenin hiç yasal hamlesi yok ama şahı saldırı altında değil. Oyun berabere biter. Kazanırken buna dikkat et!'},
+    {f:'7k/8/6K1/8/8/8/8/5Q2 w - - 0 1', m:'Şimdi tek hamlede mat et. Dikkat et, pat yapma.', mat:true, ip:'f1', ok:'Mat! Şah saldırı altında ve kaçacak yeri yok.', no:'Bu mat değil. Şaha saldırmalısın ve kaçacak yeri kalmamalı. Veziri f8\'e dene.'}]},
+  {id:'rok', ad:'Rok', a:[
+    {f:'4k3/8/8/8/8/8/8/4K2R w K - 0 1', m:'Rok şahı güvene alır: şah kaleye doğru iki kare gider, kale şahın öbür yanına geçer. Şah ve kale daha önce oynamamış, araları boş olmalı. Şah çekilirken ya da tehdit altındaki kareden geçerek rok yapılmaz. Şahı g1\'e götür.', h:['e1g1'], ok:'Rok tamam! Şah köşede güvende, kale oyuna girdi.', no:'Şahı iki kare sağa, g1\'e götür.'}]},
+  {id:'gecerken', ad:'Geçerken alma', a:[
+    {f:'4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 2', m:'Siyah piyon iki kare gelip yanına geçti. Yalnız hemen bu hamlede, onu bir kare gelmiş gibi alabilirsin. e5\'teki piyonunu d6\'ya sür.', h:['e5d6'], ok:'Geçerken aldın! Bir sonraki hamlede bu hak biterdi.', no:'Piyonunu çapraz ileriye, d6\'ya sür.'}]},
+  {id:'terfi', ad:'Piyon terfisi', a:[
+    {f:'8/4P1k1/8/8/8/8/8/4K3 w - - 0 1', m:'Piyon son sıraya ulaşınca vezir, kale, fil ya da ata dönüşür. Çoğu zaman vezir seçilir. Piyonunu e8\'e sür.', h:['e7e8'], ok:'Tebrikler, yeni bir taş kazandın!', no:'Piyonu e8\'e sür.'}]},
+  {id:'berabere', ad:'Beraberlikler', a:[
+    {f:'4k3/8/8/8/3N4/8/8/4K3 w - - 0 1', m:'Yetersiz materyal: tek at ya da tek fil gibi mat kuramayacak taşlar kalırsa oyun berabere biter.'},
+    {f:'4k3/8/8/8/8/8/8/R3K3 w - - 0 1', m:'Üç tekrar: aynı konum aynı oyuncunun sırasında üç kez oluşursa oyun berabere biter.'},
+    {f:'4k3/8/8/8/8/8/8/R3K3 w - - 0 1', m:'50 hamle: iki taraf da 50 hamle boyunca taş almaz ve piyon oynatmazsa oyun berabere biter. Oyuncular anlaşarak da beraberlik yapabilir.'}]}
+ ]},
+ {b:'İlk oyunun', d:[
+  {id:'deger', ad:'Taşların değeri', a:[
+    {f:OGREN_BAS, m:'Piyon 1, at ve fil 3, kale 5, vezir 9 puan sayılır. Şahın değeri ölçülemez. Takas yaparken bunu düşün.'},
+    {f:'4k3/8/2q5/1r6/3N4/8/8/4K3 w - - 0 1', m:'Atın iki taşı birden tehdit ediyor. Hangisini alırsın?', h:['d4c6'], ok:'Doğru. Vezir 9, kale 5 puan: en değerlisini aldın.', no:'Kale 5, vezir 9 puan. Daha değerlisini al.'}]},
+  {id:'acilis', ad:'Oyuna başlarken', a:[
+    {f:OGREN_BAS, m:'Önce merkezi tut: piyonunu e4 ya da d4\'e sür.', h:['e2e4','d2d4'], ok:'İyi başlangıç. Merkezdeki piyon taşlarına yol açar.', no:'Merkez piyonunu, e ya da d piyonunu iki kare sür.'},
+    {f:'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2', m:'Sonra taşlarını oyuna sok: atını merkeze yakın bir kareye çıkar.', h:['g1f3','b1c3'], ok:'Güzel. At artık merkezi kontrol ediyor.', no:'Atını f3 ya da c3\'e çıkar.'},
+    {f:'r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4', m:'Şimdi şahını güvene al: rok yap.', h:['e1g1'], ok:'Harika açılış: merkez, gelişim, rok. Bu üçünü unutma.', no:'Şahı g1\'e götürerek rok yap.'}]},
+  {id:'basitmat', ad:'İlk matların', a:[
+    {f:'k7/8/1K6/8/8/8/8/7R w - - 0 1', m:'Şahın, rakip şahı kenara sıkıştırdı. Kaleyle mat et.', mat:true, ip:'h1', ok:'Mat! Kale son sırayı tuttu, şahın da kaçış karelerini kapattı.', no:'Kaleyi son sıraya, h8\'e sür.'},
+    {f:'k7/8/1K6/8/8/8/8/6Q1 w - - 0 1', m:'Şimdi vezirle mat et.', mat:true, ip:'g1', ok:'Mat! Tebrikler, artık oyunu biliyorsun.', no:'Veziri son sıraya, g8\'e getir.'}]}
+ ]}
+];
+const OGREN_DUZ=[]; OGREN.forEach(b=>b.d.forEach(d=>OGREN_DUZ.push(d)));
+let ogrenDersI=0, ogrenAdimI=0, ogrenOncekiOrdu=null;
+function ogrenBitenler(){ try{ const v=JSON.parse(localStorage.getItem('c64_ogrenBiten')||'[]'); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
+function ogrenSesAcik(){ try{ return localStorage.getItem('c64_ogrenSes')!=='0'; }catch(e){ return true; } }
+function ogrenKonus(t){
+  try{
+    if(typeof Konus==='undefined') return;
+    Konus.sustur();
+    if(!ogrenSesAcik() || (typeof Ses!=='undefined' && Ses.sessizMi)) return;
+    const KOD={tr:'tr-TR',en:'en-US',ru:'ru-RU',ar:'ar-SA',fr:'fr-FR',de:'de-DE',it:'it-IT',zh:'zh-CN'};
+    Konus.oku(metniCevir(t), KOD[uygDil]||'en-US', 'kadin');
+  }catch(e){}
+}
+/* Ders listesi */
+function ogrenAc(){
+  if(typeof cevrimiciAktif!=='undefined' && cevrimiciAktif && !oyunBitti){
+    if(typeof anlatimGoster==='function') anlatimGoster(metniCevir('Devam eden çevrimiçi oyunun var'),3000);
+    return;
+  }
+  let z=document.getElementById('ogrenEkran');
+  if(!z){ z=document.createElement('div'); z.id='ogrenEkran'; document.body.appendChild(z); }
+  const biten=ogrenBitenler();
+  let h='<div class="ogUst"><button type="button" id="ogGeri">‹</button><span>Öğren</span></div>'+
+    '<div class="ogAlt">Satrancı sıfırdan, tahtada deneyerek öğren.</div>'+
+    '<div class="ogIlerle"><i style="width:'+Math.round(OGREN_DUZ.filter(d=>biten.includes(d.id)).length/OGREN_DUZ.length*100)+'%"></i></div>';
+  OGREN.forEach(b=>{
+    h+='<div class="ogBolum">'+b.b+'</div>';
+    b.d.forEach(d=>{
+      const i=OGREN_DUZ.indexOf(d), tamam=biten.includes(d.id);
+      h+='<button type="button" class="ogDers'+(tamam?' tamam':'')+'" data-i="'+i+'"><b>'+(tamam?'✓':(i+1))+'</b><span>'+d.ad+'</span><em>›</em></button>';
+    });
+  });
+  z.innerHTML=h;
+  z.classList.add('acik');
+  document.getElementById('ogGeri').onclick=ogrenKapat;
+  z.querySelectorAll('.ogDers').forEach(b=>{ b.onclick=()=>ogrenDersBaslat(+b.dataset.i); });
+}
+function ogrenKapat(){ const z=document.getElementById('ogrenEkran'); if(z) z.classList.remove('acik'); }
+function ogrenDersBaslat(i){
+  ogrenKapat();
+  ogrenDersI=i; ogrenAdimI=0;
+  if(!ogrenModu){
+    ogrenModu=true;
+    document.body.classList.add('ogrende');
+    mod='2p';
+    ogrenOncekiOrdu=aktifOrdu;
+    aktifOrdu=ORDULAR[0];
+    document.getElementById('menu').classList.add('gizli');
+    document.getElementById('hud').classList.add('acik');
+    ['btnYardim','btnSahne','btnYeni','btnMenu'].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display='none'; });
+  }
+  ogrenAdimGoster();
+}
+function ogrenAdimGoster(){
+  const d=OGREN_DUZ[ogrenDersI], a=d.a[ogrenAdimI];
+  Motor.fenYukle(a.f);
+  oyunBitti=false; secili=-1; legalSet=[];
+  kilit=!(a.h||a.mat);
+  kamYaw=0; kamUzak=uygunUzaklik(); kamPitch=dikeyKamPitch();
+  if(typeof kameraGuncelle==='function') kameraGuncelle();
+  if(aktifArena) arenaKur(aktifArena);
+  vurguTemizle();
+  taslariDiz(false);
+  tahtaTercihleriniUygula();
+  if(typeof panelYerlesimGuncelle==='function') panelYerlesimGuncelle();
+  hudGuncelle();
+  try{ sahGosterge(); }catch(e){}
+  if(a.sec) ogrenSecGoster(a.sec);
+  let p=document.getElementById('ogrenPanel');
+  if(!p){ p=document.createElement('div'); p.id='ogrenPanel'; document.body.appendChild(p); }
+  const gorev=!!(a.h||a.mat);
+  p.innerHTML='<div class="opUst"><button type="button" id="opKapat" aria-label="Kapat">✕</button><span class="opAd"></span>'+
+    '<span class="opSayac">'+(ogrenAdimI+1)+' / '+d.a.length+'</span><button type="button" id="opSes" aria-label="Ses"></button></div>'+
+    '<div class="opMetin" id="opMetin"></div><div class="opDugmeler">'+
+    (gorev?'<button type="button" class="opBtn" id="opIpucu">İpucu</button>':'')+
+    '<button type="button" class="opBtn dolu" id="opDevam"'+(gorev?' style="display:none"':'')+'>Devam</button></div>';
+  p.classList.add('acik');
+  p.querySelector('.opAd').textContent=d.ad;
+  document.getElementById('opMetin').textContent=a.m;
+  document.getElementById('opKapat').onclick=ogrenBitir;
+  const sb=document.getElementById('opSes');
+  const sesCiz=()=>{ sb.innerHTML=ogrenSesAcik()?IKON.sesAcik:IKON.sesKapali; };
+  sesCiz();
+  sb.onclick=()=>{
+    try{ localStorage.setItem('c64_ogrenSes', ogrenSesAcik()?'0':'1'); }catch(e){}
+    sesCiz();
+    if(ogrenSesAcik()) ogrenKonus(document.getElementById('opMetin').dataset.t||a.m); else Konus.sustur();
+  };
+  document.getElementById('opMetin').dataset.t=a.m;
+  document.getElementById('opDevam').onclick=ogrenIleri;
+  const ib=document.getElementById('opIpucu');
+  if(ib) ib.onclick=()=>{ ogrenSecGoster(a.ip||a.h[0].slice(0,2)); };
+  ogrenKonus(a.m);
+  _incKay=0; inceleGorunumAyarla();
+  if(typeof kameraGuncelle==='function') kameraGuncelle();
+  cizimIste();
+}
+function ogrenSecGoster(kareAd){
+  const k=(kareAd.charCodeAt(0)-97)+(8-parseInt(kareAd[1],10))*8;
+  secili=k;
+  legalSet=Motor.legal(Motor.turn).filter(x=>x.from===k);
+  vurguGoster(legalSet,k);
+}
+/* Görevde oynanan hamle (hamleOyna buraya yönlendirir) */
+function ogrenHamle(h){
+  const a=OGREN_DUZ[ogrenDersI].a[ogrenAdimI];
+  const m=document.getElementById('opMetin');
+  if(!a.h && !a.mat) return;
+  const uci=hamleUci(h);
+  const k=Motor.yap(h);
+  const dogru = a.mat ? Motor.durum()==='mat' : a.h.some(u=>uci.slice(0,4)===u);
+  secili=-1; legalSet=[]; vurguTemizle();
+  if(!dogru){
+    Motor.gerial(k);
+    try{ Ses.cal('hata'); }catch(e){}
+    m.dataset.t=a.no; m.textContent=a.no; m.classList.remove('dogru'); m.classList.add('yanlis');
+    ogrenKonus(a.no);
+    return;
+  }
+  kilit=true;
+  taslariDiz(false);
+  hudGuncelle();
+  try{ sahGosterge(); sonHamleGoster(h.from,h.to); }catch(e){}
+  try{ if(a.mat) Ses.olay('mat'); else Ses.cal('hamle'); }catch(e){}
+  m.dataset.t=a.ok; m.textContent=a.ok; m.classList.remove('yanlis'); m.classList.add('dogru');
+  const ib=document.getElementById('opIpucu'); if(ib) ib.style.display='none';
+  document.getElementById('opDevam').style.display='';
+  ogrenKonus(a.ok);
+}
+function ogrenIleri(){
+  const d=OGREN_DUZ[ogrenDersI];
+  if(ogrenAdimI<d.a.length-1){ ogrenAdimI++; ogrenAdimGoster(); return; }
+  const biten=ogrenBitenler();
+  if(!biten.includes(d.id)){ biten.push(d.id); try{ localStorage.setItem('c64_ogrenBiten',JSON.stringify(biten)); }catch(e){} }
+  if(ogrenDersI<OGREN_DUZ.length-1){ ogrenDersBaslat(ogrenDersI+1); return; }
+  /* Son ders bitti: kolay yapay zekâya karşı ilk maç */
+  const p=document.getElementById('ogrenPanel');
+  const m=document.getElementById('opMetin');
+  m.dataset.t='Tüm dersleri bitirdin! Şimdi ilk maçını kolay yapay zekâya karşı oyna.';
+  m.textContent=m.dataset.t; m.classList.add('dogru');
+  ogrenKonus(m.dataset.t);
+  const db=p.querySelector('.opDugmeler');
+  db.innerHTML='<button type="button" class="opBtn" id="opListe">Derslere dön</button><button type="button" class="opBtn dolu" id="opMac">İlk maçını oyna</button>';
+  document.getElementById('opListe').onclick=ogrenBitir;
+  document.getElementById('opMac').onclick=()=>{ ogrenBitir(); ogrenKapat(); kurulumAc(); aiZorluk='kolay'; kurulumSecimEsitle(); };
+}
+function ogrenBitir(){
+  ogrenModu=false;
+  document.body.classList.remove('ogrende');
+  try{ Konus.sustur(); }catch(e){}
+  if(ogrenOncekiOrdu){ aktifOrdu=ogrenOncekiOrdu; ogrenOncekiOrdu=null; }
+  const p=document.getElementById('ogrenPanel'); if(p) p.classList.remove('acik');
+  ['btnYardim','btnSahne','btnYeni','btnMenu'].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display=''; });
+  secili=-1; legalSet=[]; kilit=false; vurguTemizle();
+  Motor.reset();
+  document.getElementById('hud').classList.remove('acik');
+  document.getElementById('menu').classList.remove('gizli');
+  inceleGorunumAyarla();
+  ogrenAc();
 }
 
 let bulutIst={
@@ -13610,7 +14008,7 @@ function gecmisOyunIncele(hamleler){
   document.getElementById('hud').classList.add('acik');
   arenaKur(aktifArena); taslariDiz();
   inceleAnalizVar=false;
-  tahtadaIncelemeBaslat();
+  tahtadaIncelemeBaslat(true);
 }
 
 function basarimKontrol(){
@@ -14721,6 +15119,12 @@ const CEVM={
 'Vay canına! 😮':{en:'Wow! 😮',ru:'Ого! 😮',ar:'يا للروعة! 😮'},
 'Yakındı! 😅':{en:'Close one! 😅',ru:'Почти! 😅',ar:'كانت قريبة! 😅'},
 'İyi oyundu 🤝':{en:'Good game 🤝',ru:'Хорошая игра 🤝',ar:'مباراة جيدة 🤝'},
+'Profili gör':{en:'View profile',ru:'Профиль',ar:'عرض الملف'},
+'+ Arkadaş ekle':{en:'+ Add friend',ru:'+ В друзья',ar:'+ إضافة صديق'},
+'✓ Arkadaşsınız':{en:'✓ Friends',ru:'✓ Вы друзья',ar:'✓ أصدقاء'},
+'✓ İstek gönderildi':{en:'✓ Request sent',ru:'✓ Запрос отправлен',ar:'✓ تم إرسال الطلب'},
+'İsteği kabul et':{en:'Accept request',ru:'Принять запрос',ar:'قبول الطلب'},
+'Gönderilemedi':{en:'Could not send',ru:'Не удалось отправить',ar:'تعذّر الإرسال'},
 'Tekrar oynayalım mı?':{en:'Play again?',ru:'Сыграем ещё?',ar:'نلعب مجددًا؟'}
 };
 /* Kalıplı metinler (sayı/isim içerenler) */
@@ -15032,6 +15436,161 @@ metniCevirHam=function(t){
   return null;
 };
 const ORJ=new WeakMap();      // metin düğümü -> orijinal Türkçe
+
+/* Öğren dersleri ile çevrilmemiş arena, ordu ve arayüz adları (4 Kasım 2026) */
+Object.assign(CEVM,{
+'Gül Ağacı':{en:'Rosewood',ru:'Палисандр',ar:'خشب الورد',fr:'Bois de rose',de:'Rosenholz',it:'Palissandro',zh:'玫瑰木'},
+'Lewis Tahtası':{en:'Lewis Board',ru:'Доска Льюиса',ar:'رقعة لويس',fr:'Plateau de Lewis',de:'Lewis-Brett',it:'Scacchiera di Lewis',zh:'刘易斯棋盘'},
+'Zarif Masa':{en:'Elegant Table',ru:'Изящный стол',ar:'طاولة أنيقة',fr:'Table élégante',de:'Eleganter Tisch',it:'Tavolo elegante',zh:'雅致棋桌'},
+'Siyah Mermer Masa':{en:'Black Marble Table',ru:'Стол из чёрного мрамора',ar:'طاولة رخام أسود',fr:'Table en marbre noir',de:'Tisch aus schwarzem Marmor',it:'Tavolo in marmo nero',zh:'黑色大理石棋桌'},
+'Mermer Tahta':{en:'Marble Board',ru:'Мраморная доска',ar:'رقعة رخامية',fr:'Plateau en marbre',de:'Marmorbrett',it:'Scacchiera di marmo',zh:'大理石棋盘'},
+'Meşe ve Abanoz':{en:'Oak & Ebony',ru:'Дуб и эбен',ar:'بلوط وأبنوس',fr:'Chêne et ébène',de:'Eiche & Ebenholz',it:'Quercia ed ebano',zh:'橡木与乌木'},
+'Duman':{en:'Smoke',ru:'Дым',ar:'دخان',fr:'Fumée',de:'Rauch',it:'Fumo',zh:'烟灰'},
+'Akçaağaç ve gül ağacı kakma turnuva tahtası.':{en:'Tournament board inlaid with maple and rosewood.',ru:'Турнирная доска с инкрустацией из клёна и палисандра.',ar:'رقعة بطولات مطعّمة بخشب القيقب والورد.',fr:'Plateau de tournoi marqueté d\'érable et de bois de rose.',de:'Turnierbrett mit Einlagen aus Ahorn und Rosenholz.',it:'Scacchiera da torneo intarsiata in acero e palissandro.',zh:'枫木与玫瑰木镶嵌的比赛棋盘。'},
+'Tik ve gül ağacı kaplama, kalın blok tahta.':{en:'Thick block board veneered in teak and rosewood.',ru:'Толстая доска с отделкой из тика и палисандра.',ar:'رقعة سميكة مكسوّة بخشب الساج والورد.',fr:'Plateau épais plaqué de teck et de bois de rose.',de:'Dickes Brett mit Teak- und Rosenholzfurnier.',it:'Scacchiera spessa impiallacciata in teak e palissandro.',zh:'柚木与玫瑰木贴面的厚实棋盘。'},
+'Ortaçağ Lewis taşlarının sade ahşap tahtası.':{en:'The plain wooden board of the medieval Lewis pieces.',ru:'Простая деревянная доска средневековых фигур Льюиса.',ar:'رقعة خشبية بسيطة لقطع لويس من العصور الوسطى.',fr:'Le plateau en bois sobre des pièces médiévales de Lewis.',de:'Das schlichte Holzbrett der mittelalterlichen Lewis-Figuren.',it:'La semplice scacchiera di legno dei pezzi medievali di Lewis.',zh:'中世纪刘易斯棋子的朴素木质棋盘。'},
+'Kademeli çerçeveli ince işçilik tahta.':{en:'Finely crafted board with a stepped frame.',ru:'Изящная доска со ступенчатой рамой.',ar:'رقعة دقيقة الصنع بإطار متدرّج.',fr:'Plateau finement travaillé à cadre en gradins.',de:'Fein gearbeitetes Brett mit gestuftem Rahmen.',it:'Scacchiera finemente lavorata con cornice a gradini.',zh:'阶梯式边框的精工棋盘。'},
+'Siyah mermer çerçeveli, ahşap kenarlı tahta.':{en:'Board with a black marble frame and wooden edges.',ru:'Доска с рамой из чёрного мрамора и деревянными краями.',ar:'رقعة بإطار من الرخام الأسود وحواف خشبية.',fr:'Plateau à cadre de marbre noir et bords en bois.',de:'Brett mit schwarzem Marmorrahmen und Holzkanten.',it:'Scacchiera con cornice in marmo nero e bordi in legno.',zh:'黑色大理石边框配木质边缘的棋盘。'},
+'Beyaz ve siyah mermer satranç tahtası.':{en:'Chessboard of white and black marble.',ru:'Шахматная доска из белого и чёрного мрамора.',ar:'رقعة شطرنج من الرخام الأبيض والأسود.',fr:'Échiquier en marbre blanc et noir.',de:'Schachbrett aus weißem und schwarzem Marmor.',it:'Scacchiera in marmo bianco e nero.',zh:'黑白大理石棋盘。'},
+'Bal rengi meşe, koyu abanoz. Ağır, sıcak bir tahta.':{en:'Honey oak and dark ebony. A heavy, warm board.',ru:'Медовый дуб и тёмный эбен. Тяжёлая, тёплая доска.',ar:'بلوط عسلي وأبنوس داكن. رقعة ثقيلة ودافئة.',fr:'Chêne miel et ébène sombre. Un plateau lourd et chaleureux.',de:'Honigfarbene Eiche, dunkles Ebenholz. Ein schweres, warmes Brett.',it:'Quercia miele ed ebano scuro. Una scacchiera pesante e calda.',zh:'蜜色橡木配深色乌木，厚重而温暖。'},
+'Desenli açık ceviz ve füme kaplama. Modern ve sakin.':{en:'Patterned light walnut and smoked veneer. Modern and calm.',ru:'Светлый орех с узором и дымчатая отделка. Современно и спокойно.',ar:'جوز فاتح منقوش وقشرة مدخّنة. عصرية وهادئة.',fr:'Noyer clair veiné et placage fumé. Moderne et calme.',de:'Gemasertes helles Nussholz und Rauchfurnier. Modern und ruhig.',it:'Noce chiaro venato e impiallacciatura fumé. Moderna e calma.',zh:'纹理浅胡桃木配烟熏贴面，现代而沉静。'},
+'Çizgi Film':{en:'Cartoon',ru:'Мультяшный',ar:'كرتون',fr:'Dessin animé',de:'Cartoon',it:'Cartone animato',zh:'卡通'},
+'Kristal':{en:'Crystal',ru:'Хрусталь',ar:'كريستال',fr:'Cristal',de:'Kristall',it:'Cristallo',zh:'水晶'},
+'Lewis':{en:'Lewis',ru:'Льюис',ar:'لويس',fr:'Lewis',de:'Lewis',it:'Lewis',zh:'刘易斯'},
+'Samuray':{en:'Samurai',ru:'Самурай',ar:'ساموراي',fr:'Samouraï',de:'Samurai',it:'Samurai',zh:'武士'},
+'Turnuva':{en:'Tournament',ru:'Турнир',ar:'بطولة',fr:'Tournoi',de:'Turnier',it:'Torneo',zh:'比赛'},
+'Zarif Klasik':{en:'Elegant Classic',ru:'Изящная классика',ar:'كلاسيكي أنيق',fr:'Classique élégant',de:'Eleganter Klassiker',it:'Classico elegante',zh:'雅致经典'},
+'Porselen':{en:'Porcelain',ru:'Фарфор',ar:'خزف',fr:'Porcelaine',de:'Porzellan',it:'Porcellana',zh:'瓷器'},
+'Mermer':{en:'Marble',ru:'Мрамор',ar:'رخام',fr:'Marbre',de:'Marmor',it:'Marmo',zh:'大理石'},
+'Sevimli, oyuncak gibi set.':{en:'A cute, toy-like set.',ru:'Милый набор, похожий на игрушки.',ar:'طقم لطيف يشبه الألعاب.',fr:'Un jeu mignon, façon jouet.',de:'Ein niedliches Set wie Spielzeug.',it:'Un set grazioso, simile a un giocattolo.',zh:'可爱的玩具风棋子。'},
+'Yarı saydam kristal taşlar: berrak cama karşı füme.':{en:'Translucent crystal pieces: clear glass against smoke.',ru:'Полупрозрачные хрустальные фигуры: прозрачное стекло против дымчатого.',ar:'قطع كريستال شبه شفافة: زجاج صافٍ مقابل مدخّن.',fr:'Pièces de cristal translucides : verre clair contre fumé.',de:'Durchscheinende Kristallfiguren: klares Glas gegen Rauchglas.',it:'Pezzi di cristallo traslucidi: vetro chiaro contro fumé.',zh:'半透明水晶棋子：透明玻璃对烟灰玻璃。'},
+'12. yüzyıl Lewis taşlarının replikası — gerçek tarama.':{en:'Replica of the 12th-century Lewis pieces, from a real scan.',ru:'Копия фигур Льюиса XII века по настоящему скану.',ar:'نسخة من قطع لويس من القرن الثاني عشر بمسح حقيقي.',fr:'Réplique des pièces de Lewis du XIIe siècle, d\'après un vrai scan.',de:'Replik der Lewis-Figuren aus dem 12. Jahrhundert, echter Scan.',it:'Replica dei pezzi di Lewis del XII secolo, da scansione reale.',zh:'12 世纪刘易斯棋子的复制品，来自真实扫描。'},
+'Japon savaşçı ordusu — figürlü set.':{en:'An army of Japanese warriors, a figurine set.',ru:'Армия японских воинов, фигурный набор.',ar:'جيش من المحاربين اليابانيين، طقم تماثيل.',fr:'Une armée de guerriers japonais, jeu à figurines.',de:'Eine Armee japanischer Krieger, Figurenset.',it:'Un esercito di guerrieri giapponesi, set di figure.',zh:'日本武士军团，人物造型棋子。'},
+'Modern turnuva seti — yüksek detay.':{en:'Modern tournament set, high detail.',ru:'Современный турнирный набор, высокая детализация.',ar:'طقم بطولات حديث بتفاصيل عالية.',fr:'Jeu de tournoi moderne, très détaillé.',de:'Modernes Turnierset, hoher Detailgrad.',it:'Set moderno da torneo, molto dettagliato.',zh:'现代比赛棋子，细节丰富。'},
+'İnce işçilikli klasik set.':{en:'A finely crafted classic set.',ru:'Классический набор тонкой работы.',ar:'طقم كلاسيكي دقيق الصنع.',fr:'Un jeu classique finement travaillé.',de:'Ein fein gearbeitetes klassisches Set.',it:'Un set classico finemente lavorato.',zh:'做工精细的经典棋子。'},
+'Parlak porselen: beyaz ve siyah klasik taşlar.':{en:'Glossy porcelain: classic white and black pieces.',ru:'Блестящий фарфор: классические белые и чёрные фигуры.',ar:'خزف لامع: قطع كلاسيكية بيضاء وسوداء.',fr:'Porcelaine brillante : pièces classiques blanches et noires.',de:'Glänzendes Porzellan: klassische weiße und schwarze Figuren.',it:'Porcellana lucida: classici pezzi bianchi e neri.',zh:'亮面瓷器：经典黑白棋子。'},
+'Mermer taşlar — beyaz ve siyah mermer.':{en:'Marble pieces in white and black.',ru:'Мраморные фигуры: белый и чёрный мрамор.',ar:'قطع رخامية: رخام أبيض وأسود.',fr:'Pièces en marbre blanc et noir.',de:'Marmorfiguren in Weiß und Schwarz.',it:'Pezzi in marmo bianco e nero.',zh:'黑白大理石棋子。'},
+'Gerçek':{en:'Real',ru:'Настоящий',ar:'واقعي',fr:'Réel',de:'Echt',it:'Reale',zh:'真实'},
+'Savaş':{en:'Battle',ru:'Битва',ar:'معركة',fr:'Bataille',de:'Schlacht',it:'Battaglia',zh:'战斗'},
+'Ara':{en:'Search',ru:'Поиск',ar:'بحث',fr:'Chercher',de:'Suchen',it:'Cerca',zh:'搜索'},
+'KABUL ET':{en:'ACCEPT',ru:'ПРИНЯТЬ',ar:'قبول',fr:'ACCEPTER',de:'ANNEHMEN',it:'ACCETTA',zh:'接受'},
+'REDDET':{en:'DECLINE',ru:'ОТКЛОНИТЬ',ar:'رفض',fr:'REFUSER',de:'ABLEHNEN',it:'RIFIUTA',zh:'拒绝'},
+'Döndür':{en:'Rotate',ru:'Повернуть',ar:'تدوير',fr:'Pivoter',de:'Drehen',it:'Ruota',zh:'旋转'},
+'Dinliyorum…':{en:'Listening…',ru:'Слушаю…',ar:'أستمع…',fr:'J\'écoute…',de:'Ich höre…',it:'Ascolto…',zh:'正在聆听…'},
+'İleri':{en:'Forward',ru:'Вперёд',ar:'للأمام',fr:'Suivant',de:'Vor',it:'Avanti',zh:'前进'},
+'Bitir':{en:'Finish',ru:'Завершить',ar:'إنهاء',fr:'Terminer',de:'Beenden',it:'Fine',zh:'结束'},
+'Benim hamlelerim':{en:'My moves',ru:'Мои ходы',ar:'نقلاتي',fr:'Mes coups',de:'Meine Züge',it:'Le mie mosse',zh:'我的走法'},
+'Animasyon:':{en:'Animation:',ru:'Анимация:',ar:'الرسوم المتحركة:',fr:'Animation :',de:'Animation:',it:'Animazione:',zh:'动画：'},
+'· Grafik:':{en:'· Graphics:',ru:'· Графика:',ar:'· الرسومات:',fr:'· Graphismes :',de:'· Grafik:',it:'· Grafica:',zh:'· 画质：'},
+'Ses efektleri':{en:'Sound effects',ru:'Звуковые эффекты',ar:'المؤثرات الصوتية',fr:'Effets sonores',de:'Soundeffekte',it:'Effetti sonori',zh:'音效'},
+'Stockfish kaynak kodu:':{en:'Stockfish source code:',ru:'Исходный код Stockfish:',ar:'الشيفرة المصدرية لـ Stockfish:',fr:'Code source de Stockfish :',de:'Stockfish-Quellcode:',it:'Codice sorgente di Stockfish:',zh:'Stockfish 源代码：'},
+'GPL-3.0 tam metni:':{en:'Full text of GPL-3.0:',ru:'Полный текст GPL-3.0:',ar:'النص الكامل لـ GPL-3.0:',fr:'Texte intégral de la GPL-3.0 :',de:'Volltext der GPL-3.0:',it:'Testo completo della GPL-3.0:',zh:'GPL-3.0 全文：'},
+'Öğren':{en:'Learn',ru:'Обучение',ar:'تعلّم',fr:'Apprendre',de:'Lernen',it:'Impara',zh:'学习'},
+'Satrancı sıfırdan öğren':{en:'Learn chess from scratch',ru:'Шахматы с нуля',ar:'تعلّم الشطرنج من الصفر',fr:'Les échecs depuis zéro',de:'Schach von Grund auf',it:'Gli scacchi da zero',zh:'从零学国际象棋'},
+'Satrancı sıfırdan, tahtada deneyerek öğren.':{en:'Learn chess from scratch by trying it on the board.',ru:'Учитесь шахматам с нуля, пробуя на доске.',ar:'تعلّم الشطرنج من الصفر بالتجربة على الرقعة.',fr:'Apprenez les échecs depuis zéro en jouant sur l\'échiquier.',de:'Lerne Schach von Grund auf, direkt auf dem Brett.',it:'Impara gli scacchi da zero provando sulla scacchiera.',zh:'从零开始，在棋盘上边试边学。'},
+'İpucu':{en:'Hint',ru:'Подсказка',ar:'تلميح',fr:'Indice',de:'Hinweis',it:'Suggerimento',zh:'提示'},
+'Devam':{en:'Continue',ru:'Далее',ar:'متابعة',fr:'Continuer',de:'Weiter',it:'Continua',zh:'继续'},
+'Derslere dön':{en:'Back to lessons',ru:'К урокам',ar:'العودة إلى الدروس',fr:'Retour aux leçons',de:'Zurück zu den Lektionen',it:'Torna alle lezioni',zh:'返回课程'},
+'İlk maçını oyna':{en:'Play your first game',ru:'Сыграть первую партию',ar:'العب مباراتك الأولى',fr:'Jouez votre première partie',de:'Spiele deine erste Partie',it:'Gioca la tua prima partita',zh:'下第一盘棋'},
+'Tüm dersleri bitirdin! Şimdi ilk maçını kolay yapay zekâya karşı oyna.':{en:'You finished all the lessons! Now play your first game against the easy AI.',ru:'Вы прошли все уроки! Сыграйте первую партию против лёгкого ИИ.',ar:'أنهيت كل الدروس! العب الآن مباراتك الأولى ضد الذكاء الاصطناعي السهل.',fr:'Vous avez terminé toutes les leçons ! Jouez maintenant contre l\'IA facile.',de:'Du hast alle Lektionen geschafft! Spiele jetzt gegen die leichte KI.',it:'Hai finito tutte le lezioni! Ora gioca contro l\'IA facile.',zh:'你已完成所有课程！现在和简单难度的 AI 下第一盘棋吧。'},
+'Temeller':{en:'Basics',ru:'Основы',ar:'الأساسيات',fr:'Les bases',de:'Grundlagen',it:'Le basi',zh:'基础'},
+'Taşlar':{en:'Pieces',ru:'Фигуры',ar:'القطع',fr:'Les pièces',de:'Figuren',it:'I pezzi',zh:'棋子'},
+'Kurallar':{en:'Rules',ru:'Правила',ar:'القواعد',fr:'Les règles',de:'Regeln',it:'Le regole',zh:'规则'},
+'İlk oyunun':{en:'Your first game',ru:'Первая партия',ar:'مباراتك الأولى',fr:'Votre première partie',de:'Deine erste Partie',it:'La tua prima partita',zh:'第一盘棋'},
+'Tahta ve kareler':{en:'Board and squares',ru:'Доска и поля',ar:'الرقعة والمربعات',fr:'Échiquier et cases',de:'Brett und Felder',it:'Scacchiera e case',zh:'棋盘与格子'},
+'Oyunun amacı':{en:'The goal',ru:'Цель игры',ar:'هدف اللعبة',fr:'Le but du jeu',de:'Das Spielziel',it:'Lo scopo del gioco',zh:'游戏目标'},
+'Piyon':{en:'Pawn',ru:'Пешка',ar:'البيدق',fr:'Pion',de:'Bauer',it:'Pedone',zh:'兵'},
+'Kale':{en:'Rook',ru:'Ладья',ar:'الرخ',fr:'Tour',de:'Turm',it:'Torre',zh:'车'},
+'Fil':{en:'Bishop',ru:'Слон',ar:'الفيل',fr:'Fou',de:'Läufer',it:'Alfiere',zh:'象'},
+'Vezir':{en:'Queen',ru:'Ферзь',ar:'الوزير',fr:'Dame',de:'Dame',it:'Regina',zh:'后'},
+'At':{en:'Knight',ru:'Конь',ar:'الحصان',fr:'Cavalier',de:'Springer',it:'Cavallo',zh:'马'},
+'Şah':{en:'King',ru:'Король',ar:'الملك',fr:'Roi',de:'König',it:'Re',zh:'王'},
+'Şah çekme':{en:'Check',ru:'Шах',ar:'كش الملك',fr:'L\'échec',de:'Schach bieten',it:'Lo scacco',zh:'将军'},
+'Mat ve pat':{en:'Checkmate and stalemate',ru:'Мат и пат',ar:'الكش مات والتعادل بالجمود',fr:'Mat et pat',de:'Matt und Patt',it:'Matto e stallo',zh:'将死与逼和'},
+'Rok':{en:'Castling',ru:'Рокировка',ar:'التبييت',fr:'Le roque',de:'Rochade',it:'Arrocco',zh:'王车易位'},
+'Geçerken alma':{en:'En passant',ru:'Взятие на проходе',ar:'الأخذ بالمرور',fr:'La prise en passant',de:'En passant',it:'Presa en passant',zh:'吃过路兵'},
+'Piyon terfisi':{en:'Pawn promotion',ru:'Превращение пешки',ar:'ترقية البيدق',fr:'La promotion',de:'Bauernumwandlung',it:'La promozione',zh:'兵的升变'},
+'Beraberlikler':{en:'Draws',ru:'Ничьи',ar:'التعادل',fr:'Les nulles',de:'Remis',it:'La patta',zh:'和棋'},
+'Taşların değeri':{en:'Piece values',ru:'Ценность фигур',ar:'قيمة القطع',fr:'La valeur des pièces',de:'Figurenwerte',it:'Il valore dei pezzi',zh:'棋子价值'},
+'Oyuna başlarken':{en:'Starting a game',ru:'Начало партии',ar:'بداية المباراة',fr:'Bien commencer',de:'Die Eröffnung',it:'Iniziare la partita',zh:'如何开局'},
+'İlk matların':{en:'Your first checkmates',ru:'Первые маты',ar:'أول كش مات لك',fr:'Vos premiers mats',de:'Deine ersten Matts',it:'I tuoi primi matti',zh:'你的第一次将死'},
+'Satranç 64 karelik bir tahtada oynanır. Sütunlar a-h harfleriyle, sıralar 1-8 rakamlarıyla adlandırılır. Her karenin bir adı vardır: e4 gibi.':{en:'Chess is played on a board of 64 squares. Files are named a-h and ranks 1-8. Every square has a name, like e4.',ru:'Шахматы играют на доске из 64 полей. Вертикали обозначают буквами a-h, горизонтали цифрами 1-8. У каждого поля есть имя, например e4.',ar:'يُلعب الشطرنج على رقعة من 64 مربعًا. تُسمى الأعمدة بالحروف a-h والصفوف بالأرقام 1-8. لكل مربع اسم مثل e4.',fr:'Les échecs se jouent sur 64 cases. Les colonnes sont nommées a-h et les rangées 1-8. Chaque case a un nom, comme e4.',de:'Schach wird auf 64 Feldern gespielt. Linien heißen a-h, Reihen 1-8. Jedes Feld hat einen Namen, zum Beispiel e4.',it:'Gli scacchi si giocano su 64 case. Le colonne si chiamano a-h e le traverse 1-8. Ogni casa ha un nome, come e4.',zh:'国际象棋在 64 格的棋盘上进行。纵列用 a-h 表示，横排用 1-8 表示。每个格子都有名字，比如 e4。'},
+'İki tarafın 16\'şar taşı vardır. Önce beyaz oynar, sonra sırayla birer hamle yapılır.':{en:'Each side has 16 pieces. White moves first, then players take turns, one move at a time.',ru:'У каждой стороны 16 фигур. Первыми ходят белые, затем игроки ходят по очереди.',ar:'لكل طرف 16 قطعة. يبدأ الأبيض، ثم يتناوب اللاعبان نقلة بنقلة.',fr:'Chaque camp a 16 pièces. Les blancs commencent, puis chacun joue un coup à tour de rôle.',de:'Jede Seite hat 16 Figuren. Weiß beginnt, dann zieht jeder abwechselnd einmal.',it:'Ogni parte ha 16 pezzi. Il bianco muove per primo, poi si gioca a turno una mossa alla volta.',zh:'双方各有 16 枚棋子。白方先走，然后轮流各走一步。'},
+'Amaç rakibin şahını mat etmektir: şah saldırı altındadır ve kurtuluş yolu yoktur. Şah tahtadan alınmaz, mat olunca oyun biter.':{en:'The goal is to checkmate the enemy king: it is under attack and has no way out. The king is never captured; the game ends at checkmate.',ru:'Цель: поставить мат королю соперника. Король под ударом, и спасения нет. Короля не снимают с доски, при мате игра заканчивается.',ar:'الهدف هو كش مات ملك الخصم: يكون تحت الهجوم ولا مخرج له. لا يُؤخذ الملك من الرقعة، وتنتهي اللعبة عند الكش مات.',fr:'Le but est de mater le roi adverse : il est attaqué et n\'a aucune issue. Le roi n\'est jamais pris, la partie s\'arrête au mat.',de:'Ziel ist es, den gegnerischen König mattzusetzen: Er wird angegriffen und hat keinen Ausweg. Der König wird nie geschlagen, beim Matt endet das Spiel.',it:'Lo scopo è dare scacco matto al re avversario: è sotto attacco e non ha scampo. Il re non viene mai catturato, la partita finisce con il matto.',zh:'目标是将死对方的王：王被攻击且无路可逃。王不会被吃掉，将死时棋局结束。'},
+'Şimdi sen dene: kaleni d8\'e sür ve mat et.':{en:'Now you try: move your rook to d8 and checkmate.',ru:'Теперь вы: поставьте ладью на d8 и дайте мат.',ar:'جرّب الآن: حرّك الرخ إلى d8 واكش مات.',fr:'À vous : jouez la tour en d8 et faites mat.',de:'Jetzt du: Ziehe den Turm nach d8 und setze matt.',it:'Ora tocca a te: porta la torre in d8 e dai matto.',zh:'你来试试：把车走到 d8 将死对方。'},
+'Mat! Siyah şah kendi piyonlarının arkasında kaldı, kaçacak yeri yok.':{en:'Checkmate! The black king is stuck behind its own pawns with nowhere to go.',ru:'Мат! Чёрный король заперт за своими пешками, бежать некуда.',ar:'كش مات! علق الملك الأسود خلف بيادقه ولا مكان يهرب إليه.',fr:'Mat ! Le roi noir est coincé derrière ses pions, sans issue.',de:'Matt! Der schwarze König steckt hinter seinen Bauern fest.',it:'Matto! Il re nero è bloccato dietro i suoi pedoni, senza via di fuga.',zh:'将死！黑王被自己的兵挡住，无处可逃。'},
+'Kaleyi d sütunundan yukarı, d8\'e sür.':{en:'Move the rook up the d-file to d8.',ru:'Ведите ладью вверх по вертикали d, на d8.',ar:'حرّك الرخ صعودًا في العمود d إلى d8.',fr:'Montez la tour sur la colonne d, jusqu\'en d8.',de:'Ziehe den Turm die d-Linie hinauf nach d8.',it:'Porta la torre lungo la colonna d fino a d8.',zh:'沿 d 列把车走到 d8。'},
+'Piyon yalnız ileri gider, geri dönemez. İlk hamlesinde iki kare gidebilir. Piyonunu e4\'e sür.':{en:'A pawn only moves forward and can never go back. On its first move it can go two squares. Move your pawn to e4.',ru:'Пешка ходит только вперёд и не возвращается. Первым ходом может пройти два поля. Поставьте пешку на e4.',ar:'يتحرك البيدق إلى الأمام فقط ولا يعود. في أول نقلة يمكنه التقدم مربعين. حرّك بيدقك إلى e4.',fr:'Le pion avance seulement, sans jamais reculer. Au premier coup, il peut avancer de deux cases. Jouez votre pion en e4.',de:'Ein Bauer zieht nur vorwärts, nie zurück. Beim ersten Zug darf er zwei Felder gehen. Ziehe deinen Bauern nach e4.',it:'Il pedone va solo avanti e non torna indietro. Alla prima mossa può avanzare di due case. Porta il pedone in e4.',zh:'兵只能向前，不能后退。第一步可以走两格。把兵走到 e4。'},
+'Harika. Bundan sonra bu piyon birer kare ilerler.':{en:'Great. From now on this pawn moves one square at a time.',ru:'Отлично. Теперь эта пешка ходит на одно поле.',ar:'رائع. من الآن يتقدم هذا البيدق مربعًا واحدًا.',fr:'Parfait. Désormais ce pion avance d\'une case à la fois.',de:'Super. Ab jetzt zieht dieser Bauer je ein Feld.',it:'Ottimo. Da ora questo pedone avanza di una casa.',zh:'很好。之后这个兵每次走一格。'},
+'İki kare ileri, e4\'e sür.':{en:'Two squares forward, to e4.',ru:'На два поля вперёд, на e4.',ar:'مربعين إلى الأمام، إلى e4.',fr:'Deux cases en avant, en e4.',de:'Zwei Felder vor, nach e4.',it:'Due case avanti, in e4.',zh:'向前两格，走到 e4。'},
+'Piyon çapraz ileriye doğru taş alır, önündeki taşı alamaz. d5\'teki piyonu al.':{en:'A pawn captures diagonally forward and cannot take what is straight ahead. Capture the pawn on d5.',ru:'Пешка бьёт по диагонали вперёд и не может взять фигуру прямо перед собой. Возьмите пешку на d5.',ar:'يأخذ البيدق قطريًا إلى الأمام ولا يأخذ ما أمامه مباشرة. خذ البيدق في d5.',fr:'Le pion prend en diagonale vers l\'avant, jamais droit devant. Prenez le pion en d5.',de:'Ein Bauer schlägt schräg nach vorn, nicht geradeaus. Schlage den Bauern auf d5.',it:'Il pedone cattura in diagonale in avanti, non dritto davanti a sé. Cattura il pedone in d5.',zh:'兵斜向前吃子，不能吃正前方的棋子。吃掉 d5 的兵。'},
+'Doğru. Düz gider, çapraz alır.':{en:'Correct. It moves straight and captures diagonally.',ru:'Верно. Ходит прямо, бьёт наискось.',ar:'صحيح. يتحرك مستقيمًا ويأخذ قطريًا.',fr:'Exact. Il avance tout droit et prend en diagonale.',de:'Richtig. Er zieht gerade und schlägt schräg.',it:'Giusto. Muove dritto e cattura in diagonale.',zh:'正确。直走，斜吃。'},
+'Çapraz ileriye, d5\'e git.':{en:'Go diagonally forward, to d5.',ru:'Наискось вперёд, на d5.',ar:'اذهب قطريًا إلى الأمام، إلى d5.',fr:'En diagonale vers l\'avant, en d5.',de:'Schräg nach vorn, nach d5.',it:'In diagonale in avanti, in d5.',zh:'斜向前走到 d5。'},
+'Kale düz gider: yatay ve dikey, istediği kadar kare. Başka bir taşın üzerinden atlayamaz.':{en:'The rook moves straight, along ranks and files, as many squares as it likes. It cannot jump over pieces.',ru:'Ладья ходит прямо, по горизонтали и вертикали, на любое число полей. Перепрыгивать через фигуры нельзя.',ar:'يتحرك الرخ مستقيمًا أفقيًا وعموديًا لأي عدد من المربعات. لا يمكنه القفز فوق القطع.',fr:'La tour va tout droit, en rangée et en colonne, d\'autant de cases qu\'elle veut. Elle ne saute pas les pièces.',de:'Der Turm zieht gerade, waagerecht und senkrecht, beliebig weit. Er kann nicht springen.',it:'La torre muove dritta, in orizzontale e in verticale, di quante case vuole. Non può saltare i pezzi.',zh:'车走直线，横竖都行，格数不限，不能越过棋子。'},
+'b6\'daki piyonu kaleyle al.':{en:'Capture the pawn on b6 with your rook.',ru:'Возьмите пешку на b6 ладьёй.',ar:'خذ البيدق في b6 بالرخ.',fr:'Prenez le pion en b6 avec la tour.',de:'Schlage den Bauern auf b6 mit dem Turm.',it:'Cattura il pedone in b6 con la torre.',zh:'用车吃掉 b6 的兵。'},
+'Doğru. Yol boştu, kale sonuna kadar gitti.':{en:'Correct. The path was clear, so the rook went all the way.',ru:'Верно. Путь был свободен, и ладья прошла до конца.',ar:'صحيح. كان الطريق خاليًا فذهب الرخ حتى النهاية.',fr:'Exact. La voie était libre, la tour est allée jusqu\'au bout.',de:'Richtig. Der Weg war frei, also zog der Turm ganz durch.',it:'Giusto. La strada era libera e la torre è arrivata fino in fondo.',zh:'正确。路上没有棋子，车一直走到底。'},
+'Kaleyi b sütunundan yukarı sür.':{en:'Move the rook up the b-file.',ru:'Ведите ладью вверх по вертикали b.',ar:'حرّك الرخ صعودًا في العمود b.',fr:'Montez la tour sur la colonne b.',de:'Ziehe den Turm die b-Linie hinauf.',it:'Porta la torre lungo la colonna b.',zh:'沿 b 列向上走车。'},
+'Fil çapraz gider ve hep aynı renk karelerde kalır. Her iki tarafın biri açık, biri koyu kare fili vardır.':{en:'The bishop moves diagonally and always stays on one color. Each side has one light-squared and one dark-squared bishop.',ru:'Слон ходит по диагонали и всегда остаётся на полях одного цвета. У каждой стороны один белопольный и один чернопольный слон.',ar:'يتحرك الفيل قطريًا ويبقى دائمًا على لون واحد. لكل طرف فيل للمربعات الفاتحة وآخر للداكنة.',fr:'Le fou se déplace en diagonale et reste toujours sur la même couleur. Chaque camp a un fou de cases claires et un de cases sombres.',de:'Der Läufer zieht diagonal und bleibt immer auf einer Farbe. Jede Seite hat einen weiß- und einen schwarzfeldrigen Läufer.',it:'L\'alfiere muove in diagonale e resta sempre sullo stesso colore. Ogni parte ha un alfiere campochiaro e uno camposcuro.',zh:'象斜着走，始终停留在同一种颜色的格子上。双方各有一个白格象和一个黑格象。'},
+'f5\'teki piyonu filinle al.':{en:'Capture the pawn on f5 with your bishop.',ru:'Возьмите пешку на f5 слоном.',ar:'خذ البيدق في f5 بالفيل.',fr:'Prenez le pion en f5 avec le fou.',de:'Schlage den Bauern auf f5 mit dem Läufer.',it:'Cattura il pedone in f5 con l\'alfiere.',zh:'用象吃掉 f5 的兵。'},
+'Doğru. Fil uzun çaprazda çok güçlüdür.':{en:'Correct. A bishop is very strong on a long diagonal.',ru:'Верно. На длинной диагонали слон очень силён.',ar:'صحيح. الفيل قوي جدًا على القطر الطويل.',fr:'Exact. Le fou est très fort sur une longue diagonale.',de:'Richtig. Auf einer langen Diagonale ist der Läufer sehr stark.',it:'Giusto. L\'alfiere è molto forte su una lunga diagonale.',zh:'正确。象在长斜线上非常强大。'},
+'Fil çapraz gider: b1\'den f5\'e.':{en:'The bishop moves diagonally: from b1 to f5.',ru:'Слон ходит по диагонали: с b1 на f5.',ar:'يتحرك الفيل قطريًا: من b1 إلى f5.',fr:'Le fou va en diagonale : de b1 à f5.',de:'Der Läufer zieht diagonal: von b1 nach f5.',it:'L\'alfiere muove in diagonale: da b1 a f5.',zh:'象斜着走：从 b1 到 f5。'},
+'Vezir en güçlü taştır: kale ve fil gibi hem düz hem çapraz gider.':{en:'The queen is the strongest piece: it moves straight and diagonally, like a rook and a bishop.',ru:'Ферзь самая сильная фигура: ходит прямо и по диагонали, как ладья и слон.',ar:'الوزير أقوى قطعة: يتحرك مستقيمًا وقطريًا مثل الرخ والفيل.',fr:'La dame est la pièce la plus forte : elle va tout droit et en diagonale, comme la tour et le fou.',de:'Die Dame ist die stärkste Figur: Sie zieht gerade und diagonal wie Turm und Läufer.',it:'La regina è il pezzo più forte: muove dritta e in diagonale, come torre e alfiere.',zh:'后是最强的棋子：能直走也能斜走，就像车和象。'},
+'f6\'daki atı vezirle al.':{en:'Capture the knight on f6 with your queen.',ru:'Возьмите коня на f6 ферзём.',ar:'خذ الحصان في f6 بالوزير.',fr:'Prenez le cavalier en f6 avec la dame.',de:'Schlage den Springer auf f6 mit der Dame.',it:'Cattura il cavallo in f6 con la regina.',zh:'用后吃掉 f6 的马。'},
+'Doğru. Vezir tahtanın öbür ucundan bile vurur.':{en:'Correct. The queen strikes even from across the board.',ru:'Верно. Ферзь бьёт даже с другого конца доски.',ar:'صحيح. يضرب الوزير حتى من الطرف الآخر للرقعة.',fr:'Exact. La dame frappe même depuis l\'autre bout de l\'échiquier.',de:'Richtig. Die Dame schlägt sogar quer über das Brett.',it:'Giusto. La regina colpisce anche dall\'altro lato della scacchiera.',zh:'正确。后即使隔着整个棋盘也能攻击。'},
+'Çaprazdan f6\'ya git.':{en:'Go diagonally to f6.',ru:'По диагонали на f6.',ar:'اذهب قطريًا إلى f6.',fr:'Allez en f6 par la diagonale.',de:'Ziehe diagonal nach f6.',it:'Vai in f6 in diagonale.',zh:'沿斜线走到 f6。'},
+'At L şeklinde gider: iki kare düz, bir kare yana. Taşların üzerinden atlayabilen tek taştır.':{en:'The knight moves in an L: two squares straight, one to the side. It is the only piece that can jump over others.',ru:'Конь ходит буквой Г: два поля прямо, одно в сторону. Только он может перепрыгивать через фигуры.',ar:'يتحرك الحصان على شكل L: مربعان مستقيمًا ومربع جانبًا. وهو الوحيد الذي يقفز فوق القطع.',fr:'Le cavalier se déplace en L : deux cases tout droit, une sur le côté. C\'est la seule pièce qui saute par-dessus les autres.',de:'Der Springer zieht in L-Form: zwei Felder gerade, eins zur Seite. Nur er kann über Figuren springen.',it:'Il cavallo muove a L: due case dritto, una di lato. È l\'unico pezzo che salta gli altri.',zh:'马走 L 形：直走两格，再横走一格。它是唯一能越过其他棋子的棋子。'},
+'c3\'teki atla d5\'teki piyonu al.':{en:'Capture the pawn on d5 with the knight on c3.',ru:'Конём с c3 возьмите пешку на d5.',ar:'خذ البيدق في d5 بالحصان من c3.',fr:'Avec le cavalier en c3, prenez le pion en d5.',de:'Schlage mit dem Springer von c3 den Bauern auf d5.',it:'Con il cavallo in c3 cattura il pedone in d5.',zh:'用 c3 的马吃掉 d5 的兵。'},
+'Doğru. Atın gittiği kare hep ters renktedir.':{en:'Correct. A knight always lands on the opposite color.',ru:'Верно. Конь всегда попадает на поле другого цвета.',ar:'صحيح. يصل الحصان دائمًا إلى لون معاكس.',fr:'Exact. Le cavalier arrive toujours sur la couleur opposée.',de:'Richtig. Der Springer landet immer auf der anderen Farbe.',it:'Giusto. Il cavallo arriva sempre sul colore opposto.',zh:'正确。马每走一步都会落到相反颜色的格子。'},
+'L çiz: c3\'ten d5\'e.':{en:'Draw an L: from c3 to d5.',ru:'Нарисуйте букву Г: с c3 на d5.',ar:'ارسم L: من c3 إلى d5.',fr:'Tracez un L : de c3 à d5.',de:'Zeichne ein L: von c3 nach d5.',it:'Disegna una L: da c3 a d5.',zh:'走 L 形：从 c3 到 d5。'},
+'Şah her yöne yalnız bir kare gider. Saldırı altındaki bir kareye giremez.':{en:'The king moves one square in any direction. It cannot step onto an attacked square.',ru:'Король ходит на одно поле в любую сторону. На атакованное поле ему нельзя.',ar:'يتحرك الملك مربعًا واحدًا في أي اتجاه. لا يمكنه دخول مربع تحت الهجوم.',fr:'Le roi se déplace d\'une case dans toutes les directions. Il ne peut pas aller sur une case attaquée.',de:'Der König zieht ein Feld in jede Richtung. Auf ein angegriffenes Feld darf er nicht.',it:'Il re muove di una casa in ogni direzione. Non può andare su una casa attaccata.',zh:'王向任意方向走一格，不能走到被攻击的格子。'},
+'Siyah kale 2. sırayı tutuyor, o sıraya giremezsin. Şahını yana götür.':{en:'The black rook controls the 2nd rank, so you cannot step there. Move your king sideways.',ru:'Чёрная ладья держит 2-ю горизонталь, туда нельзя. Отведите короля в сторону.',ar:'يسيطر الرخ الأسود على الصف الثاني فلا يمكنك دخوله. حرّك ملكك جانبًا.',fr:'La tour noire contrôle la 2e rangée, vous ne pouvez pas y aller. Déplacez le roi sur le côté.',de:'Der schwarze Turm beherrscht die 2. Reihe, dorthin darfst du nicht. Ziehe den König zur Seite.',it:'La torre nera controlla la seconda traversa, lì non puoi andare. Sposta il re di lato.',zh:'黑车控制第 2 横排，你不能走上去。把王向旁边走。'},
+'Doğru. Şah asla tehlikeli kareye gitmez.':{en:'Correct. The king never steps into danger.',ru:'Верно. Король никогда не идёт под удар.',ar:'صحيح. لا يدخل الملك مربعًا خطرًا أبدًا.',fr:'Exact. Le roi ne va jamais sur une case dangereuse.',de:'Richtig. Der König zieht nie in Gefahr.',it:'Giusto. Il re non va mai in pericolo.',zh:'正确。王绝不能走进危险的格子。'},
+'Yan kareye, d1 ya da f1\'e git.':{en:'Go to the next square: d1 or f1.',ru:'На соседнее поле: d1 или f1.',ar:'اذهب إلى المربع المجاور: d1 أو f1.',fr:'Allez sur la case voisine : d1 ou f1.',de:'Gehe aufs Nachbarfeld: d1 oder f1.',it:'Vai sulla casa accanto: d1 o f1.',zh:'走到旁边的格子：d1 或 f1。'},
+'Şah çekildi! Üç yol var: araya gir, çeken taşı al ya da kaç. Önce araya gir: kaleni a2\'ye koy.':{en:'Check! There are three ways out: block, capture the attacker, or move away. First, block: put your rook on a2.',ru:'Шах! Есть три пути: закрыться, взять атакующую фигуру или уйти. Сначала закройтесь: поставьте ладью на a2.',ar:'كش! هناك ثلاث طرق: اعتراض، أو أخذ القطعة المهاجمة، أو الهروب. اعترض أولًا: ضع الرخ في a2.',fr:'Échec ! Trois solutions : parer, prendre la pièce ou fuir. D\'abord, parez : placez la tour en a2.',de:'Schach! Drei Auswege: dazwischenziehen, den Angreifer schlagen oder ausweichen. Zuerst dazwischen: Turm nach a2.',it:'Scacco! Tre vie d\'uscita: parare, catturare l\'attaccante o scappare. Prima para: metti la torre in a2.',zh:'将军！有三种应对：垫子、吃掉攻击的棋子或躲开。先垫子：把车走到 a2。'},
+'Doğru. Yol kapandı, şah kurtuldu.':{en:'Correct. The line is blocked and the king is safe.',ru:'Верно. Линия закрыта, король спасён.',ar:'صحيح. أُغلق الطريق ونجا الملك.',fr:'Exact. La ligne est bloquée, le roi est sauf.',de:'Richtig. Die Linie ist zu, der König ist sicher.',it:'Giusto. La linea è chiusa e il re è salvo.',zh:'正确。路线被挡住，王安全了。'},
+'Kaleyi a2\'ye, araya koy.':{en:'Put the rook on a2, in between.',ru:'Поставьте ладью на a2, между ними.',ar:'ضع الرخ في a2 بينهما.',fr:'Placez la tour en a2, entre les deux.',de:'Stelle den Turm auf a2 dazwischen.',it:'Metti la torre in a2, nel mezzo.',zh:'把车走到 a2，挡在中间。'},
+'Şimdi çeken taşı al: filinle a8\'deki kaleyi al.':{en:'Now capture the attacker: take the rook on a8 with your bishop.',ru:'Теперь возьмите атакующую фигуру: слоном возьмите ладью на a8.',ar:'الآن خذ القطعة المهاجمة: خذ الرخ في a8 بالفيل.',fr:'Maintenant, prenez l\'attaquant : le fou prend la tour en a8.',de:'Jetzt schlage den Angreifer: Läufer schlägt den Turm auf a8.',it:'Ora cattura l\'attaccante: prendi la torre in a8 con l\'alfiere.',zh:'现在吃掉攻击的棋子：用象吃掉 a8 的车。'},
+'Doğru. Tehdit tahtadan kalktı.':{en:'Correct. The threat is gone.',ru:'Верно. Угрозы больше нет.',ar:'صحيح. زال التهديد.',fr:'Exact. La menace a disparu.',de:'Richtig. Die Drohung ist weg.',it:'Giusto. La minaccia è sparita.',zh:'正确。威胁消失了。'},
+'Fili çaprazdan a8\'e götür.':{en:'Take the bishop diagonally to a8.',ru:'Ведите слона по диагонали на a8.',ar:'حرّك الفيل قطريًا إلى a8.',fr:'Amenez le fou en a8 par la diagonale.',de:'Ziehe den Läufer diagonal nach a8.',it:'Porta l\'alfiere in diagonale in a8.',zh:'沿斜线把象走到 a8。'},
+'Araya girecek taş yok. Şahını a sütunundan çıkar.':{en:'Nothing can block this time. Move your king off the a-file.',ru:'Закрыться нечем. Уведите короля с вертикали a.',ar:'لا قطعة للاعتراض. أخرج ملكك من العمود a.',fr:'Rien ne peut parer. Sortez votre roi de la colonne a.',de:'Nichts kann dazwischenziehen. Ziehe den König von der a-Linie.',it:'Non si può parare. Togli il re dalla colonna a.',zh:'这次没有棋子能垫。把王移出 a 列。'},
+'Doğru. Şah çekilince önce şahı kurtarmak zorunludur.':{en:'Correct. When in check, you must save the king first.',ru:'Верно. При шахе сначала нужно спасти короля.',ar:'صحيح. عند الكش يجب إنقاذ الملك أولًا.',fr:'Exact. En échec, il faut d\'abord sauver le roi.',de:'Richtig. Im Schach muss zuerst der König gerettet werden.',it:'Giusto. Sotto scacco devi prima salvare il re.',zh:'正确。被将军时，必须先救王。'},
+'Şahı b1 ya da b2\'ye götür.':{en:'Move the king to b1 or b2.',ru:'Отведите короля на b1 или b2.',ar:'حرّك الملك إلى b1 أو b2.',fr:'Jouez le roi en b1 ou b2.',de:'Ziehe den König nach b1 oder b2.',it:'Porta il re in b1 o b2.',zh:'把王走到 b1 或 b2。'},
+'Pat: sırası gelenin hiç yasal hamlesi yok ama şahı saldırı altında değil. Oyun berabere biter. Kazanırken buna dikkat et!':{en:'Stalemate: the player to move has no legal move, but the king is not under attack. The game is a draw. Watch out for this when winning!',ru:'Пат: у игрока нет ходов, но король не под ударом. Игра заканчивается вничью. Будьте внимательны, когда выигрываете!',ar:'الجمود: لا نقلة قانونية للاعب، لكن ملكه ليس تحت الهجوم. تنتهي اللعبة بالتعادل. انتبه لذلك وأنت متقدم!',fr:'Pat : le joueur au trait n\'a aucun coup légal, mais son roi n\'est pas attaqué. La partie est nulle. Attention quand vous gagnez !',de:'Patt: Wer am Zug ist, hat keinen Zug, aber der König wird nicht angegriffen. Das Spiel ist remis. Pass auf, wenn du gewinnst!',it:'Stallo: chi deve muovere non ha mosse legali, ma il re non è attaccato. La partita è patta. Attenzione quando stai vincendo!',zh:'逼和：轮到走棋的一方无子可走，但王没有被攻击。棋局和棋。领先时要特别小心！'},
+'Şimdi tek hamlede mat et. Dikkat et, pat yapma.':{en:'Now checkmate in one move. Careful, no stalemate.',ru:'Теперь дайте мат в один ход. Осторожно, без пата.',ar:'الآن اكش مات في نقلة واحدة. احذر الجمود.',fr:'Maintenant, matez en un coup. Attention au pat.',de:'Setze jetzt in einem Zug matt. Vorsicht vor Patt.',it:'Ora dai matto in una mossa. Attento allo stallo.',zh:'现在一步将死。小心不要逼和。'},
+'Mat! Şah saldırı altında ve kaçacak yeri yok.':{en:'Checkmate! The king is under attack with nowhere to go.',ru:'Мат! Король под ударом, бежать некуда.',ar:'كش مات! الملك تحت الهجوم ولا مكان له.',fr:'Mat ! Le roi est attaqué et sans issue.',de:'Matt! Der König wird angegriffen und hat keinen Ausweg.',it:'Matto! Il re è attaccato e non ha scampo.',zh:'将死！王被攻击且无处可逃。'},
+'Bu mat değil. Şaha saldırmalısın ve kaçacak yeri kalmamalı. Veziri f8\'e dene.':{en:'That is not checkmate. You must attack the king and leave it no escape. Try the queen on f8.',ru:'Это не мат. Нужно атаковать короля и не оставить ему выхода. Попробуйте ферзя на f8.',ar:'هذا ليس كش مات. يجب مهاجمة الملك دون ترك مهرب له. جرّب الوزير في f8.',fr:'Ce n\'est pas mat. Il faut attaquer le roi sans lui laisser d\'issue. Essayez la dame en f8.',de:'Das ist nicht matt. Greife den König an und lass ihm keinen Ausweg. Versuche die Dame auf f8.',it:'Non è matto. Devi attaccare il re senza lasciargli scampo. Prova la regina in f8.',zh:'这不是将死。必须攻击王并且不给它退路。试试把后走到 f8。'},
+'Rok şahı güvene alır: şah kaleye doğru iki kare gider, kale şahın öbür yanına geçer. Şah ve kale daha önce oynamamış, araları boş olmalı. Şah çekilirken ya da tehdit altındaki kareden geçerek rok yapılmaz. Şahı g1\'e götür.':{en:'Castling keeps the king safe: the king moves two squares toward the rook, and the rook crosses to its other side. Neither may have moved and the squares between must be empty. You cannot castle in check or through an attacked square. Move the king to g1.',ru:'Рокировка защищает короля: он идёт на два поля к ладье, а ладья переходит на другую его сторону. Оба не должны были ходить, между ними пусто. Нельзя рокироваться под шахом и через атакованное поле. Поставьте короля на g1.',ar:'التبييت يحمي الملك: يتحرك مربعين نحو الرخ، وينتقل الرخ إلى جانبه الآخر. يجب ألا يكونا قد تحركا وأن يكون ما بينهما خاليًا. لا يجوز أثناء الكش أو عبر مربع مهدد. حرّك الملك إلى g1.',fr:'Le roque met le roi à l\'abri : il avance de deux cases vers la tour, qui passe de l\'autre côté. Aucun des deux ne doit avoir bougé, les cases entre eux sont vides. Pas de roque en échec ni à travers une case attaquée. Jouez le roi en g1.',de:'Die Rochade sichert den König: Er zieht zwei Felder zum Turm, der Turm wechselt auf seine andere Seite. Beide dürfen noch nicht gezogen haben, dazwischen muss frei sein. Nicht im Schach und nicht über ein angegriffenes Feld. Ziehe den König nach g1.',it:'L\'arrocco mette al sicuro il re: va di due case verso la torre, che passa dall\'altro lato. Nessuno dei due deve aver mosso, tra loro le case sono vuote. Non si arrocca sotto scacco né attraverso una casa attaccata. Porta il re in g1.',zh:'王车易位保护王：王向车走两格，车跳到王的另一侧。两者都不能动过，中间必须没有棋子。被将军时或经过被攻击的格子时不能易位。把王走到 g1。'},
+'Rok tamam! Şah köşede güvende, kale oyuna girdi.':{en:'Castled! The king is safe in the corner and the rook is in play.',ru:'Рокировка сделана! Король в безопасности, ладья в игре.',ar:'تم التبييت! الملك آمن في الزاوية والرخ دخل اللعب.',fr:'Roque réussi ! Le roi est à l\'abri, la tour entre en jeu.',de:'Rochiert! Der König steht sicher, der Turm ist im Spiel.',it:'Arrocco fatto! Il re è al sicuro e la torre entra in gioco.',zh:'易位完成！王在角落很安全，车也加入了战斗。'},
+'Şahı iki kare sağa, g1\'e götür.':{en:'Move the king two squares right, to g1.',ru:'Король на два поля вправо, на g1.',ar:'حرّك الملك مربعين يمينًا إلى g1.',fr:'Roi de deux cases à droite, en g1.',de:'König zwei Felder nach rechts, nach g1.',it:'Re di due case a destra, in g1.',zh:'把王向右走两格到 g1。'},
+'Siyah piyon iki kare gelip yanına geçti. Yalnız hemen bu hamlede, onu bir kare gelmiş gibi alabilirsin. e5\'teki piyonunu d6\'ya sür.':{en:'The black pawn just came two squares and landed beside yours. Only on this very move, you can capture it as if it had moved one square. Move your e5 pawn to d6.',ru:'Чёрная пешка прошла два поля и встала рядом. Только этим ходом можно взять её, как будто она прошла одно поле. Сыграйте пешкой с e5 на d6.',ar:'تقدم البيدق الأسود مربعين ووقف بجانبك. في هذه النقلة فقط يمكنك أخذه كأنه تقدم مربعًا واحدًا. حرّك بيدق e5 إلى d6.',fr:'Le pion noir vient d\'avancer de deux cases à côté du vôtre. À ce coup seulement, vous pouvez le prendre comme s\'il n\'avait avancé que d\'une case. Jouez e5 en d6.',de:'Der schwarze Bauer zog zwei Felder neben deinen. Nur in diesem Zug kannst du ihn schlagen, als wäre er ein Feld gezogen. Ziehe von e5 nach d6.',it:'Il pedone nero ha appena fatto due case fermandosi accanto al tuo. Solo a questa mossa puoi catturarlo come se ne avesse fatta una. Porta il pedone e5 in d6.',zh:'黑兵刚走两格，停在你的兵旁边。只有这一步，你可以像它只走一格那样吃掉它。把 e5 的兵走到 d6。'},
+'Geçerken aldın! Bir sonraki hamlede bu hak biterdi.':{en:'En passant! On the next move this right would be gone.',ru:'Взятие на проходе! Следующим ходом это право исчезло бы.',ar:'أخذت بالمرور! في النقلة التالية كان هذا الحق سينتهي.',fr:'En passant ! Au coup suivant, ce droit aurait disparu.',de:'En passant! Beim nächsten Zug wäre dieses Recht weg.',it:'En passant! Alla mossa dopo questo diritto sarebbe sparito.',zh:'吃过路兵成功！下一步这个权利就会消失。'},
+'Piyonunu çapraz ileriye, d6\'ya sür.':{en:'Move your pawn diagonally forward, to d6.',ru:'Ведите пешку наискось вперёд, на d6.',ar:'حرّك بيدقك قطريًا إلى الأمام، إلى d6.',fr:'Jouez votre pion en diagonale, en d6.',de:'Ziehe deinen Bauern schräg nach d6.',it:'Porta il pedone in diagonale, in d6.',zh:'把兵斜向前走到 d6。'},
+'Piyon son sıraya ulaşınca vezir, kale, fil ya da ata dönüşür. Çoğu zaman vezir seçilir. Piyonunu e8\'e sür.':{en:'When a pawn reaches the last rank it becomes a queen, rook, bishop or knight. Most players pick a queen. Move your pawn to e8.',ru:'Дойдя до последней горизонтали, пешка становится ферзём, ладьёй, слоном или конём. Чаще выбирают ферзя. Поставьте пешку на e8.',ar:'عندما يصل البيدق إلى الصف الأخير يصبح وزيرًا أو رخًا أو فيلًا أو حصانًا. غالبًا يُختار الوزير. حرّك بيدقك إلى e8.',fr:'Arrivé à la dernière rangée, le pion devient dame, tour, fou ou cavalier. On choisit presque toujours la dame. Jouez votre pion en e8.',de:'Auf der letzten Reihe wird der Bauer zu Dame, Turm, Läufer oder Springer. Meist wählt man die Dame. Ziehe deinen Bauern nach e8.',it:'Arrivato all\'ultima traversa il pedone diventa regina, torre, alfiere o cavallo. Di solito si sceglie la regina. Porta il pedone in e8.',zh:'兵走到最后一排时可变成后、车、象或马，通常选后。把兵走到 e8。'},
+'Tebrikler, yeni bir taş kazandın!':{en:'Congratulations, you won a new piece!',ru:'Поздравляем, у вас новая фигура!',ar:'تهانينا، ربحت قطعة جديدة!',fr:'Bravo, vous avez gagné une nouvelle pièce !',de:'Glückwunsch, du hast eine neue Figur!',it:'Complimenti, hai ottenuto un nuovo pezzo!',zh:'恭喜，你得到了一枚新棋子！'},
+'Piyonu e8\'e sür.':{en:'Move the pawn to e8.',ru:'Поставьте пешку на e8.',ar:'حرّك البيدق إلى e8.',fr:'Jouez le pion en e8.',de:'Ziehe den Bauern nach e8.',it:'Porta il pedone in e8.',zh:'把兵走到 e8。'},
+'Yetersiz materyal: tek at ya da tek fil gibi mat kuramayacak taşlar kalırsa oyun berabere biter.':{en:'Insufficient material: if only pieces that cannot checkmate remain, such as a lone knight or bishop, the game is a draw.',ru:'Недостаток материала: если остались фигуры, которыми нельзя дать мат, например один конь или слон, это ничья.',ar:'مادة غير كافية: إذا بقيت قطع لا تستطيع الكش مات، مثل حصان أو فيل وحيد، تنتهي اللعبة بالتعادل.',fr:'Matériel insuffisant : s\'il ne reste que des pièces incapables de mater, comme un cavalier ou un fou seul, la partie est nulle.',de:'Zu wenig Material: Bleiben nur Figuren, die nicht mattsetzen können, etwa ein einzelner Springer oder Läufer, ist es remis.',it:'Materiale insufficiente: se restano solo pezzi che non possono dare matto, come un cavallo o un alfiere soli, è patta.',zh:'子力不足：如果只剩单马或单象这类无法将死的棋子，棋局和棋。'},
+'Üç tekrar: aynı konum aynı oyuncunun sırasında üç kez oluşursa oyun berabere biter.':{en:'Threefold repetition: if the same position occurs three times with the same player to move, the game is a draw.',ru:'Троекратное повторение: если одна и та же позиция с тем же ходом возникает три раза, это ничья.',ar:'التكرار الثلاثي: إذا تكرر الوضع نفسه ثلاث مرات والدور للاعب نفسه، تنتهي اللعبة بالتعادل.',fr:'Triple répétition : si la même position survient trois fois avec le même joueur au trait, la partie est nulle.',de:'Dreifache Wiederholung: Entsteht dieselbe Stellung dreimal mit demselben Spieler am Zug, ist es remis.',it:'Triplice ripetizione: se la stessa posizione si ripete tre volte con lo stesso giocatore al tratto, è patta.',zh:'三次重复：同一局面在同一方走棋时出现三次，棋局和棋。'},
+'50 hamle: iki taraf da 50 hamle boyunca taş almaz ve piyon oynatmazsa oyun berabere biter. Oyuncular anlaşarak da beraberlik yapabilir.':{en:'50 moves: if neither side captures or moves a pawn for 50 moves, the game is a draw. Players can also agree to a draw.',ru:'Правило 50 ходов: если 50 ходов не было взятий и ходов пешками, это ничья. Игроки также могут договориться о ничьей.',ar:'قاعدة 50 نقلة: إذا لم يأخذ أي طرف قطعة أو يحرك بيدقًا لمدة 50 نقلة، تنتهي بالتعادل. ويمكن للاعبين الاتفاق على التعادل.',fr:'50 coups : sans prise ni coup de pion pendant 50 coups, la partie est nulle. Les joueurs peuvent aussi convenir de la nulle.',de:'50 Züge: Ohne Schlagen und Bauernzug in 50 Zügen ist es remis. Spieler können sich auch auf Remis einigen.',it:'50 mosse: senza catture né mosse di pedone per 50 mosse, è patta. I giocatori possono anche accordarsi per la patta.',zh:'50 步规则：双方连续 50 步没有吃子也没有走兵，棋局和棋。双方也可以协议和棋。'},
+'Piyon 1, at ve fil 3, kale 5, vezir 9 puan sayılır. Şahın değeri ölçülemez. Takas yaparken bunu düşün.':{en:'A pawn is worth 1, knight and bishop 3, rook 5, queen 9. The king is priceless. Keep this in mind when trading.',ru:'Пешка стоит 1, конь и слон 3, ладья 5, ферзь 9. Король бесценен. Учитывайте это при размене.',ar:'البيدق 1، الحصان والفيل 3، الرخ 5، الوزير 9. الملك لا يُقدّر بثمن. فكّر في ذلك عند التبادل.',fr:'Pion 1, cavalier et fou 3, tour 5, dame 9. Le roi n\'a pas de prix. Pensez-y lors des échanges.',de:'Bauer 1, Springer und Läufer 3, Turm 5, Dame 9. Der König ist unbezahlbar. Denke beim Tauschen daran.',it:'Pedone 1, cavallo e alfiere 3, torre 5, regina 9. Il re non ha prezzo. Pensaci quando fai cambi.',zh:'兵 1 分，马和象 3 分，车 5 分，后 9 分，王无价。兑子时要考虑这些。'},
+'Atın iki taşı birden tehdit ediyor. Hangisini alırsın?':{en:'Your knight attacks two pieces at once. Which one do you take?',ru:'Ваш конь атакует сразу две фигуры. Какую возьмёте?',ar:'حصانك يهاجم قطعتين معًا. أيهما تأخذ؟',fr:'Votre cavalier attaque deux pièces à la fois. Laquelle prenez-vous ?',de:'Dein Springer greift zwei Figuren an. Welche schlägst du?',it:'Il tuo cavallo attacca due pezzi insieme. Quale prendi?',zh:'你的马同时攻击两枚棋子。吃哪一个？'},
+'Doğru. Vezir 9, kale 5 puan: en değerlisini aldın.':{en:'Correct. Queen 9, rook 5: you took the most valuable.',ru:'Верно. Ферзь 9, ладья 5: вы взяли самую ценную.',ar:'صحيح. الوزير 9 والرخ 5: أخذت الأغلى.',fr:'Exact. Dame 9, tour 5 : vous avez pris la plus précieuse.',de:'Richtig. Dame 9, Turm 5: Du hast die wertvollste genommen.',it:'Giusto. Regina 9, torre 5: hai preso il più prezioso.',zh:'正确。后 9 分，车 5 分：你吃了最值钱的。'},
+'Kale 5, vezir 9 puan. Daha değerlisini al.':{en:'Rook 5, queen 9. Take the more valuable one.',ru:'Ладья 5, ферзь 9. Возьмите более ценную.',ar:'الرخ 5 والوزير 9. خذ الأغلى.',fr:'Tour 5, dame 9. Prenez la plus précieuse.',de:'Turm 5, Dame 9. Nimm die wertvollere.',it:'Torre 5, regina 9. Prendi il più prezioso.',zh:'车 5 分，后 9 分。吃更值钱的。'},
+'Önce merkezi tut: piyonunu e4 ya da d4\'e sür.':{en:'First take the center: move a pawn to e4 or d4.',ru:'Сначала займите центр: поставьте пешку на e4 или d4.',ar:'سيطر على المركز أولًا: حرّك بيدقًا إلى e4 أو d4.',fr:'D\'abord le centre : jouez un pion en e4 ou d4.',de:'Besetze zuerst das Zentrum: Bauer nach e4 oder d4.',it:'Prima il centro: porta un pedone in e4 o d4.',zh:'先占中心：把兵走到 e4 或 d4。'},
+'İyi başlangıç. Merkezdeki piyon taşlarına yol açar.':{en:'Good start. A central pawn opens lines for your pieces.',ru:'Хорошее начало. Центральная пешка открывает путь фигурам.',ar:'بداية جيدة. بيدق المركز يفتح الطريق لقطعك.',fr:'Bon début. Un pion central ouvre la voie à vos pièces.',de:'Guter Start. Ein Zentrumsbauer öffnet deinen Figuren den Weg.',it:'Buon inizio. Un pedone centrale apre la strada ai pezzi.',zh:'好的开始。中心兵为棋子打开了道路。'},
+'Merkez piyonunu, e ya da d piyonunu iki kare sür.':{en:'Move a central pawn, the e or d pawn, two squares.',ru:'Пешкой e или d пройдите на два поля.',ar:'حرّك بيدق المركز، بيدق e أو d، مربعين.',fr:'Avancez un pion central, e ou d, de deux cases.',de:'Ziehe einen Zentrumsbauern, e oder d, zwei Felder.',it:'Avanza di due case un pedone centrale, e o d.',zh:'把中心的 e 兵或 d 兵走两格。'},
+'Sonra taşlarını oyuna sok: atını merkeze yakın bir kareye çıkar.':{en:'Then bring your pieces out: move a knight to a square near the center.',ru:'Затем вводите фигуры в игру: выведите коня ближе к центру.',ar:'ثم أدخل قطعك في اللعب: أخرج حصانًا إلى مربع قريب من المركز.',fr:'Ensuite, sortez vos pièces : placez un cavalier près du centre.',de:'Entwickle dann deine Figuren: Ziehe einen Springer nahe ans Zentrum.',it:'Poi sviluppa i pezzi: porta un cavallo vicino al centro.',zh:'接着出动棋子：把马走到靠近中心的格子。'},
+'Güzel. At artık merkezi kontrol ediyor.':{en:'Nice. The knight now controls the center.',ru:'Хорошо. Теперь конь контролирует центр.',ar:'جميل. يسيطر الحصان الآن على المركز.',fr:'Bien. Le cavalier contrôle maintenant le centre.',de:'Schön. Der Springer kontrolliert jetzt das Zentrum.',it:'Bene. Ora il cavallo controlla il centro.',zh:'不错。马现在控制着中心。'},
+'Atını f3 ya da c3\'e çıkar.':{en:'Move a knight to f3 or c3.',ru:'Выведите коня на f3 или c3.',ar:'أخرج حصانًا إلى f3 أو c3.',fr:'Jouez un cavalier en f3 ou c3.',de:'Ziehe einen Springer nach f3 oder c3.',it:'Porta un cavallo in f3 o c3.',zh:'把马走到 f3 或 c3。'},
+'Şimdi şahını güvene al: rok yap.':{en:'Now make your king safe: castle.',ru:'Теперь обезопасьте короля: сделайте рокировку.',ar:'الآن أمّن ملكك: قم بالتبييت.',fr:'Mettez maintenant votre roi à l\'abri : roquez.',de:'Bring jetzt deinen König in Sicherheit: Rochiere.',it:'Ora metti al sicuro il re: arrocca.',zh:'现在让王安全：王车易位。'},
+'Harika açılış: merkez, gelişim, rok. Bu üçünü unutma.':{en:'A great opening: center, development, castling. Remember these three.',ru:'Отличный дебют: центр, развитие, рокировка. Запомните эти три шага.',ar:'افتتاحية رائعة: المركز، التطوير، التبييت. تذكّر هذه الثلاثة.',fr:'Superbe ouverture : centre, développement, roque. Retenez ces trois idées.',de:'Tolle Eröffnung: Zentrum, Entwicklung, Rochade. Merke dir diese drei.',it:'Ottima apertura: centro, sviluppo, arrocco. Ricorda questi tre punti.',zh:'漂亮的开局：占中心、出子、易位。记住这三点。'},
+'Şahı g1\'e götürerek rok yap.':{en:'Castle by moving the king to g1.',ru:'Сделайте рокировку: король на g1.',ar:'قم بالتبييت بتحريك الملك إلى g1.',fr:'Roquez en jouant le roi en g1.',de:'Rochiere, indem du den König nach g1 ziehst.',it:'Arrocca portando il re in g1.',zh:'把王走到 g1 完成易位。'},
+'Şahın, rakip şahı kenara sıkıştırdı. Kaleyle mat et.':{en:'Your king has pushed the enemy king to the edge. Checkmate with the rook.',ru:'Ваш король прижал короля соперника к краю. Дайте мат ладьёй.',ar:'حاصر ملكك ملك الخصم عند الحافة. اكش مات بالرخ.',fr:'Votre roi a repoussé le roi adverse au bord. Matez avec la tour.',de:'Dein König hat den gegnerischen König an den Rand gedrängt. Setze mit dem Turm matt.',it:'Il tuo re ha spinto quello avversario sul bordo. Dai matto con la torre.',zh:'你的王把对方的王逼到了边上。用车将死。'},
+'Mat! Kale son sırayı tuttu, şahın da kaçış karelerini kapattı.':{en:'Checkmate! The rook holds the last rank and your king covers the escape squares.',ru:'Мат! Ладья держит последнюю горизонталь, а ваш король закрыл пути отхода.',ar:'كش مات! يسيطر الرخ على الصف الأخير ويغلق ملكك مربعات الهروب.',fr:'Mat ! La tour tient la dernière rangée et votre roi couvre les cases de fuite.',de:'Matt! Der Turm hält die letzte Reihe, dein König deckt die Fluchtfelder.',it:'Matto! La torre tiene l\'ultima traversa e il tuo re copre le fughe.',zh:'将死！车控制最后一排，你的王封住了退路。'},
+'Kaleyi son sıraya, h8\'e sür.':{en:'Move the rook to the last rank, to h8.',ru:'Ведите ладью на последнюю горизонталь, на h8.',ar:'حرّك الرخ إلى الصف الأخير، إلى h8.',fr:'Jouez la tour sur la dernière rangée, en h8.',de:'Ziehe den Turm auf die letzte Reihe, nach h8.',it:'Porta la torre sull\'ultima traversa, in h8.',zh:'把车走到最后一排的 h8。'},
+'Şimdi vezirle mat et.':{en:'Now checkmate with the queen.',ru:'Теперь дайте мат ферзём.',ar:'الآن اكش مات بالوزير.',fr:'Matez maintenant avec la dame.',de:'Setze jetzt mit der Dame matt.',it:'Ora dai matto con la regina.',zh:'现在用后将死。'},
+'Mat! Tebrikler, artık oyunu biliyorsun.':{en:'Checkmate! Congratulations, now you know the game.',ru:'Мат! Поздравляем, теперь вы знаете игру.',ar:'كش مات! تهانينا، أصبحت تعرف اللعبة.',fr:'Mat ! Bravo, vous connaissez maintenant le jeu.',de:'Matt! Glückwunsch, jetzt kennst du das Spiel.',it:'Matto! Complimenti, ora conosci il gioco.',zh:'将死！恭喜，你已经学会下棋了。'},
+'Veziri son sıraya, g8\'e getir.':{en:'Bring the queen to the last rank, to g8.',ru:'Поставьте ферзя на последнюю горизонталь, на g8.',ar:'أحضر الوزير إلى الصف الأخير، إلى g8.',fr:'Amenez la dame sur la dernière rangée, en g8.',de:'Bringe die Dame auf die letzte Reihe, nach g8.',it:'Porta la regina sull\'ultima traversa, in g8.',zh:'把后走到最后一排的 g8。'}
+});
 const ORJA=new WeakMap();     // eleman -> {öznitelik: orijinal}
 const BEKLENEN=new WeakMap(); // bizim yazdığımız değer (geri besleme kilidi)
 function metniCevirHam(t){
@@ -15132,13 +15691,13 @@ if(uygDil!=='tr'){
    PREMIUM & REKLAM SİSTEMİ
    Kural: Android köprüsü (AndroidKopru) yoksa her şey açık kalır —
    yani bu kod, Android tarafı eklenene kadar davranışı DEĞİŞTİRMEZ.
-   Model: ilk 24 saat serbest → sonra klasik dışı ordular, Harp/Retro
+   Model: ilk 7 gün serbest → sonra klasik dışı ordular, Harp/Retro
    dışı arenalar reklamla 24 saat; tahta analizi açılış başına reklam.
    Premium: tek seferlik satın alma → reklamsız + hepsi kalıcı açık.
    ================================================================ */
 const BEDAVA_ORDU=['klasik'];
 const BEDAVA_ARENA=['harp','retro'];
-const BEDAVA_SAAT=24, ODUL_SAAT=24;
+const BEDAVA_SAAT=7*24, ODUL_SAAT=24;   // ilk kurulumdan sonra 7 gün her şey açık (4 Kasım 2026, sahibin isteği)
 let premiumAktif=false;
 /* Eskiden hata tamamen yutuluyordu: depolama kapalıysa/kota doluysa kullanıcı
    premium alıyor, uygulamayı kapatıp açtığında premium kayboluyor ve neden
@@ -15798,12 +16357,17 @@ function avatarFotoSil(){
     okuyucu.onload=()=>{
       const img=new Image();
       img.onload=()=>{
-        /* ortadan kare kırp, 64×64'e küçült */
-        const c=document.createElement('canvas'); c.width=64; c.height=64;
+        /* ortadan kare kırp, 256×256'ya küçült (eskiden 64×64: büyütünce bulanık görünüyordu).
+           Firestore kuralı 40.000 karakterden büyük fotoğrafı (ve onunla birlikte tüm profil kaydını) reddeder;
+           o yüzden sınırın altına inene kadar kalite düşürülür. */
+        const BOY=256;
+        const c=document.createElement('canvas'); c.width=BOY; c.height=BOY;
         const x=c.getContext('2d');
+        x.imageSmoothingEnabled=true; x.imageSmoothingQuality='high';
         const kisa=Math.min(img.width,img.height);
-        x.drawImage(img,(img.width-kisa)/2,(img.height-kisa)/2,kisa,kisa,0,0,64,64);
-        const url=c.toDataURL('image/jpeg',.6);
+        x.drawImage(img,(img.width-kisa)/2,(img.height-kisa)/2,kisa,kisa,0,0,BOY,BOY);
+        let kalite=.82, url=c.toDataURL('image/jpeg',kalite);
+        while(url.length>=38000 && kalite>.3){ kalite-=.08; url=c.toDataURL('image/jpeg',kalite); }
         if(fbKullanici && !misafirMod){ bulutIst.avatarFoto=url; bulutIstKaydet(); }
         else if(typeof pSakla==='function') pSakla('c64_avfoto',url);
         istProfilDoldur();
@@ -17102,7 +17666,7 @@ else { try{ SesOyun.kur(); }catch(e){} }
   /* Oyun sonu (şah mat + Stockfish karnesi) da HEP dikey (4 Ekim 2026, sahibin isteği). Kapatıp
      tahtaya dönünce oyunun kayıtlı yönüne geçilir. Gezinme çubuğu kuralı değişmez (analizde() ayrı). */
   const sonEk=document.getElementById('son');
-  const dikZorunlu=()=>analizde() || !!(sonEk && sonEk.classList.contains('acik'));
+  const dikZorunlu=()=>analizde() || !!(sonEk && sonEk.classList.contains('acik')) || document.body.classList.contains('ogrende');   // Öğren de hep dikey
   let analizYon='dikey';
   const simdiki=()=>dikZorunlu()?analizYon:kayitli();
   function etiket(){
@@ -17201,7 +17765,7 @@ function devPanelAc(){
   const b1=document.createElement('button');
   b1.textContent='⏩ Bedava dönemi bitir (kilit testi)';
   b1.style.cssText='display:block;margin:16px 0 8px;padding:10px 14px;border-radius:8px;border:1px solid var(--brass);background:rgba(185,154,91,.14);color:#E8E2D2;cursor:pointer;font-family:inherit';
-  b1.onclick=()=>{ try{ localStorage.setItem('c64_ilk',''+(Date.now()-25*3600000)); }catch(e){} b1.textContent='✓ Bitirildi — kilitler aktif'; if(typeof rozetGuncelle==='function') rozetGuncelle(); };
+  b1.onclick=()=>{ try{ localStorage.setItem('c64_ilk',''+(Date.now()-(BEDAVA_SAAT+1)*3600000)); }catch(e){} b1.textContent='✓ Bitirildi — kilitler aktif'; if(typeof rozetGuncelle==='function') rozetGuncelle(); };
   const b1b=document.createElement('button');
   b1b.textContent='🔓 Reklam ödüllerini temizle (24s kilitleri geri getir)';
   b1b.style.cssText='display:block;margin-bottom:8px;padding:10px 14px;border-radius:8px;border:1px solid var(--brass);background:rgba(185,154,91,.10);color:#E8E2D2;cursor:pointer;font-family:inherit';
