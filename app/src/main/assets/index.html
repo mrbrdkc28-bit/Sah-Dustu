@@ -404,6 +404,19 @@ body:not(.dikeyAktif) #cevrimiciSerit{top:56px;left:14px;right:auto;text-align:l
 .cvLobiGor{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dim)}
 .cvLobiGor input{accent-color:#3ecf6e;width:16px;height:16px;margin:0}
 #cvLobiListe{display:flex;flex-direction:column;gap:6px}
+/* Lobi şeridi (Kasım 2026) */
+#cvLobiListe:has(.lobiKart){flex-direction:row;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;
+  margin:0 -20px;padding:2px 20px 8px;scrollbar-width:none}
+#cvLobiListe::-webkit-scrollbar{display:none}
+.lobiKart{flex:0 0 104px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 8px 9px;
+  border-radius:14px;background:rgba(127,127,127,.08);border:1px solid rgba(127,127,127,.18);min-width:0;text-align:center}
+.lobiKart.cvr{border-color:rgba(62,207,110,.45)}
+.lobiKart .lobiAv{margin-bottom:3px}
+.lobiKart .lobiAd{width:100%;font-size:13px}
+.lobiKart .lobiAlt{width:100%;font-size:11.5px}
+.lobiKart .lobiDurum{width:100%;font-size:10.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lobiKart.cvr .lobiDurum{color:#3ecf6e;font-weight:700}
+.lobiKart .lobiBtn{margin-top:5px;width:100%;padding:6px 4px;font-size:12px}
 .lobiSatir{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(127,127,127,.08);border:1px solid rgba(127,127,127,.18)}
 .lobiAv{position:relative;width:38px;height:38px;flex:0 0 38px;border-radius:50%;background:rgba(127,127,127,.16);
   display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--brass)}
@@ -2043,6 +2056,20 @@ body.onizlemede #anlatim{z-index:45;bottom:auto;top:calc(190px + env(safe-area-i
 #cvEylem .cvAltSatir #cvOdaOlustur .cvIkon{width:26px;height:26px}
 #cvEylem .cvAltSatir #cvOdaOlustur .cvIkon svg{width:16px;height:16px}
 #cvEylem .cvAltSatir{min-height:46px}
+/* Dar ekranda Katıl düğmesi sağdan taşıyordu (kod alanı içeriği kadar genişliğin altına inmiyordu, Kasım 2026) */
+#cvEylem .cvAltSatir #cvKatilKutu{min-width:0}
+#cvEylem .cvAltSatir #cvKodGiris{flex:1 1 0;width:0}
+#cvEylem .cvAltSatir #cvOdayaKatil{flex:none}
+#ilkHamleSayac{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 108px);transform:translateX(-50%);z-index:36;display:none;
+  padding:7px 14px;border-radius:18px;background:rgba(12,14,20,.86);border:1px solid rgba(232,182,76,.35);color:#EDE6D6;
+  font:700 13px Manrope,sans-serif;white-space:nowrap;pointer-events:none}
+#ilkHamleSayac.acik{display:block}
+#rakipBaglanti{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 108px);transform:translateX(-50%);z-index:36;display:none;
+  padding:7px 14px;border-radius:18px;background:rgba(60,20,16,.9);border:1px solid rgba(240,120,90,.45);color:#F6D9CF;
+  font:700 13px Manrope,sans-serif;white-space:nowrap;pointer-events:none}
+#rakipBaglanti.acik{display:block}
+#ilkHamleSayac.benim{background:linear-gradient(135deg,#F2C765,#C9912A);color:#1a1408;border-color:transparent}
+@media (max-width:350px){ #cvEylem .cvAltSatir{flex-wrap:wrap} #cvEylem .cvAltSatir #cvOdaOlustur,#cvEylem .cvAltSatir #cvKatilKutu{flex:1 1 100%} }
 #cvEylem .cvBtn.cvKatil{padding:10px 14px}
 
 /* ===== BULMACALAR ekranı (4 Ekim 2026): Günün Bulmacası + uygulamanın tasarım dili ===== */
@@ -3030,10 +3057,10 @@ function perdeBittiginde(fn){
       <div class="cvSureBaslik">SÜRE</div>
       <div id="cvSureler">
         <button class="cvSure" data-dk="1" data-inc="0">1+0<small>Bullet</small></button>
-        <button class="cvSure secili" data-dk="3" data-inc="0">3+0<small>Blitz</small></button>
+        <button class="cvSure" data-dk="3" data-inc="0">3+0<small>Blitz</small></button>
         <button class="cvSure" data-dk="3" data-inc="2">3+2<small>Blitz</small></button>
         <button class="cvSure" data-dk="5" data-inc="0">5+0<small>Blitz</small></button>
-        <button class="cvSure" data-dk="10" data-inc="0">10+0<small>Rapid</small></button>
+        <button class="cvSure secili" data-dk="10" data-inc="0">10+0<small>Rapid</small></button>
         <button class="cvSure" data-dk="15" data-inc="10">15+10<small>Rapid</small></button>
         <button class="cvSure cvSuresiz" data-dk="0" data-inc="0">∞<small>Süresiz · herkesle eşleşir</small></button>
       </div>
@@ -6934,7 +6961,7 @@ function hudGuncelle(){
   const beyaz=Motor.turn==='w';
   document.getElementById('siraAd').textContent=beyaz?'Beyaz':'Siyah';
   document.querySelector('#sira .nokta').style.background=beyaz?'#E9E2D0':'#1E2029';
-  document.getElementById('durum').textContent=Motor.sahTehdit(Motor.turn)?'ŞAH!':'';
+  document.getElementById('durum').textContent=Motor.sahTehdit(Motor.turn)?(Motor.legal(Motor.turn).length?'ŞAH!':'ŞAH MAT'):'';
   // Materyal üstünlüğü (standart taş değerleri)
   const DV={p:1,n:3,b:3,r:5,q:9,k:0};
   const bPuan=ist.esirB.reduce((a,t)=>a+DV[t],0); // beyazın aldıkları (siyah taşlar)
@@ -7614,7 +7641,10 @@ function oyunSonu(d, terkKazanan){
      Çevrimiçi oyunlar ayrı yoldan (puanIsle) işlenir, bu kural onlara dokunmaz.
      AYNI CİHAZDA İKİ KİŞİLİK oyun da yazılmaz (sahibin kararı): kazanan taraf hep
      "oyuncu" sayıldığından galibiyet/seri şişiyordu; iki tarafı aynı kişi oynayabilir. */
-  const iptalOyun = !cevrimiciAktif && (mod!=='ai' || oyunKaydi.length < 2);
+  const cvIptal = cevrimiciAktif && cvHamleSayisi() < 2;   // çevrimiçide de ilk hamleler yapılmadan biten oyun iptal
+  const cvZatenYazildi = cevrimiciAktif && !!Cevrimici.odaId && cvSonKayitOda===Cevrimici.odaId;
+  const iptalOyun = cvIptal || cvZatenYazildi || (!cevrimiciAktif && (mod!=='ai' || oyunKaydi.length < 2));
+  if(cevrimiciAktif && !iptalOyun) cvSonKayitOda=Cevrimici.odaId;
   if(fbKullanici && !misafirMod && !iptalOyun){
     oyunIstKaydedildi=true;   // doğruluk da yalnız bu oyunlar için eklenir (bkz. stockfishDegerlendir)
     const oyuncuRenk = cevrimiciAktif ? Cevrimici.benimRenk
@@ -7675,6 +7705,7 @@ function oyunSonu(d, terkKazanan){
     d==='mat' ? 'ŞAH DÜŞTÜ' : d==='sure' ? 'SÜRE DOLDU' : d==='terk' ? (teslim ? 'TESLİM' : 'RAKİP AYRILDI')
     : d==='berabere' ? '½ BERABERE' : d==='yetersiz' ? 'YETERSİZ MATERYAL'
     : d==='3tekrar' ? 'ÜÇ TEKRAR' : d==='50hamle' ? '50 HAMLE KURALI' : 'PAT';
+  if(cvIptal) document.getElementById('sonBaslik').textContent='OYUN İPTAL';
   // Çevrimiçi: sonuç durumunu rakiple senkronla (özellikle süre — iki saat bağımsız sayar)
   if(cevrimiciAktif){
     const beraberlikMi = (d==='pat'||d==='berabere'||d==='yetersiz'||d==='3tekrar'||d==='50hamle');
@@ -7691,6 +7722,7 @@ function oyunSonu(d, terkKazanan){
     d==='mat' ? kazanan+' meydanın hâkimi.'
     : d==='sure' ? kazanan+' kazandı — rakibin zamanı tükendi.'
     : d==='terk' ? kazanan+' kazandı — '+(teslim ? (kazanan==='Beyaz'?'Siyah':'Beyaz')+' teslim oldu.' : 'rakip oyuna dönmedi.')
+    : cvIptal ? 'İlk hamleler yapılmadan bitti, puan değişmedi.'
     : d==='berabere' ? 'İki taraf da anlaştı. Beraberlik.'
     : 'Kimse diz çökmedi. Berabere.';
   /* Karne çizimi TEKRAR ÇAĞRILABİLİR: arka plandaki Stockfish analizi
@@ -7768,8 +7800,9 @@ function oyunSonu(d, terkKazanan){
         const ky=kocYorumu(benimRenk, d, kz);
         if(ky) kr+='<div class="krKoc"><span class="krKocIkon">♞</span>'+
                    '<span class="krKocMetin">'+ky+'</span></div>';
-        if(benimDog!==null){
-          const hs=oyunKaydi.filter(k=>k.renk===benimRenk).length;
+        const hs=oyunKaydi.filter(k=>k.renk===benimRenk).length;
+        /* Çok kısa oyunda (birkaç hamlede teslim vb.) "seviye" anlamsız bir sayı çıkarıyordu (Kasım 2026) */
+        if(benimDog!==null && hs>=8){
           const ry=oyunReytingi(benimDog, hs);
           if(ry) kr+='<div class="krReyting"><span class="krReyEt">BU OYUNDAKİ SEVİYEN</span>'+
                      '<span class="krReySay">'+ry+'</span></div>';
@@ -7826,12 +7859,8 @@ function oyunSonu(d, terkKazanan){
      Eskiden rakibin adı oyun sonunda hiç görünmüyordu, dolayısıyla
      sonradan arkadaş eklemek de mümkün değildi. */
   {
-    const rb=document.getElementById('sonRovans');
+    sonDugmeleriAyarla();
     const gorunur = !!(sonRakipUid && fbKullanici && !misafirMod);
-    if(rb){
-      rb.style.display = gorunur ? '' : 'none';
-      rb.disabled=false; rb.textContent='RÖVANŞ';
-    }
     let rs=document.getElementById('sonRakipSerit');
     if(!rs){
       rs=document.createElement('div'); rs.id='sonRakipSerit';
@@ -9275,7 +9304,10 @@ function menuKur(){
   const ykK=document.getElementById('ykKapat'); if(ykK) ykK.onclick=yardimKapat;
   const bDuz=document.getElementById('btnDuz'); if(bDuz) bDuz.onclick=duzGorunumDegistir;
   const bTasAd=document.getElementById('btnTasAd'); if(bTasAd) bTasAd.onclick=tasAdiDegistir;
-  document.getElementById('sonYeni').onclick=()=>{document.getElementById('son').classList.remove('acik'); document.getElementById('analizEkran').classList.remove('acik'); document.getElementById('grafikCanvas').classList.remove('acik'); inceleAnalizVar=false; yeniOyun();};
+  /* Çevrimiçi oyun sonunda TEKRAR, eski odada rakipsiz yerel bir oyun başlatıyordu: saat işliyor, süre bitince
+     sonuç eski odaya yazılıp puan düşebiliyordu (Kasım 2026, sahibi buldu). Çevrimiçide yalnız RÖVANŞ var. */
+  document.getElementById('sonYeni').onclick=()=>{ if(cevrimiciAktif){ rovansTeklifEt(document.getElementById('sonRovans')); return; }
+    document.getElementById('son').classList.remove('acik'); document.getElementById('analizEkran').classList.remove('acik'); document.getElementById('grafikCanvas').classList.remove('acik'); inceleAnalizVar=false; yeniOyun();};
   { const rb=document.getElementById('sonRovans');
     if(rb) rb.onclick=()=>rovansTeklifEt(rb); }
   const menuyeDon=()=>{
@@ -10115,7 +10147,7 @@ const Bildirim=(()=>{
   }
   return { izinIste, gonder, destekVarMi };
 })();
-let cvSecilenSure={ dk:3, inc:0 }; // çevrimiçi seçilen süre (varsayılan 3+0)
+let cvSecilenSure={ dk:10, inc:0 }; // çevrimiçi seçilen süre (varsayılan 10+0, Kasım 2026)
 let ilkHamleYapildi=false, cevrimiciIptalZamanlayici=null;
 function cevrimiciOyunBaslat(rakipAd){
   cevrimiciAktif=true;
@@ -10195,27 +10227,78 @@ async function cevrimiciYenidenKur(aday){
 }
 
 
+/* Çevrimiçi oyunda yapılan hamle sayısı. Yeniden bağlanınca yerel kayıt boş olduğu için odadaki sayı da okunur. */
+function cvHamleSayisi(){
+  const v=(typeof Cevrimici!=='undefined' && Cevrimici.veri) || {};
+  return Math.max(oyunKaydi.length, v.hamleSayi||0);
+}
+/* İLK HAMLE SÜRESİ (Kasım 2026, sahibi buldu: oyun başlamadan puan kaybediliyordu). Sırası gelen taraf 30 sn
+   içinde ilk hamlesini yapmazsa oyun İPTAL olur: kimse puan kaybetmez (chess.com / lichess'teki "abort"). */
+const ILK_HAMLE_MS = 30000;
+let _ilkHamleN=-1, _ilkHamleBas=0;
+function ilkHamleGoster(sn, benim){
+  let e=document.getElementById('ilkHamleSayac');
+  if(!e){ e=document.createElement('div'); e.id='ilkHamleSayac'; document.body.appendChild(e); }
+  e.textContent=metniCevir(benim ? 'İlk hamleni yap' : 'Rakibin ilk hamlesi bekleniyor')+' · '+sn;
+  e.classList.toggle('benim', !!benim);
+  e.classList.add('acik');
+}
+function ilkHamleGizle(){ const e=document.getElementById('ilkHamleSayac'); if(e) e.classList.remove('acik'); }
 let terkZamanlayici=null;   // 1 sn'lik kontrol döngüsü
 let terkGeriSayim=0;        // kalan saniye (0 = geri sayım yok) — sadece GÖSTERİM için
 let rakipSonGorulme=0;      // rakibin son kalp atışı zamanı
 let terkBaslangicDamga=0;   // geri sayımın BAŞLADIĞI an (zaman damgası)
 
 const TERK_SESSIZLIK_MS = 15000; // rakip bu kadar sessizse geri sayım başlar
-const TERK_SURE_MS      = 60000; // geri sayım süresi (1 dk)
+/* BAĞLANTI KOPUKLUĞU (Kasım 2026, sahibiyle konuşuldu): uygulama arka plana geçince telefon "buradayım" sinyalini
+   yavaşlatıyor ya da durduruyor; oyuncu kapatmadığı halde 75 sn'de terk sayılıp kaybediyordu.
+   Süreli oyunda terk sayacı YOK: hakem saattir (kopan tarafın saati rakibin telefonunda işler, biterse süreden
+   kaybeder; dönerse kaldığı yerden oynar). Süresiz oyunda sayaç 3 dk. */
+const TERK_SURE_MS      = 180000; // süresiz oyunda geri sayım süresi (3 dk)
+function rakipBaglantiGoster(saatIsliyor){
+  let e=document.getElementById('rakipBaglanti');
+  if(!e){ e=document.createElement('div'); e.id='rakipBaglanti'; document.body.appendChild(e); }
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  e.textContent=c(saatIsliyor ? 'Rakibin bağlantısı yok · saati işliyor' : 'Rakibin bağlantısı yok');
+  e.classList.add('acik');
+}
+function rakipBaglantiGizle(){ const e=document.getElementById('rakipBaglanti'); if(e) e.classList.remove('acik'); }
 
 function terkIzlemeBaslat(){
   if(terkZamanlayici){ clearInterval(terkZamanlayici); }
   rakipSonGorulme=Date.now();
   terkBaslangicDamga=0;
+  _ilkHamleN=-1;
   terkZamanlayici=setInterval(()=>{
-    if(!cevrimiciAktif || oyunBitti){ return; }
+    if(!cevrimiciAktif || oyunBitti){ ilkHamleGizle(); rakipBaglantiGizle(); return; }
     const v=Cevrimici.veri||{};
+    {
+      const n=cvHamleSayisi(), an=Date.now();
+      if(n<2){
+        if(n!==_ilkHamleN){ _ilkHamleN=n; _ilkHamleBas=an; }
+        const kalanI=Math.max(0, Math.ceil((ILK_HAMLE_MS-(an-_ilkHamleBas))/1000));
+        ilkHamleGoster(kalanI, Motor.turn===Cevrimici.benimRenk);
+        if(kalanI<=0){
+          ilkHamleGizle();
+          oyunBitti=true; kilit=true;
+          Cevrimici.oyunIptal();
+          anlatimGoster(metniCevir('İlk hamle yapılmadı — oyun iptal edildi, puan değişmedi.'));
+          setTimeout(()=>{ if(typeof menuyeDonCevrimici==='function') menuyeDonCevrimici(); }, 3200);
+          return;
+        }
+      } else ilkHamleGizle();
+    }
     const rakipRenk = Cevrimici.benimRenk==='w' ? 'b' : 'w';
     const rakipDamga = v['sonGorulme_'+rakipRenk] || 0;
     if(rakipDamga>rakipSonGorulme) rakipSonGorulme=rakipDamga;
     const simdi = Date.now();
     const sessizlik = simdi - rakipSonGorulme;
 
+    if(sureSecim>0){
+      if(sessizlik >= TERK_SESSIZLIK_MS && cvHamleSayisi()>=2) rakipBaglantiGoster(Motor.turn!==Cevrimici.benimRenk);
+      else rakipBaglantiGizle();
+      return;
+    }
     if(terkBaslangicDamga>0){
       // Geri sayım sürüyor — kalan süreyi SAYAÇTAN DEĞİL, ZAMAN DAMGASINDAN hesapla.
       // (Sayaç kullanılırsa uygulama kapatılınca geri sayım durur ve oyun asla bitmez.)
@@ -10233,7 +10316,7 @@ function terkIzlemeBaslat(){
       if(kalan<=0){
         terkGeriSayimGizle();
         terkBaslangicDamga=0;
-        const oyunBasladi = oyunKaydi.some(k=>k.renk==='w') && oyunKaydi.some(k=>k.renk==='b');
+        const oyunBasladi = cvHamleSayisi()>=2;
         Cevrimici.terkSonucBildir(oyunBasladi);
         oyunBitti=true; kilit=true;
         if(oyunBasladi){
@@ -10263,7 +10346,7 @@ function terkGeriSayimGoster(sn){
   let e=document.getElementById('terkGeriSayim');
   if(!e){ e=document.createElement('div'); e.id='terkGeriSayim'; document.body.appendChild(e); }
   // Gerçek sonuç: her iki taraf da en az bir hamle yaptıysa galibiyet, yoksa iptal
-  const oyunBasladi = oyunKaydi.some(k=>k.renk==='w') && oyunKaydi.some(k=>k.renk==='b');
+  const oyunBasladi = cvHamleSayisi()>=2;
   e.innerHTML='<div class="tgsBaslik">Rakip bağlantısı koptu</div>'+
     '<div class="tgsSayac">'+sn+'</div>'+
     '<div class="tgsAlt">'+(oyunBasladi?'Dönmezse oyunu kazanırsın':'Dönmezse oyun iptal olur')+'</div>';
@@ -10639,7 +10722,7 @@ function lobiSonGorulme(ms){
 function lobiCiz(){
   const el=document.getElementById('cvLobiListe'); if(!el) return;
   const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
-  const goster=lobiHepsi?lobiVeri:lobiVeri.slice(0,6);
+  const goster=lobiVeri;   // yatay şerit: hepsi kaydırılarak görülür
   if(!lobiVeri.length){
     el.innerHTML='<div class="lobiBos">'+lobiKac(c(Cevrimici.hazirMi()?'Lobide henüz kimse yok.':'Lobiyi görmek için giriş yapmalısın.'))+'</div>';
   }else el.innerHTML=goster.map(k=>{
@@ -10651,14 +10734,16 @@ function lobiCiz(){
     const av = foto ? '<img src="'+foto+'" alt="" loading="lazy">'
              : '<span>'+lobiKac(k.avatar || (k.ad||'?').slice(0,1).toUpperCase())+'</span>';
     const bay=bayrak(k.ulke);
-    return '<div class="lobiSatir"><div class="lobiAv" data-oy-av="'+lobiKac(k.uid)+'">'+av+'<span class="lobiNokta'+(k.cevrimici?'':' yok')+'"></span></div>'+
-      '<div class="lobiBilgi"><div class="lobiAd" data-oy-uid="'+lobiKac(k.uid)+'">'+lobiKac(k.ad)+(bay?' <span class="lobiBayrak">'+lobiKac(bay)+'</span>':'')+'</div>'+
-      '<div class="lobiAlt">'+(k.cevrimici?'<span class="cvr">'+lobiKac(c('Çevrimiçi'))+'</span>':lobiKac(c('Çevrimdışı')+' · '+lobiSonGorulme(k.son)))+
-      ' · '+(k.puan||800)+'</div></div>'+
+    /* Kompakt kart (Kasım 2026): lobi dikey listede ekranın yarısını kaplıyor, süre/ordu/arena seçimleri aşağıda
+       kalıyordu. Artık yatay kaydırılan kartlar; çevrimiçi olanlar önde (sıralama lobiListesi'nde). */
+    return '<div class="lobiKart'+(k.cevrimici?' cvr':'')+'"><div class="lobiAv" data-oy-av="'+lobiKac(k.uid)+'">'+av+'<span class="lobiNokta'+(k.cevrimici?'':' yok')+'"></span></div>'+
+      '<div class="lobiAd" data-oy-uid="'+lobiKac(k.uid)+'">'+lobiKac(k.ad)+'</div>'+
+      '<div class="lobiAlt">'+(bay?lobiKac(bay)+' ':'')+(k.puan||800)+'</div>'+
+      '<div class="lobiDurum">'+lobiKac(k.cevrimici?c('Çevrimiçi'):lobiSonGorulme(k.son).replace(/^.*?(\d)/,'$1'))+'</div>'+
       '<button class="lobiBtn" data-lobi="'+lobiKac(k.uid)+'"'+(bekle?' disabled':'')+'>'+lobiKac(c(bekle?'Gönderildi':'Oyun iste'))+'</button></div>';
   }).join('');
   const d=document.getElementById('cvLobiDaha');
-  if(d){ d.classList.toggle('var', lobiVeri.length>6); d.textContent=c(lobiHepsi?'Daha az göster':'Tümünü göster')+(lobiHepsi?'':' ('+lobiVeri.length+')'); }
+  if(d) d.classList.remove('var');
 }
 async function lobiYukle(){
   if(!Cevrimici.hazirMi()){ lobiVeri=[]; lobiCiz(); return; }
@@ -10942,7 +11027,7 @@ function menuyeDonCevrimici(){
     okunmamisSohbet=0; sohbetRozetGuncelle(); }
   if(cevrimiciIptalZamanlayici){ clearTimeout(cevrimiciIptalZamanlayici); cevrimiciIptalZamanlayici=null; }
   if(terkZamanlayici){ clearInterval(terkZamanlayici); terkZamanlayici=null; }
-  terkGeriSayim=0; terkGeriSayimGizle();
+  terkGeriSayim=0; terkGeriSayimGizle(); ilkHamleGizle(); rakipBaglantiGizle();
   try{ if(typeof AndroidGuvenlik!=='undefined' && AndroidGuvenlik.ekranGizle) AndroidGuvenlik.ekranGizle(false); }catch(e){}
   const cs=document.getElementById('cevrimiciSerit'); if(cs) cs.classList.remove('acik');
   const by=document.getElementById('btnYeni'); if(by) by.style.display='';
@@ -11057,6 +11142,15 @@ function cevrimiciRakipAyrildi(){
 function cevrimiciSonucUygula(veri){
   if(oyunBitti) return;
   oyunBitti=true; kilit=true;
+  sonDugmeleriAyarla();
+  if(cvHamleSayisi()<2 && veri.sonucTip!=='berabere'){
+    document.getElementById('sonBaslik').textContent='OYUN İPTAL';
+    document.getElementById('sonAlt').textContent='İlk hamleler yapılmadan bitti, puan değişmedi.';
+    const dk0=document.getElementById('oyunaDonKart'); if(dk0) dk0.style.display='none';
+    if(cevrimiciArkaplanda){ cevrimiciArkaplanda=false; document.getElementById('menu').classList.add('gizli'); document.getElementById('hud').classList.add('acik'); }
+    document.getElementById('son').classList.add('acik');
+    return;
+  }
   const tip=veri.sonucTip, kazanan=veri.kazanan;
   // Saatleri durdur, oyun sonu ekranını uygun mesajla göster
   let baslik, alt;
@@ -11094,7 +11188,12 @@ function cevrimiciSonucUygula(veri){
   document.getElementById('son').classList.add('acik');
 }
 // Çevrimiçi sonucu istatistiğe yaz (oyunSonu'ndaki mantığın sade hali)
+/* Aynı çevrimiçi oyun son oyunlara iki kez yazılıyordu (6 Kasım 2026 kaydında 101 hamlelik maç iki kez, toplam oyun
+   ve mağlubiyet bir fazla). Bir odanın sonucu bu oturumda yalnız bir kez yazılır. */
+let cvSonKayitOda=null;
 function cevrimiciIstatistikGuncelle(sonuc){
+  if(Cevrimici.odaId && cvSonKayitOda===Cevrimici.odaId) return;
+  cvSonKayitOda=Cevrimici.odaId;
   oyunIstKaydedildi=true;
   const oyuncuRenk=Cevrimici.benimRenk;
   const rOn=oyuncuRenk==='w'?'beyaz':'siyah';
@@ -11162,6 +11261,7 @@ async function puanIsle(oda, bekle){
       await new Promise(r=>setTimeout(r,1500));
     }
     if(!v) return null;
+    if((v.hamleSayi||0)<2 && v.sonucTip!=='berabere') return null;   // ilk hamleler yapılmadan bitmiş: iptal sayılır
     const renk = v.beyaz===uid ? 'w' : (v.siyah===uid ? 'b' : null);
     if(!renk) return null;
     const gercek = v.kazanan==null ? 0.5 : (v.kazanan===renk ? 1 : 0);
@@ -12694,11 +12794,22 @@ function rakipIzlemeGuncelle(deger){
 function sahneOynuyorMu(){ return saatDurduran>1; }   // kendi sahnem de oynuyorsa yazı gereksiz
 function saatDurdur(){ saatDurduran++; }
 function saatSurdur(){ saatDurduran=Math.max(0,saatDurduran-1); }
-function saatTik(ham){
+/* SAAT GERÇEK ZAMANLA (Kasım 2026): eskiden kare süresiyle sayılıyor ve kare başına en çok 0,05 sn
+   düşülüyordu; telefon yavaşlayınca ya da kare atlayınca saat yavaşlıyor, uygulama arka plandayken hiç
+   işlemiyordu (rakibin telefonunda ise işliyordu). Artık geçen gerçek süre düşülür. Çevrimdışı oyunda tek
+   seferde en çok 0,25 sn düşülür: uygulamadan çıkıp dönmek saati bitirmesin. */
+let _saatSon=0;
+function saatTik(){
+  const simdi=performance.now();
+  let gecen=_saatSon ? (simdi-_saatSon)/1000 : 0;
+  _saatSon=simdi;
+  if(!cevrimiciAktif) gecen=Math.min(gecen, 0.25);
   if(!oyunAktif||oyunBitti||sureSecim<=0) return;
   if(saatDurduran>0) return;   // animasyon oynuyor: sure islemesin
+  // Çevrimiçi: saat, iki taraf da ilk hamlesini yapınca başlar (yapılmazsa oyun iptal olur, bkz. terkIzlemeBaslat)
+  if(cevrimiciAktif && cvHamleSayisi()<2) return;
   const r=Motor.turn;
-  saatler[r]-=ham;
+  saatler[r]-=gecen;
   if(saatler[r]<=60 && !sonDkCal[r]){ sonDkCal[r]=true;
     if(sureSesUyari) Ses.cal('sure1dk');
     if(sureTitreUyari && navigator.vibrate) try{ navigator.vibrate([120,60,120]); }catch(e){}
@@ -12842,7 +12953,7 @@ function mucevherleriTopla(){
 function dongu(){
   requestAnimationFrame(dongu);
   const ham=Math.min(saat.getDelta(),.05), dt=ham*zamanCarpani, t=saat.elapsedTime;
-  saatTik(ham);
+  saatTik();
 
   /* --- Sahneyi değiştiren işler: her biri gerekirse çizim ister --- */
   const tweenVar = (typeof tweenler!=='undefined' && tweenler.length>0);
@@ -13986,7 +14097,8 @@ function istRender(){
     btn.onclick=()=>{
       const i=+btn.dataset.i;
       const oyun=bulutIst.sonOyunlar[i];
-      if(oyun && oyun.hamleler && oyun.hamleler.length) gecmisOyunIncele(oyun.hamleler);
+      /* Tahtada inceleme oyun sonunda reklamlı/Premium; profilden girilince kapı atlanıyordu (Kasım 2026) */
+      if(oyun && oyun.hamleler && oyun.hamleler.length) premiumKapi('analiz', null, ()=>gecmisOyunIncele(oyun.hamleler));
     };
   });
 }
@@ -14336,6 +14448,7 @@ const Cevrimici=(()=>{
   // ---- SONUÇ BİLDİR (mat/süre/pat) ----
   async function sonucBildir(tip, kazananRenk, teslim){
     if(!odaId || !hazirMi()) return;
+    if(tip!=='berabere' && typeof cvHamleSayisi==='function' && cvHamleSayisi()<2) return oyunIptal();
     try{
       await fbDb.collection('oyunlar').doc(odaId).update({
         durum:'bitti', sonucTip:tip, kazanan:kazananRenk||null, bitisZamani: Date.now(), teslim: !!teslim
@@ -14469,6 +14582,7 @@ const Cevrimici=(()=>{
   // ---- ODADAN AYRIL / TEMİZLE ----
   async function ayril(){
     kalpDurdur();
+    davetIzleBirak();
     if(dinleyici){ dinleyici(); dinleyici=null; }
     if(beklemeOdaDinleyici){ beklemeOdaDinleyici(); beklemeOdaDinleyici=null; }
     try{ if(beklemeRef){ await beklemeRef.delete(); beklemeRef=null; } }catch(e){}
@@ -14619,6 +14733,8 @@ const Cevrimici=(()=>{
         .set({oda:kod, sure:dk, inc:inc, sahne:(+dk>0 ? (sahneAyari?1:0) : null), ad:benimAd||'Oyuncu',
               gonderen:fbKullanici.uid, hedef:hedefUid, ts:Date.now()});
       sonDavetHata='';
+      davetYanitIzle(hedefUid, kod);
+      hedefOyundaKontrol(hedefUid);
       return kod;
     }catch(e){
       const kod=(e&&e.code)||'';
@@ -14630,6 +14746,51 @@ const Cevrimici=(()=>{
   }
   let sonDavetHata='';
   function davetHatasi(){ return sonDavetHata; }
+  /* Davet reddedildi mi? (Kasım 2026, sahibin isteği) Karşı taraf reddedince davet belgesini siler; kabul edince
+     önce odaya katılır, sonra siler. Belge silindiği halde oda birkaç saniye sonra hâlâ "bekliyor"sa ret sayılır. */
+  /* Davet edilen kişi şu an çevrimiçi bir oyunda mı? (Kasım 2026) Profildeki açık oda (katilimKaydet yazar,
+     sonuç işlenince silinir) hâlâ oynanıyorsa ve son 2 dk'da kalp atışı varsa gönderene haber verilir.
+     Yapay zekâ oyunları burada görünmez; o zaman davet karşı tarafta oyun bitince açılır. */
+  async function hedefOyundaKontrol(hedefUid){
+    try{
+      const p=(await fbDb.collection('oyuncular').doc(hedefUid).get()).data()||{};
+      if(!p.acikOda) return;
+      const o=await fbDb.collection('oyunlar').doc(p.acikOda).get();
+      const v=o.exists ? (o.data()||{}) : null;
+      if(!v || v.durum!=='oynaniyor') return;
+      if(Date.now()-Math.max(v.sonGorulme_w||0, v.sonGorulme_b||0) > 120000) return;
+      if(typeof window.davetHedefOyunda==='function') window.davetHedefOyunda(hedefUid, p.kullaniciAdi||'');
+    }catch(e){}
+  }
+  /* Oyun sırasında ertelenen davet hâlâ duruyor mu (gönderen vazgeçmedi, 10 dk dolmadı)? */
+  async function davetGecerli(id){
+    if(!hazirMi()) return false;
+    try{
+      const d=await fbDb.collection('davetler').doc(id).get();
+      return d.exists && (Date.now()-((d.data()||{}).ts||0)) <= DAVET_OMRU;
+    }catch(e){ return false; }
+  }
+  let davetIzleyici=null;
+  function davetIzleBirak(){ if(davetIzleyici){ try{ davetIzleyici(); }catch(e){} davetIzleyici=null; } }
+  function davetYanitIzle(hedefUid, kod){
+    davetIzleBirak();
+    let goruldu=false;
+    try{
+      davetIzleyici=fbDb.collection('davetler').doc(hedefUid+'_'+fbKullanici.uid).onSnapshot(s=>{
+        if(s.exists){ goruldu=true; return; }
+        if(!goruldu) return;
+        davetIzleBirak();
+        setTimeout(async ()=>{
+          if(odaId!==kod) return;
+          try{
+            const o=await fbDb.collection('oyunlar').doc(kod).get();
+            if(odaId===kod && o.exists && (o.data()||{}).durum==='bekliyor' && typeof window.davetReddedildi==='function')
+              window.davetReddedildi(hedefUid);
+          }catch(e){}
+        }, 6000);
+      }, ()=>{});
+    }catch(e){}
+  }
   /* Arkadaşlık isteklerini canlı dinle: istek gelince anında bildirim çıksın.
      Eskiden yalnızca "İstekler" sekmesi açılınca görülüyordu. */
   let istekDinleyici=null;
@@ -14678,7 +14839,7 @@ const Cevrimici=(()=>{
   return {
     odaOlustur, odayaKatil, rastgeleEsles, ayril, hamleGonder, oyunIptal, sonucBildir,
     izlemeYaz, lobiListesi, lobiGizliYaz,
-    arkadasAra, arkadasIstekGonder, arkadasIstekleriAl, arkadasKabul, arkadasReddet,
+    arkadasAra, arkadasIstekGonder, arkadasIstekleriAl, arkadasKabul, arkadasReddet, davetGecerli,
     arkadaslariAl, arkadasSil, oyunDavetGonder, davetleriDinle, davetDinlemeyiDurdur,
     davetSil, kisaEtiket, davetHatasi,
     isteklerıDinle, istekDinlemeyiDurdur,
@@ -15119,6 +15280,18 @@ const CEVM={
 'Vay canına! 😮':{en:'Wow! 😮',ru:'Ого! 😮',ar:'يا للروعة! 😮'},
 'Yakındı! 😅':{en:'Close one! 😅',ru:'Почти! 😅',ar:'كانت قريبة! 😅'},
 'İyi oyundu 🤝':{en:'Good game 🤝',ru:'Хорошая игра 🤝',ar:'مباراة جيدة 🤝'},
+'Rakibin bağlantısı yok · saati işliyor':{en:'Opponent disconnected · their clock is running',ru:'Соперник отключился · его часы идут',ar:'انقطع اتصال الخصم · ساعته تعمل',fr:'Adversaire déconnecté · sa pendule tourne',de:'Gegner getrennt · seine Uhr läuft',it:'Avversario disconnesso · il suo orologio scorre',zh:'对手已断线 · 其计时在走'},
+'Rakibin bağlantısı yok':{en:'Opponent disconnected',ru:'Соперник отключился',ar:'انقطع اتصال الخصم',fr:'Adversaire déconnecté',de:'Gegner getrennt',it:'Avversario disconnesso',zh:'对手已断线'},
+'seni oyuna davet etti · oyun bitince yanıtlayabilirsin':{en:'invited you to a game · you can answer when this game ends',ru:'приглашает вас в игру · ответить можно после партии',ar:'دعاك إلى مباراة · يمكنك الرد بعد انتهاء المباراة',fr:'vous invite à jouer · répondez à la fin de la partie',de:'lädt dich zu einer Partie ein · antworte nach dieser Partie',it:'ti ha invitato a giocare · puoi rispondere a fine partita',zh:'邀请你对局 · 本局结束后可回复'},
+'şu an bir oyunda. Oyunu bitince isteğini görecek.':{en:'is in a game right now. They will see your request when it ends.',ru:'сейчас играет. Увидит приглашение после партии.',ar:'في مباراة الآن. سيرى طلبك عند انتهائها.',fr:'est en partie. Il verra votre demande à la fin.',de:'spielt gerade. Sieht deine Anfrage nach der Partie.',it:'sta giocando. Vedrà la richiesta a fine partita.',zh:'正在对局中，结束后会看到你的邀请。'},
+'Bir oyuncu':{en:'A player',ru:'Игрок',ar:'لاعب',fr:'Un joueur',de:'Ein Spieler',it:'Un giocatore',zh:'一位玩家'},
+'İlk hamleni yap':{en:'Make your first move',ru:'Сделайте первый ход',ar:'قم بنقلتك الأولى',fr:'Jouez votre premier coup',de:'Mach deinen ersten Zug',it:'Fai la tua prima mossa',zh:'请走第一步'},
+'Rakibin ilk hamlesi bekleniyor':{en:'Waiting for opponent\'s first move',ru:'Ждём первый ход соперника',ar:'بانتظار نقلة الخصم الأولى',fr:'En attente du premier coup adverse',de:'Warte auf den ersten Zug des Gegners',it:'In attesa della prima mossa avversaria',zh:'等待对手走第一步'},
+'İlk hamle yapılmadı — oyun iptal edildi, puan değişmedi.':{en:'No first move was made — the game was aborted, rating unchanged.',ru:'Первый ход не сделан — партия отменена, рейтинг не изменился.',ar:'لم تُلعب النقلة الأولى — أُلغيت المباراة ولم يتغير التصنيف.',fr:'Aucun premier coup — partie annulée, classement inchangé.',de:'Kein erster Zug — Partie abgebrochen, Wertung unverändert.',it:'Nessuna prima mossa — partita annullata, punteggio invariato.',zh:'未走第一步，棋局已取消，积分不变。'},
+'OYUN İPTAL':{en:'GAME ABORTED',ru:'ПАРТИЯ ОТМЕНЕНА',ar:'أُلغيت المباراة',fr:'PARTIE ANNULÉE',de:'PARTIE ABGEBROCHEN',it:'PARTITA ANNULLATA',zh:'棋局取消'},
+'İlk hamleler yapılmadan bitti, puan değişmedi.':{en:'It ended before the first moves, rating unchanged.',ru:'Партия закончилась до первых ходов, рейтинг не изменился.',ar:'انتهت قبل النقلات الأولى ولم يتغير التصنيف.',fr:'Terminée avant les premiers coups, classement inchangé.',de:'Vor den ersten Zügen beendet, Wertung unverändert.',it:'Finita prima delle prime mosse, punteggio invariato.',zh:'在第一步之前结束，积分不变。'},
+'Rakip':{en:'Opponent',ru:'Соперник',ar:'الخصم',fr:'Adversaire',de:'Gegner',it:'Avversario',zh:'对手'},
+'oyun isteğini reddetti. İstersen yeniden gönderebilirsin.':{en:'declined your game request. You can send it again.',ru:'отклонил(а) приглашение. Можно отправить снова.',ar:'رفض طلب اللعب. يمكنك إرساله مجددًا.',fr:'a refusé votre invitation. Vous pouvez la renvoyer.',de:'hat deine Spielanfrage abgelehnt. Du kannst sie erneut senden.',it:'ha rifiutato la richiesta di gioco. Puoi inviarla di nuovo.',zh:'拒绝了对局邀请，你可以再次发送。'},
 'Profili gör':{en:'View profile',ru:'Профиль',ar:'عرض الملف'},
 '+ Arkadaş ekle':{en:'+ Add friend',ru:'+ В друзья',ar:'+ إضافة صديق'},
 '✓ Arkadaşsınız':{en:'✓ Friends',ru:'✓ Вы друзья',ar:'✓ أصدقاء'},
@@ -15695,6 +15868,9 @@ if(uygDil!=='tr'){
    dışı arenalar reklamla 24 saat; tahta analizi açılış başına reklam.
    Premium: tek seferlik satın alma → reklamsız + hepsi kalıcı açık.
    ================================================================ */
+/* Taş setleri (ordular) ve arenalar ŞİMDİLİK herkese açık (Kasım 2026, sahibin kararı; sonra yeniden
+   kilitlenecek). Yeniden kilitlemek için true yapmak yeterli; BEDAVA_* listeleri ve reklamla açma aynen duruyor. */
+const TAS_TAHTA_PREMIUM=false;
 const BEDAVA_ORDU=['klasik'];
 const BEDAVA_ARENA=['harp','retro'];
 const BEDAVA_SAAT=7*24, ODUL_SAAT=24;   // ilk kurulumdan sonra 7 gün her şey açık (4 Kasım 2026, sahibin isteği)
@@ -15948,6 +16124,24 @@ function istekBildirimBagla(){
 
 /* ---- Gelen davet penceresi ---- */
 let bekleyenDavet=null;
+let ertelenenDavetler=[];
+/* Oyun bitince (ya da menüye dönülünce) ertelenen davet hâlâ geçerliyse pencereyi aç */
+setInterval(async ()=>{
+  if(!ertelenenDavetler.length || bekleyenDavet) return;
+  if(typeof oyunAktif!=='undefined' && oyunAktif && !oyunBitti) return;
+  const pop=document.getElementById('davetPop'); if(pop && pop.classList.contains('acik')) return;
+  const d=ertelenenDavetler.shift();
+  if(await Cevrimici.davetGecerli(d.id)) davetGoster(d);
+}, 2500);
+/* Gönderen taraf: davet ettiğimiz kişi şu an bir oyunda */
+window.davetHedefOyunda=function(hedef, ad){
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  const isim=ad || (typeof oyOnbellek!=='undefined' && oyOnbellek[hedef] && oyOnbellek[hedef].ad) || c('Rakip');
+  const m=isim+' '+c('şu an bir oyunda. Oyunu bitince isteğini görecek.');
+  const b=document.getElementById('cvBekleme');
+  if(b && b.classList.contains('acik')) document.getElementById('cvBeklemeMetin').textContent=m;
+  else anlatimGoster(m, 4500);
+};
 function davetGoster(d){
   bekleyenDavet=d;
   document.getElementById('davetMetin').innerHTML =
@@ -15992,6 +16186,20 @@ function cvSecimEsitle(){
     l.querySelectorAll('.arena').forEach(x=>x.classList.toggle('secili', x.dataset.kId===o.id));
   });
 }
+/* Gönderdiğimiz oyun isteği reddedildi: bekleme ekranını kapat, odayı sil, aynı kişiye hemen yeniden istek gönderilebilsin */
+window.davetReddedildi=function(hedef){
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  const ad=(typeof oyOnbellek!=='undefined' && oyOnbellek[hedef] && oyOnbellek[hedef].ad) || (hedef===sonRakipUid && sonRakipAd) || c('Rakip');
+  try{ delete lobiDavetZamani[hedef]; lobiCiz(); }catch(e){}
+  try{ clearTimeout(_rakipYokZam); clearInterval(_sayacZam); const ry=document.getElementById('cvRakipYok'); if(ry) ry.classList.remove('acik'); }catch(e){}
+  document.getElementById('cvBekleme').classList.remove('acik');
+  Cevrimici.ayril();
+  const m=ad+' '+c('oyun isteğini reddetti. İstersen yeniden gönderebilirsin.');
+  anlatimGoster(m, 4500);
+  try{ if(typeof Bildirim!=='undefined') Bildirim.gonder('Chess64', m); }catch(e){}
+  try{ if(navigator.vibrate) navigator.vibrate([60,40,60]); }catch(e){}
+  const rb=document.getElementById('sonRovans'); if(rb){ rb.disabled=false; rb.textContent='RÖVANŞ'; }
+};
 function davetKapat(){
   document.getElementById('davetPop').classList.remove('acik');
   bekleyenDavet=null;
@@ -16002,16 +16210,24 @@ function davetOlaylariBagla(){
   k.onclick=async ()=>{
     if(!bekleyenDavet) return;
     const d=bekleyenDavet; davetKapat();
-    await Cevrimici.davetSil(d.id);
+    if(cevrimiciAktif && oyunBitti) menuyeDonCevrimici();   // biten oyunun ekranındayken gelen rövanş
     await odayaKatilAkis(d.oda, ()=>{
       document.getElementById('cevrimiciEkran').classList.add('acik');
       cvBeklemeGoster('Bağlanılıyor…');
     });
+    await Cevrimici.davetSil(d.id);   // katıldıktan sonra: gönderen ret sanmasın
   };
   r.onclick=async ()=>{
     if(bekleyenDavet) await Cevrimici.davetSil(bekleyenDavet.id);
     davetKapat();
   };
+}
+/* Oyun sonu düğmeleri: çevrimiçide TEKRAR gizli, RÖVANŞ görünür; yerelde tersi */
+function sonDugmeleriAyarla(){
+  const rb=document.getElementById('sonRovans'), yb=document.getElementById('sonYeni');
+  const rovans = !!(sonRakipUid && fbKullanici && !misafirMod);
+  if(rb){ rb.style.display = rovans ? '' : 'none'; rb.disabled=false; rb.textContent='RÖVANŞ'; }
+  if(yb) yb.style.display = cevrimiciAktif ? 'none' : '';
 }
 /* ---- RÖVANŞ: oyun sonunda rakibe tekrar teklif ---- */
 async function rovansTeklifEt(btn){
@@ -16019,6 +16235,9 @@ async function rovansTeklifEt(btn){
   const hedef=sonRakipUid; if(!hedef) return;
   const benimAd=(bulutIst&&bulutIst.kullaniciAdi)||'Oyuncu';
   if(btn){ btn.disabled=true; btn.textContent='GÖNDERİLİYOR…'; }
+  /* Biten çevrimiçi oyun kapatılmadan rövanş odası açılıyordu: çevrimiçi durum açık kaldığı için rakip katılsa
+     bile yeni oyun iki tarafta da başlamıyordu (Kasım 2026). Önce eski oyun kapanır (rakip bilgisi korunur). */
+  if(cevrimiciAktif && oyunBitti){ menuyeDonCevrimici(); }
   const kod=await Cevrimici.oyunDavetGonder(hedef, benimAd);
   if(!kod){
     /* Sessizce başarısız olmasın: sebebi göster. */
@@ -16042,6 +16261,7 @@ function odulVer(an){ const o=odulTablo(); o[an]=Date.now()+ODUL_SAAT*3600000; p
 function kilitli(tur,id){
   if(!kopruVar()) return false;               /* tarayıcı/geliştirme: hepsi açık */
   if(premiumAktif || pOku('c64_prem')==='1' || bedavaDonem()) return false;
+  if((tur==='ordu'||tur==='arena') && !TAS_TAHTA_PREMIUM) return false;
   if(tur==='ordu')  return BEDAVA_ORDU.indexOf(id)<0  && !odulAktif('ordu_'+id);
   if(tur==='arena') return BEDAVA_ARENA.indexOf(id)<0 && !odulAktif('arena_'+id);
   if(tur==='analiz') return true;             /* her açılışta reklam */
@@ -16157,8 +16377,14 @@ window.reklamSonucu=function(etiket,durum){
   const dinle=()=>{
     if(fbKullanici && !misafirMod && Cevrimici && Cevrimici.davetleriDinle){
       Cevrimici.davetleriDinle(d=>{
-        // Oyun içindeysek rahatsız etme; menüdeysek göster
-        if(typeof oyunAktif!=='undefined' && oyunAktif && !oyunBitti) return;
+        /* Oyun sürerken gelen davet eskiden sessizce kayboluyordu (dinleyici yalnız ilk gelişi görür). Artık
+           oyunu kesmeyen kısa bir haber verilir, davet oyun bitince açılır (Kasım 2026, sahibin isteği). */
+        if(typeof oyunAktif!=='undefined' && oyunAktif && !oyunBitti){
+          if(!ertelenenDavetler.some(x=>x.id===d.id)) ertelenenDavetler.push(d);
+          const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+          anlatimGoster((d.ad||c('Bir oyuncu'))+' '+c('seni oyuna davet etti · oyun bitince yanıtlayabilirsin'), 4500);
+          return;
+        }
         davetGoster(d);
       });
       /* Arkadaşlık istekleri: oyun içinde de gösterilebilir (küçük şerit,
@@ -18342,7 +18568,8 @@ function devPanelAc(){
       {id:'orta',   ad:'Orta',   alt:c('Dengeli')+' · 60 Hz'},
       {id:'dusuk',  ad:'Düşük',  alt:c('Efektler kapalı, en az ısınma')+' · 60 Hz'}
     ];
-    if(hz>60) secenekler.unshift({id:'yuksekMaks', ad:'Yüksek', alt:c('En akıcı')+' · '+hz+' Hz · '+c('Önerilen')});
+    /* İki seçenek de "Yüksek" adını taşıyordu (Kasım 2026); ekranın en yüksek hızı ayrı adla gösterilir */
+    if(hz>60) secenekler.unshift({id:'yuksekMaks', ad:'En akıcı', alt:hz+' Hz · '+c('Önerilen')});
     secenekler.forEach(o=>{
       const b=document.createElement('button'); b.type='button'; b.className='ssSec'+(o.id===secim?' secili':'');
       b.innerHTML='<span class="ssAd"><span></span><small></small>'+(o.uyari?'<em class="ssUyari"></em>':'')+'</span><span class="ssTik">✓</span>';
