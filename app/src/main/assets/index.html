@@ -129,6 +129,32 @@ canvas{display:block}
 #bulmacaZorluk .bzRozet{display:inline-block;margin-top:6px;font-size:12px;font-weight:600;
   color:var(--brass,#E8B64C);background:rgba(232,182,76,.12);border-radius:20px;padding:3px 12px}
 #bulmacaZorluk #bzKapat{margin-top:14px}
+/* Kütüphane (Kasım 2026) */
+#kutupEkran .kpSekmeler{display:flex;gap:6px;margin:4px 0 14px}
+#kutupEkran .kpSekme{flex:1;padding:9px 6px;border-radius:12px;border:1px solid var(--line,rgba(232,182,76,.2));background:transparent;color:var(--dim);font:700 13px Manrope,sans-serif;cursor:pointer}
+#kutupEkran .kpSekme.secili{background:rgba(232,182,76,.16);border-color:rgba(232,182,76,.55);color:var(--brass)}
+#kutupEkran .kpMadde{border:1px solid var(--line,rgba(232,182,76,.18));border-radius:14px;margin-bottom:8px;background:var(--panel,rgba(255,255,255,.03))}
+#kutupEkran .kpMadde summary{padding:13px 14px;font:700 15px Manrope,sans-serif;color:var(--bone);cursor:pointer;list-style:none}
+#kutupEkran .kpMadde summary::-webkit-details-marker{display:none}
+#kutupEkran .kpMadde summary::after{content:'›';float:right;color:var(--dim);transition:transform .2s}
+#kutupEkran .kpMadde[open] summary::after{transform:rotate(90deg)}
+#kutupEkran .kpMadde p,#kutupEkran .kpMac p{margin:0;padding:0 14px 14px;color:var(--dim);font-size:14px;line-height:1.55}
+#kutupEkran .kpNot{color:var(--dim);font-size:12px;margin:10px 4px;opacity:.8}
+#kutupEkran .kpMac{border:1px solid var(--line,rgba(232,182,76,.18));border-radius:16px;margin-bottom:10px;background:var(--panel,rgba(255,255,255,.03))}
+#kutupEkran .kpMacUst{display:flex;justify-content:space-between;align-items:baseline;padding:13px 14px 2px;gap:10px}
+#kutupEkran .kpMacUst b{font:700 16px 'Cinzel',serif;color:var(--brass)}
+#kutupEkran .kpMacUst span{color:var(--dim);font-size:13px}
+#kutupEkran .kpOyuncu{padding:0 14px;color:var(--bone);font-size:14px;font-weight:600}
+#kutupEkran .kpOyuncu em{font-style:normal;color:var(--dim)} #kutupEkran .kpOyuncu i{font-style:normal;color:var(--brass);margin-left:6px}
+#kutupEkran .kpYer{padding:2px 14px 8px;color:var(--dim);font-size:12px}
+#kutupEkran .kpIzle{margin:0 14px 14px;padding:9px 14px;border-radius:12px;border:1px solid rgba(232,182,76,.5);background:rgba(232,182,76,.12);color:var(--brass);font:700 13px Manrope,sans-serif;cursor:pointer}
+/* Bulmaca menüsü: taktik temaları (Kasım 2026) */
+#bulmacaZorluk .bzKart{max-height:90vh;overflow-y:auto}
+#bulmacaZorluk .bzBolum{font:700 11px Manrope,sans-serif;letter-spacing:.2em;color:var(--brass,#E8B64C);margin:18px 0 4px;text-align:left}
+#bulmacaZorluk .bzIzgara{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#bulmacaZorluk .bzIzgara .bzSec{margin:0;padding:12px 8px;font-size:14px}
+#bulmacaZorluk .bzIzgara .bzRozet{font-size:11px;padding:2px 8px}
+
 #terkGeriSayim{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;
   align-items:center;justify-content:center;background:rgba(6,7,11,.88);text-align:center}
 #terkGeriSayim.acik{display:flex}
@@ -329,6 +355,13 @@ canvas{display:block}
   padding:14px;cursor:pointer;border:none;border-radius:6px}
 #btnGiris{background:var(--brass);color:var(--ink)}
 #btnKayit{background:none;border:1px solid var(--brass)!important;color:var(--brass)}
+/* Tarayıcı sürümü: hesap yalnız uygulamada açılır (html.web, araclar/web-hazirla.py ekler) */
+#webIndirKutu{display:none}
+html.web #btnKayit,html.web #btnMisafir{display:none!important}
+html.web #webIndirKutu{display:block;margin-top:14px;padding:12px;border-radius:12px;border:1px solid rgba(232,182,76,.35);text-align:center;font-size:13px;color:var(--dim)}
+html.web #webIndirKutu.vurgu{border-color:var(--brass);background:rgba(232,182,76,.1)}
+#webIndirKutu div{display:flex;gap:8px;justify-content:center;margin-top:8px}
+#webIndirKutu a{padding:7px 14px;border-radius:10px;background:var(--brass,#E8B64C);color:#1a1408;font-weight:700;text-decoration:none}
 #girisForm button.metin{background:none;color:var(--dim);font-family:'Manrope',sans-serif;
   font-weight:600;font-size:13px;letter-spacing:.02em;padding:8px}
 #girisHata{color:var(--blood);font-size:12px;min-height:16px;text-align:center}
@@ -1444,7 +1477,7 @@ body.azHareket #son.acik *{animation:none!important}
    siyah şerit kalktı). Tam ekran katmanlarda o kenara SAYDAM kenarlık eklenir:
    arka plan kenara kadar uzanır, yazı/düğmeler eskisi gibi delikten uzak kalır.
    Delik olmayan kenarda env() 0'dır, hiçbir şey değişmez. */
-#yukleniyor,#acilisPerde,#istEkran,#ogrenEkran,#girisEkran,#menu,#lisansEkran,#kurulumEkran,#arkadasEkran,
+#yukleniyor,#acilisPerde,#istEkran,#ogrenEkran,#kutupEkran,#girisEkran,#menu,#lisansEkran,#kurulumEkran,#arkadasEkran,
 #istekBildirim,#davetPop,#cevrimiciEkran,#hud,#secenekModal,#sesKurModal,#sohbetModal,#terfiModal,
 #yardimKapla,#inceleHUD,#analizEkran,#son,#liderEkran{
   border-top:env(safe-area-inset-top,0px) solid transparent;
@@ -1488,7 +1521,7 @@ html[data-tema] #menu .anaBaslik{margin-top:26px}
   display:flex;align-items:flex-end;justify-content:flex-end;padding:3px}
 #secimSayfa .ssRenk i{width:10px;height:10px;border-radius:3px;display:block}
 html[data-tema="fildisi"] #menu{background:radial-gradient(90% 40% at 50% 8%,#fffdf8,transparent 70%),linear-gradient(180deg,#f3ede2,#e8dfcf)!important}
-html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran){--panel:#fbf8f1;--card:#fbf8f1;--line:rgba(120,95,50,.18);--bone:#1f1b14;--txt:#2b261d;--dim:#776f61;--brass:#A87618;color:#2b261d;background:radial-gradient(90% 40% at 50% 0%,#fffdf8,transparent 70%),linear-gradient(180deg,#f3ede2,#e8dfcf)!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran){--panel:#fbf8f1;--card:#fbf8f1;--line:rgba(120,95,50,.18);--bone:#1f1b14;--txt:#2b261d;--dim:#776f61;--brass:#A87618;color:#2b261d;background:radial-gradient(90% 40% at 50% 0%,#fffdf8,transparent 70%),linear-gradient(180deg,#f3ede2,#e8dfcf)!important}
 html[data-tema="fildisi"] .anaBaslik h1{color:#1c1914}
 html[data-tema="fildisi"] .anaBaslik h1 span{color:#B07E22}
 html[data-tema="fildisi"] .anaKart:not(.oyna){background:#fbf8f1;border-color:rgba(120,95,50,.16);box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 6px 16px rgba(90,70,30,.08)}
@@ -1503,20 +1536,20 @@ html[data-tema="fildisi"] .anaKart.oyna .kartIkon{background:rgba(232,182,76,.14
 html[data-tema="fildisi"] #profilCubuk{background:rgba(255,255,255,.75);color:#2a261f;border-color:rgba(0,0,0,.08)}
 html[data-tema="fildisi"] #menu [onclick*="lisansEkran"],html[data-tema="fildisi"] #menu [onclick*="gizlilik"],html[data-tema="fildisi"] #menu [onclick*="Gizlilik"]{color:#6f685b}
 html[data-tema="fildisi"] #altSecim button{border-color:rgba(120,95,50,.25);color:#3a342a;background:rgba(255,255,255,.6)}
-html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#E8E2D2"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="232, 226, 210"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#cfc9ba"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="207, 201, 186"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#C9C2B2"]{color:#2b261d!important}
-html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#a9a493"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#7d7868"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#8a8578"]{color:#6f685b!important}
-html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="color:#E8B0A0"]{color:#A8402C!important}
-html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="#3a382f"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="58, 56, 47"]{border-color:rgba(120,95,50,.25)!important}
-html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran) [style*="rgba(255,255,255,.02)"]{background:#fbf8f1!important;border:1px solid rgba(120,95,50,.12)}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran) [style*="color:#E8E2D2"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran) [style*="232, 226, 210"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran) [style*="color:#cfc9ba"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran) [style*="207, 201, 186"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran) [style*="color:#C9C2B2"]{color:#2b261d!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran) [style*="color:#a9a493"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran) [style*="color:#7d7868"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran) [style*="color:#8a8578"]{color:#6f685b!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran) [style*="color:#E8B0A0"]{color:#A8402C!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran) [style*="#3a382f"],html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran) [style*="58, 56, 47"]{border-color:rgba(120,95,50,.25)!important}
+html[data-tema="fildisi"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran) [style*="rgba(255,255,255,.02)"]{background:#fbf8f1!important;border:1px solid rgba(120,95,50,.12)}
 html[data-tema="fildisi"] #bulmacaZorluk .bzSec span{color:#6f685b}
 html[data-tema="gece"] #menu{background:radial-gradient(70% 32% at 50% 15%,rgba(232,182,76,.20),rgba(232,182,76,.06) 55%,transparent 80%),radial-gradient(120% 60% at 50% 100%,rgba(40,48,78,.35),transparent 70%),linear-gradient(180deg,#0c0f19,#080a11 55%,#06070b)!important}
-html[data-tema="gece"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran){--panel:#10131d;--line:rgba(232,182,76,.13);background:radial-gradient(90% 36% at 50% 0%,rgba(232,182,76,.10),transparent 70%),linear-gradient(180deg,#0c0f19,#06070b)!important}
+html[data-tema="gece"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran){--panel:#10131d;--line:rgba(232,182,76,.13);background:radial-gradient(90% 36% at 50% 0%,rgba(232,182,76,.10),transparent 70%),linear-gradient(180deg,#0c0f19,#06070b)!important}
 html[data-tema="gece"] .anaKart:not(.oyna){background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.008) 60%),#10131d;border-color:rgba(232,182,76,.11);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.3)}
 html[data-tema="gece"] .anaKart:not(.oyna) .kartIkon{background:linear-gradient(160deg,rgba(232,182,76,.16),rgba(232,182,76,.06));border-color:rgba(232,182,76,.22)}
 html[data-tema="gece"] .anaKart:not(.oyna) .kartAlt{color:#a29d90}
 html[data-tema="gece"] .anaBaslik h1{text-shadow:0 0 28px rgba(232,182,76,.18)}
 html[data-tema="obsidyen"] #menu{background:radial-gradient(80% 30% at 50% 0%,rgba(255,255,255,.05),transparent 70%),#050506!important}
-html[data-tema="obsidyen"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran){--panel:#0e0e10;--line:rgba(255,255,255,.09);background:radial-gradient(80% 30% at 50% 0%,rgba(255,255,255,.04),transparent 70%),#050506!important}
+html[data-tema="obsidyen"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran){--panel:#0e0e10;--line:rgba(255,255,255,.09);background:radial-gradient(80% 30% at 50% 0%,rgba(255,255,255,.04),transparent 70%),#050506!important}
 html[data-tema="obsidyen"] .anaBaslik h1{font-size:36px;letter-spacing:.24em;color:#f1ede4}
 html[data-tema="obsidyen"] .anaBaslik::after{content:"";display:block;width:54px;height:1px;margin:16px auto 0;background:linear-gradient(90deg,transparent,#E8B64C,transparent)}
 html[data-tema="obsidyen"] .kartlar{gap:0;margin-top:30px}
@@ -1529,7 +1562,7 @@ html[data-tema="obsidyen"] .anaKart:not(.oyna) .kartAlt{color:#8d887e}
 html[data-tema="obsidyen"] .anaKart:not(.oyna) .kartOk{color:#E8B64C;opacity:.8}
 html[data-tema="obsidyen"] #altSecim button{border:none;border-bottom:1px solid rgba(232,182,76,.4);border-radius:0;background:none;color:#cfc9ba}
 html[data-tema="zumrut"] #menu{background:radial-gradient(80% 36% at 50% 12%,rgba(78,150,108,.28),transparent 75%),linear-gradient(180deg,#0d2a1f,#081a13 55%,#05110c)!important}
-html[data-tema="zumrut"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran){--panel:#0b241b;--line:rgba(201,168,92,.22);--bone:#efe6cf;--dim:#9fb3a5;background:radial-gradient(80% 36% at 50% 0%,rgba(78,150,108,.22),transparent 75%),linear-gradient(180deg,#0d2a1f,#05110c)!important}
+html[data-tema="zumrut"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran){--panel:#0b241b;--line:rgba(201,168,92,.22);--bone:#efe6cf;--dim:#9fb3a5;background:radial-gradient(80% 36% at 50% 0%,rgba(78,150,108,.22),transparent 75%),linear-gradient(180deg,#0d2a1f,#05110c)!important}
 html[data-tema="zumrut"] .anaKart:not(.oyna){background:linear-gradient(180deg,rgba(255,255,255,.035),transparent),rgba(9,32,24,.85);border-color:rgba(201,168,92,.24);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.3)}
 html[data-tema="zumrut"] .anaKart:not(.oyna) .kartIkon{background:rgba(201,168,92,.12);border-color:rgba(201,168,92,.28)}
 html[data-tema="zumrut"] .anaKart:not(.oyna) .kartAlt{color:#9fb3a5}
@@ -1539,7 +1572,7 @@ html[data-tema="zumrut"] .anaKart:not(.oyna) .kartIkon{color:#d8b866}
 html[data-tema="zumrut"] #profilCubuk{background:rgba(6,26,19,.75);border-color:rgba(201,168,92,.25)}
 html[data-tema="zumrut"] #altSecim button{border-color:rgba(201,168,92,.35);color:#e6dcc0;background:rgba(201,168,92,.07)}
 html[data-tema="bordo"] #menu{background:radial-gradient(80% 36% at 50% 10%,rgba(170,40,64,.38),transparent 75%),linear-gradient(180deg,#2a0b14,#17070c 55%,#0c0407)!important}
-html[data-tema="bordo"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran){--panel:#260a12;--line:rgba(232,182,76,.18);--bone:#f3e6d4;--dim:#bfa3a7;background:radial-gradient(80% 36% at 50% 0%,rgba(170,40,64,.30),transparent 75%),linear-gradient(180deg,#2a0b14,#0c0407)!important}
+html[data-tema="bordo"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran){--panel:#260a12;--line:rgba(232,182,76,.18);--bone:#f3e6d4;--dim:#bfa3a7;background:radial-gradient(80% 36% at 50% 0%,rgba(170,40,64,.30),transparent 75%),linear-gradient(180deg,#2a0b14,#0c0407)!important}
 html[data-tema="bordo"] .anaKart:not(.oyna){background:linear-gradient(180deg,rgba(255,255,255,.04),transparent),rgba(38,10,18,.82);border-color:rgba(232,182,76,.20);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.3)}
 html[data-tema="bordo"] .anaKart:not(.oyna) .kartIkon{background:rgba(232,182,76,.11);border-color:rgba(232,182,76,.26)}
 html[data-tema="bordo"] .anaKart:not(.oyna) .kartAlt{color:#bfa3a7}
@@ -1550,7 +1583,7 @@ html[data-tema="bordo"] #altSecim button{border-color:rgba(232,182,76,.32);color
 /* Buzlu Cam: menünün zemini AÇIK — arkada canlı 3B tahta görünür, kartlar buzlu cam
    (sahibi bu görünümü beğendi). Sahne menüde de zaten çizildiği için ek yük yok. */
 html[data-tema="cam"] #menu{background:none!important}
-html[data-tema="cam"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran){--panel:#161a26;--line:rgba(255,255,255,.12);background:linear-gradient(180deg,#0e1018,#06070b)!important}
+html[data-tema="cam"] :is(#kurulumEkran,#istEkran,#arkadasEkran,#cevrimiciEkran,#girisEkran,#lisansEkran,#liderEkran,#bulmacaZorluk,#ogrenEkran,#kutupEkran){--panel:#161a26;--line:rgba(255,255,255,.12);background:linear-gradient(180deg,#0e1018,#06070b)!important}
 html[data-tema="cam"] #menu .anaBaslik h1{text-shadow:0 4px 30px rgba(0,0,0,.6)}
 html[data-tema="cam"] #menu .anaKart:not(.oyna){background:rgba(22,25,36,.42);border-color:rgba(255,255,255,.13);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 8px 22px rgba(0,0,0,.3)}
 html[data-tema="cam"] #menu .anaKart:not(.oyna) .kartIkon{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14)}
@@ -2156,22 +2189,22 @@ body.incelemede #yonBtn{transform:translateY(-98px) scale(.86);transition:transf
   box-shadow:0 8px 20px rgba(201,145,42,.32),inset 0 1px 0 rgba(255,255,255,.35)}
 #inceleKontrol .ibtn.dolu svg{width:15px;height:15px}
 /* ===== ÖĞREN ===== */
-#ogrenEkran,#ogrenEkran *,#ogrenPanel,#ogrenPanel *{box-sizing:border-box}
-#ogrenEkran{position:fixed;inset:0;z-index:60;display:none;overflow-y:auto;overflow-x:hidden;background:var(--ink,#0a0c12);padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 28px}
-#ogrenEkran.acik{display:block}
-#ogrenEkran .ogUst{display:flex;align-items:center;gap:12px;font:700 20px 'Cinzel',serif;letter-spacing:.14em;color:var(--bone)}
-#ogrenEkran #ogGeri{background:none;border:none;color:var(--brass);font-size:30px;line-height:1;padding:2px 10px 6px 4px;cursor:pointer}
-#ogrenEkran .ogAlt{color:var(--dim);font-size:14px;margin:6px 2px 12px}
-#ogrenEkran .ogIlerle{height:6px;border-radius:3px;background:rgba(127,127,127,.2);overflow:hidden;margin-bottom:6px}
-#ogrenEkran .ogIlerle i{display:block;height:100%;background:linear-gradient(90deg,#C9912A,#F2C765)}
-#ogrenEkran .ogBolum{font:700 11px Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);margin:18px 2px 8px}
-#ogrenEkran .ogDers{display:flex;align-items:center;gap:12px;width:100%;padding:11px 14px;margin-bottom:8px;border-radius:14px;cursor:pointer;
+:is(#ogrenEkran,#kutupEkran),:is(#ogrenEkran,#kutupEkran) *,#ogrenPanel,#ogrenPanel *{box-sizing:border-box}
+:is(#ogrenEkran,#kutupEkran){position:fixed;inset:0;z-index:60;display:none;overflow-y:auto;overflow-x:hidden;background:var(--ink,#0a0c12);padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 28px}
+:is(#ogrenEkran,#kutupEkran).acik{display:block}
+:is(#ogrenEkran,#kutupEkran) .ogUst{display:flex;align-items:center;gap:12px;font:700 20px 'Cinzel',serif;letter-spacing:.14em;color:var(--bone)}
+:is(#ogrenEkran,#kutupEkran) #ogGeri{background:none;border:none;color:var(--brass);font-size:30px;line-height:1;padding:2px 10px 6px 4px;cursor:pointer}
+:is(#ogrenEkran,#kutupEkran) .ogAlt{color:var(--dim);font-size:14px;margin:6px 2px 12px}
+:is(#ogrenEkran,#kutupEkran) .ogIlerle{height:6px;border-radius:3px;background:rgba(127,127,127,.2);overflow:hidden;margin-bottom:6px}
+:is(#ogrenEkran,#kutupEkran) .ogIlerle i{display:block;height:100%;background:linear-gradient(90deg,#C9912A,#F2C765)}
+:is(#ogrenEkran,#kutupEkran) .ogBolum{font:700 11px Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);margin:18px 2px 8px}
+:is(#ogrenEkran,#kutupEkran) .ogDers{display:flex;align-items:center;gap:12px;width:100%;padding:11px 14px;margin-bottom:8px;border-radius:14px;cursor:pointer;
   border:1px solid rgba(185,154,91,.3);background:var(--panel,#12141B);color:var(--bone);font:600 15px Manrope,sans-serif;text-align:start}
-#ogrenEkran .ogDers b{flex:0 0 28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;
+:is(#ogrenEkran,#kutupEkran) .ogDers b{flex:0 0 28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;
   background:rgba(232,182,76,.14);color:var(--brass)}
-#ogrenEkran .ogDers.tamam b{background:#2f7d4f;color:#fff}
-#ogrenEkran .ogDers span{flex:1;min-width:0}
-#ogrenEkran .ogDers em{font-style:normal;color:var(--dim);font-size:20px}
+:is(#ogrenEkran,#kutupEkran) .ogDers.tamam b{background:#2f7d4f;color:#fff}
+:is(#ogrenEkran,#kutupEkran) .ogDers span{flex:1;min-width:0}
+:is(#ogrenEkran,#kutupEkran) .ogDers em{font-style:normal;color:var(--dim);font-size:20px}
 body.ogrende .notSerit,body.ogrende #notPanel,body.ogrende #notPanelSag{display:none!important}
 #ogrenPanel{position:fixed;left:0;right:0;bottom:0;z-index:40;display:none;flex-direction:column;gap:8px;padding:10px 14px calc(env(safe-area-inset-bottom,0px) + 12px);
   border-radius:22px 22px 0 0;background:linear-gradient(180deg,#121319,#090a0e);box-shadow:0 -1px 0 rgba(232,182,76,.2),0 -16px 36px rgba(0,0,0,.45);color:#EDE6D6}
@@ -2206,6 +2239,26 @@ body.ogrende .notSerit,body.ogrende #notPanel,body.ogrende #notPanelSag{display:
 #inceleKontrol .ibtn{flex-basis:42px;height:42px}
 #inceleKontrol .ibtn.dolu{border-radius:21px}
 #inceleKontrol .ibtn:active{transform:scale(.94);opacity:1}
+/* GENİŞ EKRAN (PC tarayıcı, yatay tablet — Kasım 2026, sahibin isteği): alttaki panel tahtanın yarısını örtüyordu.
+   Panel iki yana bölünür: solda özet + gidişat grafiği, sağda çıkış/dil, yorum kartı ve kontroller; tahta ortada tam görünür. */
+@media (min-width:1000px) and (min-height:560px) and (min-aspect-ratio:4/3){
+  #inceleHUD{top:88px;bottom:14px;left:14px;right:14px;padding:0!important;gap:10px!important;border-radius:0!important;
+    background:none!important;box-shadow:none!important;pointer-events:none;
+    grid-template-columns:min(290px,21vw) 1fr min(330px,24vw);grid-template-rows:auto auto auto 1fr auto;align-content:start}
+  #inceleHUD.acik{display:grid}
+  #inceleHUD>*{pointer-events:auto;min-width:0}
+  #inceleHUD>#inceleUst,#inceleHUD>#inceleOzet,#inceleHUD>#inceleGrafik,#inceleHUD>#inceleKapsam,#inceleHUD>#inceleYorum,#inceleHUD>#inceleKontrol{
+    background:linear-gradient(180deg,#121319,#090a0e);border:1px solid rgba(232,182,76,.16);border-radius:18px;padding:10px 12px;
+    box-shadow:0 14px 34px rgba(0,0,0,.4)}
+  #inceleUst{grid-column:3;grid-row:1;flex-wrap:wrap}
+  #inceleOzet{grid-column:1;grid-row:1}
+  #inceleOzet.acik{flex-wrap:wrap!important;gap:6px}
+  #inceleGrafik{grid-column:1;grid-row:2}
+  #inceleKapsam{grid-column:1;grid-row:3}
+  #igKutu{height:64px}
+  #inceleYorum{grid-column:3;grid-row:2 / span 3;height:auto!important;max-height:none;align-self:stretch}
+  #inceleKontrol{grid-column:3;grid-row:5}
+}
 
 /* ===== OYUN SONU — premium karne (4 Ekim 2026) =====
    Opak katmanlı arka plan (oyun arayüzü arkadan sızmaz), iki doğruluk halkası, karo sınıf ızgarası,
@@ -2758,6 +2811,9 @@ function perdeBittiginde(fn){
       Google ile Giriş Yap
     </button>
     <button id="btnMisafir" class="metin">Misafir olarak devam et</button>
+    <div id="webIndirKutu"><span>Hesabın yok mu? Önce Chess64'ü telefonuna indir ve hesabını orada aç.</span>
+      <div><a href="https://apps.apple.com/app/id6821573099" target="_blank" rel="noopener">App Store</a>
+      <a href="https://play.google.com/store/apps/details?id=com.emre.sahdustu" target="_blank" rel="noopener">Google Play</a></div></div>
   </div>
   <div id="girisYukleniyor" style="display:none">
     <div class="cember"></div>
@@ -2813,6 +2869,15 @@ function perdeBittiginde(fn){
       <div class="kartMetin">
         <div class="kartAd">Öğren</div>
         <div class="kartAlt">Satrancı sıfırdan öğren</div>
+      </div>
+      <div class="kartOk">›</div>
+    </button>
+
+    <button class="anaKart" id="kutupKart">
+      <div class="kartIkon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5.5A1.5 1.5 0 0 1 5.5 4H10v15.5H5.5A1.5 1.5 0 0 0 4 21"/><path d="M10 4h4v15.5h-4"/><path d="m14.5 5 3.6-.9a1 1 0 0 1 1.2.7l3 12.6a1 1 0 0 1-.7 1.2l-3.6.9"/></svg></div>
+      <div class="kartMetin">
+        <div class="kartAd">Kütüphane</div>
+        <div class="kartAlt">Kurallar, varyantlar, efsane maçlar</div>
       </div>
       <div class="kartOk">›</div>
     </button>
@@ -3464,6 +3529,18 @@ let fbAuth=null, fbDb=null, fbKullanici=null;
     fbDb=firebase.firestore();
     fbAuth.onAuthStateChanged(async function(u){
       fbKullanici=u;
+      /* TARAYICI SÜRÜMÜ (Kasım 2026, sahibin isteği): hesap yalnız uygulamada açılır. Profili olmayan hesap
+         (uygulamada hiç açılmamış) oturumu kapatılır; profil oluşturulmaz. Uygulamada WEB_SURUM yoktur. */
+      if(u && window.WEB_SURUM){
+        let var_=false;
+        try{ var_=(await firebase.firestore().collection('oyuncular').doc(u.uid).get()).exists; }catch(e){ var_=true; }
+        if(!var_){
+          fbKullanici=null;
+          try{ await fbAuth.signOut(); }catch(e){}
+          if(typeof webHesapYok==='function') webHesapYok();
+          return;
+        }
+      }
       if(u){
         // Oturum zaten açık: istatistikleri yükle ve giriş ekranını atla
         misafirMod=false;
@@ -5708,27 +5785,31 @@ const Ses=(()=>{
     ['fil','Fil borusu','Fil borusu',4],['kisneme','At kişnemesi','Kişneme',4],['top','Top atışı','Top atışı',4],
     /* 8 Ekim 2026: olay sesleri için (başlama, şah, rok, mat) — yine Freesound CC0; taşlara da atanabilir */
     ['gong','Gong','Gong',3],['can','Çan','Çan',4],['borazan','Savaş borusu','Boru',3],
-    ['fanfar','Zafer fanfarı','Fanfar',4],['tezahurat','Tezahürat','Tezahürat',3],['kapi','Kale kapısı','Kapı',4]];
+    ['fanfar','Zafer fanfarı','Fanfar',4],['tezahurat','Tezahürat','Tezahürat',3],['kapi','Kale kapısı','Kapı',4],
+    /* Kasım 2026: Destan paketinin kendi sesleri (kalkan, ok-yay, taiko, demir kapı — Freesound CC0, KAYNAK.txt) */
+    ['destan','Destan sesi','Destan',10]];
   const PAKET_TARIF={
     gercek:{p_sec:'satranc_13:0:.55',p_hamle:'satranc_03',p_yeme:'satranc_16:0:.7+satranc_03:.11',
       n_sec:'satranc_14:0:.55',n_hamle:'satranc_05',n_yeme:'satranc_15:0:.7+satranc_05:.11',
       b_sec:'satranc_15:0:.55',b_hamle:'satranc_02',b_yeme:'satranc_16:0:.7+satranc_02:.11',
       r_sec:'satranc_16:0:.55',r_hamle:'satranc_04',r_yeme:'satranc_01:0:.7+satranc_04:.12',
-      q_sec:'satranc_13:0:.55',q_hamle:'satranc_07',q_yeme:'satranc_12:0:.7+satranc_07:.12',
-      k_sec:'satranc_14:0:.55',k_hamle:'satranc_09',k_yeme:'satranc_11:0:.7+satranc_10:.13'},
-    savas:{p_sec:'zirh_03:0:.55',p_hamle:'=ordu_p_hamle',p_yeme:'kilic_05',
+      q_sec:'satranc_18:0:.55',q_hamle:'satranc_07',q_yeme:'satranc_12:0:.7+satranc_07:.12',
+      k_sec:'satranc_17:0:.5',k_hamle:'satranc_09',k_yeme:'satranc_11:0:.7+satranc_10:.13'},
+    savas:{p_sec:'zirh_03:0:.55',p_hamle:'zirh_01',p_yeme:'kilic_05',
       n_sec:'nal_09:0:.6',n_hamle:'nal_02+nal_01:.13:.8',n_yeme:'nal_02+kilic_07:.08',
-      b_sec:'kilic_04:0:.55',b_hamle:'=ordu_b_hamle',b_yeme:'kilic_08',
+      b_sec:'kilic_04:0:.55',b_hamle:'zirh_04',b_yeme:'kilic_08',
       r_sec:'zirh_06:0:.55',r_hamle:'tas_04',r_yeme:'tas_05+davul_04:.03:.8',
       q_sec:'kilic_01:0:.5',q_hamle:'zirh_07',q_yeme:'kilic_06+kilic_07:.15',
       k_sec:'zirh_09:0:.55',k_hamle:'davul_04',k_yeme:'davul_03+kilic_05:.05:.8'},
-    /* DESTAN (8 Ekim 2026): Savaş'ın üstüne fil (fil borusu), at (kişneme), kale (top atışı) */
-    destan:{p_sec:'zirh_03:0:.55',p_hamle:'=ordu_p_hamle',p_yeme:'kilic_05',
-      n_sec:'kisneme_02:0:.5',n_hamle:'nal_02+nal_01:.13:.8',n_yeme:'nal_02+kisneme_03:.06:.7',
-      b_sec:'fil_02:0:.5',b_hamle:'=ordu_b_hamle',b_yeme:'fil_01:0:.75+kilic_08:.22:.7',
-      r_sec:'zirh_06:0:.55',r_hamle:'tas_04',r_yeme:'top_01:0:.85',
-      q_sec:'kilic_01:0:.5',q_hamle:'zirh_07',q_yeme:'top_02:0:.7+kilic_06:.12:.8',
-      k_sec:'zirh_09:0:.55',k_hamle:'davul_04',k_yeme:'davul_03+kilic_05:.05:.8'}
+    /* DESTAN (Kasım 2026, sahibin isteği: her paket diğerlerinden tamamen farklı olsun). Hiçbir ses başka pakette
+       kullanılmaz: kalkan, ok-yay, taiko davulu, demir kapı (sfx/kutu/destan_*), at kişnemesi, fil borusu, kale kapısı,
+       gong, top atışı ve savaş borusu. */
+    destan:{p_sec:'destan_01:0:.6',p_hamle:'destan_02:0:.8',p_yeme:'destan_03',
+      n_sec:'kisneme_02:0:.5',n_hamle:'nal_05+nal_06:.13:.8',n_yeme:'destan_10+kisneme_03:.06:.6',
+      b_sec:'fil_02:0:.5',b_hamle:'destan_04:0:.8',b_yeme:'fil_01:0:.75',
+      r_sec:'kapi_01:0:.55',r_hamle:'destan_06:0:.8',r_yeme:'top_01:0:.85',
+      q_sec:'destan_07:0:.6',q_hamle:'destan_08:0:.7',q_yeme:'destan_09+top_02:.3:.55',
+      k_sec:'gong_01:0:.4',k_hamle:'destan_05:0:.85',k_yeme:'borazan_01:0:.7'}
   };
   function tarifCoz(tr){ return tr.split('+').map(x=>{ const a=x.split(':');
     return [a[0][0]==='=' ? a[0].slice(1) : 'kt_'+a[0], +(a[1]||0), a[2]==null?.9:+a[2]]; }); }
@@ -6982,6 +7063,16 @@ function hudGuncelle(){
 }
 
 /* ---- Hamle uygulama (görsel + motor) ---- */
+/* Bugün oynandı bilgisi: günlük 13:00 hatırlatması o gün oynayana gitmez (Kasım 2026). Günde bir kez bildirilir. */
+let _oynandiGun='';
+function gunlukOynandi(){
+  try{
+    const g=new Date().toDateString(); if(_oynandiGun===g) return; _oynandiGun=g;
+    if(typeof AndroidBildirim!=='undefined' && AndroidBildirim.oyunOynandi) AndroidBildirim.oyunOynandi();
+    else if(window.IOS_UYGULAMA && window.webkit && webkit.messageHandlers && webkit.messageHandlers.ios)
+      webkit.messageHandlers.ios.postMessage({ad:'oyunOynandi', deger:''});
+  }catch(e){}
+}
 async function hamleOyna(h, ai=false, uzaktan=false){
   // GÜVENCE: Hamle her zaman CANLI konumda işlenmeli. İnceleme modunda kalındıysa
   // (mesh'ler geri konumda) önce canlıya dön ki taşlar doğru mesh'lerle animasyonlansın.
@@ -6989,6 +7080,7 @@ async function hamleOyna(h, ai=false, uzaktan=false){
     gozdenGecir=-1; secili=-1; legalSet=[];
     taslariDiz(false); vurguTemizle();
   }
+  if(!ai && !uzaktan) gunlukOynandi();
   if(ogrenModu && !ai && !uzaktan){ ogrenHamle(h); return; }
   // Bulmaca modu: hamleyi çözümle karşılaştır
   if(bulmacaModu && !ai){
@@ -7015,6 +7107,7 @@ async function hamleOyna(h, ai=false, uzaktan=false){
       if(Motor.durum()==='mat'){
         Ses.olay('mat'); bulmacaSonuc(true); return;
       }
+      if(bulmacaAdim>=b.h.length){ bulmacaSonuc(true); return; }   // taktik: çözüm satırı bitti
       // Rakip cevabını otomatik oyna (varsa)
       Ses.cal('hamle');
       const rakipUci=b.h[bulmacaAdim];
@@ -8307,11 +8400,15 @@ const Konus=(()=>{
     if(!sesler.length) yukle();
     const ayni=sesler.filter(v=>v.lang && v.lang.toLowerCase().startsWith(dilKodu.slice(0,2)));
     if(!ayni.length) return null;
-    // cinsiyet tahmini: ses adında ipucu ara
-    const kadinIz=/female|kadın|woman|zira|google.*(tr|english)|samantha|karen|tessa|yelda/i;
-    const erkekIz=/male|erkek|man|david|fred|daniel|alex|mehmet/i;
-    const iz = cinsiyet==='kadin'?kadinIz:erkekIz;
-    return ayni.find(v=>iz.test(v.name)) || ayni[0];
+    /* Cinsiyet ses adından anlaşılır. ESKİ HATA (Kasım 2026, PC tarayıcı): erkek kalıbındaki "male" kelimesi
+       "Google UK English Female" içinde de geçtiği için İngilizcede kadın/erkek ters, Türkçede ise kadın kalıbı
+       "Google Türkçe"yi tanımadığı için ikisi de erkek (Microsoft Tolga) çıkıyordu. Artık tam kelime + bilinen adlar. */
+    const kadinIz=/\bfemale\b|kadın|woman|google türkçe|google us english|zira|hazel|susan|aria|jenny|michelle|sonia|libby|natasha|samantha|karen|tessa|moira|fiona|victoria|yelda|emel|seda|filiz|ipek|elif/i;
+    const erkekIz=/(^|[^e])\bmale\b|erkek|david|mark|george|guy|ryan|christopher|eric|steffan|thomas|william|daniel|fred|alex|tolga|ahmet|mehmet|cem/i;
+    const kadin=ayni.filter(v=>kadinIz.test(v.name)&&!/\bmale\b/i.test(v.name.replace(/female/ig,'')));
+    const erkek=ayni.filter(v=>erkekIz.test(v.name)&&!/\bfemale\b/i.test(v.name));
+    if(cinsiyet==='kadin') return kadin[0] || ayni.find(v=>!erkek.includes(v)) || ayni[0];
+    return erkek[0] || ayni.find(v=>!kadin.includes(v)) || ayni[0];
   }
   return {
     mevcut(){ return (typeof AndroidTTS!=='undefined') || (typeof speechSynthesis!=='undefined'); },
@@ -8352,7 +8449,9 @@ const Konus=(()=>{
         if(!sesler.length) yukle();
         const v=sesBul(dilKodu,cinsiyet);
         if(v){ u.voice=v; u.lang=v.lang; } else { u.lang=dilKodu; }
-        u.rate=0.98; u.pitch = cinsiyet==='kadin'?1.1:0.9; u.volume=1.0;
+        /* Bu dilde tek ses varsa (ör. Windows'ta yalnız Microsoft Tolga) kadın/erkek farkı perdeyle belirginleşir */
+        const tekSes = !!(v && sesBul(dilKodu, cinsiyet==='kadin'?'erkek':'kadin')===v);
+        u.rate=0.98; u.pitch = cinsiyet==='kadin' ? (tekSes?1.45:1.1) : (tekSes?0.8:0.9); u.volume=1.0;
         /* cbCalistir nesil kontrolü yaptığı için iptal edilen eski
            konuşmanın onend'i artık yeni zinciri bozamaz. */
         u.onend=()=>cbCalistir(n);
@@ -9145,6 +9244,7 @@ function menuKur(){
   const ib=document.getElementById('istKart'); if(ib) ib.onclick=()=>istEkraniAc();
   const bb=document.getElementById('bulmacaKart'); if(bb) bb.onclick=()=>bulmacaBaslat();
   const og=document.getElementById('ogrenKart'); if(og) og.onclick=()=>ogrenAc();
+  const kk=document.getElementById('kutupKart'); if(kk) kk.onclick=()=>kutupAc();
   const ok=document.getElementById('oynaKart'); if(ok) ok.onclick=()=>kurulumAc();
   const hk=document.getElementById('hizliKart'); if(hk) hk.onclick=()=>{
     let a=null; try{ a=JSON.parse(localStorage.getItem('sonAyar')||'null'); }catch(e){}
@@ -10790,6 +10890,7 @@ function lobiBaslat(){
 }
 function cevrimiciAc(){
   cvAnimNotYaz();
+  try{ if(window.cvSureYaz) cvSureYaz(); if(window.cvSekmeYaz) cvSekmeYaz(); }catch(e){}
   try{ lobiBaslat(); }catch(e){}
   try{ bildirimIzniIste(); bildirimJetonuYaz(); }catch(e){}
   try{ if(Cevrimici.hazirMi()) bildirimUyariKontrol(true); }catch(e){}
@@ -11399,6 +11500,7 @@ function cvBeklemeGoster(metin, kod, ayar){
   }
 }
 function kurulumAc(){
+  try{ if(window.kurTekYaz) setTimeout(kurTekYaz,0); }catch(e){}
   mod='ai';   // Oyun Kur her açılışta yapay zekâ ile başlar (4 Kasım 2026, sahibin isteği)
   kurulumSecimEsitle();
   document.getElementById('kurulumEkran').classList.add('acik');
@@ -11726,6 +11828,7 @@ window.geriTusu=function(){
     const pm=document.getElementById('premiumModal');
     if(pm){ pm.remove(); if(typeof pmBekleyen!=='undefined') pmBekleyen=null; return true; }
     const rm=document.getElementById('raporModal'); if(rm){ rm.remove(); return true; }
+    for(const _id of ['retPop','fotoBuyut','oyuncuKart']){ const _e=document.getElementById(_id); if(_e){ _e.remove(); return true; } }
     /* (5 Ekim 2026) Geri tuşu önce açık olanı kapatır: alttan açılan seçim/ayar sayfası (oyun içindeyken de),
        arkadaşlar, lisanslar, analiz, davet/oda pencereleri. Eskiden oyun ayarlarındayken geri oyundan çıkarıyordu. */
     const ss=document.getElementById('secimSayfa');
@@ -11775,6 +11878,7 @@ window.geriTusu=function(){
     // Öğren: dersten listeye, listeden menüye
     if(typeof ogrenModu!=='undefined' && ogrenModu){ ogrenBitir(); return true; }
     if(acik('ogrenEkran')){ ogrenKapat(); return true; }
+    if(acik('kutupEkran')){ kutupKapat(); return true; }
     // 4. Bulmaca modundaysa → bulmacadan çık
     if(typeof bulmacaModu!=='undefined' && bulmacaModu){ if(typeof bulmacaBitir==='function'){ bulmacaBitir(); return true; } }
     // 5. Bulmaca zorluk seçimi açıksa → kapat
@@ -12235,8 +12339,32 @@ function inceleGorunumAyarla(){
     const hud=ogrenAltta ? ogrenP : document.getElementById('inceleHUD');
     camera.clearViewOffset();
     window._duzIncKadraj=null;
-    if(!hud || !hud.classList.contains('acik')){ _incKay=0; document.body.classList.remove('incelemede'); cizimIste(); return; }
+    if(!hud || !hud.classList.contains('acik')){ if(camera.zoom!==1){ camera.zoom=1; camera.updateProjectionMatrix(); } _incKay=0; document.body.classList.remove('incelemede'); cizimIste(); return; }
     if(!ogrenAltta) document.body.classList.add('incelemede');
+    if(camera.zoom!==1){ camera.zoom=1; camera.updateProjectionMatrix(); }
+    /* Geniş ekran: panel iki yanda (CSS ızgara). Ortadaki boşluğun genişliği hesaplanır, tahta sığmıyorsa uzaklaştırılır. */
+    if(!ogrenAltta && getComputedStyle(hud).display==='grid'){
+      _incKay=0;
+      const ol=document.getElementById('inceleOzet'), sg=document.getElementById('inceleYorum');
+      const sol=ol ? ol.getBoundingClientRect().right+10 : 0, sag=sg ? sg.getBoundingClientRect().left-10 : innerWidth;
+      const W=innerWidth, H=innerHeight;
+      if(typeof duzGorunum!=='undefined' && duzGorunum){
+        const ustEl=document.getElementById('hud'); const ust=(ustEl ? ustEl.getBoundingClientRect().bottom : 64)+4, alt=H-8;
+        const bant=Math.max(120, alt-ust), gen=Math.max(160, sag-sol), tanY=Math.tan(camera.fov/2*Math.PI/180), S=9;
+        const uzak=Math.max(S*H/(bant*2*tanY), S*H/(gen*2*tanY));
+        const pxBirim=H/(2*uzak*tanY);
+        window._duzIncKadraj={uzak, kay:-(((ust+alt)/2)-H/2)/pxBirim};
+        cizimIste(); return;
+      }
+      camera.updateMatrixWorld();
+      let xMin=1e9, xMax=-1e9;
+      for(const x of [-4.6,4.6]) for(const z of [-4.6,4.6]){
+        const v=new THREE.Vector3(x,0,z).project(camera); const px=(v.x+1)/2*W; xMin=Math.min(xMin,px); xMax=Math.max(xMax,px);
+      }
+      const yarim=Math.max(W/2-xMin, xMax-W/2), bos=Math.min(W/2-sol, sag-W/2);
+      if(yarim>bos && bos>80){ camera.zoom=Math.max(0.55, bos/yarim); camera.updateProjectionMatrix(); }
+      cizimIste(); return;
+    }
     if(typeof duzGorunum!=='undefined' && duzGorunum){
       /* 2B (8 Ekim 2026): tam ekran genişliğindeki düz tahta üst çubuk ile panel arasına sığmıyordu
          (üst ve alt sıralar örtülüyordu). Tahta (koordinatlarıyla ~9 birim) o boşluğa sığacak
@@ -12281,6 +12409,7 @@ function inceleSayacYaz(idx){
 function _hexRgba(h,a){ const m=/^#?([0-9a-f]{6})$/i.exec(h||''); if(!m) return 'rgba(159,168,181,'+a+')';
   const v=parseInt(m[1],16); return 'rgba('+(v>>16)+','+((v>>8)&255)+','+(v&255)+','+a+')'; }
 function inceleYorumGoster(otomatik){
+  if(window._hikayeMac && typeof hikayeYorumGoster==='function'){ hikayeYorumGoster(otomatik); return; }
   const el=document.getElementById('inceleYorum');
   if(inceleIdx<0){
     el.style.removeProperty('--sc'); el.style.removeProperty('--sca'); el.style.removeProperty('--scb');
@@ -12404,6 +12533,7 @@ function inceleOtoBasla(){
 function inceleOtoAdim(){
   if(!inceleOtoCalisirken) return;
   const _n=inceleOtoNesil;
+  if(window._hikayeMac && inceleIdx<0 && !window._hikayeGirisTamam){ window._hikayeGirisTamam=true; inceleYorumGoster(true); return; }
   if(inceleIdx>=oyunKaydi.length-1){ inceleOtoDur(); return; }
   // Sonraki KRİTİK hamleye atla; aradaki sıradanları tahtada hızlıca göster ama konuşturma
   let hedef=inceleIdx+1;
@@ -12420,7 +12550,7 @@ function inceleOtoAdim(){
     setTimeout(()=>araOynat(j+1), 380); // sıradan hamleler hızlı akar, sessiz
   }
   // hedef = sonraki kritik hamle
-  if(inceleAnalizVar){
+  if(inceleAnalizVar && !window._hikayeMac){
     while(hedef<oyunKaydi.length-1 && !inceleKritikMi(oyunKaydi[hedef])) hedef++;
   }
   function kritikGoster(){
@@ -12462,6 +12592,7 @@ function tahtadaIncelemeBitir(){
     vurguTemizle();
     document.getElementById('hud').classList.remove('acik');
     document.getElementById('menu').classList.remove('gizli');
+    if(typeof kutupIzlemeBitti==='function' && kutupIzlemeBitti()) return;   // efsane maçtan dönüş
     document.getElementById('istEkran').classList.add('acik');
     return;
   }
@@ -13110,6 +13241,18 @@ const BILGILER=[
 ];
 function rastgeleBilgi(){ return BILGILER[Math.floor(Math.random()*BILGILER.length)]; }
 
+/* Taktik temaları (Kasım 2026): bulmacada t bu anahtarlardan biriyse çözüm satırı bitince doğru sayılır. */
+const TAKTIK_TEMA=[
+  {k:'catal', ad:'Çatal', ip:'Tek taşla iki hedefe saldır'},
+  {k:'acmaz', ad:'Açmaz', ip:'Arkasındaki değerli taş yüzünden kıpırdayamayan taşı bul'},
+  {k:'sis', ad:'Şiş', ip:'Değerli taşa saldır, kaçınca arkasındakini al'},
+  {k:'acarak', ad:'Açarak Saldırı', ip:'Bir taşı çek, arkasındaki taşın saldırısını aç'},
+  {k:'saptirma', ad:'Saptırma', ip:'Savunan taşı görevinden uzaklaştır'},
+  {k:'cekme', ad:'Çekme', ip:'Rakip taşı kötü bir kareye gelmeye zorla'},
+  {k:'arahamle', ad:'Ara Hamle', ip:'Beklenen hamleden önce daha güçlü bir tehdit bul'},
+  {k:'kapan', ad:'Kapan', ip:'Rakip taşın kaçacak karesini bırakma'},
+];
+function taktikTema(t){ return TAKTIK_TEMA.find(x=>x.k===t)||null; }
 const BULMACALAR=[
   {f:'2rq1rk1/1p3p1p/p1pn2p1/P1Np4/1P1PnP2/4P3/5PBP/R1Q3RK b - - 1 1', r:'b', h:['e4f2'], t:1, n:'Boğma matı! Kendi taşlarıyla çevrili şah, atın darbesiyle kaçamadan mat olur.'},
   {f:'r4rk1/pp3ppp/3b4/2p1pPB1/7N/2PP3n/PP4PP/R2Q2RK b - - 0 1', r:'b', h:['h3f2'], t:1, n:'Klasik boğma matı — at, kendi taşlarına hapsolmuş şahı yakalar.'},
@@ -13198,12 +13341,14 @@ function bulmacaBaslat(){
     '<button class="bzSec" data-t="1">Tek Hamlede Mat '+rozet(1)+'</button>'+
     '<button class="bzSec" data-t="2">İki Hamlede Mat '+rozet(2)+'</button>'+
     '<button class="bzSec" data-t="3">Üç Hamlede Mat '+rozet(3)+'</button>'+
+    (TAKTIK_TEMA.some(x=>say(x.k)) ? '<div class="bzBolum">TAKTİKLER</div><div class="bzIzgara">'+
+      TAKTIK_TEMA.filter(x=>say(x.k)).map(x=>'<button class="bzSec" data-t="'+x.k+'">'+x.ad+'<br>'+rozet(x.k)+'</button>').join('')+'</div>' : '')+
     '<button id="bzKapat" class="ikincil">Menüye Dön</button></div>';
   z.classList.add('acik');
   try{ if(typeof agacTara==='function') agacTara(z); }catch(e){}
   document.getElementById('bzGunluk').onclick=()=>{ z.classList.remove('acik'); bulmacaGunlukBaslat(); };
   z.querySelectorAll('.bzSec').forEach(b=>{
-    b.onclick=()=>{ z.classList.remove('acik'); bulmacaTipBaslat(parseInt(b.dataset.t)); };
+    b.onclick=()=>{ z.classList.remove('acik'); const t=b.dataset.t; bulmacaTipBaslat(/^\d+$/.test(t)?parseInt(t):t); };
   });
   document.getElementById('bzKapat').onclick=()=>{ z.classList.remove('acik'); };
 }
@@ -13214,7 +13359,7 @@ function bulmacaBaslat(){
 let bulmacaGunlukMod=false;
 function gunAnahtari(){ const t=new Date(); return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate(); }
 function gunlukBulmaca(){
-  const havuz=[]; BULMACALAR.forEach((b,i)=>{ if(b.p && b.p>=900 && b.p<=1900) havuz.push(i); });
+  const havuz=[]; BULMACALAR.forEach((b,i)=>{ if(typeof b.t==='number' && b.p && b.p>=900 && b.p<=1900) havuz.push(i); });
   if(!havuz.length) return BULMACALAR[0];
   let x=64; const kar=havuz.slice();                       // sabit tohumlu karıştırma (her cihazda aynı)
   for(let i=kar.length-1;i>0;i--){ x=(x*1103515245+12345)&0x7fffffff; const j=x%(i+1); [kar[i],kar[j]]=[kar[j],kar[i]]; }
@@ -13241,9 +13386,7 @@ function bulmacaTipBaslat(tip){
   bulmacaIndex=bulmacaListe[bulmacaListePos];
   bulmacaModu=true;
   mod='2p';   // mod 'ai' kalırsa siyahın oynadığı bulmacada tahtaya dokunulamıyor
-  bulmacaOncekiOrdu=aktifOrdu;
-  const nap=ORDULAR.find(o=>o.id==='napolyon');
-  if(nap) aktifOrdu=nap;
+  if(typeof egitimGorunumAc==='function') egitimGorunumAc();   // Oyma Tahta + Çizgi Film (Kasım 2026)
   document.getElementById('menu').classList.add('gizli');
   document.getElementById('istEkran').classList.remove('acik');
   document.getElementById('hud').classList.add('acik');
@@ -13276,7 +13419,8 @@ function bulmacaGoster(){
   tahtaTercihleriniUygula();
   if(typeof panelYerlesimGuncelle==='function') panelYerlesimGuncelle();
   hudGuncelle();
-  const tipAd={1:'Tek hamlede mat',2:'İki hamlede mat',3:'Üç hamlede mat'}[b.t];
+  const _tt=taktikTema(b.t);
+  const tipAd=_tt ? (_tt.ad+'. '+_tt.ip) : {1:'Tek hamlede mat',2:'İki hamlede mat',3:'Üç hamlede mat'}[b.t];
   const renkAd=(b.r==='w')?'Beyaz':'Siyah';
   let s=document.getElementById('bulmacaSerit');
   if(!s){ s=document.createElement('div'); s.id='bulmacaSerit'; document.body.appendChild(s); }
@@ -13304,12 +13448,13 @@ function bulmacaSonuc(dogru){
       if(bulmacaGunlukMod) localStorage.setItem('gunlukCozulen', gunAnahtari());
     }catch(e){}
     s.innerHTML='<div class="bsBaslik" style="color:#5FBF6A">✓ ÇÖZDÜN!</div>'+
-      '<div class="bsMetin">'+((typeof uygDil!=='undefined'&&uygDil!=='tr')?metniCevir('Harika bir mat! Gözün keskin.'):b.n)+'</div>'+
+      '<div class="bsMetin">'+((typeof uygDil!=='undefined'&&uygDil!=='tr')?metniCevir(taktikTema(b.t)?'Harika! Taktiği buldun.':'Harika bir mat! Gözün keskin.'):b.n)+'</div>'+
       (bulmacaListePos+1<bulmacaListe.length ? '<button id="bulmacaSonraki">Sonraki Bulmaca</button> ' : '')+
       '<button id="bulmacaCik">Menüye Dön</button>';
     Ses.cal('basla');
     if(typeof Konus!=='undefined'){ const d=(typeof yorumDil!=='undefined')?yorumDil:'tr';
-      Konus.oku(d==='tr'?'Doğru! Mat.':'Correct! Checkmate.', d==='tr'?'tr-TR':'en-US',
+      const _tk=!!taktikTema(b.t);
+      Konus.oku(d==='tr'?(_tk?'Doğru!':'Doğru! Mat.'):(_tk?'Correct!':'Correct! Checkmate.'), d==='tr'?'tr-TR':'en-US',
         (typeof sesProfili!=='undefined')?sesProfili.cinsiyet:'kadin'); }
     const sb=document.getElementById('bulmacaSonraki');
     if(sb) sb.onclick=()=>{
@@ -13354,7 +13499,7 @@ function bulmacaPufVeGec(){
 function bulmacaBitir(){
   bulmacaModu=false;
   // Bulmaca öncesi orduya geri dön
-  if(bulmacaOncekiOrdu){ aktifOrdu=bulmacaOncekiOrdu; bulmacaOncekiOrdu=null; }
+  if(typeof egitimGorunumKapat==='function') egitimGorunumKapat();
   const s=document.getElementById('bulmacaSerit'); if(s) s.classList.remove('acik');
   const hudSag=document.querySelector('#hud .hud-sag');
   if(hudSag) hudSag.style.display='';
@@ -13454,20 +13599,29 @@ function ogrenAc(){
   let z=document.getElementById('ogrenEkran');
   if(!z){ z=document.createElement('div'); z.id='ogrenEkran'; document.body.appendChild(z); }
   const biten=ogrenBitenler();
+  if(typeof tasSinifKur==='function') tasSinifKur();
+  const bitSay=OGREN_DUZ.filter(d=>biten.includes(d.id)).length, oran=Math.round(bitSay/OGREN_DUZ.length*100);
+  const siradaki=OGREN_DUZ.find(d=>!biten.includes(d.id));
+  const ikon=['wK','wN','wR','wP'];
   let h='<div class="ogUst"><button type="button" id="ogGeri">‹</button><span>Öğren</span></div>'+
     '<div class="ogAlt">Satrancı sıfırdan, tahtada deneyerek öğren.</div>'+
-    '<div class="ogIlerle"><i style="width:'+Math.round(OGREN_DUZ.filter(d=>biten.includes(d.id)).length/OGREN_DUZ.length*100)+'%"></i></div>';
-  OGREN.forEach(b=>{
-    h+='<div class="ogBolum">'+b.b+'</div>';
+    '<button type="button" class="ogHero" data-i="'+(siradaki?OGREN_DUZ.indexOf(siradaki):0)+'"><span class="ogHalka" style="--p:'+oran+'"><b>%'+oran+'</b></span>'+
+      '<span class="ogHeroM"><small>'+(siradaki?(bitSay?'DEVAM ET':'BAŞLA'):'TAMAMLANDI')+'</small><strong>'+(siradaki?siradaki.ad:'Tekrar et')+'</strong>'+
+      '<em>'+bitSay+' / '+OGREN_DUZ.length+' ders</em></span><i>›</i></button>';
+  OGREN.forEach((b,k)=>{
+    const bs=b.d.filter(d=>biten.includes(d.id)).length;
+    h+='<section class="ogKisim"><div class="ogKBas"><span class="ogKIkon tk tk-'+ikon[k%ikon.length]+'"></span><div class="ogKMetin"><b>'+b.b+'</b>'+
+      '<div class="ogKCubuk"><u><i style="width:'+Math.round(bs/b.d.length*100)+'%"></i></u><span>'+bs+'/'+b.d.length+'</span></div></div></div><div class="ogYol">';
     b.d.forEach(d=>{
-      const i=OGREN_DUZ.indexOf(d), tamam=biten.includes(d.id);
-      h+='<button type="button" class="ogDers'+(tamam?' tamam':'')+'" data-i="'+i+'"><b>'+(tamam?'✓':(i+1))+'</b><span>'+d.ad+'</span><em>›</em></button>';
+      const i=OGREN_DUZ.indexOf(d), tamam=biten.includes(d.id), sira=d===siradaki;
+      h+='<button type="button" class="ogDers'+(tamam?' tamam':'')+(sira?' sira':'')+'" data-i="'+i+'"><b>'+(tamam?'✓':(i+1))+'</b><span>'+d.ad+'</span><small>'+d.a.length+' adım</small><em>›</em></button>';
     });
+    h+='</div></section>';
   });
   z.innerHTML=h;
   z.classList.add('acik');
   document.getElementById('ogGeri').onclick=ogrenKapat;
-  z.querySelectorAll('.ogDers').forEach(b=>{ b.onclick=()=>ogrenDersBaslat(+b.dataset.i); });
+  z.querySelectorAll('.ogDers,.ogHero').forEach(b=>{ b.onclick=()=>ogrenDersBaslat(+b.dataset.i); });
 }
 function ogrenKapat(){ const z=document.getElementById('ogrenEkran'); if(z) z.classList.remove('acik'); }
 function ogrenDersBaslat(i){
@@ -13477,8 +13631,7 @@ function ogrenDersBaslat(i){
     ogrenModu=true;
     document.body.classList.add('ogrende');
     mod='2p';
-    ogrenOncekiOrdu=aktifOrdu;
-    aktifOrdu=ORDULAR[0];
+    if(typeof egitimGorunumAc==='function') egitimGorunumAc();   // Oyma Tahta + Çizgi Film (Kasım 2026)
     document.getElementById('menu').classList.add('gizli');
     document.getElementById('hud').classList.add('acik');
     ['btnYardim','btnSahne','btnYeni','btnMenu'].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display='none'; });
@@ -13582,7 +13735,7 @@ function ogrenBitir(){
   ogrenModu=false;
   document.body.classList.remove('ogrende');
   try{ Konus.sustur(); }catch(e){}
-  if(ogrenOncekiOrdu){ aktifOrdu=ogrenOncekiOrdu; ogrenOncekiOrdu=null; }
+  if(typeof egitimGorunumKapat==='function') egitimGorunumKapat();
   const p=document.getElementById('ogrenPanel'); if(p) p.classList.remove('acik');
   ['btnYardim','btnSahne','btnYeni','btnMenu'].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display=''; });
   secili=-1; legalSet=[]; kilit=false; vurguTemizle();
@@ -13614,6 +13767,12 @@ async function emailAramaAnahtari(email){
   return Array.from(new Uint8Array(ozet),b=>b.toString(16).padStart(2,'0')).join('');
 }
 
+function webHesapYok(){
+  try{ if(fbAuth && fbAuth.currentUser) fbAuth.signOut(); }catch(e){}
+  const g=document.getElementById('girisEkran'); if(g) g.classList.remove('gizli');
+  girisHataGoster(metniCevir('Bu hesap Chess64 uygulamasında açılmamış. Önce uygulamayı telefonuna indirip hesap aç, sonra burada aynı hesapla giriş yap.'));
+  const k=document.getElementById('webIndirKutu'); if(k) k.classList.add('vurgu');
+}
 function girisHataGoster(m){
   const _h=document.getElementById('girisHata'); if(_h) _h.style.color='';
   const e=document.getElementById('girisHata'); if(e) e.textContent=m;
@@ -13718,6 +13877,7 @@ async function googleGiris(){
     if(kul && fbDb){
       const ref = fbDb.collection('oyuncular').doc(kul.uid);
       const snap = await ref.get();
+      if(!snap.exists && window.WEB_SURUM){ girisYukleniyorGoster(false); webHesapYok(); return; }
       if(!snap.exists){
         const ad = (kul.displayName || 'Oyuncu').slice(0,20);
         await ref.set({ kullaniciAdi: ad, ulke:'', avatar:'', puan:800, olusturma:Date.now() }, {merge:true});
@@ -13755,7 +13915,11 @@ async function girisYap(){
   if(!email||!sifre){ girisHataGoster('E-posta ve şifre gerekli.'); return; }
   girisYukleniyorGoster(true);
   try{
-    await fbAuth.signInWithEmailAndPassword(email,sifre);
+    const _sonuc=await fbAuth.signInWithEmailAndPassword(email,sifre);
+    if(window.WEB_SURUM){
+      const _p=await fbDb.collection('oyuncular').doc(_sonuc.user.uid).get().catch(()=>null);
+      if(_p && !_p.exists){ girisYukleniyorGoster(false); webHesapYok(); return; }
+    }
     misafirMod=false;
     await bulutIstYukle();
     girisEkraniGec();
@@ -14119,7 +14283,7 @@ function gecmisOyunIncele(hamleler){
   document.getElementById('menu').classList.add('gizli');
   document.getElementById('hud').classList.add('acik');
   arenaKur(aktifArena); taslariDiz();
-  inceleAnalizVar=false;
+  inceleAnalizVar=!!window._hikayeMac;   // efsane maç hikâyesinde analiz yok, her hamle anlatılır
   tahtadaIncelemeBaslat(true);
 }
 
@@ -14771,25 +14935,38 @@ const Cevrimici=(()=>{
     }catch(e){ return false; }
   }
   let davetIzleyici=null;
-  function davetIzleBirak(){ if(davetIzleyici){ try{ davetIzleyici(); }catch(e){} davetIzleyici=null; } }
+  function davetIzleBirak(){ if(davetIzleyici){ try{ davetIzleyici(); }catch(e){} davetIzleyici=null; } if(typeof davetYoklama!=='undefined' && davetYoklama){ clearInterval(davetYoklama); davetYoklama=null; } }
+  /* 2.1'de ret bildirimi hiç gelmiyordu: kural belgeyi "gonderen/hedef" alanına bakarak okutuyor; belge silinince
+     okunacak alan kalmadığından dinleyici "silindi" yerine izin hatası alıp susuyordu. Artık izin hatası ya da
+     belgenin yok olması aynı sayılır; ayrıca dinleyici kopabileceği için 4 sn'de bir yoklanır (Kasım 2026). */
+  let davetYoklama=null;
   function davetYanitIzle(hedefUid, kod){
     davetIzleBirak();
-    let goruldu=false;
+    let goruldu=false, bitti=false;
+    const ref=fbDb.collection('davetler').doc(hedefUid+'_'+fbKullanici.uid);
+    const gitti=()=>{
+      if(bitti || !goruldu) return;
+      bitti=true; davetIzleBirak();
+      setTimeout(async ()=>{
+        if(odaId!==kod) return;
+        try{
+          const o=await fbDb.collection('oyunlar').doc(kod).get();
+          if(odaId===kod && o.exists && (o.data()||{}).durum==='bekliyor' && typeof window.davetReddedildi==='function')
+            window.davetReddedildi(hedefUid);
+        }catch(e){}
+      }, 5000);
+    };
     try{
-      davetIzleyici=fbDb.collection('davetler').doc(hedefUid+'_'+fbKullanici.uid).onSnapshot(s=>{
+      davetIzleyici=ref.onSnapshot(s=>{
         if(s.exists){ goruldu=true; return; }
-        if(!goruldu) return;
-        davetIzleBirak();
-        setTimeout(async ()=>{
-          if(odaId!==kod) return;
-          try{
-            const o=await fbDb.collection('oyunlar').doc(kod).get();
-            if(odaId===kod && o.exists && (o.data()||{}).durum==='bekliyor' && typeof window.davetReddedildi==='function')
-              window.davetReddedildi(hedefUid);
-          }catch(e){}
-        }, 6000);
-      }, ()=>{});
+        gitti();
+      }, ()=>gitti());
     }catch(e){}
+    davetYoklama=setInterval(async ()=>{
+      if(bitti || odaId!==kod){ davetIzleBirak(); return; }
+      try{ const d=await ref.get({source:'server'}); if(d.exists){ goruldu=true; return; } gitti(); }
+      catch(e){ if(e && e.code==='permission-denied') gitti(); }
+    }, 4000);
   }
   /* Arkadaşlık isteklerini canlı dinle: istek gelince anında bildirim çıksın.
      Eskiden yalnızca "İstekler" sekmesi açılınca görülüyordu. */
@@ -14987,6 +15164,7 @@ const CEVM={
 /* --- Oyun kurma --- */
 'OYUN KUR':{en:'GAME SETUP',ru:'НОВАЯ ИГРА',ar:'إعداد المباراة'},
 'ARENA':{en:'ARENA',ru:'АРЕНА',ar:'الساحة'},
+'Taş seslerini ayarla':{en:'Set piece sounds',ru:'Настроить звуки фигур',ar:'اضبط أصوات القطع',fr:'Régler les sons des pièces',de:'Figurenklänge einstellen',it:'Imposta i suoni dei pezzi',zh:'设置棋子音效'},
 'ORDUN':{en:'YOUR ARMY',ru:'ТВОЯ АРМИЯ',ar:'جيشك'},
 'SÜRE':{en:'TIME',ru:'ВРЕМЯ',ar:'الوقت'},
 'Süre':{en:'Time',ru:'Время',ar:'الوقت'},
@@ -15320,7 +15498,10 @@ const CEVR=[
 [/^Siyah teslim oldu\.$/,{en:'Black resigned.',ru:'Чёрные сдались.',ar:'استسلم الأسود.'}],
 [/^rakip oyuna dönmedi\.$/,{en:'opponent did not return.',ru:'соперник не вернулся.',ar:'لم يعد الخصم.'}],
 [/^Doğruluk — Sen: %(\S+)\s+·\s+Rakip: %(\S+)$/,{en:'Accuracy — You: $1%  ·  Opponent: $2%',ru:'Точность — Ты: $1%  ·  Соперник: $2%',ar:'الدقة — أنت: $1%  ·  الخصم: $2%'}],
-[/^Doğruluk — Beyaz: %(\S+)\s+·\s+Siyah: %(\S+)$/,{en:'Accuracy — White: $1%  ·  Black: $2%',ru:'Точность — Белые: $1%  ·  Чёрные: $2%',ar:'الدقة — الأبيض: $1%  ·  الأسود: $2%'}]
+[/^Doğruluk — Beyaz: %(\S+)\s+·\s+Siyah: %(\S+)$/,{en:'Accuracy — White: $1%  ·  Black: $2%',ru:'Точность — Белые: $1%  ·  Чёрные: $2%',ar:'الدقة — الأبيض: $1%  ·  الأسود: $2%'}],
+[/^(Beyaz|Siyah) oynar\. (Çatal|Açmaz|Şiş|Açarak Saldırı|Saptırma|Çekme|Ara Hamle|Kapan)\. (.+)\.$/,{en:'$1 to play. $2. $3.',ru:'Ход: $1. $2. $3.',ar:'$1 يلعب. $2. $3.',fr:'Trait aux $1. $2. $3.',de:'$1 am Zug. $2. $3.',it:'Muove il $1. $2. $3.',zh:'$1走。$2。$3。'}],
+[/^(\d+) adım$/,{en:'$1 steps',ru:'Шагов: $1',ar:'$1 خطوات',fr:'$1 étapes',de:'$1 Schritte',it:'$1 passi',zh:'$1 步'}],
+[/^(\d+) \/ (\d+) ders$/,{en:'$1 / $2 lessons',ru:'$1 / $2 уроков',ar:'$1 / $2 دروس',fr:'$1 / $2 leçons',de:'$1 / $2 Lektionen',it:'$1 / $2 lezioni',zh:'$1 / $2 课'}]
 ];
 /* Tek hamle-sayısı kelimeleri kalıp içinde çevrilsin */
 const HAMLE_SAYI={Tek:{en:'one',ru:'1 ход',ar:'نقلة واحدة'},'İki':{en:'two',ru:'2 хода',ar:'نقلتين'},'Üç':{en:'three',ru:'3 хода',ar:'ثلاث نقلات'}};
@@ -15658,6 +15839,58 @@ Object.assign(CEVM,{
 'Ses efektleri':{en:'Sound effects',ru:'Звуковые эффекты',ar:'المؤثرات الصوتية',fr:'Effets sonores',de:'Soundeffekte',it:'Effetti sonori',zh:'音效'},
 'Stockfish kaynak kodu:':{en:'Stockfish source code:',ru:'Исходный код Stockfish:',ar:'الشيفرة المصدرية لـ Stockfish:',fr:'Code source de Stockfish :',de:'Stockfish-Quellcode:',it:'Codice sorgente di Stockfish:',zh:'Stockfish 源代码：'},
 'GPL-3.0 tam metni:':{en:'Full text of GPL-3.0:',ru:'Полный текст GPL-3.0:',ar:'النص الكامل لـ GPL-3.0:',fr:'Texte intégral de la GPL-3.0 :',de:'Volltext der GPL-3.0:',it:'Testo completo della GPL-3.0:',zh:'GPL-3.0 全文：'},
+'Tek taşla iki hedefe saldır':{en:'Attack two targets with one piece',ru:'Атакуйте две цели одной фигурой',ar:'هاجم هدفين بقطعة واحدة',fr:'Attaquez deux cibles avec une seule pièce',de:'Greife mit einer Figur zwei Ziele an',it:'Attacca due bersagli con un solo pezzo',zh:'用一个棋子同时攻击两个目标'},
+'Arkasındaki değerli taş yüzünden kıpırdayamayan taşı bul':{en:'Find the piece that cannot move because of the valuable piece behind it',ru:'Найдите фигуру, которая не может уйти из-за ценной фигуры позади',ar:'ابحث عن القطعة التي لا تستطيع التحرك بسبب القطعة الثمينة خلفها',fr:'Trouvez la pièce clouée par la pièce de valeur derrière elle',de:'Finde die Figur, die wegen der wertvollen Figur dahinter nicht ziehen kann',it:'Trova il pezzo che non può muoversi per il pezzo prezioso dietro',zh:'找出因身后有贵重棋子而无法移动的棋子'},
+'Değerli taşa saldır, kaçınca arkasındakini al':{en:'Attack the valuable piece and take the one behind when it moves',ru:'Атакуйте ценную фигуру и заберите ту, что позади',ar:'هاجم القطعة الثمينة وخذ التي خلفها عندما تتحرك',fr:'Attaquez la pièce de valeur et prenez celle de derrière',de:'Greife die wertvolle Figur an und nimm die dahinter',it:'Attacca il pezzo prezioso e prendi quello dietro',zh:'攻击贵重棋子，它躲开后吃掉后面的棋子'},
+'Bir taşı çek, arkasındaki taşın saldırısını aç':{en:'Move one piece to unleash the attack of the piece behind it',ru:'Уведите фигуру и откройте атаку фигуры позади',ar:'حرّك قطعة لتكشف هجوم القطعة خلفها',fr:'Déplacez une pièce pour démasquer celle de derrière',de:'Ziehe eine Figur ab und öffne den Angriff der Figur dahinter',it:'Sposta un pezzo per scoprire l\'attacco di quello dietro',zh:'移开一个棋子，放出后面棋子的攻击'},
+'Savunan taşı görevinden uzaklaştır':{en:'Lure the defender away from its duty',ru:'Отвлеките защитника от его задачи',ar:'أبعد القطعة المدافعة عن مهمتها',fr:'Détournez le défenseur de sa tâche',de:'Lenke den Verteidiger von seiner Aufgabe ab',it:'Allontana il difensore dal suo compito',zh:'把防守棋子引离岗位'},
+'Rakip taşı kötü bir kareye gelmeye zorla':{en:'Force an enemy piece onto a bad square',ru:'Заставьте фигуру соперника встать на плохое поле',ar:'أجبر قطعة الخصم على المجيء إلى مربع سيئ',fr:'Forcez une pièce adverse sur une mauvaise case',de:'Zwinge eine gegnerische Figur auf ein schlechtes Feld',it:'Costringi un pezzo avversario su una casa cattiva',zh:'迫使对方棋子走到坏格'},
+'Beklenen hamleden önce daha güçlü bir tehdit bul':{en:'Find a stronger threat before the expected move',ru:'Найдите более сильную угрозу перед ожидаемым ходом',ar:'ابحث عن تهديد أقوى قبل النقلة المتوقعة',fr:'Trouvez une menace plus forte avant le coup attendu',de:'Finde vor dem erwarteten Zug eine stärkere Drohung',it:'Trova una minaccia più forte prima della mossa attesa',zh:'在预期的着法之前找到更强的威胁'},
+'Rakip taşın kaçacak karesini bırakma':{en:'Leave the enemy piece no square to escape',ru:'Не оставьте фигуре соперника полей для отступления',ar:'لا تترك لقطعة الخصم مربعًا للهرب',fr:'Ne laissez aucune case de fuite à la pièce adverse',de:'Lass der gegnerischen Figur kein Fluchtfeld',it:'Non lasciare case di fuga al pezzo avversario',zh:'不给对方棋子留逃跑的格子'},
+'Bu hesap Chess64 uygulamasında açılmamış. Önce uygulamayı telefonuna indirip hesap aç, sonra burada aynı hesapla giriş yap.':{en:'This account was not created in the Chess64 app. Download the app, create your account there, then sign in here with the same account.',ru:'Этот аккаунт не создан в приложении Chess64. Скачайте приложение, создайте аккаунт там и войдите здесь с тем же аккаунтом.',ar:'لم يُنشأ هذا الحساب في تطبيق Chess64. نزّل التطبيق وأنشئ حسابك فيه، ثم سجّل الدخول هنا بالحساب نفسه.',fr:'Ce compte n\'a pas été créé dans l\'application Chess64. Téléchargez l\'application, créez votre compte, puis connectez-vous ici avec le même compte.',de:'Dieses Konto wurde nicht in der Chess64-App erstellt. Lade die App, erstelle dort dein Konto und melde dich dann hier damit an.',it:'Questo account non è stato creato nell\'app Chess64. Scarica l\'app, crea lì il tuo account e poi accedi qui con lo stesso account.',zh:'此账户不是在 Chess64 应用中创建的。请先下载应用并在其中创建账户，然后用同一账户在此登录。'},
+'Hesabın yok mu? Önce Chess64\'ü telefonuna indir ve hesabını orada aç.':{en:'No account? Download Chess64 on your phone and create your account there first.',ru:'Нет аккаунта? Сначала скачайте Chess64 на телефон и создайте аккаунт там.',ar:'ليس لديك حساب؟ نزّل Chess64 على هاتفك وأنشئ حسابك هناك أولًا.',fr:'Pas de compte ? Téléchargez d\'abord Chess64 sur votre téléphone et créez-y votre compte.',de:'Kein Konto? Lade zuerst Chess64 aufs Handy und erstelle dort dein Konto.',it:'Nessun account? Scarica prima Chess64 sul telefono e crea lì il tuo account.',zh:'没有账户？请先在手机上下载 Chess64 并在其中创建账户。'},
+'Oyun isteği reddedildi':{en:'Game request declined',ru:'Приглашение отклонено',ar:'تم رفض طلب اللعب',fr:'Invitation refusée',de:'Spielanfrage abgelehnt',it:'Invito rifiutato',zh:'对局邀请被拒绝'},
+'Tamam':{en:'OK',ru:'ОК',ar:'حسنًا',fr:'OK',de:'OK',it:'OK',zh:'好的'},
+'Tekrar gönder':{en:'Send again',ru:'Отправить снова',ar:'أرسل مجددًا',fr:'Renvoyer',de:'Erneut senden',it:'Invia di nuovo',zh:'再次发送'},
+'Çevrimiçi ekranından yeniden isteyebilirsin.':{en:'You can ask again from the online screen.',ru:'Можно отправить снова с экрана онлайн-игры.',ar:'يمكنك الطلب مجددًا من شاشة اللعب عبر الإنترنت.',fr:'Vous pouvez redemander depuis l\'écran en ligne.',de:'Du kannst es im Online-Bildschirm erneut anfragen.',it:'Puoi richiedere di nuovo dalla schermata online.',zh:'可在在线界面再次邀请。'},
+'Profilim':{en:'My profile',ru:'Мой профиль',ar:'ملفي',fr:'Mon profil',de:'Mein Profil',it:'Il mio profilo',zh:'我的资料'},
+'Günlük hatırlatma':{en:'Daily reminder',ru:'Ежедневное напоминание',ar:'تذكير يومي',fr:'Rappel quotidien',de:'Tägliche Erinnerung',it:'Promemoria giornaliero',zh:'每日提醒'},
+'Her gün 13:00, o gün oynadıysan gelmez':{en:'Every day at 13:00, skipped if you already played',ru:'Каждый день в 13:00, если вы ещё не играли',ar:'كل يوم الساعة 13:00 إن لم تلعب',fr:'Chaque jour à 13 h, sauf si vous avez déjà joué',de:'Täglich um 13 Uhr, außer du hast schon gespielt',it:'Ogni giorno alle 13, se non hai ancora giocato',zh:'每天 13:00，当天已下棋则不提醒'},
+'Hatırlatma gönderilmez':{en:'No reminder is sent',ru:'Напоминания отключены',ar:'لن يُرسل تذكير',fr:'Aucun rappel envoyé',de:'Keine Erinnerung',it:'Nessun promemoria',zh:'不发送提醒'},
+'Çevrimiçi oyuncu bildirimi':{en:'Players online notification',ru:'Уведомление об игроках онлайн',ar:'إشعار اللاعبين المتصلين',fr:'Notification de joueurs en ligne',de:'Spieler-online-Mitteilung',it:'Notifica giocatori online',zh:'玩家在线通知'},
+'Bir oyuncu çevrimiçi olunca haber ver (günde en çok 1)':{en:'Tell me when a player comes online (max 1 a day)',ru:'Сообщать, когда игрок в сети (не чаще 1 в день)',ar:'أعلمني عند اتصال لاعب (مرة يوميًا كحد أقصى)',fr:'Me prévenir quand un joueur se connecte (1 par jour max)',de:'Melden, wenn ein Spieler online kommt (max. 1 pro Tag)',it:'Avvisami quando un giocatore è online (max 1 al giorno)',zh:'有玩家上线时通知我（每天最多 1 次）'},
+'Bu bildirim gönderilmez':{en:'This notification is not sent',ru:'Это уведомление отключено',ar:'لن يُرسل هذا الإشعار',fr:'Cette notification n’est pas envoyée',de:'Diese Mitteilung wird nicht gesendet',it:'Questa notifica non viene inviata',zh:'不发送此通知'},
+'DEVAM ET':{en:'CONTINUE',ru:'ПРОДОЛЖИТЬ',ar:'تابع',fr:'CONTINUER',de:'WEITER',it:'CONTINUA',zh:'继续'},
+'BAŞLA':{en:'START',ru:'НАЧАТЬ',ar:'ابدأ',fr:'COMMENCER',de:'START',it:'INIZIA',zh:'开始'},
+'TAMAMLANDI':{en:'COMPLETED',ru:'ЗАВЕРШЕНО',ar:'اكتمل',fr:'TERMINÉ',de:'ABGESCHLOSSEN',it:'COMPLETATO',zh:'已完成'},
+'Tekrar et':{en:'Review',ru:'Повторить',ar:'راجع',fr:'Réviser',de:'Wiederholen',it:'Ripassa',zh:'复习'},
+'Tarayıcı':{en:'Browser',ru:'Браузер',ar:'المتصفح',fr:'Navigateur',de:'Browser',it:'Browser',zh:'浏览器'},
+'Önce hesabınla giriş yap.':{en:'Sign in to your account first.',ru:'Сначала войдите в аккаунт.',ar:'سجّل الدخول إلى حسابك أولًا.',fr:'Connectez-vous d’abord.',de:'Melde dich zuerst an.',it:'Accedi prima al tuo account.',zh:'请先登录账户。'},
+'Tarayıcıda giriş yapıldı.':{en:'Signed in on the browser.',ru:'Вход в браузере выполнен.',ar:'تم تسجيل الدخول في المتصفح.',fr:'Connecté sur le navigateur.',de:'Im Browser angemeldet.',it:'Accesso eseguito nel browser.',zh:'已在浏览器登录。'},
+'Kodun süresi dolmuş, tarayıcıdaki yeni kodu okut.':{en:'The code expired. Scan the new one in the browser.',ru:'Код истёк. Отсканируйте новый в браузере.',ar:'انتهت صلاحية الرمز. امسح الرمز الجديد في المتصفح.',fr:'Code expiré. Scannez le nouveau.',de:'Code abgelaufen. Scanne den neuen im Browser.',it:'Codice scaduto. Scansiona quello nuovo.',zh:'代码已过期，请扫描浏览器中的新代码。'},
+'Bağlantı kurulamadı, yeniden dene.':{en:'Could not connect. Try again.',ru:'Нет соединения. Повторите.',ar:'تعذّر الاتصال. أعد المحاولة.',fr:'Connexion impossible. Réessayez.',de:'Keine Verbindung. Versuche es erneut.',it:'Connessione non riuscita. Riprova.',zh:'无法连接，请重试。'},
+'Bu bir Chess64 giriş kodu değil.':{en:'This is not a Chess64 sign-in code.',ru:'Это не код входа Chess64.',ar:'هذا ليس رمز دخول Chess64.',fr:'Ce n’est pas un code Chess64.',de:'Das ist kein Chess64-Code.',it:'Non è un codice Chess64.',zh:'这不是 Chess64 登录码。'},
+'Tarayıcıda giriş yapılsın mı?':{en:'Sign in on the browser?',ru:'Войти в браузере?',ar:'تسجيل الدخول في المتصفح؟',fr:'Se connecter sur le navigateur ?',de:'Im Browser anmelden?',it:'Accedere nel browser?',zh:'在浏览器登录？'},
+'Hesabın bu kodu gösteren tarayıcıda açılacak. Yalnız kendi ekranındaki kodu onayla.':{en:'Your account will open in the browser showing this code. Only approve a code on your own screen.',ru:'Аккаунт откроется в браузере с этим кодом. Подтверждайте только код на своём экране.',ar:'سيُفتح حسابك في المتصفح الذي يعرض هذا الرمز. وافق فقط على رمز شاشتك.',fr:'Votre compte s’ouvrira sur ce navigateur. N’approuvez que le code de votre propre écran.',de:'Dein Konto wird in diesem Browser geöffnet. Bestätige nur Codes auf deinem eigenen Bildschirm.',it:'L’account si aprirà nel browser. Approva solo il codice sul tuo schermo.',zh:'你的账户将在显示此代码的浏览器中打开。只确认你自己屏幕上的代码。'},
+'Onayla':{en:'Approve',ru:'Подтвердить',ar:'موافقة',fr:'Approuver',de:'Bestätigen',it:'Approva',zh:'确认'},
+'Telefonla giriş':{en:'Sign in with your phone',ru:'Вход с телефона',ar:'الدخول بالهاتف',fr:'Connexion par téléphone',de:'Mit dem Handy anmelden',it:'Accedi con il telefono',zh:'用手机登录'},
+'Chess64 uygulamasında Profilim ekranındaki Tarayıcı düğmesine bas ve bu kodu okut.':{en:'In the Chess64 app, tap Browser on the My Profile screen and scan this code.',ru:'В приложении откройте профиль, нажмите «Браузер» и отсканируйте код.',ar:'في تطبيق Chess64 اضغط المتصفح في ملفك وامسح هذا الرمز.',fr:'Dans l’app, touchez Navigateur dans Mon profil et scannez ce code.',de:'Tippe in der App im Profil auf Browser und scanne diesen Code.',it:'Nell’app tocca Browser nel profilo e scansiona il codice.',zh:'在 Chess64 应用的“我的资料”中点按“浏览器”并扫描此码。'},
+'Kod alınamadı':{en:'Could not get a code',ru:'Не удалось получить код',ar:'تعذّر جلب الرمز',fr:'Code indisponible',de:'Kein Code verfügbar',it:'Codice non disponibile',zh:'无法获取代码'},
+'Bilgisayarda oyna':{en:'Play on your computer',ru:'Играть на компьютере',ar:'العب على الكمبيوتر',fr:'Jouer sur ordinateur',de:'Am Computer spielen',it:'Gioca sul computer',zh:'在电脑上下棋'},
+'Bilgisayarında bu adresi aç, ekranda çıkan kodu okut.':{en:'Open this address on your computer and scan the code on the screen.',ru:'Откройте этот адрес на компьютере и отсканируйте код на экране.',ar:'افتح هذا العنوان على الكمبيوتر وامسح الرمز الظاهر.',fr:'Ouvrez cette adresse sur votre ordinateur et scannez le code affiché.',de:'Öffne diese Adresse am Computer und scanne den angezeigten Code.',it:'Apri questo indirizzo sul computer e scansiona il codice mostrato.',zh:'在电脑上打开此地址，并扫描屏幕上的代码。'},
+'Kodu okut':{en:'Scan the code',ru:'Сканировать',ar:'امسح الرمز',fr:'Scanner',de:'Code scannen',it:'Scansiona',zh:'扫描代码'},
+'Kütüphane':{en:'Library',ru:'Библиотека',ar:'المكتبة',fr:'Bibliothèque',de:'Bibliothek',it:'Biblioteca',zh:'资料库'},
+'Kurallar, varyantlar, efsane maçlar':{en:'Rules, variants, legendary games',ru:'Правила, варианты, легендарные партии',ar:'القواعد والأنواع والمباريات الأسطورية',fr:'Règles, variantes, parties légendaires',de:'Regeln, Varianten, legendäre Partien',it:'Regole, varianti, partite leggendarie',zh:'规则、变体、传奇对局'},
+'TAKTİKLER':{en:'TACTICS',ru:'ТАКТИКА',ar:'تكتيكات',fr:'TACTIQUES',de:'TAKTIK',it:'TATTICHE',zh:'战术'},
+'Çatal':{en:'Fork',ru:'Вилка',ar:'الشوكة',fr:'Fourchette',de:'Gabel',it:'Forchetta',zh:'双重攻击'},
+'Açmaz':{en:'Pin',ru:'Связка',ar:'التثبيت',fr:'Clouage',de:'Fesselung',it:'Inchiodatura',zh:'牵制'},
+'Şiş':{en:'Skewer',ru:'Сквозной удар',ar:'السيخ',fr:'Enfilade',de:'Spieß',it:'Infilata',zh:'串击'},
+'Açarak Saldırı':{en:'Discovered attack',ru:'Вскрытое нападение',ar:'الهجوم المكشوف',fr:'Attaque à la découverte',de:'Abzugsangriff',it:'Attacco di scoperta',zh:'闪击'},
+'Saptırma':{en:'Deflection',ru:'Отвлечение',ar:'الإبعاد',fr:'Déviation',de:'Ablenkung',it:'Deviazione',zh:'引离'},
+'Çekme':{en:'Attraction',ru:'Завлечение',ar:'الجذب',fr:'Attraction',de:'Hinlenkung',it:'Adescamento',zh:'引入'},
+'Ara Hamle':{en:'Intermezzo',ru:'Промежуточный ход',ar:'النقلة الوسيطة',fr:'Coup intermédiaire',de:'Zwischenzug',it:'Mossa intermedia',zh:'中间着'},
+'Kapan':{en:'Trapped piece',ru:'Ловля фигуры',ar:'القطعة المحاصرة',fr:'Pièce piégée',de:'Gefangene Figur',it:'Pezzo intrappolato',zh:'困子'},
+'Harika! Taktiği buldun.':{en:'Great! You found the tactic.',ru:'Отлично! Вы нашли тактику.',ar:'رائع! وجدت التكتيك.',fr:'Bravo ! Vous avez trouvé la tactique.',de:'Super! Du hast die Taktik gefunden.',it:'Ottimo! Hai trovato la tattica.',zh:'太棒了！你找到了战术。'},
 'Öğren':{en:'Learn',ru:'Обучение',ar:'تعلّم',fr:'Apprendre',de:'Lernen',it:'Impara',zh:'学习'},
 'Satrancı sıfırdan öğren':{en:'Learn chess from scratch',ru:'Шахматы с нуля',ar:'تعلّم الشطرنج من الصفر',fr:'Les échecs depuis zéro',de:'Schach von Grund auf',it:'Gli scacchi da zero',zh:'从零学国际象棋'},
 'Satrancı sıfırdan, tahtada deneyerek öğren.':{en:'Learn chess from scratch by trying it on the board.',ru:'Учитесь шахматам с нуля, пробуя на доске.',ar:'تعلّم الشطرنج من الصفر بالتجربة على الرقعة.',fr:'Apprenez les échecs depuis zéro en jouant sur l\'échiquier.',de:'Lerne Schach von Grund auf, direkt auf dem Brett.',it:'Impara gli scacchi da zero provando sulla scacchiera.',zh:'从零开始，在棋盘上边试边学。'},
@@ -16195,7 +16428,35 @@ window.davetReddedildi=function(hedef){
   document.getElementById('cvBekleme').classList.remove('acik');
   Cevrimici.ayril();
   const m=ad+' '+c('oyun isteğini reddetti. İstersen yeniden gönderebilirsin.');
-  anlatimGoster(m, 4500);
+  /* Kasım 2026: kısa alt yazı gözden kaçıyordu (sahibi "reddetti bildirimi gelmiyor" dedi); artık ortada düğmeli pencere */
+  try{
+    const eski=document.getElementById('retPop'); if(eski) eski.remove();
+    const p=document.createElement('div'); p.id='retPop';
+    p.style.cssText='position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(4,5,9,.72)';
+    const k=document.createElement('div');
+    k.style.cssText='width:min(340px,92vw);background:linear-gradient(180deg,#171a24,#0d0f15);border:1px solid rgba(232,182,76,.35);border-radius:20px;padding:22px 18px 16px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.5)';
+    const b=document.createElement('div'); b.textContent=c('Oyun isteği reddedildi');
+    b.style.cssText="font:700 17px 'Cinzel',serif;color:#E8B64C;margin-bottom:10px";
+    const t=document.createElement('div'); t.textContent=m; t.setAttribute('data-cevirme','');
+    t.style.cssText='color:#cfc8b8;font-size:14px;line-height:1.5;margin-bottom:16px';
+    const sat=document.createElement('div'); sat.style.cssText='display:flex;gap:8px';
+    const tekrar=document.createElement('button'); tekrar.textContent=c('Tekrar gönder');
+    tekrar.style.cssText='flex:1;padding:11px;border-radius:12px;border:none;background:#E8B64C;color:#1a1408;font-weight:700;cursor:pointer';
+    const tamam=document.createElement('button'); tamam.textContent=c('Tamam');
+    tamam.style.cssText='flex:1;padding:11px;border-radius:12px;border:1px solid rgba(232,182,76,.4);background:transparent;color:#E8B64C;font-weight:700;cursor:pointer';
+    tamam.onclick=()=>p.remove();
+    tekrar.onclick=()=>{
+      p.remove();
+      const lb=document.querySelector('#cvLobiListe button[data-lobi="'+hedef+'"]');
+      if(lb && !lb.disabled){ lb.click(); return; }
+      const rb=document.getElementById('sonRovans');
+      if(rb && rb.offsetParent && !rb.disabled){ rb.click(); return; }
+      anlatimGoster(c('Çevrimiçi ekranından yeniden isteyebilirsin.'), 3500);
+    };
+    sat.append(tekrar, tamam); k.append(b, t, sat); p.append(k);
+    p.onclick=e=>{ if(e.target===p) p.remove(); };
+    document.body.appendChild(p);
+  }catch(e){ anlatimGoster(m, 4500); }
   try{ if(typeof Bildirim!=='undefined') Bildirim.gonder('Chess64', m); }catch(e){}
   try{ if(navigator.vibrate) navigator.vibrate([60,40,60]); }catch(e){}
   const rb=document.getElementById('sonRovans'); if(rb){ rb.disabled=false; rb.textContent='RÖVANŞ'; }
@@ -16444,6 +16705,193 @@ rozetGuncelle();
 @keyframes analizGel{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:1}}
 @keyframes analizNabiz{0%,100%{box-shadow:0 0 0 0 rgba(185,154,91,.55)}50%{box-shadow:0 0 0 12px rgba(185,154,91,0)}}
 #son.acik #tahtadaIncele{animation:analizGel .55s ease .4s backwards, analizNabiz 1.8s ease 1s infinite;border-color:var(--brass)!important}
+/* Çevrimiçi ekranı tek sayfa (Kasım 2026) */
+#cevrimiciUst{padding-top:10px!important;padding-bottom:4px!important}
+#cevrimiciIcerik{padding-top:6px!important;padding-bottom:8px!important;gap:10px!important}
+#cevrimiciHata:empty{display:none}
+#cvLobiBlok{margin-bottom:0!important}
+#cvLobiBlok .blok-ipucu{display:none}
+.cvLobiBas{margin-bottom:4px!important}
+.lobiKart{flex-basis:96px!important;padding:7px 6px 7px!important;gap:1px!important}
+.lobiKart .lobiAv{margin-bottom:1px!important;transform:scale(.86)}
+.lobiKart .lobiBtn{margin-top:3px!important;padding:5px 4px!important}
+#cvSureBlok{margin-bottom:0!important}
+#cvSureBlok>.cvSureBaslik{display:none}
+#cvSureBlok.kapali #cvSureler,#cvSureBlok.kapali #cvAnimNot,#cvSureBlok.kapali #cvAyarSatir{display:none}
+#cvSureBlok:not(.kapali) #cvSureler{margin-top:8px}
+#cvSureAc{display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;border-radius:14px;cursor:pointer;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.2));color:var(--bone);font:600 14px Manrope,sans-serif}
+#cvSureAc .csEt{font-size:11px;letter-spacing:.28em;color:var(--dim)}
+#cvSureAc b{flex:1;text-align:left;font-family:'Cinzel',serif;font-size:15px;color:var(--brass,#E8B64C)}
+#cvSureAc i{font-style:normal;color:var(--dim)}
+html[data-tema="fildisi"] #cvSureAc,html[data-tema="fildisi"] #cvSecimSekme button{background:#fffdf8;border-color:rgba(120,95,50,.16)}
+#cvSecimSekme{display:flex;gap:8px;width:100%}
+#cvSecimSekme button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:8px 12px;border-radius:12px;cursor:pointer;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.2));color:var(--dim);text-align:left}
+#cvSecimSekme button span{font:600 10px Manrope,sans-serif;letter-spacing:.24em}
+#cvSecimSekme button b{font:700 13px 'Cinzel',serif;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#cvSecimSekme button.secili{border-color:var(--brass,#E8B64C);box-shadow:0 0 0 1px var(--brass,#E8B64C) inset}
+#cvSecimSekme button.secili b{color:var(--brass,#E8B64C)}
+#cevrimiciIcerik.sekmeOrdu #cvArenaBlok,#cevrimiciIcerik.sekmeArena #cvOrduBlok{display:none}
+#cvOrduBlok,#cvArenaBlok{margin-top:0!important}
+#cvOrduBlok>.cvSureBaslik,#cvArenaBlok>.cvSureBaslik{display:none}
+#cvEylem{padding-top:6px!important}
+#cvEylem .cvBtn.cvAna{padding-top:9px!important;padding-bottom:9px!important}
+#cvSesSatir{display:flex;align-items:center;gap:8px;width:100%;margin-top:2px}
+#cvSesSatir .cvSesEt{flex:none;display:flex;align-items:center;gap:5px;padding:0 2px;background:none;border:none;cursor:pointer;
+  font:600 10.5px Manrope,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+#cvSesSatir .cvSesEt span{font:400 16px sans-serif;letter-spacing:0;color:var(--brass,#E8B64C)}
+#cvSesSatir .cvSesCipler{flex:1;min-width:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+#cvSesSatir .cvSesCipler::-webkit-scrollbar{display:none}
+#cvSesSatir .cvSesCipler button{flex:none;padding:7px 12px;border-radius:999px;cursor:pointer;background:var(--panel,rgba(255,255,255,.04));
+  border:1px solid var(--line,rgba(232,182,76,.22));color:var(--bone);font:600 12.5px Manrope,sans-serif}
+#cvSesSatir .cvSesCipler button.secili{border-color:var(--brass,#E8B64C);background:rgba(232,182,76,.14);color:var(--brass,#E8B64C)}
+html[data-tema="fildisi"] #cvSesSatir .cvSesCipler button:not(.secili),html[data-tema="fildisi"] #cvSesSatir .cvAyarDugme{background:#fffdf8;border-color:rgba(120,95,50,.16)}
+#cvSesSatir .cvAyarDugme{flex:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.25));color:var(--brass,#E8B64C)}
+#cvSesSatir .cvAyarDugme svg{width:19px;height:19px}
+/* Ana sayfa (Kasım 2026, sahibin isteği): logo + söz en üstte, hemen altında kullanıcı kartı (Profilim'e gider);
+   kartlar eski tek sütun liste (karo ızgarası beğenilmedi), çıkış Profilim ekranında. */
+#menu .anaBaslik{order:0}
+#menu #profilCubuk{order:1;position:static!important;width:100%;max-width:440px;margin-top:10px;box-sizing:border-box;
+  display:flex;align-items:center;gap:12px;padding:10px 14px!important;border-radius:16px;font-size:13px;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.2));box-shadow:none}
+html[data-tema="fildisi"] #menu #profilCubuk{background:#fffdf8;border-color:rgba(120,95,50,.16)}
+#profilCubuk .pkAv{flex:none;width:40px;height:40px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:rgba(232,182,76,.14);color:var(--brass,#E8B64C);font-size:20px}
+#profilCubuk .pkAv img{width:100%;height:100%;object-fit:cover}
+#profilCubuk .pkAv>*{max-width:100%;max-height:100%}
+#profilCubuk .pkMetin{flex:1;min-width:0;display:flex;flex-direction:column;text-align:left}
+#profilCubuk .pkAd{font:700 14.5px Manrope,sans-serif;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#profilCubuk .pkAlt{font:600 12px Manrope,sans-serif;color:var(--brass,#E8B64C)}
+#profilCubuk .pkOk{font-size:20px;color:var(--dim)}
+#menu .kartlar{order:2}
+#menu #altSecim{order:3}
+#menu>*:not(.anaBaslik):not(.kartlar):not(#profilCubuk):not(#altSecim){order:4}
+#istBaslik{position:relative}
+#istCikis{margin-left:auto;padding:7px 14px;border-radius:18px;cursor:pointer;background:none;border:1px solid var(--line,rgba(232,182,76,.3));
+  color:var(--brass,#E8B64C);font:600 12.5px Manrope,sans-serif}
+html[data-tema="fildisi"] #profilCubuk .pkAd{color:#1f1b14}
+#menu .kartlar>#istKart{display:none!important}
+#istQr{display:inline-flex;align-items:center;gap:5px;margin-left:auto;padding:7px 12px;border-radius:18px;cursor:pointer;background:none;border:1px solid var(--line,rgba(232,182,76,.3));color:var(--brass,#E8B64C);font:600 12.5px Manrope,sans-serif}
+#istQr~#istCikis{margin-left:8px}
+#menu{padding-top:calc(env(safe-area-inset-top,0px) + 6px)!important;padding-bottom:10px!important}
+#menu .anaBaslik{margin:0!important}
+#menu .anaBaslik h1{font-size:clamp(30px,9.6vw,52px)!important;margin:0}
+#menu .menuSoz{height:64px!important;margin-top:0}
+#menu #profilCubuk{margin-top:4px!important;padding:7px 14px!important}
+#menu .kartlar{margin-top:8px!important;gap:7px!important}
+#menu .kartlar>.anaKart{padding:8px 14px!important}
+#menu .kartlar>.anaKart .kartIkon{width:36px!important;height:36px!important;border-radius:10px!important}
+#menu #altSecim{margin-top:8px!important}
+/* Hikâye modu (efsane maçlar): değerlendirme öğeleri gizli */
+body.hikayede #inceleOzet,body.hikayede #inceleGrafik,body.hikayede #inceleKapsam{display:none!important}
+body.hikayede #inceleYorum{height:128px}
+body.hikayede #inceleYorum .iyMetin{font-size:15px;line-height:1.5}
+body.hikayede #inceleYorum .hkBas .iyNot{font:700 18px 'Cinzel',serif}
+@media (min-width:1000px) and (min-height:560px) and (min-aspect-ratio:4/3){body.hikayede #inceleYorum{height:auto}}
+/* Öğren ve Kütüphane iç sayfaları (Kasım 2026, sahibin isteği) */
+.tk{background-repeat:no-repeat;background-position:center;background-size:contain}
+#ogrenEkran,#kutupEkran{padding-left:max(16px,calc(50% - 300px));padding-right:max(16px,calc(50% - 300px))}
+/* Devam et kartı */
+.ogHero{display:flex;align-items:center;gap:14px;width:100%;margin:6px 0 4px;padding:15px 16px;border-radius:20px;cursor:pointer;text-align:left;
+  background:linear-gradient(135deg,#232838,#10131c);border:1px solid rgba(232,182,76,.4);box-shadow:0 12px 28px rgba(20,20,30,.28);color:#efe9da}
+.ogHalka{flex:0 0 64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:conic-gradient(#E8B64C calc(var(--p)*1%),rgba(255,255,255,.12) 0)}
+.ogHalka b{width:50px;height:50px;border-radius:50%;background:#151925;display:flex;align-items:center;justify-content:center;font:800 14px Manrope,sans-serif;color:#F2C765}
+.ogHeroM{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ogHeroM small{font:700 10.5px Manrope,sans-serif;letter-spacing:.2em;color:#E8B64C}
+.ogHeroM strong{font:700 17px 'Cinzel',serif;line-height:1.2;color:#f6f0e2}
+.ogHeroM em{font:500 12.5px Manrope,sans-serif;font-style:normal;color:#b9b2a2}
+.ogHero>i{font-style:normal;font-size:24px;color:#E8B64C}
+/* Bölüm kartı ve ders yolu */
+.ogKisim{margin-top:12px;padding:14px 14px 6px;border-radius:20px;background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.18))}
+.ogKBas{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.ogKIkon{flex:0 0 44px;height:44px;border-radius:13px;background-color:rgba(232,182,76,.16);background-size:32px}
+.ogKMetin{flex:1;min-width:0}
+.ogKMetin b{display:block;font:700 16px 'Cinzel',serif;color:var(--bone)}
+.ogKCubuk{display:flex;align-items:center;gap:8px;margin-top:4px}
+.ogKCubuk u{flex:1;height:5px;border-radius:3px;background:rgba(127,127,127,.2);overflow:hidden;text-decoration:none;display:block}
+.ogKCubuk u i{display:block;height:100%;background:linear-gradient(90deg,#C9912A,#F2C765)}
+.ogKCubuk span{font:700 11.5px Manrope,sans-serif;color:var(--dim)}
+.ogYol{position:relative}
+.ogYol::before{content:"";position:absolute;left:14px;top:18px;bottom:24px;width:2px;background:rgba(127,127,127,.22)}
+#ogrenEkran .ogYol .ogDers{position:relative;background:none!important;border:none!important;box-shadow:none!important;padding:9px 2px;margin:0;border-radius:12px;color:var(--bone)}
+#ogrenEkran .ogYol .ogDers b{position:relative;z-index:1;flex:0 0 30px;height:30px;background:var(--panel,#fbf8f1);border:2px solid rgba(127,127,127,.3);color:var(--dim);font:700 12.5px Manrope,sans-serif}
+#ogrenEkran .ogYol .ogDers span{font:600 14.5px Manrope,sans-serif}
+#ogrenEkran .ogYol .ogDers small{font:500 11.5px Manrope,sans-serif;color:var(--dim);white-space:nowrap}
+#ogrenEkran .ogYol .ogDers.tamam b{background:#2f7d4f;border-color:#2f7d4f;color:#fff}
+#ogrenEkran .ogYol .ogDers.sira b{background:#E8B64C;border-color:#E8B64C;color:#1a1408;box-shadow:0 0 0 4px rgba(232,182,76,.22)}
+#ogrenEkran .ogYol .ogDers.sira span{color:var(--brass,#B07E22);font-weight:800}
+#kutupEkran #kpGeri{background:none;border:none;color:var(--brass);font-size:30px;line-height:1;padding:2px 10px 6px 4px;cursor:pointer}
+/* Kütüphane: sekmeler */
+#kutupEkran .kpSekmeler{padding:4px;gap:4px;border-radius:16px;background:rgba(127,127,127,.12);margin:6px 0 14px}
+#kutupEkran .kpSekme{border:none;border-radius:12px;padding:10px 4px;background:none}
+#kutupEkran .kpSekme.secili{background:linear-gradient(135deg,#232838,#10131c);color:#F2C765;box-shadow:0 5px 14px rgba(20,20,30,.25)}
+/* Kurallar ve varyantlar */
+#kutupEkran .kpMadde{border-radius:16px;margin-bottom:9px;overflow:hidden}
+#kutupEkran .kpMadde summary{display:flex;align-items:center;gap:12px;padding:11px 12px}
+#kutupEkran .kpMadde summary::after{margin-left:auto;font-size:20px;float:none}
+#kutupEkran .kpMadde[open]{border-color:var(--brass,#E8B64C)}
+.kpIk{flex:0 0 40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background-color:rgba(232,182,76,.16);background-size:30px;
+  font:800 15px Manrope,sans-serif;color:var(--brass,#B07E22)}
+#kutupEkran .kpMadde p{padding:0 14px 15px 64px}
+/* Efsane maçlar */
+#kutupEkran .kpMac{padding:12px;border-radius:20px;margin-bottom:12px}
+.kpMacBas{display:flex;gap:13px}
+.kpTahta{flex:0 0 116px;height:116px;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);border-radius:8px;overflow:hidden;border:3px solid #5a3a20;box-sizing:content-box}
+.kpTahta i{display:block;background-size:contain;background-repeat:no-repeat;background-position:center}
+.kpTahta i.a{background-color:#ecd8b4}.kpTahta i.k{background-color:#ab7a4e}
+.kpMacBilgi{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.kpYil{align-self:flex-start;padding:2px 9px;border-radius:999px;background:rgba(232,182,76,.17);font:800 11.5px Manrope,sans-serif;color:var(--brass,#B07E22)}
+.kpMacBilgi>b{font:700 16.5px/1.18 'Cinzel',serif;color:var(--brass,#B07E22)}
+.kpOy{display:flex;align-items:center;gap:6px;font:600 12.5px Manrope,sans-serif;color:var(--bone)}
+.kpOy::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background:#f4efe2;border:1px solid #8c8373}
+.kpOy.s::before{background:#22252e;border-color:#22252e}
+.kpOy span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpAlt{font:500 11.5px Manrope,sans-serif;color:var(--dim)}
+#kutupEkran .kpMac p{padding:11px 2px 12px;margin:0}
+#kutupEkran .kpIzle{display:block;width:100%;margin:0;padding:11px;border:none;border-radius:13px;background:linear-gradient(135deg,#232838,#10131c);color:#F2C765;font:700 13.5px Manrope,sans-serif}
+
+/* Oyun Kur ekranı tek sayfa (Kasım 2026) */
+#kurulumUst{padding-top:10px!important;padding-bottom:4px!important}
+#kurulumIcerik.kurTek{gap:10px!important;padding-top:6px!important;padding-bottom:8px!important}
+#kurulumIcerik.kurTek>.blok:not(#kurArenaBlok):not(#kurOrduBlok):not(#kurSureBlok)>.blok-baslik{display:none}
+#kurulumIcerik.kurTek .modlar:not(#sureler) .mod{padding:10px 6px!important;font-size:14px}
+#kurulumIcerik.kurTek #kurArenaBlok>.blok-baslik,#kurulumIcerik.kurTek #kurOrduBlok>.blok-baslik,#kurulumIcerik.kurTek #kurSureBlok>.blok-baslik{display:none}
+#kurulumIcerik.sekmeOrdu #kurArenaBlok,#kurulumIcerik.sekmeArena #kurOrduBlok{display:none!important}
+#kurulumIcerik.kurTek #kurAyarSatir{display:none}
+#kurSureBlok.kapali #sureler{display:none!important}
+#kurSureBlok:not(.kapali) #sureler{margin-top:2px}
+#kurSureAc{display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;border-radius:14px;cursor:pointer;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.2));color:var(--bone);font:600 14px Manrope,sans-serif}
+#kurSureAc .csEt{font-size:11px;letter-spacing:.28em;color:var(--dim)}
+#kurSureAc b{flex:1;text-align:left;font-family:'Cinzel',serif;font-size:15px;color:var(--brass,#E8B64C)}
+#kurSureAc i{font-style:normal;color:var(--dim)}
+#kurSecimSekme{display:flex;gap:8px;width:100%;max-width:560px}
+#kurSecimSekme button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:8px 12px;border-radius:12px;cursor:pointer;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.2));color:var(--dim);text-align:left}
+#kurSecimSekme button span{font:600 10px Manrope,sans-serif;letter-spacing:.24em}
+#kurSecimSekme button b{font:700 13px 'Cinzel',serif;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#kurSecimSekme button.secili{border-color:var(--brass,#E8B64C);box-shadow:0 0 0 1px var(--brass,#E8B64C) inset}
+#kurSecimSekme button.secili b{color:var(--brass,#E8B64C)}
+html[data-tema="fildisi"] #kurSureAc,html[data-tema="fildisi"] #kurSecimSekme button{background:#fffdf8;border-color:rgba(120,95,50,.16)}
+/* taş sesi satırı: çevrimiçi ekrandakiyle aynı görünüm */
+#kurSesSatir{display:flex;align-items:center;gap:8px;width:100%;max-width:560px}
+#kurSesSatir .cvSesEt{flex:none;display:flex;align-items:center;gap:5px;padding:0 2px;background:none;border:none;cursor:pointer;
+  font:600 10.5px Manrope,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+#kurSesSatir .cvSesEt span{font:400 16px sans-serif;letter-spacing:0;color:var(--brass,#E8B64C)}
+#kurSesSatir .cvSesCipler{flex:1;min-width:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+#kurSesSatir .cvSesCipler::-webkit-scrollbar{display:none}
+#kurSesSatir .cvSesCipler button{flex:none;padding:7px 12px;border-radius:999px;cursor:pointer;background:var(--panel,rgba(255,255,255,.04));
+  border:1px solid var(--line,rgba(232,182,76,.22));color:var(--bone);font:600 12.5px Manrope,sans-serif}
+#kurSesSatir .cvSesCipler button.secili{border-color:var(--brass,#E8B64C);background:rgba(232,182,76,.14);color:var(--brass,#E8B64C)}
+html[data-tema="fildisi"] #kurSesSatir .cvSesCipler button:not(.secili),html[data-tema="fildisi"] #kurSesSatir .cvAyarDugme{background:#fffdf8;border-color:rgba(120,95,50,.16)}
+#kurSesSatir .cvAyarDugme{flex:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.25));color:var(--brass,#E8B64C)}
+#kurSesSatir .cvAyarDugme svg{width:19px;height:19px}
+#kurulumIcerik.kurTek #digerAyarlar{margin-top:0}
+#basla{margin-top:8px!important}
 </style>
 <script>
 /* ---- İnceleme: hamle kalitesi rozeti (taşın üzerinde) ---- */
@@ -18417,6 +18865,29 @@ function devPanelAc(){
       b.querySelector('.ssAd small').textContent=c(PAD[ts.paket]||'Klasik')+(Object.keys(ts.ozel).length?' · '+c('özel ayar'):'')+' · '+c('taş taş seçilebilir');
       b.onclick=()=>tasSesleriAc();
       l.appendChild(b); }
+    /* Bildirim tercihleri (Kasım 2026). Tarayıcıda hatırlatma yok; çevrimiçi bildirimi hesaba yazılır, sunucu okur. */
+    { const andH=(typeof AndroidBildirim!=='undefined' && AndroidBildirim.hatirlatmaAyar), iosH=!!window.IOS_UYGULAMA;
+      if(andH||iosH){
+        const su=andH ? (AndroidBildirim.hatirlatmaAcik()?1:0) : ((()=>{ try{ return localStorage.getItem('hatirlatmaKapali')==='1'?0:1; }catch(e){ return 1; } })());
+        grup('Günlük hatırlatma', [
+          {id:1, ad:'Açık',   alt:c('Her gün 13:00, o gün oynadıysan gelmez')},
+          {id:0, ad:'Kapalı', alt:c('Hatırlatma gönderilmez')}
+        ], su, v=>{ try{
+            localStorage.setItem('hatirlatmaKapali', v===1?'0':'1');
+            if(andH) AndroidBildirim.hatirlatmaAyar(v===1);
+            else webkit.messageHandlers.ios.postMessage({ad:'hatirlatma', deger:v===1?'1':'0'});
+          }catch(e){} });
+      }
+      if(typeof fbKullanici!=='undefined' && fbKullanici && !misafirMod && (andH||iosH)){
+        const kapali=(()=>{ try{ return localStorage.getItem('cvBildirimKapali')==='1'; }catch(e){ return false; } })();
+        grup('Çevrimiçi oyuncu bildirimi', [
+          {id:1, ad:'Açık',   alt:c('Bir oyuncu çevrimiçi olunca haber ver (günde en çok 1)')},
+          {id:0, ad:'Kapalı', alt:c('Bu bildirim gönderilmez')}
+        ], kapali?0:1, v=>{ try{
+            localStorage.setItem('cvBildirimKapali', v===1?'0':'1');
+            fbDb.collection('oyuncular').doc(fbKullanici.uid).collection('ozel').doc('bildirim').set({cvKapali:v!==1},{merge:true}).catch(()=>{});
+          }catch(e){} });
+      } }
     grup('Açılış animasyonu', [
       {id:'sinematik', ad:'Sinematik', alt:c('Tahta birleşir, taşlar mat kurar')},
       {id:'klasik',    ad:'Klasik',    alt:c('Kısa: taşlar ve logo')}
@@ -18934,6 +19405,8 @@ const SOZLER=[
 })();
 </script>
 <script src="bulmacalar.js"></script>
+<script src="taktikler.js"></script>
+<script src="kutuphane.js"></script>
 
 
 <script>
@@ -19091,6 +19564,211 @@ const SOZLER=[
   new MutationObserver(()=>setTimeout(duzenle,40)).observe(hud,{attributes:true,attributeFilter:['class']});
   addEventListener('resize',()=>setTimeout(duzenle,300));
   setTimeout(duzenle,500);
+})();
+</script>
+<script>
+/* Çevrimiçi ekranı tek sayfa (Kasım 2026, sahibin isteği): süre açılır-kapanır tek satır, ordu/arena sekmeli,
+   lobi kartları sıkı. Bu dosya index.html'e gömülür (araclar/cv-tek-sayfa-yama.py); telefonda canlı denemek için de kullanılır. */
+(function(){
+  const ic=document.getElementById('cevrimiciIcerik'); if(!ic || document.getElementById('cvSureAc')) return;
+  const c=t=>(typeof metniCevir==='function')?metniCevir(t):t;
+  // --- Süre: tek satır, basınca açılır ---
+  const sb=document.getElementById('cvSureBlok');
+  const ac=document.createElement('button'); ac.type='button'; ac.id='cvSureAc';
+  sb.classList.add('kapali');
+  sb.insertBefore(ac, document.getElementById('cvSureler'));
+  function sureYaz(){
+    const s=sb.querySelector('.cvSure.secili');
+    const ad=s ? (s.dataset.dk==='0' ? '∞ '+c('Süresiz') : s.childNodes[0].textContent.trim()+' · '+(s.querySelector('small')||{}).textContent) : '';
+    ac.innerHTML='<span class="csEt">'+c('SÜRE')+'</span><b>'+ad+'</b><i>'+(sb.classList.contains('kapali')?'▾':'▴')+'</i>';
+  }
+  ac.onclick=()=>{ sb.classList.toggle('kapali'); sureYaz(); };
+  sb.querySelectorAll('.cvSure').forEach(b=>b.addEventListener('click',()=>{ setTimeout(()=>{ sb.classList.add('kapali'); sureYaz(); },0); }));
+  sureYaz();
+  window.cvSureYaz=sureYaz;
+  // --- Ordu / Arena: sekmeli tek satır ---
+  const ob=document.getElementById('cvOrduBlok'), ab=document.getElementById('cvArenaBlok');
+  const sek=document.createElement('div'); sek.id='cvSecimSekme';
+  sek.innerHTML='<button type="button" data-s="ordu" class="secili"></button><button type="button" data-s="arena"></button>';
+  ic.insertBefore(sek, ob);
+  ic.classList.add('sekmeOrdu');
+  function sekmeYaz(){
+    const so=(typeof aktifOrdu!=='undefined'&&aktifOrdu)?aktifOrdu.ad:'', sa=(typeof aktifArena!=='undefined'&&aktifArena)?aktifArena.ad:'';
+    const [b1,b2]=sek.querySelectorAll('button');
+    b1.innerHTML='<span>'+c('ORDUN')+'</span><b>'+c(so)+'</b>'; b2.innerHTML='<span>'+c('ARENA')+'</span><b>'+c(sa)+'</b>';
+  }
+  sek.onclick=e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    sek.querySelectorAll('button').forEach(x=>x.classList.toggle('secili', x===b));
+    ic.classList.toggle('sekmeOrdu', b.dataset.s==='ordu'); ic.classList.toggle('sekmeArena', b.dataset.s==='arena');
+  };
+  [ob,ab].forEach(bl=>bl.addEventListener('click',()=>setTimeout(sekmeYaz,50)));
+  sekmeYaz();
+  // --- Kartların altında tek satır: taş sesi paketleri (dokun: seç ve dinle) + yazısız ayar düğmesi ---
+  const PK=['klasik','ahsap','ordu','gercek','savas','destan'], PAD={klasik:'Klasik',ahsap:'Ahşap',ordu:'Ordu',gercek:'Gerçek',savas:'Savaş',destan:'Destan'};
+  const satir=document.createElement('div'); satir.id='cvSesSatir';
+  ic.appendChild(satir);
+  function sesCiz(){
+    const ts=(typeof Ses!=='undefined' && Ses.tasSesAyar) ? Ses.tasSesAyar : {paket:'klasik',ozel:{}};
+    satir.innerHTML='<button type="button" class="cvSesEt" aria-label="'+c('Taş sesleri')+'"><span>♪</span>'+c('Taş sesleri')+'</button>'+
+      '<div class="cvSesCipler">'+PK.map(k=>'<button type="button" data-pk="'+k+'" class="'+(ts.paket===k?'secili':'')+'">'+c(PAD[k])+'</button>').join('')+'</div>'+
+      '<button type="button" class="cvAyarDugme" aria-label="'+c('Ayarlar')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>';
+  }
+  satir.onclick=e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    if(b.classList.contains('cvAyarDugme')){ if(window.oyunAyarlariAc) window.oyunAyarlariAc(); return; }
+    if(b.classList.contains('cvSesEt')){ if(window.oyunAyarlariAc) window.oyunAyarlariAc(); setTimeout(()=>{ if(window.tasSesleriAc) window.tasSesleriAc(); },60); return; }   // taş taş ayar
+    const pk=b.dataset.pk; if(!pk || typeof Ses==='undefined') return;
+    Ses.tasSesPaket(pk); try{ Ses.dinle('n','hamle',pk); }catch(x){}
+    const sx=satir.querySelector('.cvSesCipler').scrollLeft; sesCiz(); satir.querySelector('.cvSesCipler').scrollLeft=sx;
+  };
+  sesCiz();
+  window.cvSekmeYaz=()=>{ sekmeYaz(); sesCiz(); };
+})();
+</script>
+<script>
+/* Ana sayfa tek ekran (Kasım 2026, sahibin isteği). index.html'e gömülür; telefonda canlı denemek için de kullanılır. */
+(function(){
+  if(window._menuTekSayfa) return; window._menuTekSayfa=1;
+  const c=t=>(typeof metniCevir==='function')?metniCevir(t):t;
+  const menu=document.getElementById('menu'), cubuk=document.getElementById('profilCubuk'), kartlar=menu&&menu.querySelector('.kartlar');
+  if(!menu || !cubuk || !kartlar) return;
+  kartlar.parentNode.insertBefore(cubuk, kartlar);      // kullanıcı kartı başlığın altında, kartların üstünde
+  /* Giriş yapılmışsa: fotoğraf + ad + puan, dokununca Profilim. Çıkış Profilim ekranının başlığında. */
+  const eski=window.girisDurumGuncelle;
+  function kartYaz(){
+    if(!(typeof fbKullanici!=='undefined' && fbKullanici && !misafirMod)) return;
+    const ad=(bulutIst && bulutIst.kullaniciAdi) || (fbKullanici.email ? fbKullanici.email.split('@')[0] : 'Oyuncu');
+    const av=(typeof avatarMiniHtml==='function') ? avatarMiniHtml(40) : ((bulutIst&&bulutIst.avatar)||'♞');
+    cubuk.innerHTML='<span class="pkAv">'+av+'</span><span class="pkMetin"><span class="pkAd" data-cevirme>'+lobiKac(ad)+'</span>'+
+      '<span class="pkAlt"><span>'+c((bulutIst.puan||800)+' puan')+'</span> · <span>'+c('Profilim')+'</span></span></span><span class="pkOk">›</span>';
+    cubuk.onclick=()=>{ if(typeof istEkraniAc==='function') istEkraniAc(); };
+  }
+  if(typeof eski==='function'){
+    window.girisDurumGuncelle=function(){ const r=eski.apply(this,arguments); try{ kartYaz(); }catch(e){} return r; };
+    try{ girisDurumGuncelle=window.girisDurumGuncelle; }catch(e){}
+  }
+  try{ kartYaz(); }catch(e){}
+  /* Profilim başlığına Çıkış */
+  const ib=document.getElementById('istBaslik');
+  if(ib && !document.getElementById('istCikis')){
+    const b=document.createElement('button'); b.type='button'; b.id='istCikis'; b.textContent=c('Çıkış');
+    b.onclick=()=>{ if(typeof cikisYap==='function') cikisYap(); };
+    ib.appendChild(b);
+  }
+})();
+
+/* Tarayıcıya QR ile giriş: Profilim başlığındaki düğme kamerayı açar, okutulan kod onaylanınca tarayıcıda oturum açılır */
+(function(){
+  const c=t=>(typeof metniCevir==='function')?metniCevir(t):t;
+  const and=(typeof AndroidBildirim!=='undefined' && AndroidBildirim.qrTara), ios=!!(window.IOS_UYGULAMA && window.webkit && webkit.messageHandlers && webkit.messageHandlers.ios);
+  const ib=document.getElementById('istBaslik'), cik=document.getElementById('istCikis');
+  if(!(and||ios) || !ib || document.getElementById('istQr')) return;
+  const b=document.createElement('button'); b.type='button'; b.id='istQr';
+  b.innerHTML='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M21 21h-4v-4M14 21v-.01"/></svg><span>'+c('Tarayıcı')+'</span>';
+  b.onclick=()=>{
+    if(!fbKullanici || misafirMod){ anlatimGoster(c('Önce hesabınla giriş yap.'),3000); return; }
+    /* Oyuncu adresi buradan öğrenir: önce nereye gireceği söylenir, sonra kamera açılır */
+    const p=document.createElement('div'); p.id='retPop';
+    p.style.cssText='position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(4,5,9,.72)';
+    p.innerHTML='<div style="width:min(340px,92vw);background:linear-gradient(180deg,#171a24,#0d0f15);border:1px solid rgba(232,182,76,.35);border-radius:20px;padding:22px 18px 16px;text-align:center"><div style="font:700 17px Cinzel,serif;color:#E8B64C;margin-bottom:10px"></div><div style="color:#cfc8b8;font-size:14px;line-height:1.5"></div><div data-cevirme style="font:800 19px Manrope,sans-serif;color:#F2C765;margin:10px 0 16px">chess64.pages.dev</div><div style="display:flex;gap:8px"><button type="button" style="flex:1;padding:11px;border-radius:12px;border:none;background:#E8B64C;color:#1a1408;font-weight:700"></button><button type="button" style="flex:1;padding:11px;border-radius:12px;border:1px solid rgba(232,182,76,.4);background:transparent;color:#E8B64C;font-weight:700"></button></div></div>';
+    const d=p.firstChild, btn=d.querySelectorAll('button');
+    d.children[0].textContent=c('Bilgisayarda oyna');
+    d.children[1].textContent=c('Bilgisayarında bu adresi aç, ekranda çıkan kodu okut.');
+    btn[0].textContent=c('Kodu okut'); btn[1].textContent=c('Vazgeç');
+    btn[1].onclick=()=>p.remove();
+    btn[0].onclick=()=>{ p.remove(); if(and) AndroidBildirim.qrTara(); else webkit.messageHandlers.ios.postMessage({ad:'qrTara',deger:''}); };
+    document.body.appendChild(p);
+  };
+  ib.insertBefore(b, cik||null);
+  async function onayla(id){
+    try{
+      const t=await fbKullanici.getIdToken();
+      const r=await fetch('https://europe-west1-chess64-c6ff1.cloudfunctions.net/qrOnayla',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:JSON.stringify({data:{id}})});
+      const j=await r.json();
+      anlatimGoster(c(j.result&&j.result.tamam?'Tarayıcıda giriş yapıldı.':'Kodun süresi dolmuş, tarayıcıdaki yeni kodu okut.'),3500);
+    }catch(e){ anlatimGoster(c('Bağlantı kurulamadı, yeniden dene.'),3500); }
+  }
+  window.qrTarandi=function(m){
+    const k=/^c64qr:([0-9a-f]{32})$/.exec(String(m||''));
+    if(!k){ anlatimGoster(c('Bu bir Chess64 giriş kodu değil.'),3500); return; }
+    const p=document.createElement('div'); p.id='retPop';
+    p.style.cssText='position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(4,5,9,.72)';
+    p.innerHTML='<div style="width:min(340px,92vw);background:linear-gradient(180deg,#171a24,#0d0f15);border:1px solid rgba(232,182,76,.35);border-radius:20px;padding:22px 18px 16px;text-align:center"><div style="font:700 17px Cinzel,serif;color:#E8B64C;margin-bottom:10px"></div><div style="color:#cfc8b8;font-size:14px;line-height:1.5;margin-bottom:16px"></div><div style="display:flex;gap:8px"><button type="button" style="flex:1;padding:11px;border-radius:12px;border:none;background:#E8B64C;color:#1a1408;font-weight:700"></button><button type="button" style="flex:1;padding:11px;border-radius:12px;border:1px solid rgba(232,182,76,.4);background:transparent;color:#E8B64C;font-weight:700"></button></div></div>';
+    const d=p.firstChild, btn=d.querySelectorAll('button');
+    d.children[0].textContent=c('Tarayıcıda giriş yapılsın mı?');
+    d.children[1].textContent=c('Hesabın bu kodu gösteren tarayıcıda açılacak. Yalnız kendi ekranındaki kodu onayla.');
+    btn[0].textContent=c('Onayla'); btn[1].textContent=c('Vazgeç');
+    btn[0].onclick=()=>{ p.remove(); onayla(k[1]); }; btn[1].onclick=()=>p.remove();
+    document.body.appendChild(p);
+  };
+})();
+</script>
+<script>
+/* Oyun Kur ekranı tek sayfa (Kasım 2026, sahibin isteği; çevrimiçi ekranla aynı dil): mod/zorluk/renk sıkı satırlar,
+   süre açılır-kapanır tek satır, ordu/arena sekmeli tek kart satırı, altta taş sesi paketleri + yazısız ayar düğmesi. */
+(function(){
+  const ic=document.getElementById('kurulumIcerik'); if(!ic || document.getElementById('kurSureAc')) return;
+  const c=t=>(typeof metniCevir==='function')?metniCevir(t):t;
+  const blok=id=>{ const e=document.getElementById(id); return e && e.closest('.blok'); };
+  const arenaB=blok('arenaListe'), orduB=blok('orduListe'), sureB=blok('sureler');
+  if(!arenaB || !orduB || !sureB) return;
+  arenaB.id='kurArenaBlok'; orduB.id='kurOrduBlok'; sureB.id='kurSureBlok';
+  ic.classList.add('kurTek');
+  // --- Süre: tek satır, basınca açılır ---
+  const ac=document.createElement('button'); ac.type='button'; ac.id='kurSureAc';
+  sureB.classList.add('kapali');
+  sureB.insertBefore(ac, document.getElementById('sureler'));
+  function sureYaz(){
+    const s=sureB.querySelector('#sureler .mod.secili');
+    let ad=s ? s.textContent.trim() : '';
+    const tur={60:'Bullet',180:'Blitz',300:'Blitz',600:'Rapid',900:'Rapid'}[s && s.dataset.sure];
+    if(tur) ad+=' · '+tur;
+    ac.innerHTML='<span class="csEt">'+c('SÜRE')+'</span><b>'+c(ad)+'</b><i>'+(sureB.classList.contains('kapali')?'▾':'▴')+'</i>';
+  }
+  ac.onclick=()=>{ sureB.classList.toggle('kapali'); sureYaz(); };
+  sureB.querySelectorAll('#sureler .mod').forEach(b=>b.addEventListener('click',()=>setTimeout(()=>{ sureB.classList.add('kapali'); sureYaz(); },0)));
+  sureYaz();
+  // Süre ordu/arenanın üstüne (çevrimiçi ekrandaki sıra)
+  ic.insertBefore(sureB, orduB.compareDocumentPosition(arenaB)&Node.DOCUMENT_POSITION_FOLLOWING ? orduB : arenaB);
+  // --- Ordu / Arena sekmeleri ---
+  const sek=document.createElement('div'); sek.id='kurSecimSekme';
+  sek.innerHTML='<button type="button" data-s="ordu" class="secili"></button><button type="button" data-s="arena"></button>';
+  ic.insertBefore(sek, sureB.nextSibling);
+  ic.insertBefore(orduB, sek.nextSibling); ic.insertBefore(arenaB, orduB.nextSibling);
+  ic.classList.add('sekmeOrdu');
+  function sekmeYaz(){
+    const so=(typeof aktifOrdu!=='undefined'&&aktifOrdu)?aktifOrdu.ad:'', sa=(typeof aktifArena!=='undefined'&&aktifArena)?aktifArena.ad:'';
+    const [b1,b2]=sek.querySelectorAll('button');
+    b1.innerHTML='<span>'+c('ORDUN')+'</span><b>'+c(so)+'</b>'; b2.innerHTML='<span>'+c('ARENA')+'</span><b>'+c(sa)+'</b>';
+  }
+  sek.onclick=e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    sek.querySelectorAll('button').forEach(x=>x.classList.toggle('secili', x===b));
+    ic.classList.toggle('sekmeOrdu', b.dataset.s==='ordu'); ic.classList.toggle('sekmeArena', b.dataset.s==='arena');
+  };
+  [orduB,arenaB].forEach(bl=>bl.addEventListener('click',()=>setTimeout(sekmeYaz,50)));
+  sekmeYaz();
+  // --- Taş sesleri + ayar düğmesi (çevrimiçi ekrandakiyle aynı) ---
+  const PK=['klasik','ahsap','ordu','gercek','savas','destan'], PAD={klasik:'Klasik',ahsap:'Ahşap',ordu:'Ordu',gercek:'Gerçek',savas:'Savaş',destan:'Destan'};
+  const satir=document.createElement('div'); satir.id='kurSesSatir'; satir.className='sesSatir';
+  ic.insertBefore(satir, arenaB.nextSibling);
+  function sesCiz(){
+    const ts=(typeof Ses!=='undefined' && Ses.tasSesAyar) ? Ses.tasSesAyar : {paket:'klasik',ozel:{}};
+    satir.innerHTML='<button type="button" class="cvSesEt" aria-label="'+c('Taş sesleri')+'"><span>♪</span>'+c('Taş sesleri')+'</button>'+
+      '<div class="cvSesCipler">'+PK.map(k=>'<button type="button" data-pk="'+k+'" class="'+(ts.paket===k?'secili':'')+'">'+c(PAD[k])+'</button>').join('')+'</div>'+
+      '<button type="button" class="cvAyarDugme" aria-label="'+c('Ayarlar')+'">'+((document.querySelector('#cvSesSatir .cvAyarDugme')||{}).innerHTML||'⚙')+'</button>';
+  }
+  satir.onclick=e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    if(b.classList.contains('cvAyarDugme')){ if(window.oyunAyarlariAc) window.oyunAyarlariAc(); return; }
+    if(b.classList.contains('cvSesEt')){ if(window.oyunAyarlariAc) window.oyunAyarlariAc(); setTimeout(()=>{ if(window.tasSesleriAc) window.tasSesleriAc(); },60); return; }
+    const pk=b.dataset.pk; if(!pk || typeof Ses==='undefined') return;
+    Ses.tasSesPaket(pk); try{ Ses.dinle('n','hamle',pk); }catch(x){}
+    const sx=satir.querySelector('.cvSesCipler').scrollLeft; sesCiz(); satir.querySelector('.cvSesCipler').scrollLeft=sx;
+  };
+  sesCiz();
+  window.kurTekYaz=()=>{ sureYaz(); sekmeYaz(); sesCiz(); };
 })();
 </script>
 </body>

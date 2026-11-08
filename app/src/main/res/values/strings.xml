@@ -6,4 +6,8 @@
     <string name="davet_kanal_ad">Game requests</string>
     <string name="davet_kanal_aciklama">Notifies you when a player invites you to a game</string>
     <string name="satin_alma_yakinda">Purchases are coming soon</string>
+    <string name="hatirlatma_kanal_ad">Daily reminder</string>
+    <string name="hatirlatma_kanal_aciklama">A once-a-day reminder to play</string>
+    <string name="cevrimici_kanal_ad">Players online</string>
+    <string name="cevrimici_kanal_aciklama">Tells you when a player comes online</string>
 </resources>

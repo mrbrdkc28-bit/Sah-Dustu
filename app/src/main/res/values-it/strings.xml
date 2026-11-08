@@ -5,4 +5,8 @@
     <string name="davet_kanal_ad">Richieste di partita</string>
     <string name="davet_kanal_aciklama">Ti avvisa quando un giocatore ti invita a giocare</string>
     <string name="satin_alma_yakinda">Gli acquisti arriveranno presto</string>
+    <string name="hatirlatma_kanal_ad">Promemoria giornaliero</string>
+    <string name="hatirlatma_kanal_aciklama">Un promemoria di gioco al giorno</string>
+    <string name="cevrimici_kanal_ad">Giocatori online</string>
+    <string name="cevrimici_kanal_aciklama">Avvisa quando un giocatore è online</string>
 </resources>

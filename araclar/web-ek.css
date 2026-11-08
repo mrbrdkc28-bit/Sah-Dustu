@@ -1,0 +1,15 @@
+/* Chess64 tarayıcı sürümüne özel küçük ayarlar (araclar/web-hazirla.py ekler). */
+/* Fareyle oynanırken dokunmatik vurgusu ve metin seçimi rahatsız etmesin */
+html,body{-webkit-tap-highlight-color:transparent}
+canvas{cursor:pointer}
+/* Çok geniş ekranda menü ve açılır ekranlar telefondaki gibi okunaklı genişlikte kalsın */
+@media (min-width:900px){
+  #istEkran>*,#ogrenEkran>*,#kutupEkran>*,#arkadasEkran>*,#liderEkran>*{max-width:720px;margin-left:auto;margin-right:auto}
+}
+/* Telefonla (QR) giriş */
+#webQr{display:flex;align-items:center;gap:12px;margin-top:14px;padding:10px;border-radius:12px;border:1px solid rgba(232,182,76,.35);text-align:left}
+#webQrKod{flex:0 0 108px;height:108px;background:#fff;border-radius:6px;overflow:hidden;font-size:11px;color:#333;display:flex;align-items:center;justify-content:center;text-align:center}
+#webQrKod svg{width:100%;height:100%;display:block}
+#webQr .wqMetin{display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:var(--dim)}
+#webQr .wqMetin b{font:700 14px Manrope,sans-serif;color:var(--bone)}
+html[data-tema="fildisi"] #webQr .wqMetin b{color:#1f1b14}

@@ -1,0 +1,45 @@
+/* Çevrimiçi ekranı tek sayfa (Kasım 2026) */
+#cevrimiciUst{padding-top:10px!important;padding-bottom:4px!important}
+#cevrimiciIcerik{padding-top:6px!important;padding-bottom:8px!important;gap:10px!important}
+#cevrimiciHata:empty{display:none}
+#cvLobiBlok{margin-bottom:0!important}
+#cvLobiBlok .blok-ipucu{display:none}
+.cvLobiBas{margin-bottom:4px!important}
+.lobiKart{flex-basis:96px!important;padding:7px 6px 7px!important;gap:1px!important}
+.lobiKart .lobiAv{margin-bottom:1px!important;transform:scale(.86)}
+.lobiKart .lobiBtn{margin-top:3px!important;padding:5px 4px!important}
+#cvSureBlok{margin-bottom:0!important}
+#cvSureBlok>.cvSureBaslik{display:none}
+#cvSureBlok.kapali #cvSureler,#cvSureBlok.kapali #cvAnimNot,#cvSureBlok.kapali #cvAyarSatir{display:none}
+#cvSureBlok:not(.kapali) #cvSureler{margin-top:8px}
+#cvSureAc{display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;border-radius:14px;cursor:pointer;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.2));color:var(--bone);font:600 14px Manrope,sans-serif}
+#cvSureAc .csEt{font-size:11px;letter-spacing:.28em;color:var(--dim)}
+#cvSureAc b{flex:1;text-align:left;font-family:'Cinzel',serif;font-size:15px;color:var(--brass,#E8B64C)}
+#cvSureAc i{font-style:normal;color:var(--dim)}
+html[data-tema="fildisi"] #cvSureAc,html[data-tema="fildisi"] #cvSecimSekme button{background:#fffdf8;border-color:rgba(120,95,50,.16)}
+#cvSecimSekme{display:flex;gap:8px;width:100%}
+#cvSecimSekme button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:8px 12px;border-radius:12px;cursor:pointer;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.2));color:var(--dim);text-align:left}
+#cvSecimSekme button span{font:600 10px Manrope,sans-serif;letter-spacing:.24em}
+#cvSecimSekme button b{font:700 13px 'Cinzel',serif;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#cvSecimSekme button.secili{border-color:var(--brass,#E8B64C);box-shadow:0 0 0 1px var(--brass,#E8B64C) inset}
+#cvSecimSekme button.secili b{color:var(--brass,#E8B64C)}
+#cevrimiciIcerik.sekmeOrdu #cvArenaBlok,#cevrimiciIcerik.sekmeArena #cvOrduBlok{display:none}
+#cvOrduBlok,#cvArenaBlok{margin-top:0!important}
+#cvOrduBlok>.cvSureBaslik,#cvArenaBlok>.cvSureBaslik{display:none}
+#cvEylem{padding-top:6px!important}
+#cvEylem .cvBtn.cvAna{padding-top:9px!important;padding-bottom:9px!important}
+#cvSesSatir{display:flex;align-items:center;gap:8px;width:100%;margin-top:2px}
+#cvSesSatir .cvSesEt{flex:none;display:flex;align-items:center;gap:5px;padding:0 2px;background:none;border:none;cursor:pointer;
+  font:600 10.5px Manrope,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+#cvSesSatir .cvSesEt span{font:400 16px sans-serif;letter-spacing:0;color:var(--brass,#E8B64C)}
+#cvSesSatir .cvSesCipler{flex:1;min-width:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+#cvSesSatir .cvSesCipler::-webkit-scrollbar{display:none}
+#cvSesSatir .cvSesCipler button{flex:none;padding:7px 12px;border-radius:999px;cursor:pointer;background:var(--panel,rgba(255,255,255,.04));
+  border:1px solid var(--line,rgba(232,182,76,.22));color:var(--bone);font:600 12.5px Manrope,sans-serif}
+#cvSesSatir .cvSesCipler button.secili{border-color:var(--brass,#E8B64C);background:rgba(232,182,76,.14);color:var(--brass,#E8B64C)}
+html[data-tema="fildisi"] #cvSesSatir .cvSesCipler button:not(.secili),html[data-tema="fildisi"] #cvSesSatir .cvAyarDugme{background:#fffdf8;border-color:rgba(120,95,50,.16)}
+#cvSesSatir .cvAyarDugme{flex:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.25));color:var(--brass,#E8B64C)}
+#cvSesSatir .cvAyarDugme svg{width:19px;height:19px}

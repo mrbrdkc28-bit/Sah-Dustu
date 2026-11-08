@@ -5,4 +5,8 @@
     <string name="davet_kanal_ad">طلبات اللعب</string>
     <string name="davet_kanal_aciklama">إشعار عندما يدعوك لاعب إلى مباراة</string>
     <string name="satin_alma_yakinda">عمليات الشراء قادمة قريبًا</string>
+    <string name="hatirlatma_kanal_ad">تذكير يومي</string>
+    <string name="hatirlatma_kanal_aciklama">تذكير باللعب مرة في اليوم</string>
+    <string name="cevrimici_kanal_ad">لاعبون متصلون</string>
+    <string name="cevrimici_kanal_aciklama">يُعلمك عند اتصال لاعب</string>
 </resources>

@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- Sesli oynama: mikrofon. Yalnizca kullanici sesli hamle ozelligini
          acinca calisma aninda istenir; ozellik kapaliyken mikrofon hic acilmaz. -->
@@ -35,10 +36,18 @@
         <!-- Uzak oyun istegi bildirimi (FCM): uygulama kapaliyken sistem bu kanal/simgeyle gosterir -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="davet" />
+            android:value="davet_ses" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_bildirim" />
+        <!-- Gunluk hatirlatma (13:00); telefon yeniden baslayinca / guncellenince yeniden kurulur -->
+        <receiver android:name=".HatirlatmaAlici" android:exported="false" />
+        <receiver android:name=".AcilisAlici" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
         <service
             android:name=".BildirimServisi"
             android:exported="false">

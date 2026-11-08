@@ -5,4 +5,8 @@
     <string name="davet_kanal_ad">Demandes de partie</string>
     <string name="davet_kanal_aciklama">Vous prévient quand un joueur vous invite à jouer</string>
     <string name="satin_alma_yakinda">Les achats arrivent bientôt</string>
+    <string name="hatirlatma_kanal_ad">Rappel quotidien</string>
+    <string name="hatirlatma_kanal_aciklama">Un rappel de jeu par jour</string>
+    <string name="cevrimici_kanal_ad">Joueurs en ligne</string>
+    <string name="cevrimici_kanal_aciklama">Vous prévient quand un joueur se connecte</string>
 </resources>

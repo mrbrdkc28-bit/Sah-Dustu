@@ -27,8 +27,8 @@ android {
         applicationId = "com.emre.sahdustu"
         minSdk = 26
         targetSdk = 36
-        versionCode = 10
-        versionName = "2.1"
+        versionCode = 11
+        versionName = "2.2"
     }
 
     signingConfigs {
@@ -108,4 +108,6 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     // Uzak bildirim: oyun istegi uygulama kapaliyken de gelsin (Ekim 2026)
     implementation("com.google.firebase:firebase-messaging")
+    // Tarayiciya QR ile giris: kamera izni istemeyen Google tarayicisi
+    implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
 }

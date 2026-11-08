@@ -1,0 +1,39 @@
+/* Oyun Kur ekranı tek sayfa (Kasım 2026) */
+#kurulumUst{padding-top:10px!important;padding-bottom:4px!important}
+#kurulumIcerik.kurTek{gap:10px!important;padding-top:6px!important;padding-bottom:8px!important}
+#kurulumIcerik.kurTek>.blok:not(#kurArenaBlok):not(#kurOrduBlok):not(#kurSureBlok)>.blok-baslik{display:none}
+#kurulumIcerik.kurTek .modlar:not(#sureler) .mod{padding:10px 6px!important;font-size:14px}
+#kurulumIcerik.kurTek #kurArenaBlok>.blok-baslik,#kurulumIcerik.kurTek #kurOrduBlok>.blok-baslik,#kurulumIcerik.kurTek #kurSureBlok>.blok-baslik{display:none}
+#kurulumIcerik.sekmeOrdu #kurArenaBlok,#kurulumIcerik.sekmeArena #kurOrduBlok{display:none!important}
+#kurulumIcerik.kurTek #kurAyarSatir{display:none}
+#kurSureBlok.kapali #sureler{display:none!important}
+#kurSureBlok:not(.kapali) #sureler{margin-top:2px}
+#kurSureAc{display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;border-radius:14px;cursor:pointer;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.2));color:var(--bone);font:600 14px Manrope,sans-serif}
+#kurSureAc .csEt{font-size:11px;letter-spacing:.28em;color:var(--dim)}
+#kurSureAc b{flex:1;text-align:left;font-family:'Cinzel',serif;font-size:15px;color:var(--brass,#E8B64C)}
+#kurSureAc i{font-style:normal;color:var(--dim)}
+#kurSecimSekme{display:flex;gap:8px;width:100%;max-width:560px}
+#kurSecimSekme button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:8px 12px;border-radius:12px;cursor:pointer;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.2));color:var(--dim);text-align:left}
+#kurSecimSekme button span{font:600 10px Manrope,sans-serif;letter-spacing:.24em}
+#kurSecimSekme button b{font:700 13px 'Cinzel',serif;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#kurSecimSekme button.secili{border-color:var(--brass,#E8B64C);box-shadow:0 0 0 1px var(--brass,#E8B64C) inset}
+#kurSecimSekme button.secili b{color:var(--brass,#E8B64C)}
+html[data-tema="fildisi"] #kurSureAc,html[data-tema="fildisi"] #kurSecimSekme button{background:#fffdf8;border-color:rgba(120,95,50,.16)}
+/* taş sesi satırı: çevrimiçi ekrandakiyle aynı görünüm */
+#kurSesSatir{display:flex;align-items:center;gap:8px;width:100%;max-width:560px}
+#kurSesSatir .cvSesEt{flex:none;display:flex;align-items:center;gap:5px;padding:0 2px;background:none;border:none;cursor:pointer;
+  font:600 10.5px Manrope,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+#kurSesSatir .cvSesEt span{font:400 16px sans-serif;letter-spacing:0;color:var(--brass,#E8B64C)}
+#kurSesSatir .cvSesCipler{flex:1;min-width:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+#kurSesSatir .cvSesCipler::-webkit-scrollbar{display:none}
+#kurSesSatir .cvSesCipler button{flex:none;padding:7px 12px;border-radius:999px;cursor:pointer;background:var(--panel,rgba(255,255,255,.04));
+  border:1px solid var(--line,rgba(232,182,76,.22));color:var(--bone);font:600 12.5px Manrope,sans-serif}
+#kurSesSatir .cvSesCipler button.secili{border-color:var(--brass,#E8B64C);background:rgba(232,182,76,.14);color:var(--brass,#E8B64C)}
+html[data-tema="fildisi"] #kurSesSatir .cvSesCipler button:not(.secili),html[data-tema="fildisi"] #kurSesSatir .cvAyarDugme{background:#fffdf8;border-color:rgba(120,95,50,.16)}
+#kurSesSatir .cvAyarDugme{flex:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.25));color:var(--brass,#E8B64C)}
+#kurSesSatir .cvAyarDugme svg{width:19px;height:19px}
+#kurulumIcerik.kurTek #digerAyarlar{margin-top:0}
+#basla{margin-top:8px!important}

@@ -3,7 +3,8 @@
    (uygulama kapalıyken de). Android: Firebase Cloud Messaging. iOS: doğrudan Apple (APNs, .p8 anahtarı).
    Bildirim adresleri oyuncular/{uid}/ozel/bildirim belgesinde: {android:[...], ios:[...], dil:'tr'}.
    Aynı gönderen → aynı alıcı en çok 10 dakikada bir bildirim (sunucuda da sınırlı; istemci sınırı atlatılsa bile). */
-const { onDocumentCreated } = require('firebase-functions/v2/firestore');
+const { onDocumentCreated, onDocumentWritten } = require('firebase-functions/v2/firestore');
+const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { defineSecret } = require('firebase-functions/params');
 const logger = require('firebase-functions/logger');
 const admin = require('firebase-admin');
@@ -95,7 +96,7 @@ exports.oyunIstegiBildir = onDocumentCreated(
         tokens: android,
         notification: { title: baslik, body: govde },
         data: { tur: 'davet', davet: olay.params.davetId },
-        android: { priority: 'high', ttl: SINIR_MS, notification: { channelId: 'davet', tag: 'davet_' + d.gonderen } },
+        android: { priority: 'high', ttl: SINIR_MS, notification: { channelId: 'davet_ses', tag: 'davet_' + d.gonderen } },
       });
       logger.info('FCM sonuç', { basarili: sonuc.successCount, hatali: sonuc.failureCount,
         hatalar: sonuc.responses.filter(x => x.error).map(x => x.error.code) });
@@ -114,7 +115,7 @@ exports.oyunIstegiBildir = onDocumentCreated(
         const istemci = http2.connect('https://api.push.apple.com');
         try {
           const jwt = apnsJetonu(anahtar, anahtarId);
-          const yuk = { aps: { alert: { title: baslik, body: govde }, sound: 'default', 'thread-id': 'davet' }, tur: 'davet', davet: olay.params.davetId };
+          const yuk = { aps: { alert: { title: baslik, body: govde }, sound: 'ses_davet.wav', 'thread-id': 'davet' }, tur: 'davet', davet: olay.params.davetId };
           for (const cihaz of ios) {
             const r = await apnsGonder(istemci, jwt, cihaz, yuk);
             if (r.durum === 410 || (r.durum === 400 && /BadDeviceToken/.test(r.cevap))) silinecek.ios.push(cihaz);
@@ -132,3 +133,139 @@ exports.oyunIstegiBildir = onDocumentCreated(
       await kayit.ref.update(g).catch(() => {});
     }
   });
+
+/* ---- "X şu an çevrimiçi" (Kasım 2026, sahibin isteği) ----
+   Bir oyuncu en az 30 dakika sonra yeniden çevrimiçi olunca, lobideki çevrimdışı oyunculara haber verilir.
+   Sınırlar: aynı oyuncu en çok 3 saatte bir duyurulur; bir alıcıya günde en çok 1 bildirim; gece (23:00-09:00 TSİ) gönderilmez.
+   Lobide gizli olan duyurulmaz. Alıcı Ayarlar'dan kapatabilir (oyuncular/{uid}/ozel/bildirim.cvKapali). */
+const CV_METIN = {
+  tr: { b: (ad) => `${ad} şu an çevrimiçi`, g: 'Hemen oyun isteği gönder!' },
+  en: { b: (ad) => `${ad} is online now`, g: 'Send a game request!' },
+  ru: { b: (ad) => `${ad} сейчас в сети`, g: 'Пригласите на партию!' },
+  ar: { b: (ad) => `${ad} متصل الآن`, g: 'أرسل طلب لعب الآن!' },
+  fr: { b: (ad) => `${ad} est en ligne`, g: 'Proposez-lui une partie !' },
+  de: { b: (ad) => `${ad} ist jetzt online`, g: 'Sende eine Spielanfrage!' },
+  it: { b: (ad) => `${ad} è online ora`, g: 'Invia una richiesta di partita!' },
+  zh: { b: (ad) => `${ad} 现在在线`, g: '马上发起对局邀请！' },
+};
+const YOKLUK_MS = 30 * 60 * 1000, DUYURU_MS = 3 * 3600 * 1000, ALICI_MS = 20 * 3600 * 1000, CEVRIMICI_MS = 5 * 60 * 1000;
+const msAl = (s) => { const t = s && s.exists ? s.get('ts') : null; return t && t.toMillis ? t.toMillis() : 0; };
+
+exports.cevrimiciBildir = onDocumentWritten(
+  { document: 'cevrimici/{uid}', region: 'europe-west1', secrets: [APNS_ANAHTAR] },
+  async (olay) => {
+    const once = msAl(olay.data.before), simdi = msAl(olay.data.after);
+    if (!simdi || simdi - once < YOKLUK_MS) return;          // 2 dakikalık kalp atışı: yeni gelmiş değil
+    const saat = new Date(Date.now() + 3 * 3600 * 1000).getUTCHours();
+    if (saat >= 23 || saat < 9) return;
+    const uid = olay.params.uid;
+    const prof = await db.doc(`oyuncular/${uid}`).get();
+    if (!prof.exists || prof.get('lobiGizli')) return;
+    const ad = String(prof.get('kullaniciAdi') || '').slice(0, 30);
+    if (!ad) return;
+
+    const sinirRef = db.collection('bildirimSinir').doc('cvG_' + uid);
+    const gec = await db.runTransaction(async tx => {
+      const s = await tx.get(sinirRef);
+      if (s.exists && Date.now() - (s.get('ts') || 0) < DUYURU_MS) return false;
+      tx.set(sinirRef, { ts: Date.now() });
+      return true;
+    });
+    if (!gec) return;
+
+    // Alıcılar: lobideki son 60 oyuncudan şu an çevrimdışı olanlar
+    const lobi = await db.collection('cevrimici').orderBy('ts', 'desc').limit(60).get();
+    const adaylar = lobi.docs.filter(d => d.id !== uid && Date.now() - msAl(d) > CEVRIMICI_MS).map(d => d.id);
+    if (!adaylar.length) return;
+    const [kayitlar, sinirlar] = await Promise.all([
+      db.getAll(...adaylar.map(a => db.doc(`oyuncular/${a}/ozel/bildirim`))),
+      db.getAll(...adaylar.map(a => db.collection('bildirimSinir').doc('cvA_' + a))),
+    ]);
+    const hedefler = [];
+    adaylar.forEach((a, i) => {
+      const k = kayitlar[i].exists ? kayitlar[i].data() : null;
+      if (!k || k.cvKapali || (!(k.android || []).length && !(k.ios || []).length)) return;
+      if (sinirlar[i].exists && Date.now() - (sinirlar[i].get('ts') || 0) < ALICI_MS) return;
+      hedefler.push({ uid: a, k, ref: kayitlar[i].ref });
+    });
+    if (!hedefler.length) return;
+    const yaz = db.batch();
+    hedefler.forEach(h => yaz.set(db.collection('bildirimSinir').doc('cvA_' + h.uid), { ts: Date.now() }));
+    await yaz.commit();
+    logger.info('çevrimiçi duyurusu', { uid, alici: hedefler.length });
+
+    let istemci = null, jwt = null;
+    try {
+      for (const h of hedefler) {
+        const m = CV_METIN[h.k.dil] || CV_METIN.en;
+        const baslik = m.b(ad), govde = m.g;
+        const silinecek = { android: [], ios: [] };
+        const android = (h.k.android || []).filter(Boolean);
+        if (android.length) {
+          const sonuc = await admin.messaging().sendEachForMulticast({
+            tokens: android, notification: { title: baslik, body: govde }, data: { tur: 'cevrimici', uid },
+            android: { priority: 'normal', ttl: YOKLUK_MS, notification: { channelId: 'cevrimici', tag: 'cevrimici' } },
+          });
+          sonuc.responses.forEach((r, i) => {
+            const kod = r.error && r.error.code;
+            if (kod === 'messaging/registration-token-not-registered' || kod === 'messaging/invalid-registration-token') silinecek.android.push(android[i]);
+          });
+        }
+        const ios = (h.k.ios || []).filter(Boolean);
+        if (ios.length && APNS_ANAHTAR.value()) {
+          if (!istemci) { istemci = http2.connect('https://api.push.apple.com'); jwt = apnsJetonu(APNS_ANAHTAR.value(), APNS_ANAHTAR_ID); }
+          const yuk = { aps: { alert: { title: baslik, body: govde }, sound: 'ses_genel.wav', 'thread-id': 'cevrimici' }, tur: 'cevrimici', uid };
+          for (const cihaz of ios) {
+            const r = await apnsGonder(istemci, jwt, cihaz, yuk);
+            if (r.durum === 410 || (r.durum === 400 && /BadDeviceToken/.test(r.cevap))) silinecek.ios.push(cihaz);
+            else if (r.durum !== 200) logger.warn('APNs', r.durum, r.cevap);
+          }
+        }
+        if (silinecek.android.length || silinecek.ios.length) {
+          const g = {};
+          if (silinecek.android.length) g.android = admin.firestore.FieldValue.arrayRemove(...silinecek.android);
+          if (silinecek.ios.length) g.ios = admin.firestore.FieldValue.arrayRemove(...silinecek.ios);
+          await h.ref.update(g).catch(() => {});
+        }
+      }
+    } finally { if (istemci) istemci.close(); }
+  });
+
+/* ---- Tarayıcıya QR ile giriş (Kasım 2026) ----
+   qrBaslat: tarayıcı tek kullanımlık kod alır. qrOnayla: giriş yapmış telefon kodu onaylar.
+   qrAl: tarayıcı, yalnız kendisinin bildiği "gizli" ile oturum anahtarını alır; kod bir kez kullanılır, 2 dakika geçerlidir.
+   qrGiris koleksiyonuna istemciden erişim yoktur (kurallarda izin yok); yalnız sunucu okur/yazar. */
+const QR_OMUR = 2 * 60 * 1000;
+const qrKimlikGecerli = (id) => typeof id === 'string' && /^[0-9a-f]{32}$/.test(id);
+
+exports.qrBaslat = onCall({ region: 'europe-west1', maxInstances: 5 }, async () => {
+  const id = crypto.randomBytes(16).toString('hex'), gizli = crypto.randomBytes(24).toString('hex');
+  await db.collection('qrGiris').doc(id).set({ gizli, ts: Date.now(), durum: 'bekliyor' });
+  const eski = await db.collection('qrGiris').where('ts', '<', Date.now() - 10 * 60 * 1000).limit(20).get();
+  if (!eski.empty) { const b = db.batch(); eski.forEach(d => b.delete(d.ref)); await b.commit(); }
+  return { id, gizli, omur: QR_OMUR };
+});
+
+exports.qrOnayla = onCall({ region: 'europe-west1', maxInstances: 5 }, async (istek) => {
+  if (!istek.auth) throw new HttpsError('unauthenticated', 'giris gerekli');
+  const id = istek.data && istek.data.id;
+  if (!qrKimlikGecerli(id)) throw new HttpsError('invalid-argument', 'gecersiz kod');
+  const ref = db.collection('qrGiris').doc(id);
+  await db.runTransaction(async tx => {
+    const d = await tx.get(ref);
+    if (!d.exists || d.get('durum') !== 'bekliyor' || Date.now() - d.get('ts') > QR_OMUR) throw new HttpsError('failed-precondition', 'kodun suresi doldu');
+    tx.update(ref, { durum: 'onay', uid: istek.auth.uid });
+  });
+  return { tamam: true };
+});
+
+exports.qrAl = onCall({ region: 'europe-west1', maxInstances: 10, serviceAccount: 'firebase-adminsdk-fbsvc@chess64-c6ff1.iam.gserviceaccount.com' }, async (istek) => {
+  const id = istek.data && istek.data.id, gizli = istek.data && istek.data.gizli;
+  if (!qrKimlikGecerli(id) || typeof gizli !== 'string') throw new HttpsError('invalid-argument', 'gecersiz');
+  const ref = db.collection('qrGiris').doc(id), d = await ref.get();
+  if (!d.exists || d.get('gizli') !== gizli || Date.now() - d.get('ts') > QR_OMUR) return { durum: 'bitti' };
+  if (d.get('durum') !== 'onay') return { durum: 'bekliyor' };
+  const token = await admin.auth().createCustomToken(d.get('uid'));
+  await ref.delete();
+  return { durum: 'tamam', token };
+});

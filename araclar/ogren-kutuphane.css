@@ -1,0 +1,68 @@
+/* Öğren ve Kütüphane iç sayfaları (Kasım 2026, sahibin isteği) */
+.tk{background-repeat:no-repeat;background-position:center;background-size:contain}
+#ogrenEkran,#kutupEkran{padding-left:max(16px,calc(50% - 300px));padding-right:max(16px,calc(50% - 300px))}
+/* Devam et kartı */
+.ogHero{display:flex;align-items:center;gap:14px;width:100%;margin:6px 0 4px;padding:15px 16px;border-radius:20px;cursor:pointer;text-align:left;
+  background:linear-gradient(135deg,#232838,#10131c);border:1px solid rgba(232,182,76,.4);box-shadow:0 12px 28px rgba(20,20,30,.28);color:#efe9da}
+.ogHalka{flex:0 0 64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:conic-gradient(#E8B64C calc(var(--p)*1%),rgba(255,255,255,.12) 0)}
+.ogHalka b{width:50px;height:50px;border-radius:50%;background:#151925;display:flex;align-items:center;justify-content:center;font:800 14px Manrope,sans-serif;color:#F2C765}
+.ogHeroM{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ogHeroM small{font:700 10.5px Manrope,sans-serif;letter-spacing:.2em;color:#E8B64C}
+.ogHeroM strong{font:700 17px 'Cinzel',serif;line-height:1.2;color:#f6f0e2}
+.ogHeroM em{font:500 12.5px Manrope,sans-serif;font-style:normal;color:#b9b2a2}
+.ogHero>i{font-style:normal;font-size:24px;color:#E8B64C}
+/* Bölüm kartı ve ders yolu */
+.ogKisim{margin-top:12px;padding:14px 14px 6px;border-radius:20px;background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.18))}
+.ogKBas{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.ogKIkon{flex:0 0 44px;height:44px;border-radius:13px;background-color:rgba(232,182,76,.16);background-size:32px}
+.ogKMetin{flex:1;min-width:0}
+.ogKMetin b{display:block;font:700 16px 'Cinzel',serif;color:var(--bone)}
+.ogKCubuk{display:flex;align-items:center;gap:8px;margin-top:4px}
+.ogKCubuk u{flex:1;height:5px;border-radius:3px;background:rgba(127,127,127,.2);overflow:hidden;text-decoration:none;display:block}
+.ogKCubuk u i{display:block;height:100%;background:linear-gradient(90deg,#C9912A,#F2C765)}
+.ogKCubuk span{font:700 11.5px Manrope,sans-serif;color:var(--dim)}
+.ogYol{position:relative}
+.ogYol::before{content:"";position:absolute;left:14px;top:18px;bottom:24px;width:2px;background:rgba(127,127,127,.22)}
+#ogrenEkran .ogYol .ogDers{position:relative;background:none!important;border:none!important;box-shadow:none!important;padding:9px 2px;margin:0;border-radius:12px;color:var(--bone)}
+#ogrenEkran .ogYol .ogDers b{position:relative;z-index:1;flex:0 0 30px;height:30px;background:var(--panel,#fbf8f1);border:2px solid rgba(127,127,127,.3);color:var(--dim);font:700 12.5px Manrope,sans-serif}
+#ogrenEkran .ogYol .ogDers span{font:600 14.5px Manrope,sans-serif}
+#ogrenEkran .ogYol .ogDers small{font:500 11.5px Manrope,sans-serif;color:var(--dim);white-space:nowrap}
+#ogrenEkran .ogYol .ogDers.tamam b{background:#2f7d4f;border-color:#2f7d4f;color:#fff}
+#ogrenEkran .ogYol .ogDers.sira b{background:#E8B64C;border-color:#E8B64C;color:#1a1408;box-shadow:0 0 0 4px rgba(232,182,76,.22)}
+#ogrenEkran .ogYol .ogDers.sira span{color:var(--brass,#B07E22);font-weight:800}
+/* Kütüphane: sekmeler */
+#kutupEkran .kpSekmeler{padding:4px;gap:4px;border-radius:16px;background:rgba(127,127,127,.12);margin:6px 0 14px}
+#kutupEkran .kpSekme{border:none;border-radius:12px;padding:10px 4px;background:none}
+#kutupEkran .kpSekme.secili{background:linear-gradient(135deg,#232838,#10131c);color:#F2C765;box-shadow:0 5px 14px rgba(20,20,30,.25)}
+/* Kurallar ve varyantlar */
+#kutupEkran .kpMadde{border-radius:16px;margin-bottom:9px;overflow:hidden}
+#kutupEkran .kpMadde summary{display:flex;align-items:center;gap:12px;padding:11px 12px}
+#kutupEkran .kpMadde summary::after{margin-left:auto;font-size:20px;float:none}
+#kutupEkran .kpMadde[open]{border-color:var(--brass,#E8B64C)}
+.kpIk{flex:0 0 40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background-color:rgba(232,182,76,.16);background-size:30px;
+  font:800 15px Manrope,sans-serif;color:var(--brass,#B07E22)}
+#kutupEkran .kpMadde p{padding:0 14px 15px 64px}
+/* Efsane maçlar */
+#kutupEkran .kpMac{padding:12px;border-radius:20px;margin-bottom:12px}
+.kpMacBas{display:flex;gap:13px}
+.kpTahta{flex:0 0 116px;height:116px;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);border-radius:8px;overflow:hidden;border:3px solid #5a3a20;box-sizing:content-box}
+.kpTahta i{display:block;background-size:contain;background-repeat:no-repeat;background-position:center}
+.kpTahta i.a{background-color:#ecd8b4}.kpTahta i.k{background-color:#ab7a4e}
+.kpMacBilgi{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.kpYil{align-self:flex-start;padding:2px 9px;border-radius:999px;background:rgba(232,182,76,.17);font:800 11.5px Manrope,sans-serif;color:var(--brass,#B07E22)}
+.kpMacBilgi>b{font:700 16.5px/1.18 'Cinzel',serif;color:var(--brass,#B07E22)}
+.kpOy{display:flex;align-items:center;gap:6px;font:600 12.5px Manrope,sans-serif;color:var(--bone)}
+.kpOy::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background:#f4efe2;border:1px solid #8c8373}
+.kpOy.s::before{background:#22252e;border-color:#22252e}
+.kpOy span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpAlt{font:500 11.5px Manrope,sans-serif;color:var(--dim)}
+#kutupEkran .kpMac p{padding:11px 2px 12px;margin:0}
+#kutupEkran .kpIzle{display:block;width:100%;margin:0;padding:11px;border:none;border-radius:13px;background:linear-gradient(135deg,#232838,#10131c);color:#F2C765;font:700 13.5px Manrope,sans-serif}
+#kutupEkran #kpGeri{background:none;border:none;color:var(--brass);font-size:30px;line-height:1;padding:2px 10px 6px 4px;cursor:pointer}
+/* Hikâye modu (efsane maçlar): değerlendirme öğeleri gizli */
+body.hikayede #inceleOzet,body.hikayede #inceleGrafik,body.hikayede #inceleKapsam{display:none!important}
+body.hikayede #inceleYorum{height:128px}
+body.hikayede #inceleYorum .iyMetin{font-size:15px;line-height:1.5}
+body.hikayede #inceleYorum .hkBas .iyNot{font:700 18px 'Cinzel',serif}
+@media (min-width:1000px) and (min-height:560px) and (min-aspect-ratio:4/3){body.hikayede #inceleYorum{height:auto}}

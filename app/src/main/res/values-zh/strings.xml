@@ -5,4 +5,8 @@
     <string name="davet_kanal_ad">对局邀请</string>
     <string name="davet_kanal_aciklama">有玩家邀请你下棋时通知你</string>
     <string name="satin_alma_yakinda">购买功能即将推出</string>
+    <string name="hatirlatma_kanal_ad">每日提醒</string>
+    <string name="hatirlatma_kanal_aciklama">每天提醒一次下棋</string>
+    <string name="cevrimici_kanal_ad">在线玩家</string>
+    <string name="cevrimici_kanal_aciklama">有玩家上线时通知你</string>
 </resources>

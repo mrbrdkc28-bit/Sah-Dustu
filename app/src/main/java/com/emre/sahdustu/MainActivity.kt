@@ -965,6 +965,31 @@ class MainActivity : AppCompatActivity() {
             /** tur: "bildirim" (uygulamanin bildirim ayarlari) | "otobaslat" (uretici otomatik baslatma sayfasi) */
             @JavascriptInterface
             fun ayarAc(tur: String) { runOnUiThread { bildirimAyariAc(tur) } }
+            /** Gunluk hatirlatma (Kasim 2026): o gun oynandiysa 13:00 bildirimi gosterilmez. */
+            @JavascriptInterface
+            fun oyunOynandi() { Hatirlatici.oynandi(this@MainActivity) }
+            @JavascriptInterface
+            fun hatirlatmaAyar(acik: Boolean) { Hatirlatici.ayarla(this@MainActivity, acik) }
+            @JavascriptInterface
+            fun hatirlatmaAcik(): Boolean = Hatirlatici.acikMi(this@MainActivity)
+            /** Tarayiciya QR ile giris: Google kod tarayicisi (kamera izni gerekmez); sonuc window.qrTarandi */
+            @JavascriptInterface
+            fun qrTara() {
+                runOnUiThread {
+                    val sec = com.google.mlkit.vision.barcode.common.Barcode.FORMAT_QR_CODE
+                    val ayar = com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions.Builder().setBarcodeFormats(sec).build()
+                    com.google.mlkit.vision.codescanner.GmsBarcodeScanning.getClient(this@MainActivity, ayar).startScan()
+                        .addOnSuccessListener { k ->
+                            val m = (k.rawValue ?: "").replace("\\", "").replace("'", "").replace("\n", "")
+                            webView.evaluateJavascript("if(window.qrTarandi)window.qrTarandi('$m');", null)
+                        }
+                }
+            }
+            /** Yalniz test kopyasinda: hatirlatmayi 13:00'i beklemeden gosterir */
+            @JavascriptInterface
+            fun hatirlatmaDene() {
+                if ((applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0) Hatirlatici.goster(this@MainActivity)
+            }
         }, "AndroidBildirim")
 
         // ===================== SESLI OYNAMA KOPRUSU =====================
@@ -1507,7 +1532,7 @@ class MainActivity : AppCompatActivity() {
 
     private val BILDIRIM_KANAL = "sah_dustu_sira"
     /** Uzak oyun istegi bildirimleri (FCM). Sunucu bu kanal adini kullanir (functions/index.js). */
-    private val DAVET_KANAL = "davet"
+    private val DAVET_KANAL = Hatirlatici.KANAL_DAVET
 
     private fun otoBaslatmaMarkasi(m: String) =
         listOf("xiaomi", "redmi", "poco", "oppo", "realme", "oneplus", "vivo", "iqoo", "huawei", "honor").any { m.contains(it) }
@@ -1559,9 +1584,8 @@ class MainActivity : AppCompatActivity() {
             }
             val mgr = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             mgr.createNotificationChannel(kanal)
-            mgr.createNotificationChannel(NotificationChannel(
-                DAVET_KANAL, getString(R.string.davet_kanal_ad), NotificationManager.IMPORTANCE_HIGH
-            ).apply { description = getString(R.string.davet_kanal_aciklama) })
+            Hatirlatici.kanallariKur(this)
+            Hatirlatici.planla(this)
         }
     }
 

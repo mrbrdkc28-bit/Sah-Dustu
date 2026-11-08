@@ -5,4 +5,8 @@
     <string name="davet_kanal_ad">Oyun İstekleri</string>
     <string name="davet_kanal_aciklama">Bir oyuncu seni oyuna davet ettiğinde bildirim</string>
     <string name="satin_alma_yakinda">Satın alma yakında eklenecek</string>
+    <string name="hatirlatma_kanal_ad">Günlük hatırlatma</string>
+    <string name="hatirlatma_kanal_aciklama">Günde bir kez oyun hatırlatması</string>
+    <string name="cevrimici_kanal_ad">Çevrimiçi oyuncular</string>
+    <string name="cevrimici_kanal_aciklama">Bir oyuncu çevrimiçi olduğunda bildirim</string>
 </resources>

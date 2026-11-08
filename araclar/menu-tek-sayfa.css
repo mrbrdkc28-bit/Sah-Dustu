@@ -1,0 +1,34 @@
+/* Ana sayfa (Kasım 2026, sahibin isteği): logo + söz en üstte, hemen altında kullanıcı kartı (Profilim'e gider);
+   kartlar eski tek sütun liste (karo ızgarası beğenilmedi), çıkış Profilim ekranında. */
+#menu .anaBaslik{order:0}
+#menu #profilCubuk{order:1;position:static!important;width:100%;max-width:440px;margin-top:10px;box-sizing:border-box;
+  display:flex;align-items:center;gap:12px;padding:10px 14px!important;border-radius:16px;font-size:13px;
+  background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--line,rgba(232,182,76,.2));box-shadow:none}
+html[data-tema="fildisi"] #menu #profilCubuk{background:#fffdf8;border-color:rgba(120,95,50,.16)}
+#profilCubuk .pkAv{flex:none;width:40px;height:40px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:rgba(232,182,76,.14);color:var(--brass,#E8B64C);font-size:20px}
+#profilCubuk .pkAv img{width:100%;height:100%;object-fit:cover}
+#profilCubuk .pkAv>*{max-width:100%;max-height:100%}
+#profilCubuk .pkMetin{flex:1;min-width:0;display:flex;flex-direction:column;text-align:left}
+#profilCubuk .pkAd{font:700 14.5px Manrope,sans-serif;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#profilCubuk .pkAlt{font:600 12px Manrope,sans-serif;color:var(--brass,#E8B64C)}
+#profilCubuk .pkOk{font-size:20px;color:var(--dim)}
+#menu .kartlar{order:2}
+#menu #altSecim{order:3}
+#menu>*:not(.anaBaslik):not(.kartlar):not(#profilCubuk):not(#altSecim){order:4}
+#istBaslik{position:relative}
+#istCikis{margin-left:auto;padding:7px 14px;border-radius:18px;cursor:pointer;background:none;border:1px solid var(--line,rgba(232,182,76,.3));
+  color:var(--brass,#E8B64C);font:600 12.5px Manrope,sans-serif}
+html[data-tema="fildisi"] #profilCubuk .pkAd{color:#1f1b14}
+#menu .kartlar>#istKart{display:none!important}
+#menu{padding-top:calc(env(safe-area-inset-top,0px) + 6px)!important;padding-bottom:10px!important}
+#menu .anaBaslik{margin:0!important}
+#menu .anaBaslik h1{font-size:clamp(30px,9.6vw,52px)!important;margin:0}
+#menu .menuSoz{height:64px!important;margin-top:0}
+#menu #profilCubuk{margin-top:4px!important;padding:7px 14px!important}
+#menu .kartlar{margin-top:8px!important;gap:7px!important}
+#menu .kartlar>.anaKart{padding:8px 14px!important}
+#menu .kartlar>.anaKart .kartIkon{width:36px!important;height:36px!important;border-radius:10px!important}
+#menu #altSecim{margin-top:8px!important}
+#istQr{display:inline-flex;align-items:center;gap:5px;margin-left:auto;padding:7px 12px;border-radius:18px;cursor:pointer;background:none;border:1px solid var(--line,rgba(232,182,76,.3));color:var(--brass,#E8B64C);font:600 12.5px Manrope,sans-serif}
+#istQr~#istCikis{margin-left:8px}

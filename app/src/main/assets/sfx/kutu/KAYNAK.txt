@@ -31,3 +31,8 @@ fanfar_01: #449069 "Fanfare.wav" (ricniclas) · fanfar_02: #456966 "Success Fanf
 tezahurat_01: #82800 "short cheering burst.aif" (payattention) · tezahurat_02: #651646 "Crowd Cheer 5" (Krizin) · tezahurat_03: #678543 "AF Crowd Cheer Clapping Natural Ending.wav" (mglennsound)
 kapi_01: #682775 "Metal gate closing.WAV" (thomasanthony321) · kapi_02: #336888 "Gate-Heavy-OpenClose-WAV.wav" (Omnisis) · kapi_03: #456763 "Gate door drawbridge wooden creaky opens close" (WavJunction.com) · kapi_04: #199282 "Big Metal Chain" (qubodup)
 (fil/kisneme/top da 8 Ekim'de RMS -20 dB'ye yeniden eşitlendi.)
+— Kasım 2026 Destan paketi (Freesound.org, CC0; HQ önizlemeden kesit, tepe .75) —
+destan_01: #138489 "Shield Hit 2" (JustInvoke) · destan_02: #370203 "shield guard" (nekoninja) · destan_03: #161098 "arrow_damage.wav" (braqoon)
+destan_04: #486140 "taiko.wav" (Anuj_Shrestha1) · destan_05: #486141 "taiko2.wav" (Anuj_Shrestha1) · destan_06: #372877 "Iron-Wood Slam" (Hakren)
+destan_07: #394179 "Longbow Release 2.wav" (saturdaysoundguy) · destan_08: #60013 "Whoosh" (qubodup)
+destan_09: #179996 "Arrow Release and Hit.wav" (calvarychurchatlanta) · destan_10: #708223 "Arrow_Hit_1" (Mythmazter)
