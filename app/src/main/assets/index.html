@@ -457,6 +457,8 @@ body:not(.dikeyAktif) #cevrimiciSerit{top:56px;left:14px;right:auto;text-align:l
 .lobiNokta{position:absolute;right:-1px;bottom:-1px;width:11px;height:11px;border-radius:50%;background:#3ecf6e;
   box-shadow:0 0 6px rgba(62,207,110,.7);border:2px solid var(--panel,#12141B);box-sizing:border-box}
 .lobiNokta.yok{background:#6f6a5c;box-shadow:none}
+.lobiNokta.oyunda{background:#E8B64C}
+.lobiKart.oyn .lobiDurum{color:#D9A23A;font-weight:700}
 .lobiBayrak{font-size:13px;font-weight:400}
 /* Oyuncu fotoğrafı büyütme ve oyuncu kartı (30 Ekim 2026) */
 [data-oy-av],[data-oy-uid]{cursor:pointer}
@@ -1784,6 +1786,38 @@ html[dir="rtl"] .menuSlogan.yaz{animation-name:sloganYazRtl}
   80%{filter:blur(0)}100%{clip-path:inset(-20% 0 -20% -4%);filter:blur(0)}}
 body.azHareket .menuSlogan.yaz,body.azHareket .menuSlogan.sil{animation:none}
 /* Sözler (5 Ekim 2026): sabit yükseklikli alan (söz değişince kartlar oynamaz), yazar satırı */
+.on64{position:relative;display:inline-block;isolation:isolate}
+#menu .anaBaslik h1 span.on64{color:var(--sozRenk,#B07E22);transition:color 1.4s cubic-bezier(.4,0,.2,1)}
+.on64::before,.on64::after{content:attr(data-t);position:absolute;left:0;top:0;pointer-events:none}
+.on64::before{z-index:-1;color:currentColor;filter:blur(14px);opacity:.4;transition:opacity 1.4s ease}
+html[data-tema="fildisi"] .on64::before{opacity:.22}
+.on64::after{color:transparent;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,var(--parilti,.8)) 50%,transparent 62%) no-repeat;background-size:260% 100%;background-position:130% 0;-webkit-background-clip:text;background-clip:text}
+html[data-tema="fildisi"] .on64{--parilti:.62}
+.on64.parla::after{animation:on64Parla 1.5s cubic-bezier(.3,.1,.3,1) .15s both}
+@keyframes on64Parla{from{background-position:130% 0}to{background-position:-30% 0}}
+body.azHareket .on64.parla::after{animation:none}
+#tusTanitim{position:fixed;inset:0;z-index:70;display:none;touch-action:none}
+#tusTanitim.acik{display:block}
+#tusTanitim.bitis{background:rgba(6,7,12,.72)}
+.ttDelik{position:fixed;border-radius:14px;box-shadow:0 0 0 200vmax rgba(6,7,12,.72);pointer-events:none;transition:left .32s ease,top .32s ease,width .32s ease,height .32s ease,box-shadow .35s ease}
+#tusTanitim.izle .ttDelik{box-shadow:0 0 0 200vmax rgba(6,7,12,.12)}
+.ttDelik::after{content:"";position:absolute;inset:-3px;border-radius:17px;border:2px solid #E8B64C;animation:ttNabiz 1.3s ease-in-out infinite}
+#tusTanitim.izle .ttDelik::after{animation:none;opacity:.5}
+@keyframes ttNabiz{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.09);opacity:.55}}
+.ttKart{position:fixed;left:16px;right:16px;max-width:380px;margin:0 auto;box-sizing:border-box;padding:14px 16px 15px;border-radius:16px;background:#14161f;color:#f3ead7;border:1px solid rgba(232,182,76,.4);box-shadow:0 12px 34px rgba(0,0,0,.45)}
+html[data-tema="fildisi"] .ttKart{background:#fffdf8;color:#1c1914;border-color:rgba(176,126,34,.45)}
+.ttKart.salla{animation:ttSalla .32s ease}
+@keyframes ttSalla{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.ttUst{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ttSayi{font:700 11px Manrope,sans-serif;letter-spacing:.08em;opacity:.6}
+.ttGec{background:none;border:0;padding:4px 0 4px 12px;color:inherit;opacity:.72;font:600 12.5px Manrope,sans-serif;text-decoration:underline;text-underline-offset:3px}
+.ttAd{font:700 16px 'Cinzel',Georgia,serif;letter-spacing:.04em;color:#E8B64C;margin-bottom:5px}
+html[data-tema="fildisi"] .ttAd{color:#B07E22}
+.ttMetin{font:500 14px/1.42 Manrope,sans-serif}
+.ttBas{margin-top:9px;font:700 12.5px Manrope,sans-serif;color:#E8B64C}
+html[data-tema="fildisi"] .ttBas{color:#B07E22}
+.ttTamam{display:block;width:100%;margin-top:13px;padding:12px;border:0;border-radius:12px;background:#E8B64C;color:#1c1914;font:700 14px Manrope,sans-serif}
+body.azHareket .ttDelik::after{animation:none}
 .menuSoz{width:100%;box-sizing:border-box;padding:0 6px;height:82px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:2px}
 .menuSoz .menuSlogan{max-width:100%;margin-top:0;text-wrap:balance;font-family:'SozYazi',Georgia,'Noto Serif CJK SC','Noto Serif',serif;font-weight:500;
   transform:none!important;letter-spacing:0!important;text-shadow:none}
@@ -2823,11 +2857,18 @@ function perdeBittiginde(fn){
 <div id="menu" class="gizli">
   <div id="profilCubuk"></div>
   <div class="anaBaslik">
-    <h1>CHESS <span>64</span></h1>
+    <h1>CHESS <span class="on64" data-t="64">64</span></h1>
     <div class="menuSoz"><div class="menuSlogan"></div><div class="sozYazar"></div></div>
   </div>
 
   <div class="kartlar">
+    <button class="anaKart" id="botaDonKart" style="display:none">
+      <div class="kartIkon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg></div>
+      <div class="kartMetin">
+        <div class="kartAd">BOT OYUNUNA DÖN</div>
+        <div class="kartAlt">Yarım kalan oyununa devam et</div>
+      </div>
+    </button>
     <button class="anaKart" id="oyunaDonKart" style="display:none">
       <div class="kartIkon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg></div>
       <div class="kartMetin">
@@ -7769,8 +7810,8 @@ function oyunSonu(d, terkKazanan){
     if(!Array.isArray(bulutIst.sonOyunlar)) bulutIst.sonOyunlar=[];
     // Hamle listesini de sakla (geçmiş oyunu tahtada yeniden inceleyebilmek için)
     const hamleListesi=oyunKaydi.map(k=>k.notasyon);
-    bulutIst.sonOyunlar.unshift({sonuc:sonuc, renk:oyuncuRenk, hamle:ist.hamle,
-      puanDegisim:degisim, tarih:Date.now(), hamleler:hamleListesi});
+    bulutIst.sonOyunlar.unshift(Object.assign({sonuc:sonuc, renk:oyuncuRenk, hamle:ist.hamle,
+      puanDegisim:degisim, tarih:Date.now(), hamleler:hamleListesi}, oyunRakipBilgi()));
     if(bulutIst.sonOyunlar.length>20) bulutIst.sonOyunlar=bulutIst.sonOyunlar.slice(0,20);
     basarimKontrol();
     if(cevrimiciAktif){ cevrimiciPuanVeKaydet(bulutIst.sonOyunlar[0]); }
@@ -9270,6 +9311,7 @@ function menuKur(){
   const ck=document.getElementById('cevrimiciKart'); if(ck) ck.onclick=()=>cevrimiciAc();
   // Oyuna Dön: duraklatılmış çevrimiçi oyuna geri dön
   const odk=document.getElementById('oyunaDonKart'); if(odk) odk.onclick=()=>oyunaGeriDon();
+  const bdk=document.getElementById('botaDonKart'); if(bdk) bdk.onclick=()=>botOyunaDon();
   // Çevrimiçi lobi butonları
   const cvG=document.getElementById('cevrimiciGeri'); if(cvG) cvG.onclick=cevrimiciKapat;
   document.querySelectorAll('.cvSure').forEach(b=>{
@@ -9780,7 +9822,136 @@ function yardimKapat(){
   // Bir daha otomatik çıkmasın diye işaretle (WebView'de localStorage çalışır)
   try{ localStorage.setItem('yardimGorundu','1'); }catch(e){}
 }
+/* Düğme tanıtımı (Kasım 2026, sahibin isteği): çevrimiçi olmayan ilk oyunda bir kez. Oyuncu vurgulanan düğmeye basar,
+   görünümü değiştiren düğmeler etkisini gösterip kendiliğinden eski haline döner. Çıkış düğmeleri çalıştırılmaz. Saat durur. */
+function tusTanitimGerekli(){ try{ return localStorage.getItem('c64_tusTanitim')!=='1'; }catch(e){ return false; } }
+function tusTanitim(deneme){
+  deneme=deneme||0;
+  const hud=document.getElementById('hud');
+  if(!hud || !hud.classList.contains('acik') || (typeof cevrimiciAktif!=='undefined' && cevrimiciAktif) || !tusTanitimGerekli()) return;
+  const D=['tr','en','ru','ar','fr','de','it','zh'];
+  const _d=(typeof uygDil!=='undefined'&&uygDil)||document.documentElement.lang||'tr';
+  const L=D.indexOf(_d)<0?1:D.indexOf(_d);
+  const M={
+    bas:["Dene, bas","Tap to try","Нажмите, чтобы попробовать","اضغط للتجربة","Appuyez pour essayer","Zum Ausprobieren tippen","Tocca per provare","点一下试试"],
+    git:["Bas, sonraki düğmeye geçelim","Tap to continue","Нажмите, чтобы продолжить","اضغط للمتابعة","Appuyez pour continuer","Tippen zum Fortfahren","Tocca per continuare","点击继续"],
+    gec:["Geç","Skip","Пропустить","تخطي","Passer","Überspringen","Salta","跳过"],
+    sonra:["Gördün mü? Eski haline alıyoruz.","See? Switching it back now.","Видите? Возвращаем как было.","هل رأيت؟ سنعيدها كما كانت.","Vous voyez ? On remet comme avant.","Siehst du? Wir stellen es zurück.","Visto? Ora torniamo come prima.","看到了吗？现在恢复原样。"],
+    sonAd:["Hazırsın!","You're ready!","Готово!","أنت جاهز!","C'est prêt !","Du bist bereit!","Sei pronto!","准备好了！"],
+    son:["Düğmeleri öğrendin. İyi oyunlar!","You know the buttons now. Enjoy the game!","Теперь вы знаете все кнопки. Приятной игры!","أصبحت تعرف الأزرار. لعبة ممتعة!","Vous connaissez les boutons. Bonne partie !","Jetzt kennst du die Tasten. Viel Spaß beim Spielen!","Ora conosci i pulsanti. Buona partita!","按钮都学会了，祝你玩得开心！"],
+    basla:["Oyuna başla","Start playing","Начать игру","ابدأ اللعب","Commencer à jouer","Spiel starten","Inizia a giocare","开始下棋"]
+  };
+  const modal=document.getElementById('secenekModal'), yard=document.getElementById('yardimKapla');
+  const ADIM=[
+    {h:['btnSes'],t:'d',ad:["Ses","Sound","Звук","الصوت","Son","Ton","Audio","声音"],m:["Oyunun sesini açıp kapatır.","Turns the game sound on or off.","Включает и выключает звук игры.","يشغّل صوت اللعبة أو يوقفه.","Active ou coupe le son du jeu.","Schaltet den Spielton ein oder aus.","Attiva o disattiva l'audio del gioco.","开启或关闭游戏声音。"]},
+    {h:['btnDuz'],t:'d',ad:["2B görünüm","2D view","Вид 2D","عرض ثنائي الأبعاد","Vue 2D","2D-Ansicht","Vista 2D","2D 视图"],m:["Tahtayı 3B ile düz görünüm arasında değiştirir.","Switches the board between 3D and a flat view.","Переключает доску между 3D и плоским видом.","يبدّل الرقعة بين العرض ثلاثي الأبعاد والعرض المسطح.","Passe l'échiquier de la 3D à la vue à plat.","Wechselt das Brett zwischen 3D und flacher Ansicht.","Passa la scacchiera dalla vista 3D a quella piatta.","在 3D 和平面棋盘之间切换。"]},
+    {h:['btnTasAd'],t:'d',ad:["Taş adı","Piece names","Названия фигур","أسماء القطع","Noms des pièces","Figurennamen","Nomi dei pezzi","棋子名称"],m:["Taşların adlarını tahtanın üzerinde gösterir.","Shows the name of each piece on the board.","Показывает названия фигур на доске.","يعرض اسم كل قطعة على الرقعة.","Affiche le nom de chaque pièce sur l'échiquier.","Zeigt die Namen der Figuren auf dem Brett.","Mostra il nome di ogni pezzo sulla scacchiera.","在棋盘上显示棋子名称。"]},
+    {h:['btnSahne'],t:'d',ad:["Sahne","Scenes","Сцены","المشاهد","Scènes","Szenen","Scene","动画场景"],m:["Taş yenince oynayan savaş sahnelerini açıp kapatır.","Turns the battle scenes played on captures on or off.","Включает и выключает сцены боя при взятии.","يشغّل مشاهد القتال عند أخذ القطع أو يوقفها.","Active ou coupe les scènes de combat lors des prises.","Schaltet die Kampfszenen beim Schlagen ein oder aus.","Attiva o disattiva le scene di battaglia durante le catture.","开启或关闭吃子时的战斗动画。"]},
+    {h:['gizleBtn'],t:'d',ad:["Gizle","Hide","Скрыть","إخفاء","Masquer","Ausblenden","Nascondi","隐藏"],m:["Düğmeleri gizler, ekranda tahtaya yer açar.","Hides the buttons to leave more room for the board.","Скрывает кнопки, чтобы освободить место для доски.","يخفي الأزرار لإفساح المجال للرقعة.","Masque les boutons pour laisser plus de place à l'échiquier.","Blendet die Tasten aus, damit das Brett mehr Platz hat.","Nasconde i pulsanti per lasciare più spazio alla scacchiera.","隐藏按钮，让棋盘更清楚。"]},
+    {h:['btnYonDikey','yonBtn'],t:'a',ad:["Döndür","Rotate","Повернуть","تدوير","Pivoter","Drehen","Ruota","旋转"],m:["Oyunu yatay ya da dikey ekranda oynamanı sağlar.","Lets you play in landscape or portrait.","Переключает игру между горизонтальным и вертикальным экраном.","يتيح لك اللعب بالوضع الأفقي أو العمودي.","Permet de jouer en mode paysage ou portrait.","Wechselt zwischen Quer- und Hochformat.","Ti permette di giocare in orizzontale o in verticale.","切换横屏或竖屏下棋。"]},
+    {h:['nGeri','nIleri','nSona'],g:1,t:'a',ad:["Hamleler","Moves","Ходы","النقلات","Coups","Züge","Mosse","棋步"],m:["Oyun sırasında önceki hamlelere bakarsın, en sağdaki düğme son konuma getirir.","Look back through earlier moves. The last button returns to the current position.","Просматривайте прошлые ходы. Последняя кнопка возвращает к текущей позиции.","راجع النقلات السابقة، ويعيدك الزر الأخير إلى الوضع الحالي.","Revoyez les coups précédents. Le dernier bouton revient à la position actuelle.","Sieh dir frühere Züge an. Die letzte Taste führt zur aktuellen Stellung zurück.","Rivedi le mosse precedenti. L'ultimo pulsante torna alla posizione attuale.","查看之前的棋步，最后一个按钮回到当前局面。"]},
+    {h:['nAyar','btnSecenekler'],t:'p',acik:()=>modal&&modal.style.display!=='none'&&modal.style.display!=='',ad:["Ayarlar","Settings","Настройки","الإعدادات","Réglages","Einstellungen","Impostazioni","设置"],m:["Hamle onayı, süre uyarıları ve grafik kalitesi burada. Pencereyi kapatınca devam ederiz.","Move confirmation, time alerts and graphics are here. Close the window to continue.","Здесь подтверждение ходов, сигналы времени и графика. Закройте окно, чтобы продолжить.","هنا تأكيد النقلات وتنبيهات الوقت وجودة الرسومات. أغلق النافذة للمتابعة.","Confirmation des coups, alertes de temps et graphismes. Fermez la fenêtre pour continuer.","Zugbestätigung, Zeitwarnungen und Grafik findest du hier. Schließe das Fenster, um fortzufahren.","Qui trovi conferma mosse, avvisi di tempo e grafica. Chiudi la finestra per continuare.","这里有走子确认、时间提醒和画质设置。关闭窗口后继续。"]},
+    {h:['btnYardim'],t:'p',acik:()=>yard&&yard.classList.contains('acik'),ad:["Yardım","Help","Помощь","مساعدة","Aide","Hilfe","Aiuto","帮助"],m:["Oyunun nasıl oynandığı burada yazar. Pencereyi kapatınca devam ederiz.","How to play is explained here. Close the window to continue.","Здесь объясняется, как играть. Закройте окно, чтобы продолжить.","هنا شرح طريقة اللعب. أغلق النافذة للمتابعة.","Les explications du jeu sont ici. Fermez la fenêtre pour continuer.","Hier wird das Spiel erklärt. Schließe das Fenster, um fortzufahren.","Qui è spiegato come si gioca. Chiudi la finestra per continuare.","这里有玩法说明。关闭窗口后继续。"]},
+    {h:['nMenu','btnMenu'],t:'a',ad:["Menü","Menu","Меню","القائمة","Menu","Menü","Menu","菜单"],m:["Yeni oyuna, teslim olmaya ve ana menüye buradan ulaşırsın. Oyundan çıkmayalım diye şimdi açmıyoruz.","New game, resign and the main menu are here. We won't open it now, so you stay in the game.","Здесь новая игра, сдача и главное меню. Сейчас не открываем, чтобы не выйти из игры.","هنا لعبة جديدة والاستسلام والقائمة الرئيسية. لن نفتحها الآن كي تبقى في اللعبة.","Nouvelle partie, abandon et menu principal sont ici. On ne l'ouvre pas pour rester dans la partie.","Neues Spiel, Aufgeben und Hauptmenü findest du hier. Wir öffnen es jetzt nicht, damit du im Spiel bleibst.","Qui trovi nuova partita, resa e menu principale. Non lo apriamo ora per restare in partita.","新对局、认输和主菜单都在这里。现在不打开，以免退出对局。"]}
+  ];
+  const gorunur=e=>{ if(!e) return false; const r=e.getBoundingClientRect(); return r.width>0&&r.height>0&&getComputedStyle(e).visibility!=='hidden'; };
+  const hedefler=a=>{ const v=a.h.map(i=>document.getElementById(i)).filter(gorunur); return a.g?v:v.slice(0,1); };
+  const A=ADIM.filter(a=>hedefler(a).length);
+  /* Başka pencere (ilk açılıştaki akıcılık seçimi gibi) düğmeleri örtüyorsa kapanmasını bekle */
+  const acikta=e=>{ const r=e.getBoundingClientRect(); const u=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2); return !!u&&(e===u||e.contains(u)); };
+  if(!A.length || !A.every(a=>hedefler(a).every(acikta))){
+    if(deneme<150) setTimeout(()=>tusTanitim(deneme+1),400);
+    return;
+  }
+  try{ localStorage.setItem('c64_tusTanitim','1'); localStorage.setItem('yardimGorundu','1'); }catch(e){}
+  try{ saatDurdur(); }catch(e){}
+  let z=document.getElementById('tusTanitim');
+  if(!z){ z=document.createElement('div'); z.id='tusTanitim'; z.setAttribute('data-cevirme',''); document.body.appendChild(z); }
+  z.className='acik';
+  z.innerHTML='<div class="ttDelik"></div><div class="ttKart" dir="auto"></div>';
+  const del=z.querySelector('.ttDelik'), kart=z.querySelector('.ttKart');
+  let i=-1, mesgul=false, bitti=false, geriAl=null, kut=null;
+  function bitir(){
+    if(bitti) return; bitti=true; clearInterval(nb);
+    if(geriAl){ const g=geriAl; geriAl=null; g(); }
+    z.className=''; z.style.display=''; z.innerHTML='';
+    removeEventListener('resize',ciz); window.tusTanitimGeri=null;
+    try{ saatSurdur(); }catch(e){}
+  }
+  window.tusTanitimGeri=()=>{ if(bitti||z.style.display==='none') return false; bitir(); return true; };
+  const nb=setInterval(()=>{ if(!hud.classList.contains('acik') || (typeof cevrimiciAktif!=='undefined'&&cevrimiciAktif)) bitir(); },500);
+  function kutu(a){
+    const v=hedefler(a); if(!v.length) return null;
+    const r=v.map(e=>e.getBoundingClientRect());
+    const l=Math.min(...r.map(x=>x.left))-5, t=Math.min(...r.map(x=>x.top))-5, R=Math.max(...r.map(x=>x.right))+5, B=Math.max(...r.map(x=>x.bottom))+5;
+    return {l,t,R,B};
+  }
+  function ciz(){
+    if(bitti || i<0 || i>=A.length) return;
+    kut=kutu(A[i]); if(!kut) return;
+    del.style.cssText='left:'+kut.l+'px;top:'+kut.t+'px;width:'+(kut.R-kut.l)+'px;height:'+(kut.B-kut.t)+'px';
+    if((kut.t+kut.B)/2<innerHeight/2){ kart.style.top=(kut.B+16)+'px'; kart.style.bottom='auto'; }
+    else { kart.style.top='auto'; kart.style.bottom=(innerHeight-kut.t+16)+'px'; }
+  }
+  function yaz(ad,metin,alt,sayi){
+    kart.innerHTML='<div class="ttUst"><span class="ttSayi"></span><button type="button" class="ttGec"></button></div><div class="ttAd"></div><div class="ttMetin"></div><div class="ttBas"></div>';
+    kart.querySelector('.ttSayi').textContent=sayi;
+    kart.querySelector('.ttGec').textContent=M.gec[L];
+    kart.querySelector('.ttAd').textContent=ad;
+    kart.querySelector('.ttMetin').textContent=metin;
+    kart.querySelector('.ttBas').textContent=alt;
+  }
+  function ileri(){
+    i++;
+    if(i>=A.length){
+      z.className='acik bitis'; del.style.display='none';
+      kart.style.top='50%'; kart.style.bottom='auto'; kart.style.transform='translateY(-50%)';
+      kart.innerHTML='<div class="ttAd"></div><div class="ttMetin"></div><button type="button" class="ttTamam"></button>';
+      kart.querySelector('.ttAd').textContent=M.sonAd[L];
+      kart.querySelector('.ttMetin').textContent=M.son[L];
+      const b=kart.querySelector('.ttTamam'); b.textContent=M.basla[L]; b.onclick=bitir;
+      return;
+    }
+    const a=A[i];
+    yaz(a.ad[L],a.m[L],a.t==='a'?M.git[L]:M.bas[L],(i+1)+' / '+A.length);
+    ciz();
+  }
+  function bas(){
+    const a=A[i]; const el=hedefler(a)[0]; if(!el) { ileri(); return; }
+    if(a.t==='a'){ ileri(); return; }
+    mesgul=true;
+    if(a.t==='d'){
+      el.click();
+      geriAl=()=>el.click();
+      z.classList.add('izle');
+      kart.querySelector('.ttMetin').textContent=M.sonra[L];
+      kart.querySelector('.ttBas').textContent='';
+      setTimeout(()=>{
+        if(bitti) return;
+        const g=geriAl; geriAl=null; if(g) g();
+        setTimeout(()=>{ if(bitti) return; z.classList.remove('izle'); mesgul=false; ileri(); },750);
+      },1900);
+      return;
+    }
+    el.click();
+    z.style.display='none';
+    const iz=setInterval(()=>{
+      if(bitti){ clearInterval(iz); return; }
+      if(!a.acik()){ clearInterval(iz); z.style.display=''; mesgul=false; ileri(); }
+    },250);
+  }
+  z.onclick=e=>{
+    if(bitti) return;
+    if(e.target.classList.contains('ttGec')){ if(!mesgul) bitir(); return; }
+    if(mesgul || i>=A.length) return;
+    if(kut && e.clientX>=kut.l && e.clientX<=kut.R && e.clientY>=kut.t && e.clientY<=kut.B){ bas(); return; }
+    kart.classList.remove('salla'); void kart.offsetWidth; kart.classList.add('salla');
+  };
+  addEventListener('resize',ciz);
+  ileri();
+}
 function yardimIlkGirisKontrol(){
+  if(tusTanitimGerekli() && !(typeof cevrimiciAktif!=='undefined' && cevrimiciAktif)){ setTimeout(tusTanitim,1400); return; }
   let gorundu=false;
   try{ gorundu = localStorage.getItem('yardimGorundu')==='1'; }catch(e){}
   if(!gorundu){
@@ -10250,6 +10421,7 @@ const Bildirim=(()=>{
 let cvSecilenSure={ dk:10, inc:0 }; // çevrimiçi seçilen süre (varsayılan 10+0, Kasım 2026)
 let ilkHamleYapildi=false, cevrimiciIptalZamanlayici=null;
 function cevrimiciOyunBaslat(rakipAd){
+  if(botOyunundaMi()) botOyunSakla();
   cevrimiciAktif=true;
   oyunAktif=true;
   katilimKaydet();
@@ -10797,7 +10969,7 @@ async function oyuncuKartAc(uid){
     const ad=sn==='G'?'Galibiyet':sn==='B'?'Beraberlik':'Mağlubiyet';
     let tarih=''; try{ if(o.tarih) tarih=new Date(+o.tarih).toLocaleDateString(undefined,{day:'numeric',month:'short'}); }catch(e){}
     h+='<div class="okSatir"><span class="rozet r'+sn+'">'+sn+'</span><span>'+(o&&o.renk==='w'?'♙':'♟')+'</span>'+
-       '<span>'+lobiKac(c(ad))+'</span><span style="color:var(--dim)">· '+sayi(o&&o.hamle)+' '+lobiKac(c('hamle'))+'</span>'+
+       '<span class="rkKutu"><span>'+lobiKac(c(ad))+'</span>'+(oyunRakipMetni(o)?'<small data-cevirme>'+lobiKac(oyunRakipMetni(o))+'</small>':'')+'</span><span style="color:var(--dim)">· '+sayi(o&&o.hamle)+' '+lobiKac(c('hamle'))+'</span>'+
        '<span class="okTarih">'+lobiKac(tarih)+'</span></div>';
   });
   ic.innerHTML=h;
@@ -10836,18 +11008,19 @@ function lobiCiz(){
     const bay=bayrak(k.ulke);
     /* Kompakt kart (Kasım 2026): lobi dikey listede ekranın yarısını kaplıyor, süre/ordu/arena seçimleri aşağıda
        kalıyordu. Artık yatay kaydırılan kartlar; çevrimiçi olanlar önde (sıralama lobiListesi'nde). */
-    return '<div class="lobiKart'+(k.cevrimici?' cvr':'')+'"><div class="lobiAv" data-oy-av="'+lobiKac(k.uid)+'">'+av+'<span class="lobiNokta'+(k.cevrimici?'':' yok')+'"></span></div>'+
+    return '<div class="lobiKart'+(k.cevrimici?' cvr':'')+(k.oyunda?' oyn':'')+'"><div class="lobiAv" data-oy-av="'+lobiKac(k.uid)+'">'+av+'<span class="lobiNokta'+(k.oyunda?' oyunda':(k.cevrimici?'':' yok'))+'"></span></div>'+
       '<div class="lobiAd" data-oy-uid="'+lobiKac(k.uid)+'">'+lobiKac(k.ad)+'</div>'+
       '<div class="lobiAlt">'+(bay?lobiKac(bay)+' ':'')+(k.puan||800)+'</div>'+
-      '<div class="lobiDurum">'+lobiKac(k.cevrimici?c('Çevrimiçi'):lobiSonGorulme(k.son).replace(/^.*?(\d)/,'$1'))+'</div>'+
+      '<div class="lobiDurum">'+lobiKac(k.oyunda?c('Oyunda'):k.cevrimici?c('Çevrimiçi'):lobiSonGorulme(k.son).replace(/^.*?(\d)/,'$1'))+'</div>'+
       '<button class="lobiBtn" data-lobi="'+lobiKac(k.uid)+'"'+(bekle?' disabled':'')+'>'+lobiKac(c(bekle?'Gönderildi':'Oyun iste'))+'</button></div>';
   }).join('');
   const d=document.getElementById('cvLobiDaha');
   if(d) d.classList.remove('var');
 }
+let _lobiSon=0;
 async function lobiYukle(){
   if(!Cevrimici.hazirMi()){ lobiVeri=[]; lobiCiz(); return; }
-  try{ lobiVeri=await Cevrimici.lobiListesi(); }catch(e){}
+  try{ lobiVeri=await Cevrimici.lobiListesi(); _lobiSon=Date.now(); }catch(e){}
   lobiCiz();
 }
 function lobiBaslat(){
@@ -10880,13 +11053,14 @@ function lobiBaslat(){
       cevrimiciHata((Cevrimici.davetHatasi && Cevrimici.davetHatasi()) || 'Gönderilemedi');
     }
   };
-  lobiYukle();
+  /* Ekran art arda açılınca yeniden okuma; açıkken 90 sn'de bir (eskiden 30 sn) */
+  if(lobiVeri.length && Date.now()-_lobiSon<20000) lobiCiz(); else lobiYukle();
   clearInterval(lobiZam);
   lobiZam=setInterval(()=>{
     const ek=document.getElementById('cevrimiciEkran');
-    if(ek && ek.classList.contains('acik') && !document.hidden) lobiYukle();
+    if(ek && ek.classList.contains('acik')){ if(!document.hidden) lobiYukle(); }
     else { clearInterval(lobiZam); lobiZam=null; }
-  }, 30000);
+  }, 90000);
 }
 function cevrimiciAc(){
   cvAnimNotYaz();
@@ -11310,8 +11484,8 @@ function cevrimiciIstatistikGuncelle(sonuc){
   if(!Array.isArray(bulutIst.sonOyunlar)) bulutIst.sonOyunlar=[];
   let kayit=null;
   try{
-    kayit={sonuc:sonuc, renk:oyuncuRenk, hamle:(typeof ist!=='undefined'&&ist.hamle)||oyunKaydi.length,
-           puanDegisim:0, tarih:Date.now(), hamleler:oyunKaydi.map(k=>k.notasyon)};
+    kayit=Object.assign({sonuc:sonuc, renk:oyuncuRenk, hamle:(typeof ist!=='undefined'&&ist.hamle)||oyunKaydi.length,
+           puanDegisim:0, tarih:Date.now(), hamleler:oyunKaydi.map(k=>k.notasyon)}, oyunRakipBilgi(true));
     bulutIst.sonOyunlar.unshift(kayit);
     if(bulutIst.sonOyunlar.length>20) bulutIst.sonOyunlar=bulutIst.sonOyunlar.slice(0,20);
   }catch(e){}
@@ -11413,16 +11587,21 @@ let cvBilgiZamanlayici=null;
 function varlikYaz(){
   try{
     if(!fbDb || !fbKullanici || misafirMod || document.hidden) return;
-    fbDb.collection('cevrimici').doc(fbKullanici.uid).set({ ts: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
+    const ref=fbDb.collection('cevrimici').doc(fbKullanici.uid), ts=firebase.firestore.FieldValue.serverTimestamp();
+    /* oyunda: yalnız çevrimiçi maçta true; bot oyunundaki oyuncu lobide Çevrimiçi görünür. Kural eskiyse eski biçimle yazılır. */
+    ref.set({ ts, oyunda: oyundaMi() }).catch(()=>{ ref.set({ ts }).catch(()=>{}); });
   }catch(e){}
 }
+function oyundaMi(){ return !!(cevrimiciAktif && oyunAktif && !oyunBitti); }
+let _oyundaSon=false;
+setInterval(()=>{ const o=oyundaMi(); if(o!==_oyundaSon){ _oyundaSon=o; varlikYaz(); } }, 3000);
 setInterval(varlikYaz, 120000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) varlikYaz(); });
 async function cevrimiciSayi(){
   try{
     if(!fbDb || !fbKullanici) return null;
     const esik=firebase.firestore.Timestamp.fromMillis(Date.now()-5*60000);
-    const s=await fbDb.collection('cevrimici').where('ts','>',esik).limit(100).get();
+    const s=await fbDb.collection('cevrimici').where('ts','>',esik).limit(50).get();
     return Math.max(1, s.size);
   }catch(e){ return null; }
 }
@@ -11433,7 +11612,7 @@ async function sayacYaz(){
   const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
   if(n===null){ el.textContent=''; return; }
   el.innerHTML='<i></i><span></span>';
-  el.querySelector('span').textContent = (n>=100?'100+':n)+' '+c(n===1?'oyuncu çevrimiçi':'oyuncu çevrimiçi');
+  el.querySelector('span').textContent = (n>=50?'50+':n)+' '+c(n===1?'oyuncu çevrimiçi':'oyuncu çevrimiçi');
 }
 const BOTLAR=[
   {ad:'Çaylak Piyon', zor:'kolay', puan:800},
@@ -11483,7 +11662,7 @@ async function botlaOyna(b){
 }
 function cvBeklemeGoster(metin, kod, ayar){
   clearInterval(_sayacZam);
-  if(!kod){ sayacYaz(); _sayacZam=setInterval(()=>{ if(document.getElementById('cvBekleme').classList.contains('acik')) sayacYaz(); else clearInterval(_sayacZam); }, 30000); }
+  if(!kod){ sayacYaz(); _sayacZam=setInterval(()=>{ if(document.getElementById('cvBekleme').classList.contains('acik')) sayacYaz(); else clearInterval(_sayacZam); }, 60000); }
   else { const s=document.getElementById('cvSayac'); if(s) s.textContent=''; }
   document.getElementById('cvBeklemeMetin').textContent=metin||'Rakip aranıyor…';
   document.getElementById('cvKodGoster').textContent=kod||'';
@@ -11543,7 +11722,55 @@ function kurulumSecimEsitle(){
 function kurulumKapat(){
   document.getElementById('kurulumEkran').classList.remove('acik');
 }
+/* Bot oyununda davet (Kasım 2026, sahibin isteği): çevrimiçi oyun başlarken süren bot oyunu saklanır, ana menüdeki
+   kartla kaldığı yerden sürer. Yalnız bellekte tutulur; uygulama kapanırsa ya da yeni yerel oyun açılırsa silinir. */
+let _botKayit=null, _botDonus=false, _davetSaat=false;
+function botOyunundaMi(){ return oyunAktif && !oyunBitti && !cevrimiciAktif && mod==='ai'; }
+function botOyunSakla(){
+  _botKayit={ zor:aiZorluk, insan:aktifInsanRenk, sure:sureSecim, artis:sureArtis, saat:{w:saatler.w,b:saatler.b}, sonDk:{w:sonDkCal.w,b:sonDkCal.b},
+    ordu:aktifOrdu, arena:aktifArena, kayit:oyunKaydi, gecmis:konumGecmisi, ist:{hamle:ist.hamle,esirB:ist.esirB.slice(),esirS:ist.esirS.slice()}, fen:Motor.fen() };
+}
+/* Motor ortak: bot düşünürken ya da taş oynarken çevrimiçine geçilmesin, sıra oyuncuya gelene kadar bekle */
+async function botSirasiBekle(){
+  for(let i=0;i<75;i++){
+    if(!botOyunundaMi()) return;
+    if(!kilit && Motor.turn===aktifInsanRenk) return;
+    await new Promise(r=>setTimeout(r,200));
+  }
+}
+function botOyunaDon(){
+  const k=_botKayit; if(!k || (cevrimiciAktif && oyunAktif && !oyunBitti)) return;
+  if(cevrimiciAktif){ try{ menuyeDonCevrimici(); }catch(e){} }
+  mod='ai'; aiZorluk=k.zor; insanRenk=k.insan; sureSecim=k.sure; sureArtis=k.artis; aktifOrdu=k.ordu; aktifArena=k.arena;
+  _botDonus=true; try{ oyunaBasla(); } finally { _botDonus=false; }
+  _botKayit=null;
+  /* Hamleler baştan oynatılır: üçlü tekrar geçmişi de geri gelsin. Tutmazsa konumdan kurulur. */
+  Motor.reset();
+  let tamam=true;
+  for(const r of k.kayit){
+    const h=Motor.legal(Motor.turn).find(m=>Motor.notasyon(m)===r.notasyon);
+    if(!h){ tamam=false; break; }
+    Motor.yap(h);
+  }
+  if(!tamam || Motor.fen()!==k.fen) Motor.fenYukle(k.fen);
+  oyunKaydi=k.kayit; konumGecmisi=k.gecmis; gozdenGecir=-1;
+  ist.hamle=k.ist.hamle; ist.esirB=k.ist.esirB; ist.esirS=k.ist.esirS;
+  saatler.w=k.saat.w; saatler.b=k.saat.b; sonDkCal.w=k.sonDk.w; sonDkCal.b=k.sonDk.b;
+  kilit=false; secili=-1; legalSet=[];
+  taslariDiz(false); hudGuncelle(); saatYaz();
+  try{ notasyonPaneliYaz(); esirYiginiKur(); }catch(e){}
+  cizimIste();
+  if(Motor.turn!==aktifInsanRenk){
+    kilit=true;
+    setTimeout(async()=>{ const h=Motor.enIyiHamle(aiZorluk); if(h) await hamleOyna(h,true); },900);
+  }
+}
+setInterval(()=>{
+  const k=document.getElementById('botaDonKart');
+  if(k) k.style.display=(_botKayit && !(cevrimiciAktif && oyunAktif && !oyunBitti))?'':'none';
+},1000);
 function oyunaBasla(){
+  if(!_botDonus) _botKayit=null;
   oyunAktif=true;
   cevrimiciAktif=false; // yerel oyun
   // Düz mod ve etiketleri sıfırla (her oyun temiz 3D başlasın)
@@ -11585,7 +11812,7 @@ function oyunaBasla(){
   tahtaTercihleriniUygula();
   yardimIlkGirisKontrol();
   // İnsan siyahsa, beyaz olan AI ilk hamleyi yapar (diziliş animasyonu bitsin diye bekle)
-  if(mod==='ai' && insanSiyahMi){
+  if(mod==='ai' && insanSiyahMi && !_botDonus){
     kilit=true;
     setTimeout(async()=>{
       const aiH=Motor.enIyiHamle(aiZorluk);
@@ -11882,6 +12109,7 @@ window.geriTusu=function(){
     // 4. Bulmaca modundaysa → bulmacadan çık
     if(typeof bulmacaModu!=='undefined' && bulmacaModu){ if(typeof bulmacaBitir==='function'){ bulmacaBitir(); return true; } }
     // 5. Bulmaca zorluk seçimi açıksa → kapat
+    if(window.tusTanitimGeri && window.tusTanitimGeri()) return true;
     if(acik('bulmacaZorluk')){ document.getElementById('bulmacaZorluk').classList.remove('acik'); return true; }   /* satır içi display:none kalınca menü bir daha açılmıyordu */
     // 6. Oyun içindeysek (HUD açık) → geri tuşu SEÇENEKLER menüsünü açar
     if(acik('hud') && oyunAktif){
@@ -12328,7 +12556,7 @@ function inceleGrafikCiz(){
 }
 /* İnceleme paneli tahtanın alt sıralarını örtmesin: tahta çerçevesinin ekrandaki alt kenarı
    panelin üstüne gelene kadar görüntü yukarı kaydırılır (kamera setViewOffset; sahne değişmez). */
-let _incKay=0;
+let _incKay=0, _incZoom=1, _incBoy='';
 function inceleGorunumAyarla(){
   try{
     if(typeof camera==='undefined' || !camera) return;
@@ -12339,7 +12567,7 @@ function inceleGorunumAyarla(){
     const hud=ogrenAltta ? ogrenP : document.getElementById('inceleHUD');
     camera.clearViewOffset();
     window._duzIncKadraj=null;
-    if(!hud || !hud.classList.contains('acik')){ if(camera.zoom!==1){ camera.zoom=1; camera.updateProjectionMatrix(); } _incKay=0; document.body.classList.remove('incelemede'); cizimIste(); return; }
+    if(!hud || !hud.classList.contains('acik')){ if(camera.zoom!==1){ camera.zoom=1; camera.updateProjectionMatrix(); } _incKay=0; _incZoom=1; document.body.classList.remove('incelemede'); cizimIste(); return; }
     if(!ogrenAltta) document.body.classList.add('incelemede');
     if(camera.zoom!==1){ camera.zoom=1; camera.updateProjectionMatrix(); }
     /* Geniş ekran: panel iki yanda (CSS ızgara). Ortadaki boşluğun genişliği hesaplanır, tahta sığmıyorsa uzaklaştırılır. */
@@ -12382,6 +12610,19 @@ function inceleGorunumAyarla(){
     }
     camera.updateMatrixWorld();
     const H=innerHeight; let alt=-1e9, ust=1e9;
+    /* Çerçevesiyle tahta ekrana ve üst çubuk ile panel arasına sığmıyorsa küçült (yorum kartı büyüyüp küçüldükçe zıplamasın: yalnızca küçülür) */
+    if(!ogrenAltta){
+      const _boy=innerWidth+'x'+H; if(_boy!==_incBoy){ _incBoy=_boy; _incZoom=1; _incKay=0; }
+      let xYari=0, yMin=1e9, yMax=-1e9;
+      for(const x of [-4.9,4.9]) for(const z of [-4.9,4.9]){
+        const v=new THREE.Vector3(x,0,z).project(camera);
+        xYari=Math.max(xYari, Math.abs(v.x)*innerWidth/2);
+        const py=(1-v.y)/2*H; yMin=Math.min(yMin,py); yMax=Math.max(yMax,py);
+      }
+      const uygun=Math.min(1, (innerWidth/2-6)/xYari, (hud.getBoundingClientRect().top-70)/(yMax-yMin));
+      _incZoom=Math.max(0.55, Math.min(_incZoom, uygun));
+      if(_incZoom<1){ camera.zoom=_incZoom; camera.updateProjectionMatrix(); }
+    }
     for(const x of [-4.4,4.4]) for(const z of [-4.4,4.4]) for(const y of [0,1.1]){
       const v=new THREE.Vector3(x,y,z).project(camera); const py=(1-v.y)/2*H;
       if(y===0) alt=Math.max(alt,py); ust=Math.min(ust,py);
@@ -14240,7 +14481,7 @@ function istRender(){
       const idx=B.sonOyunlar.indexOf(o);
       const inceleBtn=(o.hamleler&&o.hamleler.length)?'<button class="gecmisIncele" data-i="'+idx+'">İncele</button>':'';
       h+='<div class="istSonSatir"><span class="rozet '+rsinif+'">'+rmetin+'</span>'+
-        '<span class="renkİm '+(o.renk==='w'?'rw':'rb')+'">'+renkIm+'</span><span>'+sonucMetin+'</span>'+
+        '<span class="renkİm '+(o.renk==='w'?'rw':'rb')+'">'+renkIm+'</span><span class="rkKutu"><span>'+sonucMetin+'</span>'+(oyunRakipMetni(o)?'<small data-cevirme>'+lobiKac(oyunRakipMetni(o))+'</small>':'')+'</span>'+
         '<span class="bilgi">'+(o.hamle||0)+' hamle</span>'+inceleBtn+'</div>';
     }
     h+='</div>';
@@ -14266,6 +14507,19 @@ function istRender(){
     };
   });
 }
+/* Oyun geçmişi: kimle oynandı (Kasım 2026). rk: 'o' çevrimiçi oyuncu, 'b' bot, 'y' aynı cihazda iki kişi. Eski kayıtlarda yok. */
+function oyunRakipBilgi(cv){
+  if(cv || (typeof cevrimiciAktif!=='undefined' && cevrimiciAktif)) return {rk:'o', rAd:String(sonRakipAd||'').slice(0,30), rUid:sonRakipUid||''};
+  if(typeof mod!=='undefined' && mod==='ai') return {rk:'b', rz:(typeof aiZorluk!=='undefined'?aiZorluk:'')};
+  return {rk:'y'};
+}
+function oyunRakipMetni(o){
+  if(!o || !o.rk) return '';
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  if(o.rk==='o') return o.rAd||c('Rakip');
+  if(o.rk==='b'){ const z={kolay:'Kolay',orta:'Orta',zor:'Zor'}[o.rz]; return c('Bot')+(z?' · '+c(z):''); }
+  return c('İki Oyuncu');
+}
 function gecmisOyunIncele(hamleler){
   Motor.reset();
   oyunKaydi=[]; konumGecmisi=[];
@@ -14283,8 +14537,13 @@ function gecmisOyunIncele(hamleler){
   document.getElementById('menu').classList.add('gizli');
   document.getElementById('hud').classList.add('acik');
   arenaKur(aktifArena); taslariDiz();
+  /* Ana menünün arkasındaki sahnenin kamerası (yakın, eğik) kalıyordu; tahta orantısız büyük ve yarım görünüyordu */
+  const _duz=(typeof duzGorunum!=='undefined' && duzGorunum);
+  kamHedef.set(0,0,0); kamYaw=0; kamUzak=_duz?duzUzaklik():uygunUzaklik(); kamPitch=_duz?1.55:dikeyKamPitch();
   inceleAnalizVar=!!window._hikayeMac;   // efsane maç hikâyesinde analiz yok, her hamle anlatılır
   tahtadaIncelemeBaslat(true);
+  /* Panel açıldı, inceleme kaydırması devrede: kadraj yeni kamerayla sıfırdan ölçülür */
+  _incKay=0; _incZoom=1; kameraGuncelle(); inceleGorunumAyarla(); kameraGuncelle();
 }
 
 function basarimKontrol(){
@@ -14576,25 +14835,28 @@ const Cevrimici=(()=>{
   /* ---- LOBİ (Ekim 2026) ----
      Son görülme cevrimici/{uid}.ts'den (uygulama açıkken 2 dk'da bir yazılır); son 5 dk = çevrimiçi.
      Profilde lobiGizli:true olanlar listelenmez. */
+  const _lobiProf={};   /* uid -> {v, t}: profil 5 dk önbellekte, her yenilemede yeniden okunmaz (Firestore okuması) */
   async function lobiListesi(){
     if(!hazirMi()) return [];
     const ben=fbKullanici.uid;
-    const s=await fbDb.collection('cevrimici').orderBy('ts','desc').limit(60).get();
-    const son={}; const ids=[];
-    s.forEach(d=>{ if(d.id===ben) return; const t=d.get('ts'); son[d.id]=(t&&t.toMillis)?t.toMillis():0; ids.push(d.id); });
-    const prof={};
-    for(let i=0;i<ids.length;i+=10){
-      const parca=ids.slice(i,i+10);
+    const s=await fbDb.collection('cevrimici').orderBy('ts','desc').limit(30).get();
+    const son={}, oyunda={}; const ids=[];
+    s.forEach(d=>{ if(d.id===ben) return; const t=d.get('ts'); son[d.id]=(t&&t.toMillis)?t.toMillis():0; oyunda[d.id]=d.get('oyunda')===true; ids.push(d.id); });
+    const simdi=Date.now();
+    const eksik=ids.filter(id=>!_lobiProf[id] || simdi-_lobiProf[id].t>5*60000);
+    for(let i=0;i<eksik.length;i+=10){
+      const parca=eksik.slice(i,i+10);
       try{
         const q=await fbDb.collection('oyuncular').where(firebase.firestore.FieldPath.documentId(),'in',parca).get();
-        q.forEach(d=>{ prof[d.id]=d.data()||{}; });
+        q.forEach(d=>{ _lobiProf[d.id]={v:d.data()||{}, t:simdi}; });
       }catch(e){}
     }
-    const simdi=Date.now();
+    const prof={};
+    ids.forEach(id=>{ if(_lobiProf[id]) prof[id]=_lobiProf[id].v; });
     return ids.filter(id=>prof[id] && !prof[id].lobiGizli).map(id=>({
       uid:id, ad:prof[id].kullaniciAdi||'Oyuncu', puan:prof[id].puan||800, ulke:prof[id].ulke||'',
       foto:prof[id].avatarFoto||'', avatar:prof[id].avatar||'',
-      son:son[id], cevrimici:(simdi-son[id])<5*60000
+      son:son[id], cevrimici:(simdi-son[id])<5*60000, oyunda:oyunda[id] && (simdi-son[id])<5*60000
     })).sort((a,b)=>(b.cevrimici-a.cevrimici)||(b.son-a.son));
   }
   async function lobiGizliYaz(gizli){
@@ -15550,6 +15812,10 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Kısa: taşlar ve logo']={en:'Short: pieces and logo',ru:'Коротко: фигуры и логотип',ar:'قصير: القطع والشعار',fr:'Court : pièces et logo',de:'Kurz: Figuren und Logo',it:'Breve: pezzi e logo',zh:'简短：棋子与标志'};
   CEVM['Arkadaşlar']={en:'Friends',ru:'Друзья',ar:'الأصدقاء',fr:'Amis',de:'Freunde',it:'Amici',zh:'好友'};
   CEVM['Satranç her şeydir.']={en:'Chess is everything.',ru:'Шахматы — это всё.',ar:'الشطرنج هو كل شيء.',fr:'Les échecs sont tout.',de:'Schach ist alles.',it:'Gli scacchi sono tutto.',zh:'国际象棋就是一切。'};
+  CEVM['Oyunda']={en:'In a game',ru:'В игре',ar:'في مباراة',fr:'En partie',de:'Im Spiel',it:'In partita',zh:'对局中'};
+  CEVM['BOT OYUNUNA DÖN']={en:'BACK TO BOT GAME',ru:'ВЕРНУТЬСЯ К ИГРЕ С БОТОМ',ar:'العودة إلى مباراة الروبوت',fr:'REPRENDRE LA PARTIE CONTRE LE BOT',de:'ZURÜCK ZUM BOT-SPIEL',it:'TORNA ALLA PARTITA COL BOT',zh:'返回人机对局'};
+  CEVM['Yarım kalan oyununa devam et']={en:'Continue your unfinished game',ru:'Продолжить незаконченную партию',ar:'تابع مباراتك غير المكتملة',fr:'Continuez votre partie inachevée',de:'Setze dein unbeendetes Spiel fort',it:'Continua la partita interrotta',zh:'继续未完成的对局'};
+  CEVM['Bot oyunun saklanır, sonra ana menüden devam edersin.']={en:'Your bot game is saved. Continue it later from the main menu.',ru:'Игра с ботом сохранится, продолжите её позже из главного меню.',ar:'تُحفظ مباراتك مع الروبوت، ويمكنك متابعتها لاحقًا من القائمة الرئيسية.',fr:'Votre partie contre le bot est gardée. Reprenez-la plus tard depuis le menu principal.',de:'Dein Bot-Spiel wird gespeichert. Setze es später im Hauptmenü fort.',it:'La partita col bot viene salvata. Continuala più tardi dal menu principale.',zh:'人机对局会保留，之后可从主菜单继续。'};
   CEVM['Oynat']={en:'Play',ru:'Пуск',ar:'تشغيل',fr:'Lire',de:'Abspielen',it:'Riproduci',zh:'播放'};
   CEVM['Durdur']={en:'Pause',ru:'Пауза',ar:'إيقاف',fr:'Pause',de:'Pause',it:'Pausa',zh:'暂停'};
   CEVM['Dinle']={en:'Listen',ru:'Слушать',ar:'استمع',fr:'Écouter',de:'Anhören',it:'Ascolta',zh:'收听'};
@@ -15879,6 +16145,7 @@ Object.assign(CEVM,{
 'Bilgisayarda oyna':{en:'Play on your computer',ru:'Играть на компьютере',ar:'العب على الكمبيوتر',fr:'Jouer sur ordinateur',de:'Am Computer spielen',it:'Gioca sul computer',zh:'在电脑上下棋'},
 'Bilgisayarında bu adresi aç, ekranda çıkan kodu okut.':{en:'Open this address on your computer and scan the code on the screen.',ru:'Откройте этот адрес на компьютере и отсканируйте код на экране.',ar:'افتح هذا العنوان على الكمبيوتر وامسح الرمز الظاهر.',fr:'Ouvrez cette adresse sur votre ordinateur et scannez le code affiché.',de:'Öffne diese Adresse am Computer und scanne den angezeigten Code.',it:'Apri questo indirizzo sul computer e scansiona il codice mostrato.',zh:'在电脑上打开此地址，并扫描屏幕上的代码。'},
 'Kodu okut':{en:'Scan the code',ru:'Сканировать',ar:'امسح الرمز',fr:'Scanner',de:'Code scannen',it:'Scansiona',zh:'扫描代码'},
+'Bot':{en:'Bot',ru:'Бот',ar:'روبوت',fr:'Bot',de:'Bot',it:'Bot',zh:'机器人'},
 'Kütüphane':{en:'Library',ru:'Библиотека',ar:'المكتبة',fr:'Bibliothèque',de:'Bibliothek',it:'Biblioteca',zh:'资料库'},
 'Kurallar, varyantlar, efsane maçlar':{en:'Rules, variants, legendary games',ru:'Правила, варианты, легендарные партии',ar:'القواعد والأنواع والمباريات الأسطورية',fr:'Règles, variantes, parties légendaires',de:'Regeln, Varianten, legendäre Partien',it:'Regole, varianti, partite leggendarie',zh:'规则、变体、传奇对局'},
 'TAKTİKLER':{en:'TACTICS',ru:'ТАКТИКА',ar:'تكتيكات',fr:'TACTIQUES',de:'TAKTIK',it:'TATTICHE',zh:'战术'},
@@ -16379,7 +16646,9 @@ function davetGoster(d){
   bekleyenDavet=d;
   document.getElementById('davetMetin').innerHTML =
     '<b>'+lobiKac(d.ad||'Bir oyuncu')+'</b> seni oyuna davet ediyor.<br>'+
-    '<span style="color:var(--dim);font-size:13px">'+odaAyarMetni(+(d.sure!=null?d.sure:3), +(d.inc||0), null)+'</span>';   /* animasyon kişisel (Ekim 2026) */
+    '<span style="color:var(--dim);font-size:13px">'+odaAyarMetni(+(d.sure!=null?d.sure:3), +(d.inc||0), null)+'</span>'+   /* animasyon kişisel (Ekim 2026) */
+    (botOyunundaMi()?'<br><span style="color:var(--dim);font-size:13px">'+lobiKac(((typeof metniCevir==='function')?metniCevir:(x=>x))('Bot oyunun saklanır, sonra ana menüden devam edersin.'))+'</span>':'');
+  if(botOyunundaMi() && !_davetSaat){ _davetSaat=true; try{ saatDurdur(); }catch(e){} }
   try{ davetSecimCiz(); }catch(e){}
   document.getElementById('davetPop').classList.add('acik');
 }
@@ -16457,13 +16726,19 @@ window.davetReddedildi=function(hedef){
     p.onclick=e=>{ if(e.target===p) p.remove(); };
     document.body.appendChild(p);
   }catch(e){ anlatimGoster(m, 4500); }
-  try{ if(typeof Bildirim!=='undefined') Bildirim.gonder('Chess64', m); }catch(e){}
+  try{
+    if(document.visibilityState==='visible'){
+      if(!(typeof Ses!=='undefined' && Ses.sessizMi)){ const _s=new Audio('sfx/bildirim_davet.mp3'); _s.volume=.9; _s.play().catch(()=>{}); }
+    } else if(typeof AndroidBildirim!=='undefined' && AndroidBildirim.gosterDavet) AndroidBildirim.gosterDavet('Chess64', m);
+    else if(typeof Bildirim!=='undefined') Bildirim.gonder('Chess64', m);
+  }catch(e){}
   try{ if(navigator.vibrate) navigator.vibrate([60,40,60]); }catch(e){}
   const rb=document.getElementById('sonRovans'); if(rb){ rb.disabled=false; rb.textContent='RÖVANŞ'; }
 };
 function davetKapat(){
   document.getElementById('davetPop').classList.remove('acik');
   bekleyenDavet=null;
+  if(_davetSaat){ _davetSaat=false; try{ saatSurdur(); }catch(e){} }
 }
 function davetOlaylariBagla(){
   const k=document.getElementById('davetKabul'), r=document.getElementById('davetRet');
@@ -16472,10 +16747,24 @@ function davetOlaylariBagla(){
     if(!bekleyenDavet) return;
     const d=bekleyenDavet; davetKapat();
     if(cevrimiciAktif && oyunBitti) menuyeDonCevrimici();   // biten oyunun ekranındayken gelen rövanş
+    const botta=botOyunundaMi();
+    if(botta){ await botSirasiBekle(); kilit=true; }   // katılım sürerken hamle oynanmasın
+    let katildi=false;
     await odayaKatilAkis(d.oda, ()=>{
+      katildi=true;
       document.getElementById('cevrimiciEkran').classList.add('acik');
       cvBeklemeGoster('Bağlanılıyor…');
     });
+    /* Katılım olmadıysa bot oyunu olduğu gibi sürer */
+    if(botta){
+      const coz=()=>{
+        if(cevrimiciAktif || !botOyunundaMi()) return;
+        const ap=document.getElementById('cvAyarPop');
+        if(ap && ap.classList.contains('acik')){ setTimeout(coz,400); return; }
+        kilit=false;
+      };
+      if(katildi) setTimeout(coz,15000); else coz();
+    }
     await Cevrimici.davetSil(d.id);   // katıldıktan sonra: gönderen ret sanmasın
   };
   r.onclick=async ()=>{
@@ -16640,6 +16929,8 @@ window.reklamSonucu=function(etiket,durum){
       Cevrimici.davetleriDinle(d=>{
         /* Oyun sürerken gelen davet eskiden sessizce kayboluyordu (dinleyici yalnız ilk gelişi görür). Artık
            oyunu kesmeyen kısa bir haber verilir, davet oyun bitince açılır (Kasım 2026, sahibin isteği). */
+        const _tt=document.getElementById('tusTanitim');
+        if(botOyunundaMi() && !(_tt && _tt.classList.contains('acik'))){ davetGoster(d); return; }   // bot oyunu saklanabilir: davet hemen sorulur
         if(typeof oyunAktif!=='undefined' && oyunAktif && !oyunBitti){
           if(!ertelenenDavetler.some(x=>x.id===d.id)) ertelenenDavetler.push(d);
           const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
@@ -16773,6 +17064,9 @@ html[data-tema="fildisi"] #menu #profilCubuk{background:#fffdf8;border-color:rgb
   color:var(--brass,#E8B64C);font:600 12.5px Manrope,sans-serif}
 html[data-tema="fildisi"] #profilCubuk .pkAd{color:#1f1b14}
 #menu .kartlar>#istKart{display:none!important}
+.istSonSatir .bilgi{white-space:nowrap;flex-shrink:0}
+.rkKutu{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+.rkKutu small{font-size:11.5px;font-weight:600;color:var(--brass,#B07E22);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
 #istQr{display:inline-flex;align-items:center;gap:5px;margin-left:auto;padding:7px 12px;border-radius:18px;cursor:pointer;background:none;border:1px solid var(--line,rgba(232,182,76,.3));color:var(--brass,#E8B64C);font:600 12.5px Manrope,sans-serif}
 #istQr~#istCikis{margin-left:8px}
 #menu{padding-top:calc(env(safe-area-inset-top,0px) + 6px)!important;padding-bottom:10px!important}
@@ -19148,7 +19442,7 @@ const SOZLER=[
   {y:'suntzu', tr:'Bütün savaşlar aldatmaya dayanır.', en:'All warfare is based on deception.', ru:'Война — это путь обмана.', ar:'الحرب كلها قائمة على الخداع.', fr:'Tout l\'art de la guerre est fondé sur la duperie.', de:'Alle Kriegführung beruht auf Täuschung.', it:'Tutta la guerra si basa sull\'inganno.', zh:'兵者，诡道也。'}
 ];
 (function(){
-  const el=document.querySelector('.menuSlogan'), yz=document.querySelector('.sozYazar'), menu=document.getElementById('menu');
+  const el=document.querySelector('.menuSlogan'), yz=document.querySelector('.sozYazar'), menu=document.getElementById('menu'), on64=document.querySelector('.on64');
   if(!el||!yz||!menu) return;
   const ACIK=['#B3261E','#B07E22','#2B5197','#1F7A4D','#7A2E6E','#A2441C'];   // Fildişi
   const KOYU=['#E0503F','#E8B64C','#7FA8E8','#5CC08A','#C77DBA','#E8894A'];   // koyu temalar
@@ -19169,6 +19463,8 @@ const SOZLER=[
     el.textContent=s; el.style.fontSize=boyut(s,d)+'px'; el.style.lineHeight=s.length>34?'1.18':'1.1';
     yz.textContent='— '+(a[d]||a.tr||'');
     el.style.setProperty('--sloganRenk', renk()); yz.style.color=renk();
+    /* Logodaki 64 sözün rengine geçer, üzerinden ışık süzülür */
+    if(on64){ on64.style.setProperty('--sozRenk', renk()); on64.classList.remove('parla'); void on64.offsetWidth; on64.classList.add('parla'); }
     el.classList.remove('sil','yaz'); yz.classList.remove('gor'); void el.offsetWidth; el.classList.add('yaz'); yz.classList.add('gor');
     return s.length;
   }
@@ -19671,7 +19967,7 @@ const SOZLER=[
     /* Oyuncu adresi buradan öğrenir: önce nereye gireceği söylenir, sonra kamera açılır */
     const p=document.createElement('div'); p.id='retPop';
     p.style.cssText='position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(4,5,9,.72)';
-    p.innerHTML='<div style="width:min(340px,92vw);background:linear-gradient(180deg,#171a24,#0d0f15);border:1px solid rgba(232,182,76,.35);border-radius:20px;padding:22px 18px 16px;text-align:center"><div style="font:700 17px Cinzel,serif;color:#E8B64C;margin-bottom:10px"></div><div style="color:#cfc8b8;font-size:14px;line-height:1.5"></div><div data-cevirme style="font:800 19px Manrope,sans-serif;color:#F2C765;margin:10px 0 16px">chess64.pages.dev</div><div style="display:flex;gap:8px"><button type="button" style="flex:1;padding:11px;border-radius:12px;border:none;background:#E8B64C;color:#1a1408;font-weight:700"></button><button type="button" style="flex:1;padding:11px;border-radius:12px;border:1px solid rgba(232,182,76,.4);background:transparent;color:#E8B64C;font-weight:700"></button></div></div>';
+    p.innerHTML='<div style="width:min(340px,92vw);background:linear-gradient(180deg,#171a24,#0d0f15);border:1px solid rgba(232,182,76,.35);border-radius:20px;padding:22px 18px 16px;text-align:center"><div style="font:700 17px Cinzel,serif;color:#E8B64C;margin-bottom:10px"></div><div style="color:#cfc8b8;font-size:14px;line-height:1.5"></div><div data-cevirme style="font:800 19px Manrope,sans-serif;color:#F2C765;margin:10px 0 16px">playchess64.pages.dev</div><div style="display:flex;gap:8px"><button type="button" style="flex:1;padding:11px;border-radius:12px;border:none;background:#E8B64C;color:#1a1408;font-weight:700"></button><button type="button" style="flex:1;padding:11px;border-radius:12px;border:1px solid rgba(232,182,76,.4);background:transparent;color:#E8B64C;font-weight:700"></button></div></div>';
     const d=p.firstChild, btn=d.querySelectorAll('button');
     d.children[0].textContent=c('Bilgisayarda oyna');
     d.children[1].textContent=c('Bilgisayarında bu adresi aç, ekranda çıkan kodu okut.');

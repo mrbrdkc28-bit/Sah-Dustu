@@ -942,6 +942,11 @@ class MainActivity : AppCompatActivity() {
             fun goster(baslik: String, govde: String) {
                 runOnUiThread { gosterBildirim(baslik, govde) }
             }
+            /** Davet reddi gibi davet bildirimleri: oyun isteği sesiyle (ses_davet) */
+            @JavascriptInterface
+            fun gosterDavet(baslik: String, govde: String) {
+                runOnUiThread { gosterBildirim(baslik, govde, DAVET_KANAL) }
+            }
             /** Uzak bildirim (Ekim 2026): FCM adresini oyuna ver; oyun Firestore'a yazar.
              *  Izin acilista zaten soruluyor (Android 13+); burada yalniz adres alinir. */
             @JavascriptInterface
@@ -1589,7 +1594,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun gosterBildirim(baslik: String, govde: String) {
+    private fun gosterBildirim(baslik: String, govde: String, kanal: String = BILDIRIM_KANAL) {
         // Uygulamayi one getiren niyet
         val niyet = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -1599,7 +1604,7 @@ class MainActivity : AppCompatActivity() {
         else PendingIntent.FLAG_UPDATE_CURRENT
         val pi = PendingIntent.getActivity(this, 0, niyet, bayrak)
 
-        val bildirim = NotificationCompat.Builder(this, BILDIRIM_KANAL)
+        val bildirim = NotificationCompat.Builder(this, kanal)
             .setSmallIcon(R.drawable.ic_bildirim)
             .setContentTitle(baslik)
             .setContentText(govde)
