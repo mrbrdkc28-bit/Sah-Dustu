@@ -27,7 +27,7 @@ android {
         applicationId = "com.emre.sahdustu"
         minSdk = 26
         targetSdk = 36
-        versionCode = 11
+        versionCode = 12
         versionName = "2.2"
     }
 

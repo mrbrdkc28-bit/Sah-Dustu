@@ -11882,7 +11882,7 @@ window.geriTusu=function(){
     // 4. Bulmaca modundaysa → bulmacadan çık
     if(typeof bulmacaModu!=='undefined' && bulmacaModu){ if(typeof bulmacaBitir==='function'){ bulmacaBitir(); return true; } }
     // 5. Bulmaca zorluk seçimi açıksa → kapat
-    if(acik('bulmacaZorluk')){ const e=document.getElementById('bulmacaZorluk'); e.classList.remove('acik'); e.style.display='none'; return true; }
+    if(acik('bulmacaZorluk')){ document.getElementById('bulmacaZorluk').classList.remove('acik'); return true; }   /* satır içi display:none kalınca menü bir daha açılmıyordu */
     // 6. Oyun içindeysek (HUD açık) → geri tuşu SEÇENEKLER menüsünü açar
     if(acik('hud') && oyunAktif){
       /* 10 Ekim 2026: oyun sürerken geri tuşu sormadan çıkmaz; çıkış penceresi açılır (devam/yeni/teslim/menü) */
