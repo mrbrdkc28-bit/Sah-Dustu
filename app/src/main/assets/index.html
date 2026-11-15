@@ -344,6 +344,64 @@ canvas{display:block}
   background:radial-gradient(120% 90% at 50% 0%, #131726 0%, var(--ink) 62%)}
 #girisEkran.gizli{display:none}
 #lisansEkran.gizli{display:none}
+/* Çevrimiçi maç başlangıcı: bölünmüş ekran (cvVsGoster) */
+#cvVs{position:fixed;inset:0;z-index:58;overflow:hidden;touch-action:none;font-family:'Manrope',system-ui,sans-serif}
+#cvVs .vsYari{position:absolute;left:0;right:0;height:50%;overflow:hidden;background:#0b0c10;
+  transition:transform .55s cubic-bezier(.6,0,.3,1)}
+#cvVs .vsUst{top:0;transform:translateY(-100%)}
+#cvVs .vsAlt{bottom:0;transform:translateY(100%)}
+#cvVs.acik .vsYari{transform:none;transition-timing-function:cubic-bezier(.2,.9,.25,1)}
+#cvVs.kapan .vsUst{transform:translateY(-100%)}
+#cvVs.kapan .vsAlt{transform:translateY(100%)}
+#cvVs .vsGorsel{position:absolute;inset:0}
+#cvVs .vsGorsel img{width:100%;height:100%;object-fit:cover;display:block}
+#cvVs .vsUst .vsGorsel>img{object-position:50% 40%}
+#cvVs .vsYari::after{content:"";position:absolute;inset:0;pointer-events:none}
+#cvVs .vsUst::after{background:linear-gradient(180deg,rgba(5,6,10,.15) 0%,rgba(5,6,10,0) 45%,rgba(5,6,10,.75) 100%)}
+#cvVs .vsAlt::after{background:linear-gradient(0deg,rgba(5,6,10,.15) 0%,rgba(5,6,10,0) 45%,rgba(5,6,10,.75) 100%)}
+#cvVs .vsBos img{filter:grayscale(.6) brightness(.55)}
+#cvVs .vs2b{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(4,1fr);background:#1a1712}
+#cvVs .vs2b i{display:flex;align-items:center;justify-content:center;font-style:normal}
+#cvVs .vs2b i.a{background:#ecdab9}
+#cvVs .vs2b i.k{background:#ae8a68}
+#cvVs .vs2b img{width:84%;height:84%;object-fit:contain}
+#cvVs .vsEtiket{position:absolute;z-index:1;display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:99px;
+  background:rgba(8,9,13,.78);border:1px solid rgba(232,182,76,.35);color:#E9E1CE;font-size:11.5px;letter-spacing:.04em;
+  max-width:calc(100% - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#cvVs .vsEtiket img{width:34px;height:22px;border-radius:99px;object-fit:cover;flex:none}
+#cvVs .vsEtiket span{overflow:hidden;text-overflow:ellipsis}
+#cvVs .vsEtiket b{color:#E8B64C;font-weight:700}
+#cvVs .vsUst .vsEtiket{top:calc(env(safe-area-inset-top,0px) + 16px);inset-inline-start:16px}
+#cvVs .vsAlt .vsEtiket{bottom:calc(env(safe-area-inset-bottom,0px) + 18px);inset-inline-end:16px}
+#cvVs .vsCizgi{position:absolute;left:0;right:0;top:50%;height:2px;margin-top:-1px;z-index:1;opacity:0;
+  background:linear-gradient(90deg,transparent,#E8B64C 20%,#F6D88A 50%,#E8B64C 80%,transparent);box-shadow:0 0 14px rgba(232,182,76,.7);
+  transition:opacity .3s ease .3s}
+#cvVs.acik .vsCizgi{opacity:1}
+#cvVs.kapan .vsCizgi{opacity:0;transition-delay:0s}
+#cvVs .vsSerit{position:absolute;z-index:2;display:flex;align-items:center;gap:10px;height:52px;padding:0 16px 0 6px;
+  background:linear-gradient(135deg,rgba(24,22,18,.94),rgba(10,11,16,.94));border:1px solid rgba(232,182,76,.38);
+  box-shadow:0 12px 30px rgba(0,0,0,.5);transition:transform .5s cubic-bezier(.2,.9,.25,1.1),opacity .35s ease}
+#cvVs .vsRakip{left:0;right:22%;bottom:calc(50% + 14px);border-left:0;border-radius:0 14px 14px 0;transform:translateX(-105%);transition-delay:.18s}
+#cvVs .vsBen{right:0;left:22%;top:calc(50% + 14px);border-right:0;border-radius:14px 0 0 14px;transform:translateX(105%);transition-delay:.28s}
+#cvVs.acik .vsSerit{transform:none}
+#cvVs.kapan .vsSerit{opacity:0;transition-delay:0s}
+#cvVs .vsAv{width:40px;height:40px;border-radius:10px;flex:none;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 35% 30%,#3a3326,#14120e);border:1px solid rgba(232,182,76,.6);color:#E8B64C;font:700 18px 'Cinzel',Georgia,serif}
+#cvVs .vsAv img{width:100%;height:100%;object-fit:cover}
+#cvVs .vsAd{font:700 16px 'Cinzel',Georgia,serif;color:#F2E9D4;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#cvVs .vsUlke{font-size:14px;flex:none}
+#cvVs .vsRenk{width:10px;height:10px;border-radius:50%;flex:none;border:1px solid rgba(232,182,76,.6);margin-inline-start:auto}
+#cvVs .vsRenk.w{background:#f3eee2}
+#cvVs .vsRenk.b{background:#16130f}
+#cvVs .vsPuan{font:700 14px 'Cinzel',Georgia,serif;color:#E8B64C;flex:none}
+#cvVs .vsPuan:empty{display:none}
+#cvVs .vsRozet{position:absolute;z-index:3;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#2a2419,#0d0c0a);
+  border:1.5px solid #E8B64C;box-shadow:0 0 0 4px rgba(10,11,16,.85),0 10px 26px rgba(0,0,0,.6),0 0 22px rgba(232,182,76,.35);
+  font:700 22px 'Cinzel',Georgia,serif;letter-spacing:.04em;color:#F3CF73;transform:scale(0) rotate(-12deg);
+  transition:transform .45s cubic-bezier(.2,1.4,.4,1) .4s}
+#cvVs.acik .vsRozet{transform:none}
+#cvVs.kapan .vsRozet{transform:scale(0);transition-delay:0s;transition-duration:.25s}
 #gizlilikEkran{position:fixed;inset:0;z-index:61;display:flex;flex-direction:column;background:#06070b;
   padding-top:env(safe-area-inset-top,0px)}
 #gizlilikEkran.gizli{display:none}
@@ -10727,6 +10785,102 @@ function cevrimiciBilgiGoster(rakipAd){
   }catch(e){}
 }
 
+/* ÇEVRİMİÇİ MAÇ BAŞLANGICI (15 Kasım 2026, sahibin isteği; chess.com'daki gibi).
+   Ekran ikiye bölünür: üstte RAKİBİN seçtiği ordu + arena + 2B/3B, altta SENİNKİ; ortada iki isim şeridi
+   yanlardan gelir, aralarında VS. ~2 sn sonra iki yarı açılır ve oyun her zamanki gibi başlar.
+   Taşların iniş animasyonu bekletilir (zaman damgaları kaydırılır), ekran açılırken başlar; taş dizme koduna
+   dokunulmaz. Dokununca ya da rakip hamle yapınca hemen biter. Yeniden bağlanmada oynamaz.
+   Seçimler maç verisinde: beyazSecim / siyahSecim = {o: ordu, a: arena, d: 1 ise 2B}. Eski sürümde yoktur. */
+function cvSecimim(){
+  try{ return { o:(aktifOrdu&&aktifOrdu.id)||'klasik', a:(aktifArena&&aktifArena.id)||ARENALAR[0].id, d:tahtaTercihi('duz')?1:0 }; }
+  catch(e){ return null; }
+}
+let cvVsBitir=null;
+function cvVsGoster(v, rakipAd){
+  if(window.cvVsBitir) window.cvVsBitir(true);
+  v=v||Cevrimici.veri||{};
+  const benW=(Cevrimici.benimRenk==='w');
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  const kac=(typeof lobiKac==='function')?lobiKac:(x=>String(x));
+  const d=(typeof uygDil!=='undefined'?uygDil:'tr');
+  const B=(d==='tr')?['3B','2B','puan']:(d==='ru')?['3D','2D','рейтинг']:(d==='ar')?['3D','2D','التقييم']:
+          (d==='fr')?['3D','2D','classement']:(d==='de')?['3D','2D','Wertung']:(d==='it')?['3D','2D','punteggio']:
+          (d==='zh')?['3D','2D','积分']:['3D','2D','rating'];
+  const benSecim=cvSecimim()||{o:'klasik',a:ARENALAR[0].id,d:0};
+  const rakipSecim=(benW?v.siyahSecim:v.beyazSecim)||null;
+  const avatarHtml=(foto,av,ad)=>{ const f=guvenliFoto(foto||''); if(f) return '<img src="'+f+'" alt="">';
+    return '<span>'+kac(av || String(ad||'?').trim().charAt(0).toUpperCase() || '\u265E')+'</span>'; };
+  /* Bir yarı: 3B ise ordunun önizlemesi (oyunun 3B motoruyla çekilmiş), 2B ise düz tahta ve 2B taşlar */
+  const yariHtml=(secim, beyazMi, ust)=>{
+    if(!secim) return '<div class="vsGorsel vsBos"><img src="onizleme/ordu_klasik.webp" alt=""></div>';
+    const ordu=ORDULAR.find(o=>o.id===secim.o)||ORDULAR[0];
+    const arena=ARENALAR.find(a=>a.id===secim.a)||ARENALAR[0];
+    let g;
+    if(secim.d){
+      const sira=['R','N','B','Q','K','B','N','R'], renk=beyazMi?'w':'b';
+      const tas=k=>{ const sv=CBURNETT[renk+k]; return sv?'<img src="data:image/svg+xml;utf8,'+encodeURIComponent(sv)+'" alt="">':''; };
+      const satirlar=ust?[sira,Array(8).fill('P'),[],[]]:[[],[],Array(8).fill('P'),sira];
+      let h='';
+      satirlar.forEach((sat,r)=>{ for(let k=0;k<8;k++) h+='<i class="'+(((r+k)%2)?'k':'a')+'">'+(sat[k]?tas(sat[k]):'')+'</i>'; });
+      g='<div class="vsGorsel vs2b">'+h+'</div>';
+    } else {
+      g='<div class="vsGorsel"><img src="onizleme/ordu_'+kac(ordu.id)+'.webp" alt=""></div>';
+    }
+    return g+'<div class="vsEtiket"><img src="onizleme/arena_'+kac(arena.id)+'.webp" alt=""><span>'+
+      kac(c(ordu.ad||''))+' · '+kac(c(arena.ad||''))+' · <b>'+(secim.d?B[1]:B[0])+'</b></span></div>';
+  };
+  const serit=(sinif,ad,foto,av,ulke,puan,renkW)=>
+    '<div class="vsSerit '+sinif+'"><div class="vsAv">'+avatarHtml(foto,av,ad)+'</div>'+
+    '<div class="vsAd" dir="auto">'+kac(ad)+'</div><span class="vsUlke">'+(ulke?ulkeBayrak(ulke):'')+'</span>'+
+    '<span class="vsRenk '+(renkW?'w':'b')+'"></span><span class="vsPuan">'+(puan?kac(puan):'')+'</span></div>';
+  const bi=(typeof bulutIst!=='undefined' && bulutIst)||{};
+  const girisli=!!(fbKullanici && !misafirMod);
+  const benAd=(girisli && bi.kullaniciAdi)||'Sen';
+  const rakipUlke=benW?(v.siyahUlke||''):(v.beyazUlke||'');
+  const rakipPuan=benW?v.siyahPuan:v.beyazPuan;
+  let el=document.getElementById('cvVs'); if(el) el.remove();
+  el=document.createElement('div'); el.id='cvVs';
+  el.innerHTML=
+    '<div class="vsYari vsUst">'+yariHtml(rakipSecim, !benW, true)+'</div>'+
+    '<div class="vsYari vsAlt">'+yariHtml(benSecim, benW, false)+'</div>'+
+    '<div class="vsCizgi"></div>'+
+    serit('vsRakip', rakipAd||'Rakip', '', '', rakipUlke, rakipPuan||'', !benW)+
+    '<div class="vsRozet">VS</div>'+
+    serit('vsBen', benAd, (typeof avatarFotoAl==='function'?avatarFotoAl():'')||'', girisli?(bi.avatar||''):'',
+          girisli?(bi.ulke||''):'', (girisli&&bi.puan)?bi.puan:'', benW);
+  document.body.appendChild(el);
+  try{ agacTara(el); }catch(e){}
+  // Rakibin fotoğrafı (profilinden; gelirse)
+  try{
+    const rakipUid=benW?v.siyah:v.beyaz;
+    if(rakipUid && fbDb) fbDb.collection('oyuncular').doc(rakipUid).get().then(dd=>{
+      if(!dd.exists || !el.isConnected) return; const p=dd.data()||{};
+      const a=el.querySelector('.vsRakip .vsAv'); if(a) a.innerHTML=avatarHtml(p.avatarFoto,p.avatar,rakipAd);
+      if(!rakipUlke && p.ulke){ const u=el.querySelector('.vsRakip .vsUlke'); if(u) u.textContent=ulkeBayrak(p.ulke); }
+    }).catch(()=>{});
+  }catch(e){}
+  /* Taşların inişini bekle: ekran açılırken başlasın */
+  const ACIL_MS=1900, KAPAN_MS=550;
+  const ertele=ms=>{ try{ for(const a of dizilmeAnim) a.basla+=ms; }catch(e){} };
+  ertele(ACIL_MS);
+  let bitti=false, zam=0;
+  const bitir=(hemen)=>{
+    if(bitti) return; bitti=true; clearTimeout(zam); window.cvVsBitir=null;
+    if(hemen){
+      // Bekleyen inişler hemen bitsin (rakip hamlesi gelirse taşlar yerinde olmalı)
+      try{ const t=performance.now(); for(const a of dizilmeAnim) a.basla=Math.min(a.basla, t-a.sure-1); dizilmeGuncelle(); }catch(e){}
+      el.remove(); return;
+    }
+    // Erken dokunuş: inişleri şimdiye çek
+    try{ const t=performance.now(), ilk=Math.min(...dizilmeAnim.map(a=>a.basla)); if(isFinite(ilk) && ilk>t) ertele(t-ilk); }catch(e){}
+    el.classList.add('kapan'); setTimeout(()=>el.remove(), KAPAN_MS+50);
+  };
+  window.cvVsBitir=bitir;
+  el.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); bitir(false); });
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('acik')));
+  zam=setTimeout(()=>bitir(false), ACIL_MS);
+}
+
 /* Odanın ayarını tek satırda yaz: "3+2 · animasyonlu", "Süresiz" */
 function odaAyarMetni(dk, inc, sahne){
   const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
@@ -11260,6 +11414,7 @@ function cevrimiciGuncelle(veri){
     document.getElementById('cevrimiciEkran').classList.remove('acik');
     sonIslenenHamleSayac=0;
     if(typeof cevrimiciOyunBaslat==='function') cevrimiciOyunBaslat(rakipAd);
+    try{ cvVsGoster(veri, rakipAd); }catch(e){ console.log('cvVs:',e); }
   }
   // Rakipten gelen hamleyi tahtaya uygula
   if(cevrimiciAktif && veri.sonHamle){
@@ -11404,6 +11559,7 @@ function _hamleBitti(){
   };
 })();
 function cevrimiciHamleUygula(sh){
+  if(window.cvVsBitir) window.cvVsBitir(true);
   if(_hamleSuruyor>0){
     let yapildi=false;
     const calis=()=>{ if(yapildi) return; yapildi=true; cevrimiciHamleUygulaAsil(sh); };
@@ -14801,6 +14957,7 @@ const Cevrimici=(()=>{
         olusturan:ben,
         beyaz:ben, beyazAd:benAd, beyazPuan:(typeof bulutIst!=='undefined'&&bulutIst.puan)?bulutIst.puan:800,
         beyazUlke:(typeof bulutIst!=='undefined'&&bulutIst.ulke)?bulutIst.ulke:'',
+        beyazSecim:(typeof cvSecimim==='function'?cvSecimim():null),
         siyah:null, siyahAd:null,
         sira:'w',
         sonHamle:null,
@@ -14835,7 +14992,7 @@ const Cevrimici=(()=>{
         /* ODA KURALI (4 Ekim 2026): odayı kuran odanın ayarlarını belirler (süre +
            animasyon). Süreli odada animasyon ayarı farklıysa sessizce değiştirme;
            oyuncuya sor (odaAyarSor). Süresiz odada şart yok. */
-        tx.update(ref,{ siyah:ben, siyahAd:benAd, siyahPuan:(typeof bulutIst!=='undefined'&&bulutIst.puan)?bulutIst.puan:800, siyahUlke:(typeof bulutIst!=='undefined'&&bulutIst.ulke)?bulutIst.ulke:'', durum:'oynaniyor' });
+        tx.update(ref,{ siyah:ben, siyahAd:benAd, siyahPuan:(typeof bulutIst!=='undefined'&&bulutIst.puan)?bulutIst.puan:800, siyahUlke:(typeof bulutIst!=='undefined'&&bulutIst.ulke)?bulutIst.ulke:'', siyahSecim:(typeof cvSecimim==='function'?cvSecimim():null), durum:'oynaniyor' });
         return true;
       });
       if(ok){ odaId=kod; benimRenk='b'; durum='oynaniyor'; odaDinle(kod); }
@@ -14891,8 +15048,8 @@ const Cevrimici=(()=>{
             tx.set(odaRef,{
               durum:'oynaniyor',
               olusturan:dd.uid,
-              beyaz:dd.uid, beyazAd:dd.ad||'Oyuncu', beyazPuan:dd.puan||800, beyazUlke:dd.ulke||'',
-              siyah:ben, siyahAd:benAd, siyahPuan:(typeof bulutIst!=='undefined'&&bulutIst.puan)?bulutIst.puan:800, siyahUlke:(typeof bulutIst!=='undefined'&&bulutIst.ulke)?bulutIst.ulke:'',
+              beyaz:dd.uid, beyazAd:dd.ad||'Oyuncu', beyazPuan:dd.puan||800, beyazUlke:dd.ulke||'', beyazSecim:dd.secim||null,
+              siyah:ben, siyahAd:benAd, siyahPuan:(typeof bulutIst!=='undefined'&&bulutIst.puan)?bulutIst.puan:800, siyahUlke:(typeof bulutIst!=='undefined'&&bulutIst.ulke)?bulutIst.ulke:'', siyahSecim:(typeof cvSecimim==='function'?cvSecimim():null),
               sira:'w', sonHamle:null, hamleSayi:0,
               sureDk: (dd.sureDk!=null?dd.sureDk:3), sureInc: dd.sureInc||0,
               sahne: (dd.sureDk>0) ? (dd.sahne===1?1:0) : null,
@@ -14913,6 +15070,7 @@ const Cevrimici=(()=>{
           sureDk:(typeof cvSecilenSure!=='undefined'?cvSecilenSure.dk:3),
           sureInc:(typeof cvSecilenSure!=='undefined'?cvSecilenSure.inc:0),
           sahne: sahneAyari?1:0,
+          secim: (typeof cvSecimim==='function'?cvSecimim():null),
           zaman: firebase.firestore.FieldValue.serverTimestamp()
         });
         beklemeRef=ref;
