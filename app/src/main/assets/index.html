@@ -344,50 +344,6 @@ canvas{display:block}
   background:radial-gradient(120% 90% at 50% 0%, #131726 0%, var(--ink) 62%)}
 #girisEkran.gizli{display:none}
 #lisansEkran.gizli{display:none}
-/* Çevrimiçi maç tanıtımı (cvTanitimOyna) */
-#cvTanitim{position:fixed;inset:0;z-index:58;pointer-events:auto;touch-action:none;font-family:'Manrope',system-ui,sans-serif}
-#cvTanitim .ctPerde{position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(4,5,9,.86) 0%,rgba(4,5,9,.25) 30%,rgba(4,5,9,0) 46%,rgba(4,5,9,0) 58%,rgba(4,5,9,.3) 72%,rgba(4,5,9,.88) 100%);
-  opacity:0;transition:opacity .45s ease}
-#cvTanitim.acik .ctPerde{opacity:1}
-#cvTanitim .ctKart{position:absolute;left:18px;right:18px;display:flex;align-items:center;gap:14px;padding:14px 16px;
-  border-radius:20px;background:linear-gradient(135deg,rgba(26,24,20,.84),rgba(10,11,16,.88));
-  border:1px solid rgba(232,182,76,.32);box-shadow:0 18px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06);
-  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;transition:transform .6s cubic-bezier(.2,.9,.25,1.15),opacity .45s ease}
-#cvTanitim .ctRakip{top:calc(env(safe-area-inset-top,0px) + 64px);transform:translateY(-36px)}
-#cvTanitim .ctBen{bottom:calc(env(safe-area-inset-bottom,0px) + 74px);transform:translateY(36px);transition-delay:.12s}
-#cvTanitim.acik .ctKart{opacity:1;transform:none}
-#cvTanitim .ctAv{width:54px;height:54px;border-radius:50%;flex:none;overflow:hidden;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 35% 30%,#3a3326,#14120e);border:1.5px solid #E8B64C;color:#E8B64C;font:700 22px 'Cinzel',Georgia,serif}
-#cvTanitim .ctAv img{width:100%;height:100%;object-fit:cover}
-#cvTanitim .ctBilgi{flex:1;min-width:0}
-#cvTanitim .ctAd{font:700 19px/1.15 'Cinzel',Georgia,serif;color:#F2E9D4;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#cvTanitim .ctAlt{display:flex;align-items:center;gap:7px;margin-top:6px;font-size:12px;color:#b9b2a2;letter-spacing:.04em;white-space:nowrap}
-#cvTanitim .ctRenk{width:10px;height:10px;border-radius:50%;flex:none;border:1px solid rgba(232,182,76,.6)}
-#cvTanitim .ctRenk.w{background:#f3eee2}
-#cvTanitim .ctRenk.b{background:#16130f}
-#cvTanitim .ctPuan{margin-inline-start:auto;color:#b9b2a2}
-#cvTanitim .ctPuan b{font:700 16px 'Cinzel',Georgia,serif;color:#E8B64C}
-#cvTanitim .ctSen{position:absolute;top:-9px;inset-inline-end:16px;padding:2px 10px;border-radius:99px;background:#E8B64C;color:#1a1206;
-  font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-#cvTanitim .ctOrta{position:absolute;left:24px;right:24px;top:47%;display:flex;align-items:center;gap:16px;
-  transform:translateY(-50%) scale(1.6);opacity:0;transition:transform .5s cubic-bezier(.2,.9,.3,1.3) .3s,opacity .3s ease .3s}
-#cvTanitim.acik .ctOrta{transform:translateY(-50%);opacity:1}
-#cvTanitim .ctCizgi{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(232,182,76,.85),transparent)}
-#cvTanitim .ctVs{font:700 46px/1 'Cinzel',Georgia,serif;letter-spacing:.06em;color:#E8B64C;
-  text-shadow:0 0 22px rgba(232,182,76,.55),0 4px 18px rgba(0,0,0,.7)}
-#cvTanitim .ctSure{position:absolute;left:50%;top:calc(47% + 36px);transform:translateX(-50%);padding:5px 14px;border-radius:99px;
-  background:rgba(10,11,16,.78);border:1px solid rgba(232,182,76,.4);font:700 13px 'Cinzel',Georgia,serif;white-space:nowrap;
-  letter-spacing:.14em;color:#F2E9D4;opacity:0;transition:opacity .4s ease .55s}
-#cvTanitim.acik .ctSure{opacity:1}
-#cvTanitim .ctAtla{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 30px);text-align:center;
-  font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(242,233,212,.55);opacity:0;transition:opacity .4s ease .8s}
-#cvTanitim.acik .ctAtla{opacity:1}
-#cvTanitim.sonuyor .ctKart,#cvTanitim.sonuyor .ctOrta,#cvTanitim.sonuyor .ctSure,#cvTanitim.sonuyor .ctAtla{opacity:0;transition-delay:0s;transition-duration:.5s}
-#cvTanitim.sonuyor .ctRakip{transform:translateY(-28px)}
-#cvTanitim.sonuyor .ctBen{transform:translateY(28px)}
-#cvTanitim.sonuyor .ctPerde{opacity:0}
-#cvTanitim.kalk{opacity:0;transition:opacity .35s ease;pointer-events:none}
 #gizlilikEkran{position:fixed;inset:0;z-index:61;display:flex;flex-direction:column;background:#06070b;
   padding-top:env(safe-area-inset-top,0px)}
 #gizlilikEkran.gizli{display:none}
@@ -10771,96 +10727,6 @@ function cevrimiciBilgiGoster(rakipAd){
   }catch(e){}
 }
 
-/* ÇEVRİMİÇİ MAÇ TANITIMI (15 Kasım 2026, sahibin isteği; chess24'teki gibi ama daha gösterişli).
-   Eşleşince ~3 sn: kamera rakibin tarafından, onun taşlarına yakından başlar; üstte rakibin kartı, altta seninki,
-   ortada VS ve süre. Sonra kamera tahtanın etrafında dönüp senin tarafına oturur, kartlar söner.
-   Dokununca hemen biter. Saat iki taraf da ilk hamlesini yapınca başladığı için süre yemez.
-   Yeniden bağlanmada (oyun ortası) oynamaz. */
-let cvTanitimBitir=null;
-function cvTanitimOyna(rakipAd){
-  if(cvTanitimBitir) cvTanitimBitir();
-  const v=Cevrimici.veri||{}, benW=(Cevrimici.benimRenk==='w');
-  try{ taslariDiz(false); }catch(e){}   // taşlar gökten inmeden hemen yerinde olsun: kamera rakibin ordusunu gösterecek
-  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
-  const d=(typeof uygDil!=='undefined'?uygDil:'tr');
-  const E={tr:['Sen','puan','Geçmek için dokun'],en:['You','rating','Tap to skip'],ru:['Вы','рейтинг','Нажмите, чтобы пропустить'],
-    ar:['أنت','التقييم','المس للتخطي'],fr:['Vous','classement','Touchez pour passer'],de:['Du','Wertung','Tippen zum Überspringen'],
-    it:['Tu','punteggio','Tocca per saltare'],zh:['你','积分','轻触跳过']}[d]||['You','rating','Tap to skip'];
-  const kac=(typeof lobiKac==='function')?lobiKac:(x=>String(x));
-  const avatarHtml=(foto,av,ad)=>{ const f=guvenliFoto(foto||''); if(f) return '<img src="'+f+'" alt="">';
-    return '<span>'+kac(av || String(ad||'?').trim().charAt(0).toUpperCase() || '\u265E')+'</span>'; };
-  const puanHtml=p=>p?('<b>'+kac(p)+'</b> '+E[1]):'';
-  const kart=(sinif,ad,foto,av,ulke,puan,renkW,ben)=>
-    '<div class="ctKart '+sinif+'"><div class="ctAv">'+avatarHtml(foto,av,ad)+'</div><div class="ctBilgi">'+
-    '<div class="ctAd" dir="auto">'+kac(ad)+'</div><div class="ctAlt"><span class="ctRenk '+(renkW?'w':'b')+'"></span>'+
-    '<span>'+kac(c(renkW?'Beyaz':'Siyah'))+'</span><span class="ctUlke">'+(ulke?ulkeBayrak(ulke):'')+'</span>'+
-    '<span class="ctPuan">'+puanHtml(puan)+'</span></div></div>'+(ben?'<div class="ctSen">'+E[0]+'</div>':'')+'</div>';
-  const bi=(typeof bulutIst!=='undefined' && bulutIst)||{};
-  const girisli=!!(fbKullanici && !misafirMod);
-  const benAd=(girisli && bi.kullaniciAdi)||E[0];
-  const benFoto=(typeof avatarFotoAl==='function'?avatarFotoAl():'')||'';
-  const rakipUlke=benW?(v.siyahUlke||''):(v.beyazUlke||'');
-  const dk=(v.sureDk!=null?v.sureDk:3), inc=(v.sureInc||0);
-  const sureMetni=dk>0?(dk+'+'+inc):c('Süresiz');
-  let el=document.getElementById('cvTanitim'); if(el) el.remove();
-  el=document.createElement('div'); el.id='cvTanitim';
-  el.innerHTML='<div class="ctPerde"></div>'+
-    kart('ctRakip', rakipAd||'Rakip', '', '', rakipUlke, '', !benW, false)+
-    '<div class="ctOrta"><span class="ctCizgi"></span><b class="ctVs">VS</b><span class="ctCizgi"></span></div>'+
-    '<div class="ctSure">'+kac(sureMetni)+'</div>'+
-    kart('ctBen', benAd, benFoto, girisli?(bi.avatar||''):'', girisli?(bi.ulke||''):'', (girisli&&bi.puan)?bi.puan:'', benW, true)+
-    '<div class="ctAtla">'+E[2]+'</div>';
-  document.body.appendChild(el);
-  // Rakibin fotoğrafı, puanı ve ülkesi profilinden (gelince karta yazılır)
-  try{
-    const rakipUid=benW?v.siyah:v.beyaz;
-    if(rakipUid && fbDb) fbDb.collection('oyuncular').doc(rakipUid).get().then(dd=>{
-      if(!dd.exists || !el.isConnected) return; const p=dd.data()||{};
-      const k=el.querySelector('.ctRakip'); if(!k) return;
-      k.querySelector('.ctAv').innerHTML=avatarHtml(p.avatarFoto,p.avatar,rakipAd);
-      if(p.puan) k.querySelector('.ctPuan').innerHTML=puanHtml(p.puan);
-      if(!rakipUlke && p.ulke) k.querySelector('.ctUlke').textContent=ulkeBayrak(p.ulke);
-    }).catch(()=>{});
-  }catch(e){}
-  /* Kamera: önce alçaktan ve yakından RAKİBİN ORDUSUNA (önden) bakar, yavaşça yanlamasına süzülür;
-     sonra yükselip geri çekilerek oyuncunun normal görüşüne oturur. Beyaz arka sıra z=+3.5, siyah z=-3.5. */
-  const son={yaw:benW?0:Math.PI, pitch:dikeyKamPitch(), uzak:uygunUzaklik()};
-  const rakipZ=benW?-2.9:2.9, yon=benW?1:-1;
-  const basH=new THREE.Vector3(-.9*yon,.55,rakipZ), sonH=new THREE.Vector3(0,0,0), araH=new THREE.Vector3();
-  const bas={yaw:son.yaw+.5, pitch:.34, uzak:Math.min(6.4,son.uzak*.45)};
-  const azHareket=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const T_YAKIN=azHareket?.6:1.55, T_DON=azHareket?.6:1.35, T_SON=T_YAKIN+T_DON+.25;
-  const yumusak=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
-  let t=0, onceki=0, bitti=false, raf=0;   // geçen süre kare kare toplanır: arena kurulurken donma süreyi yemez
-  const kur=(yaw,pitch,uzak,h)=>{ kamYaw=yaw; kamPitch=pitch; kamUzak=uzak; if(h) kamHedef.copy(h); };
-  kur(bas.yaw,bas.pitch,bas.uzak,basH);
-  const bitir=()=>{
-    if(bitti) return; bitti=true; cancelAnimationFrame(raf); cvTanitimBitir=null;
-    kur(son.yaw,son.pitch,son.uzak); kamHedef.set(0,0,0);
-    el.classList.add('kalk'); setTimeout(()=>el.remove(),450);
-  };
-  cvTanitimBitir=bitir;
-  const y0=bas.yaw-.32, p0=bas.pitch+.03, u0=bas.uzak*.92, h0=basH.clone().setX(.9*yon);
-  const adim=()=>{
-    if(bitti) return;
-    const simdi=performance.now(); t+=onceki?Math.min(.05,(simdi-onceki)/1000):0; onceki=simdi;
-    if(!cevrimiciAktif){ bitir(); return; }
-    if(t<T_YAKIN){
-      const e=t/T_YAKIN, ys=e*(2-e);                       // rakip ordusu boyunca yanlamasına süzülme
-      kur(bas.yaw-.32*ys, bas.pitch+.03*e, bas.uzak*(1-.08*e), araH.lerpVectors(basH,h0,ys));
-    } else if(t<T_YAKIN+T_DON){
-      const e=yumusak((t-T_YAKIN)/T_DON);                  // yüksel, geri çekil, kendi tarafına otur
-      kur(y0+(son.yaw-y0)*e, p0+(son.pitch-p0)*e, u0+(son.uzak-u0)*e, araH.lerpVectors(h0,sonH,e));
-      if(e>.45) el.classList.add('sonuyor');
-    } else if(t<T_SON){ kur(son.yaw,son.pitch,son.uzak,sonH); }
-    else { bitir(); return; }
-    raf=requestAnimationFrame(adim);
-  };
-  el.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); bitir(); });
-  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('acik')));
-  raf=requestAnimationFrame(adim);
-}
-
 /* Odanın ayarını tek satırda yaz: "3+2 · animasyonlu", "Süresiz" */
 function odaAyarMetni(dk, inc, sahne){
   const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
@@ -11394,7 +11260,6 @@ function cevrimiciGuncelle(veri){
     document.getElementById('cevrimiciEkran').classList.remove('acik');
     sonIslenenHamleSayac=0;
     if(typeof cevrimiciOyunBaslat==='function') cevrimiciOyunBaslat(rakipAd);
-    try{ cvTanitimOyna(rakipAd); }catch(e){ console.log('cvTanitim:',e); }
   }
   // Rakipten gelen hamleyi tahtaya uygula
   if(cevrimiciAktif && veri.sonHamle){
