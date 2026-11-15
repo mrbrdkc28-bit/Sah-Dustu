@@ -39,7 +39,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.webkit.WebViewAssetLoader
 import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
@@ -92,6 +95,52 @@ class MainActivity : AppCompatActivity() {
         get() = if (REKLAM_TEST) "ca-app-pub-3940256099942544/5224354917"
         else "ca-app-pub-6150501660747489/3941985052"
     private var odulluReklam: RewardedAd? = null
+
+    /* BANNER (15 Kasim 2026): yalniz menu/liste ekranlarinda, altta. Ne zaman gorunecegine
+       oyun kodu karar verir (AndroidKopru.bannerGoster); tahtada ve Premium'da hic yok.
+       !!! BANNER_GERCEK bos oldugu surece YAYIN surumu da Google TEST bannerini gosterir.
+       AdMob'da "Chess64 Android Banner" birimi olusturulunca kimligi buraya yazilmali. */
+    private val BANNER_GERCEK = ""
+    private val BANNER_BIRIMI: String
+        get() = if (REKLAM_TEST || BANNER_GERCEK.isEmpty()) "ca-app-pub-3940256099942544/9214589741" else BANNER_GERCEK
+    private var bannerKap: android.widget.FrameLayout? = null
+    private var bannerView: AdView? = null
+    @Volatile private var bannerIstek = false
+
+    private fun bannerUygula() {
+        runOnUiThread {
+            if (webViewYok) return@runOnUiThread
+            val goster = bannerIstek && !premiumVar && reklamSdkHazir
+            if (goster && bannerView == null) bannerKur()
+            bannerKap?.visibility = if (goster) android.view.View.VISIBLE else android.view.View.GONE
+            if (goster) bannerView?.resume() else bannerView?.pause()
+            val h = if (goster) (bannerView?.adSize?.height ?: 0) else 0
+            webView.evaluateJavascript("window.bannerYukseklik&&bannerYukseklik($h)", null)
+        }
+    }
+
+    private fun bannerKur() {
+        try {
+            val kap = android.widget.FrameLayout(this)
+            kap.setBackgroundColor(0xFF0B0C10.toInt())
+            kok.addView(kap, android.widget.FrameLayout.LayoutParams(
+                android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+                android.widget.FrameLayout.LayoutParams.WRAP_CONTENT, android.view.Gravity.BOTTOM))
+            val av = AdView(this)
+            av.adUnitId = BANNER_BIRIMI
+            val dm = resources.displayMetrics
+            val genislikDp = ((if (kok.width > 0) kok.width - kok.paddingLeft - kok.paddingRight else dm.widthPixels) / dm.density).toInt()
+            av.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, genislikDp))
+            kap.addView(av, android.widget.FrameLayout.LayoutParams(
+                android.widget.FrameLayout.LayoutParams.WRAP_CONTENT,
+                android.widget.FrameLayout.LayoutParams.WRAP_CONTENT, android.view.Gravity.CENTER_HORIZONTAL))
+            av.adListener = object : AdListener() {
+                override fun onAdFailedToLoad(e: LoadAdError) { hataKaydet("Banner yuklenemedi: " + e.code + " " + e.message) }
+            }
+            av.loadAd(AdRequest.Builder().build())
+            bannerKap = kap; bannerView = av
+        } catch (t: Throwable) { hataKaydet("Banner kurulamadi: " + (t.message ?: t.toString())) }
+    }
     private var reklamDeneme = 0
     private var reklamSonHata = "-"
     private var reklamSdkHazir = false
@@ -229,6 +278,7 @@ class MainActivity : AppCompatActivity() {
         try {
             MobileAds.initialize(this) { durum ->
                 reklamSdkHazir = true
+                bannerUygula()
                 /* KRITIK TANI: initialize'in "bitti" demesi, reklam motorunun
                    HAZIR oldugu anlamina GELMEZ. Gercek durum adaptor haritasinda.
                    Play Services tarafindaki dinamik modul yuklenemediyse adaptor
@@ -648,6 +698,8 @@ class MainActivity : AppCompatActivity() {
                     } catch (t: Throwable) { hataKaydet("Gizlilik formu istisnasi: " + (t.message ?: "?")) }
                 }
             }
+            @JavascriptInterface
+            fun bannerGoster(goster: Boolean) { bannerIstek = goster; bannerUygula() }
             @JavascriptInterface
             fun premiumMu(): String = if (premiumVar) "1" else "0"
             /* Google Play'den gelen yerel fiyat ("₺XX,XX"); urun henuz yuklenmediyse bos */
@@ -1652,6 +1704,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        bannerView?.pause()
         // Arka plana gecerken mikrofonu MUTLAKA birak: acik kalirsa hem pil yer
         // hem de kullanici "dinleniyorum" hissi yasar.
         dinlemeIstegi = false
@@ -1722,6 +1775,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (bannerKap?.visibility == android.view.View.VISIBLE) bannerView?.resume()
         gezinmeUygula()   // arka plandan donunce sistem cubuklari eski haline donebiliyor
         /* Uygulama one geldiginde reklam denemelerini sifirla: gecici bir ag
            veya WebView sorunu yuzunden "pes edilmis" durumda kalmasin. */
@@ -1826,6 +1880,7 @@ class MainActivity : AppCompatActivity() {
     }
     private fun premiumBildir(sessiz: Boolean) {
         premiumVar = true
+        bannerUygula()
         runOnUiThread {
             if (webViewYok) return@runOnUiThread
             // Acilista geri yukleme sessiz; yeni satin almada tesekkur mesaji
@@ -1838,6 +1893,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         // Once bayrak: bu andan sonra konusmaBitti() WebView'e dokunmaz.
         webViewYok = true
+        try { bannerView?.destroy() } catch (t: Throwable) {}
         try { fatura?.endConnection() } catch (t: Throwable) {}
         bildirimSesiAc()
         try { anaKuyruk.removeCallbacksAndMessages(null) } catch (t: Throwable) {}

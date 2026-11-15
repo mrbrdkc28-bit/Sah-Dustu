@@ -403,6 +403,13 @@ canvas{display:block}
 #cvVs.acik .vsRozet{transform:none}
 #cvVs.kapan .vsRozet{transform:scale(0);transition-delay:0s;transition-duration:.25s}
 #inceleYorum .iyFikir{color:var(--txt,#E9E1CE);opacity:.92;font-style:italic}
+/* Banner varken liste ekranları reklamın üstünde biter (reklam hiçbir düğmeyi örtmez) */
+body.bannerVar :is(#menu,#cevrimiciEkran,#istEkran,#liderEkran,#kutupEkran,#bulmacaZorluk){
+  bottom:var(--bannerH,0px)!important;overflow-y:auto}   /* --bannerH: reklamın kapladığı TOPLAM yükseklik (iOS'ta alt güvenli alan dahil) */
+/* Menü tek ekrana sığsın: banner kadar yer, söz ve kart aralıklarından alınır */
+body.bannerVar #menu .menuSoz{height:50px!important}
+body.bannerVar #menu .kartlar{gap:5px!important}
+body.bannerVar #menu .kartlar>.anaKart{padding-top:6px!important;padding-bottom:6px!important}
 #gizlilikEkran{position:fixed;inset:0;z-index:61;display:flex;flex-direction:column;background:#06070b;
   padding-top:env(safe-area-inset-top,0px)}
 #gizlilikEkran.gizli{display:none}
@@ -20464,6 +20471,41 @@ const SOZLER=[
   };
   sesCiz();
   window.kurTekYaz=()=>{ sureYaz(); sekmeYaz(); sesCiz(); };
+})();
+</script>
+<script>
+/* BANNER REKLAM (15 Kasım 2026, sahibin isteği): rahatsız etmeyen, ekranın en altında tek şerit.
+   YALNIZ menü ve liste ekranlarında (ana menü, çevrimiçi lobi, profil, liderlik, kütüphane, bulmaca seçimi).
+   Tahta görünürken (oyun, bulmaca, inceleme, analiz), açılışta, girişte ve Premium'da ASLA.
+   Karar burada verilir; reklamı Android (MainActivity) / iOS (Reklam.swift) çizer: AndroidKopru.bannerGoster(true/false).
+   Reklam gelince yüksekliği window.bannerYukseklik(px) ile bildirilir; ekranlar o kadar yukarıda biter. */
+(function(){
+  let son=null, bekliyor=false;
+  const el=id=>document.getElementById(id);
+  const gor=id=>{ const e=el(id); return !!(e && !e.classList.contains('gizli') && getComputedStyle(e).display!=='none'); };
+  const acik=id=>{ const e=el(id); return !!(e && e.classList.contains('acik')); };
+  function karar(){
+    if(typeof premiumAktif!=='undefined' && premiumAktif) return false;
+    const p=el('acilisPerde'); if(p && !p.classList.contains('bitti')) return false;
+    if(gor('girisEkran') || gor('yukleniyor')) return false;
+    if(acik('hud') || acik('inceleHUD') || acik('analizEkran') || gor('analizEkran') || el('cvVs')) return false;
+    if(gor('lisansEkran') || gor('gizlilikEkran') || el('premiumModal')) return false;
+    return gor('menu') || gor('cevrimiciEkran') || gor('istEkran') || gor('liderEkran') || gor('kutupEkran') || gor('bulmacaZorluk');
+  }
+  function guncelle(){
+    bekliyor=false;
+    const k=karar(); if(k===son) return; son=k;
+    document.body.classList.toggle('bannerVar', k);
+    try{ if(window.AndroidKopru && AndroidKopru.bannerGoster) AndroidKopru.bannerGoster(k); }catch(e){}
+  }
+  window.bannerGuncelle=()=>{ son=null; guncelle(); };
+  window.bannerYukseklik=h=>{ const v=Math.max(0, Math.min(140, Number(h)||0)); document.documentElement.style.setProperty('--bannerH', v+'px'); };
+  const planla=()=>{ if(!bekliyor){ bekliyor=true; requestAnimationFrame(guncelle); } };
+  const basla=()=>{
+    new MutationObserver(planla).observe(document.body,{subtree:true, attributes:true, attributeFilter:['class','style'], childList:true});
+    planla();
+  };
+  if(document.body) basla(); else addEventListener('DOMContentLoaded', basla);
 })();
 </script>
 </body>
