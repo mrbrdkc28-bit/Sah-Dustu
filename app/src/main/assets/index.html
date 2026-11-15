@@ -344,65 +344,81 @@ canvas{display:block}
   background:radial-gradient(120% 90% at 50% 0%, #131726 0%, var(--ink) 62%)}
 #girisEkran.gizli{display:none}
 #lisansEkran.gizli{display:none}
-/* Çevrimiçi maç başlangıcı: bölünmüş ekran (cvVsGoster) */
-#cvVs{position:fixed;inset:0;z-index:58;overflow:hidden;touch-action:none;font-family:'Manrope',system-ui,sans-serif}
-#cvVs .vsYari{position:absolute;left:0;right:0;height:50%;overflow:hidden;background:#0b0c10;
-  transition:transform .55s cubic-bezier(.6,0,.3,1)}
-#cvVs .vsUst{top:0;transform:translateY(-100%)}
-#cvVs .vsAlt{bottom:0;transform:translateY(100%)}
-#cvVs.acik .vsYari{transform:none;transition-timing-function:cubic-bezier(.2,.9,.25,1)}
-#cvVs.kapan .vsUst{transform:translateY(-100%)}
-#cvVs.kapan .vsAlt{transform:translateY(100%)}
-#cvVs .vsGorsel{position:absolute;inset:0}
-#cvVs .vsGorsel img{width:100%;height:100%;object-fit:cover;display:block}
-#cvVs .vsUst .vsGorsel>img{object-position:50% 40%}
-#cvVs .vsYari::after{content:"";position:absolute;inset:0;pointer-events:none}
-#cvVs .vsUst::after{background:linear-gradient(180deg,rgba(5,6,10,.15) 0%,rgba(5,6,10,0) 45%,rgba(5,6,10,.75) 100%)}
-#cvVs .vsAlt::after{background:linear-gradient(0deg,rgba(5,6,10,.15) 0%,rgba(5,6,10,0) 45%,rgba(5,6,10,.75) 100%)}
-#cvVs .vsBos img{filter:grayscale(.6) brightness(.55)}
-#cvVs .vs2b{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(4,1fr);background:#1a1712}
-#cvVs .vs2b i{display:flex;align-items:center;justify-content:center;font-style:normal}
-#cvVs .vs2b i.a{background:#ecdab9}
-#cvVs .vs2b i.k{background:#ae8a68}
-#cvVs .vs2b img{width:84%;height:84%;object-fit:contain}
-#cvVs .vsEtiket{position:absolute;z-index:1;display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:99px;
-  background:rgba(8,9,13,.78);border:1px solid rgba(232,182,76,.35);color:#E9E1CE;font-size:11.5px;letter-spacing:.04em;
-  max-width:calc(100% - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-#cvVs .vsEtiket img{width:34px;height:22px;border-radius:99px;object-fit:cover;flex:none}
-#cvVs .vsEtiket span{overflow:hidden;text-overflow:ellipsis}
-#cvVs .vsEtiket b{color:#E8B64C;font-weight:700}
-#cvVs .vsUst .vsEtiket{top:calc(env(safe-area-inset-top,0px) + 16px);inset-inline-start:16px}
-#cvVs .vsAlt .vsEtiket{bottom:calc(env(safe-area-inset-bottom,0px) + 18px);inset-inline-end:16px}
-#cvVs .vsCizgi{position:absolute;left:0;right:0;top:50%;height:2px;margin-top:-1px;z-index:1;opacity:0;
-  background:linear-gradient(90deg,transparent,#E8B64C 20%,#F6D88A 50%,#E8B64C 80%,transparent);box-shadow:0 0 14px rgba(232,182,76,.7);
-  transition:opacity .3s ease .3s}
-#cvVs.acik .vsCizgi{opacity:1}
-#cvVs.kapan .vsCizgi{opacity:0;transition-delay:0s}
-#cvVs .vsSerit{position:absolute;z-index:2;display:flex;align-items:center;gap:10px;height:52px;padding:0 16px 0 6px;
-  background:linear-gradient(135deg,rgba(24,22,18,.94),rgba(10,11,16,.94));border:1px solid rgba(232,182,76,.38);
-  box-shadow:0 12px 30px rgba(0,0,0,.5);transition:transform .5s cubic-bezier(.2,.9,.25,1.1),opacity .35s ease}
-#cvVs .vsRakip{left:0;right:22%;bottom:calc(50% + 14px);border-left:0;border-radius:0 14px 14px 0;transform:translateX(-105%);transition-delay:.18s}
-#cvVs .vsBen{right:0;left:22%;top:calc(50% + 14px);border-right:0;border-radius:14px 0 0 14px;transform:translateX(105%);transition-delay:.28s}
-#cvVs.acik .vsSerit{transform:none}
-#cvVs.kapan .vsSerit{opacity:0;transition-delay:0s}
-#cvVs .vsAv{width:40px;height:40px;border-radius:10px;flex:none;overflow:hidden;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 35% 30%,#3a3326,#14120e);border:1px solid rgba(232,182,76,.6);color:#E8B64C;font:700 18px 'Cinzel',Georgia,serif}
-#cvVs .vsAv img{width:100%;height:100%;object-fit:cover}
-#cvVs .vsAd{font:700 16px 'Cinzel',Georgia,serif;color:#F2E9D4;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-#cvVs .vsUlke{font-size:14px;flex:none}
-#cvVs .vsRenk{width:10px;height:10px;border-radius:50%;flex:none;border:1px solid rgba(232,182,76,.6);margin-inline-start:auto}
-#cvVs .vsRenk.w{background:#f3eee2}
-#cvVs .vsRenk.b{background:#16130f}
-#cvVs .vsPuan{font:700 14px 'Cinzel',Georgia,serif;color:#E8B64C;flex:none}
-#cvVs .vsPuan:empty{display:none}
-#cvVs .vsRozet{position:absolute;z-index:3;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:16px;
-  display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#2a2419,#0d0c0a);
-  border:1.5px solid #E8B64C;box-shadow:0 0 0 4px rgba(10,11,16,.85),0 10px 26px rgba(0,0,0,.6),0 0 22px rgba(232,182,76,.35);
-  font:700 22px 'Cinzel',Georgia,serif;letter-spacing:.04em;color:#F3CF73;transform:scale(0) rotate(-12deg);
-  transition:transform .45s cubic-bezier(.2,1.4,.4,1) .4s}
-#cvVs.acik .vsRozet{transform:none}
-#cvVs.kapan .vsRozet{transform:scale(0);transition-delay:0s;transition-duration:.25s}
-#inceleYorum .iyFikir{color:var(--txt,#E9E1CE);opacity:.92;font-style:italic}
+/* Çevrimiçi maç tanıtımı v3 (cvVsGoster) */
+body.cvTanitimda :is(#hud,#esirler,#notPanel,#cevrimiciSerit,#rakipIzle,#sonPuan,#gizleBtn,#notSeritUst,#notSeritAlt,#saatKutu,#yonBtn){opacity:0!important;pointer-events:none!important;transition:opacity .3s}
+#cvVs{position:fixed;inset:0;z-index:58;overflow:hidden;touch-action:none;font-family:'Manrope',system-ui,sans-serif;color:#F2E9D4}
+/* 1) VS kartı */
+#cvVs .vkKapak{position:absolute;inset:0;background:#06070b;transition:opacity .6s ease}
+#cvVs .vkIsik{position:absolute;inset:-20%;pointer-events:none;
+  background:radial-gradient(60% 38% at 50% 50%,rgba(232,182,76,.20),transparent 70%),
+             radial-gradient(70% 45% at 50% 0%,rgba(120,90,40,.22),transparent 70%),
+             radial-gradient(70% 45% at 50% 100%,rgba(120,90,40,.22),transparent 70%);
+  opacity:0;transform:scale(.9);transition:opacity 1s ease,transform 1.6s ease}
+#cvVs.acik .vkIsik{opacity:1;transform:none}
+#cvVs.dunya .vkKapak{opacity:0;pointer-events:none}
+#cvVs .vkKart{position:absolute;left:20px;right:20px;display:flex;align-items:center;gap:14px;padding:16px 16px 14px;border-radius:22px;
+  background:linear-gradient(135deg,rgba(34,30,22,.9),rgba(12,13,18,.95));border:1px solid rgba(232,182,76,.34);
+  box-shadow:0 22px 50px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.06);opacity:0;
+  transition:transform .7s cubic-bezier(.2,.9,.25,1.08),opacity .5s ease}
+#cvVs .vkRakip{bottom:calc(50% + 62px);transform:translateX(-110%)}
+#cvVs .vkBen{top:calc(50% + 62px);transform:translateX(110%);transition-delay:.12s}
+#cvVs.acik .vkKart{opacity:1;transform:none}
+#cvVs .vkAv{width:62px;height:62px;border-radius:50%;flex:none;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 35% 30%,#3d3527,#14120e);box-shadow:0 0 0 2px #E8B64C,0 0 0 5px rgba(232,182,76,.16);
+  color:#E8B64C;font:700 25px 'Cinzel',Georgia,serif}
+#cvVs .vkAv img{width:100%;height:100%;object-fit:cover}
+#cvVs .vkBilgi{flex:1;min-width:0}
+#cvVs .vkAd{font:700 20px/1.15 'Cinzel',Georgia,serif;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cvVs .vkAlt{display:flex;align-items:center;gap:7px;margin-top:6px;font-size:12px;color:#b9b2a2;letter-spacing:.04em;white-space:nowrap}
+#cvVs .vkRenk{width:10px;height:10px;border-radius:50%;flex:none;border:1px solid rgba(232,182,76,.6)}
+#cvVs .vkRenk.w{background:#f3eee2}
+#cvVs .vkRenk.b{background:#16130f}
+#cvVs .vkPuan{margin-inline-start:auto}
+#cvVs .vkPuan b{font:700 16px 'Cinzel',Georgia,serif;color:#E8B64C}
+#cvVs .vkSecim{margin-top:9px;padding-top:8px;border-top:1px solid rgba(232,182,76,.16);font-size:11.5px;letter-spacing:.05em;color:#d9cfb9;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cvVs .vkSecim b{color:#E8B64C}
+#cvVs .vkSen{position:absolute;top:-10px;inset-inline-end:18px;padding:3px 11px;border-radius:99px;background:#E8B64C;color:#1a1206;
+  font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+#cvVs .vkOrta{position:absolute;left:22px;right:22px;top:50%;display:flex;align-items:center;gap:16px;
+  transform:translateY(-50%) scale(1.8);opacity:0;transition:transform .55s cubic-bezier(.2,1.25,.35,1) .35s,opacity .3s ease .35s}
+#cvVs.acik .vkOrta{transform:translateY(-50%);opacity:1}
+#cvVs .vkCizgi{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(232,182,76,.9),transparent)}
+#cvVs .vkVs{font:700 54px/1 'Cinzel',Georgia,serif;letter-spacing:.06em;color:#F3CF73;
+  text-shadow:0 0 26px rgba(232,182,76,.6),0 4px 18px rgba(0,0,0,.8);animation:vkNabiz 1.6s ease-in-out .9s infinite}
+@keyframes vkNabiz{50%{text-shadow:0 0 40px rgba(232,182,76,.9),0 4px 18px rgba(0,0,0,.8)}}
+#cvVs .vkSure{position:absolute;left:50%;top:calc(50% + 34px);transform:translateX(-50%);padding:4px 14px;border-radius:99px;
+  border:1px solid rgba(232,182,76,.4);background:rgba(10,11,16,.8);font:700 13px 'Cinzel',Georgia,serif;letter-spacing:.14em;white-space:nowrap;
+  opacity:0;transition:opacity .4s ease .6s}
+#cvVs.acik .vkSure{opacity:1}
+/* 2) Rakibin dünyası (sahne arkada görünür) */
+#cvVs .vkDunya{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .6s ease .15s;
+  background:linear-gradient(180deg,rgba(4,5,9,.78) 0%,rgba(4,5,9,.18) 26%,transparent 40%,transparent 82%,rgba(4,5,9,.5) 100%)}
+#cvVs.dunya .vkDunya{opacity:1}
+#cvVs .vkDunyaUst{position:absolute;left:22px;right:22px;top:calc(env(safe-area-inset-top,0px) + 38px);transform:translateY(-14px);
+  transition:transform .8s cubic-bezier(.2,.9,.25,1) .15s}
+#cvVs.dunya .vkDunyaUst{transform:none}
+#cvVs .vkDunyaEt{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.24em;color:#E8B64C}
+#cvVs .vkDunyaAd{display:flex;align-items:center;gap:10px;margin-top:8px;font:700 24px 'Cinzel',Georgia,serif;letter-spacing:.03em;
+  text-shadow:0 2px 14px rgba(0,0,0,.7)}
+#cvVs .vkDunyaAv{width:36px;height:36px;border-radius:50%;overflow:hidden;flex:none;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 1.5px #E8B64C;background:#14120e;color:#E8B64C;font-size:16px}
+#cvVs .vkDunyaAv img{width:100%;height:100%;object-fit:cover}
+#cvVs .vkDunyaSecim{margin-top:6px;font-size:13px;letter-spacing:.06em;color:#efe6d2;text-shadow:0 1px 8px rgba(0,0,0,.8)}
+#cvVs .vkDunyaSecim b{color:#E8B64C}
+/* 3) Altın perde: soldan süpürür, sağdan çıkar */
+#cvVs .vkPerde{position:absolute;inset:-10% -30%;z-index:3;display:flex;align-items:center;justify-content:center;pointer-events:none;
+  background:linear-gradient(105deg,#7a5414 0%,#C9912A 22%,#F2C765 46%,#E8B64C 58%,#A87618 80%,#5c3d0c 100%);
+  transform:translateX(-115%) skewX(-12deg);box-shadow:0 0 60px rgba(232,182,76,.5)}
+#cvVs .vkPerde b{font:700 64px 'Cinzel',Georgia,serif;letter-spacing:.08em;color:rgba(26,18,6,.82);transform:skewX(12deg);
+  text-shadow:0 1px 0 rgba(255,236,190,.4)}
+#cvVs.perde .vkPerde{transform:translateX(0) skewX(-12deg);transition:transform .42s cubic-bezier(.7,0,.3,1)}
+#cvVs.kapali .vkKapak,#cvVs.kapali .vkDunya{display:none}
+#cvVs.aciliyor .vkPerde{transform:translateX(115%) skewX(-12deg);transition:transform .52s cubic-bezier(.7,0,.3,1)}
+#cvVs .vkAtla{position:absolute;left:0;right:0;z-index:2;bottom:calc(env(safe-area-inset-bottom,0px) + 26px);text-align:center;
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(242,233,212,.55);opacity:0;transition:opacity .4s ease 1s}
+#cvVs.acik .vkAtla{opacity:1}
+#cvVs.perde .vkAtla{opacity:0;transition-delay:0s}
 /* Banner varken liste ekranları reklamın üstünde biter (reklam hiçbir düğmeyi örtmez) */
 body.bannerVar :is(#menu,#cevrimiciEkran,#istEkran,#liderEkran,#kutupEkran,#bulmacaZorluk){
   bottom:var(--bannerH,0px)!important;overflow-y:auto}   /* --bannerH: reklamın kapladığı TOPLAM yükseklik (iOS'ta alt güvenli alan dahil) */
@@ -10905,89 +10921,180 @@ function cvSecimim(){
   catch(e){ return null; }
 }
 let cvVsBitir=null;
+/* ÇEVRİMİÇİ MAÇ TANITIMI v3 (15 Kasım 2026, sahibin isteği: "rakibin tahta ve taş seçimini, 2B/3B'sini anlamak").
+   Gerçek 3B sahneyle üç perde, ~4 sn, dokununca geçilir:
+     1) VS KARTI (opak): iki oyuncunun kartı + seçimleri. Bu sırada rakibin modelleri önbelleğe yüklenir
+        ve sahne RAKİBİN arenası + ordusuyla kurulur (ağır iş görünmez).
+     2) RAKİBİN DÜNYASI: kart söner, kamera rakibin tarafından alçaktan süzülür (2B oynuyorsa tepeden).
+     3) ALTIN PERDE: ekranı süpürür; kapalıyken oyuncunun kendi arenası/ordusu kurulur, perde açılırken
+        taşlar HER ZAMANKİ gibi gökten iner (taslariDiz(true); iniş, perde açılana kadar bekletilir).
+   Önizleme modunun (aynı geçici değiştirme) kanıtlanmış yolunu kullanır. Rakip eski sürümdeyse 2. perde atlanır.
+   Rakip hamlesi gelirse (cevrimiciHamleUygula) her şey anında oyuncunun dünyasına döner. */
 function cvVsGoster(v, rakipAd){
   if(window.cvVsBitir) window.cvVsBitir(true);
   v=v||Cevrimici.veri||{};
   const benW=(Cevrimici.benimRenk==='w');
   const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
   const kac=(typeof lobiKac==='function')?lobiKac:(x=>String(x));
-  const d=(typeof uygDil!=='undefined'?uygDil:'tr');
-  const B=(d==='tr')?['3B','2B','puan']:(d==='ru')?['3D','2D','рейтинг']:(d==='ar')?['3D','2D','التقييم']:
-          (d==='fr')?['3D','2D','classement']:(d==='de')?['3D','2D','Wertung']:(d==='it')?['3D','2D','punteggio']:
-          (d==='zh')?['3D','2D','积分']:['3D','2D','rating'];
-  const benSecim=cvSecimim()||{o:'klasik',a:ARENALAR[0].id,d:0};
-  const rakipSecim=(benW?v.siyahSecim:v.beyazSecim)||null;
+  const dil=(typeof uygDil!=='undefined'?uygDil:'tr');
+  const E=({tr:['Sen','puan','Geçmek için dokun','RAKİBİN DÜNYASI','3B','2B'],
+    en:['You','rating','Tap to skip',"OPPONENT'S WORLD",'3D','2D'],
+    ru:['Вы','рейтинг','Нажмите, чтобы пропустить','МИР СОПЕРНИКА','3D','2D'],
+    ar:['أنت','التقييم','المس للتخطي','عالم الخصم','3D','2D'],
+    fr:['Vous','classement','Touchez pour passer',"LE MONDE DE L'ADVERSAIRE",'3D','2D'],
+    de:['Du','Wertung','Tippen zum Überspringen','DIE WELT DES GEGNERS','3D','2D'],
+    it:['Tu','punteggio','Tocca per saltare',"IL MONDO DELL'AVVERSARIO",'3D','2D'],
+    zh:['你','积分','轻触跳过','对手的世界','3D','2D']})[dil]||['You','rating','Tap to skip',"OPPONENT'S WORLD",'3D','2D'];
+  const bekle=ms=>new Promise(r=>setTimeout(r,ms));
+  const kare=()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+
+  // ---- Seçimler ----
+  const benimOrdu=aktifOrdu||ORDULAR[0], benimArena=aktifArena||ARENALAR[0];
+  const benSecim=cvSecimim()||{o:benimOrdu.id,a:benimArena.id,d:0};
+  const rs=(benW?v.siyahSecim:v.beyazSecim)||null;
+  const rakipOrdu=rs?ORDULAR.find(o=>o.id===rs.o):null, rakipArena=rs?ARENALAR.find(a=>a.id===rs.a):null;
+  const rakipVar=!!(rs && rakipOrdu && rakipArena);
+  const secimMetni=(o,a,d)=>kac(c(o.ad||''))+' · '+kac(c(a.ad||''))+' · <b>'+(d?E[5]:E[4])+'</b>';
+
+  // ---- Kartlar ----
   const avatarHtml=(foto,av,ad)=>{ const f=guvenliFoto(foto||''); if(f) return '<img src="'+f+'" alt="">';
     return '<span>'+kac(av || String(ad||'?').trim().charAt(0).toUpperCase() || '\u265E')+'</span>'; };
-  /* Bir yarı: 3B ise ordunun önizlemesi (oyunun 3B motoruyla çekilmiş), 2B ise düz tahta ve 2B taşlar */
-  const yariHtml=(secim, beyazMi, ust)=>{
-    if(!secim) return '<div class="vsGorsel vsBos"><img src="onizleme/ordu_klasik.webp" alt=""></div>';
-    const ordu=ORDULAR.find(o=>o.id===secim.o)||ORDULAR[0];
-    const arena=ARENALAR.find(a=>a.id===secim.a)||ARENALAR[0];
-    let g;
-    if(secim.d){
-      const sira=['R','N','B','Q','K','B','N','R'], renk=beyazMi?'w':'b';
-      const tas=k=>{ const sv=CBURNETT[renk+k]; return sv?'<img src="data:image/svg+xml;utf8,'+encodeURIComponent(sv)+'" alt="">':''; };
-      const satirlar=ust?[sira,Array(8).fill('P'),[],[]]:[[],[],Array(8).fill('P'),sira];
-      let h='';
-      satirlar.forEach((sat,r)=>{ for(let k=0;k<8;k++) h+='<i class="'+(((r+k)%2)?'k':'a')+'">'+(sat[k]?tas(sat[k]):'')+'</i>'; });
-      g='<div class="vsGorsel vs2b">'+h+'</div>';
-    } else {
-      g='<div class="vsGorsel"><img src="onizleme/ordu_'+kac(ordu.id)+'.webp" alt=""></div>';
-    }
-    return g+'<div class="vsEtiket"><img src="onizleme/arena_'+kac(arena.id)+'.webp" alt=""><span>'+
-      kac(c(ordu.ad||''))+' · '+kac(c(arena.ad||''))+' · <b>'+(secim.d?B[1]:B[0])+'</b></span></div>';
-  };
-  const serit=(sinif,ad,foto,av,ulke,puan,renkW)=>
-    '<div class="vsSerit '+sinif+'"><div class="vsAv">'+avatarHtml(foto,av,ad)+'</div>'+
-    '<div class="vsAd" dir="auto">'+kac(ad)+'</div><span class="vsUlke">'+(ulke?ulkeBayrak(ulke):'')+'</span>'+
-    '<span class="vsRenk '+(renkW?'w':'b')+'"></span><span class="vsPuan">'+(puan?kac(puan):'')+'</span></div>';
   const bi=(typeof bulutIst!=='undefined' && bulutIst)||{};
   const girisli=!!(fbKullanici && !misafirMod);
-  const benAd=(girisli && bi.kullaniciAdi)||'Sen';
+  const kart=(sinif,ad,foto,av,ulke,puan,renkW,secim,ben)=>
+    '<div class="vkKart '+sinif+'">'+(ben?'<span class="vkSen">'+E[0]+'</span>':'')+
+    '<div class="vkAv">'+avatarHtml(foto,av,ad)+'</div><div class="vkBilgi">'+
+    '<div class="vkAd" dir="auto">'+kac(ad)+'</div>'+
+    '<div class="vkAlt"><span class="vkRenk '+(renkW?'w':'b')+'"></span><span>'+kac(c(renkW?'Beyaz':'Siyah'))+'</span>'+
+    '<span class="vkUlke">'+(ulke?ulkeBayrak(ulke):'')+'</span><span class="vkPuan">'+(puan?'<b>'+kac(puan)+'</b> '+E[1]:'')+'</span></div>'+
+    (secim?'<div class="vkSecim">'+secim+'</div>':'')+'</div></div>';
   const rakipUlke=benW?(v.siyahUlke||''):(v.beyazUlke||'');
   const rakipPuan=benW?v.siyahPuan:v.beyazPuan;
+  const dk=(v.sureDk!=null?v.sureDk:3), inc=(v.sureInc||0);
+  const sureMetni=dk>0?(dk+'+'+inc):c('Süresiz');
+
   let el=document.getElementById('cvVs'); if(el) el.remove();
   el=document.createElement('div'); el.id='cvVs';
   el.innerHTML=
-    '<div class="vsYari vsUst">'+yariHtml(rakipSecim, !benW, true)+'</div>'+
-    '<div class="vsYari vsAlt">'+yariHtml(benSecim, benW, false)+'</div>'+
-    '<div class="vsCizgi"></div>'+
-    serit('vsRakip', rakipAd||'Rakip', '', '', rakipUlke, rakipPuan||'', !benW)+
-    '<div class="vsRozet">VS</div>'+
-    serit('vsBen', benAd, (typeof avatarFotoAl==='function'?avatarFotoAl():'')||'', girisli?(bi.avatar||''):'',
-          girisli?(bi.ulke||''):'', (girisli&&bi.puan)?bi.puan:'', benW);
+    '<div class="vkKapak"><div class="vkIsik"></div>'+
+      kart('vkRakip', rakipAd||'Rakip', '', '', rakipUlke, rakipPuan||'', !benW,
+           rakipVar?secimMetni(rakipOrdu,rakipArena,rs.d):'', false)+
+      '<div class="vkOrta"><span class="vkCizgi"></span><b class="vkVs">VS</b><span class="vkCizgi"></span></div>'+
+      '<div class="vkSure">'+kac(sureMetni)+'</div>'+
+      kart('vkBen', (girisli&&bi.kullaniciAdi)||E[0], (typeof avatarFotoAl==='function'?avatarFotoAl():'')||'',
+           girisli?(bi.avatar||''):'', girisli?(bi.ulke||''):'', (girisli&&bi.puan)?bi.puan:'', benW,
+           secimMetni(benimOrdu,benimArena,benSecim.d), true)+
+    '</div>'+
+    (rakipVar?'<div class="vkDunya"><div class="vkDunyaUst"><span class="vkDunyaEt">'+E[3]+'</span>'+
+      '<div class="vkDunyaAd"><span class="vkDunyaAv">'+avatarHtml('','',rakipAd)+'</span><span dir="auto">'+kac(rakipAd||'Rakip')+'</span></div>'+
+      '<div class="vkDunyaSecim">'+secimMetni(rakipOrdu,rakipArena,rs.d)+'</div></div></div>':'')+
+    '<div class="vkPerde"><b>VS</b></div>'+
+    '<div class="vkAtla">'+E[2]+'</div>';
   document.body.appendChild(el);
+  document.body.classList.add('cvTanitimda');
   try{ agacTara(el); }catch(e){}
-  // Rakibin fotoğrafı (profilinden; gelirse)
+  // Rakibin fotoğrafı (profilinden; gelirse iki yere de)
   try{
     const rakipUid=benW?v.siyah:v.beyaz;
     if(rakipUid && fbDb) fbDb.collection('oyuncular').doc(rakipUid).get().then(dd=>{
       if(!dd.exists || !el.isConnected) return; const p=dd.data()||{};
-      const a=el.querySelector('.vsRakip .vsAv'); if(a) a.innerHTML=avatarHtml(p.avatarFoto,p.avatar,rakipAd);
-      if(!rakipUlke && p.ulke){ const u=el.querySelector('.vsRakip .vsUlke'); if(u) u.textContent=ulkeBayrak(p.ulke); }
+      const a=el.querySelector('.vkRakip .vkAv'); if(a) a.innerHTML=avatarHtml(p.avatarFoto,p.avatar,rakipAd);
+      const b=el.querySelector('.vkDunyaAv'); if(b) b.innerHTML=avatarHtml(p.avatarFoto,p.avatar,rakipAd);
+      if(!rakipUlke && p.ulke){ const u=el.querySelector('.vkRakip .vkUlke'); if(u) u.textContent=ulkeBayrak(p.ulke); }
     }).catch(()=>{});
   }catch(e){}
-  /* Taşların inişini bekle: ekran açılırken başlasın */
-  const ACIL_MS=1900, KAPAN_MS=550;
-  const ertele=ms=>{ try{ for(const a of dizilmeAnim) a.basla+=ms; }catch(e){} };
-  ertele(ACIL_MS);
-  let bitti=false, zam=0;
-  const bitir=(hemen)=>{
-    if(bitti) return; bitti=true; clearTimeout(zam); window.cvVsBitir=null;
-    if(hemen){
-      // Bekleyen inişler hemen bitsin (rakip hamlesi gelirse taşlar yerinde olmalı)
-      try{ const t=performance.now(); for(const a of dizilmeAnim) a.basla=Math.min(a.basla, t-a.sure-1); dizilmeGuncelle(); }catch(e){}
-      el.remove(); return;
+
+  // ---- Sahne yardımcıları ----
+  let durum='kapak', bitti=false, raf=0, dunyaRakipte=false;
+  const benDuz=!!duzGorunum;
+  const inisErtele=ms=>{ try{ for(const a of dizilmeAnim) a.basla+=ms; }catch(e){} };
+  inisErtele(600000);                                   // oyun başında başlayan iniş, tanıtım bitene kadar beklesin
+  const benimKamera=()=>{ kamHedef.set(0,0,0); kamYaw=benW?0:Math.PI;
+    if(duzGorunum){ kamPitch=1.55; kamUzak=duzUzaklik(); } else { kamPitch=dikeyKamPitch(); kamUzak=uygunUzaklik(); } };
+  const ciz=()=>{ try{ if(typeof cizimIste==='function') cizimIste(); }catch(e){} };
+  function dunyayaGec(ordu, arena){
+    aktifOrdu=ordu;
+    try{ arenaKur(arena); }catch(e){ console.log('cvVs arena:',e); }
+  }
+  function benimDunyam(inisli){
+    cancelAnimationFrame(raf);
+    if(dunyaRakipte){ dunyaRakipte=false; dunyayaGec(benimOrdu, benimArena); }
+    aktifOrdu=benimOrdu; aktifArena=benimArena;
+    try{ taslariDiz(!!inisli); }catch(e){}
+    if(benDuz && !duzGorunum){ try{ duzGorunumDegistir(); }catch(e){} }   // 2B katmanı yeni dizilen taşların üstüne kurulur
+    benimKamera(); ciz();
+  }
+  // Rakibin modelleri + tahta modeli önbelleğe (en çok 3 sn; gelmeyen sonra kendiliğinden takılır)
+  function rakipYukle(){
+    if(!rakipVar) return Promise.resolve();
+    const yollar=[];
+    if(rakipOrdu.id!=='klasik') for(const t of ['p','n','b','r','q','k']) for(const r of ['w','b']) yollar.push('models/'+rakipOrdu.id+'_'+t+'_'+r+'.glb');
+    if(rakipArena.tahtaGLB) yollar.push(rakipArena.tahtaGLB);
+    const isler=yollar.filter(y=>modelOnbellek[y]===undefined).map(y=>glbYukle(y).then(m=>{ modelOnbellek[y]=m; }).catch(()=>{ modelOnbellek[y]=false; }));
+    return Promise.race([Promise.all(isler), bekle(3000)]);
+  }
+  // Rakibin dünyasında kamera: onun tarafından alçaktan süzülme (2B ise tepeden yavaş dönüş)
+  function rakipKamerasi(){
+    const yaw0=benW?Math.PI:0, duz=!!(rs && rs.d);
+    const t0=performance.now(), u=uygunUzaklik();
+    const adim=()=>{
+      if(bitti || durum==='son') return;
+      const e=Math.min(1,(performance.now()-t0)/2600), y=e*(2-e);
+      kamHedef.set(0, duz?0:.25, 0);
+      if(duz){ kamYaw=yaw0+.25*y; kamPitch=1.45; kamUzak=duzUzaklik()*1.02; }
+      else { kamYaw=yaw0-.55+.75*y; kamPitch=.50+.10*y; kamUzak=u*(.80-.08*y); }
+      ciz(); raf=requestAnimationFrame(adim);
+    };
+    adim();
+  }
+
+  // ---- Akış ----
+  async function akis(){
+    const t0=performance.now();
+    requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('acik')));
+    if(rakipVar){
+      if(benDuz){ try{ duzGorunumDegistir(); tahtaTercihi('duz', true); }catch(e){} }   // tanıtım 3B; tercih korunur
+      await rakipYukle(); if(bitti) return;
+      dunyayaGec(rakipOrdu, rakipArena); dunyaRakipte=true;
+      try{ taslariDiz(false); }catch(e){}
+      rakipKamerasi(); await kare(); if(bitti) return;
     }
-    // Erken dokunuş: inişleri şimdiye çek
-    try{ const t=performance.now(), ilk=Math.min(...dizilmeAnim.map(a=>a.basla)); if(isFinite(ilk) && ilk>t) ertele(t-ilk); }catch(e){}
-    el.classList.add('kapan'); setTimeout(()=>el.remove(), KAPAN_MS+50);
+    // VS kartı en az ~1,7 sn görünsün (animasyonları bitsin)
+    const kalan=1700-(performance.now()-t0); if(kalan>0) await bekle(kalan); if(bitti) return;
+    if(rakipVar){
+      durum='dunya'; el.classList.add('dunya');           // kart söner, rakibin dünyası görünür
+      await bekle(2300); if(bitti) return;
+    }
+    await perdeyleBitir();
+  }
+  async function perdeyleBitir(){
+    if(durum==='son') return; durum='son';
+    el.classList.add('perde');                          // altın perde kapanır (0,42 sn)
+    await bekle(430); if(bitti) return;
+    el.classList.add('kapali');
+    benimDunyam(true);                                  // perde arkasında kendi dünyan; iniş perde açılınca
+    inisErtele(560);
+    await kare(); if(bitti) return;
+    el.classList.add('aciliyor');                       // perde açılır (0,5 sn)
+    document.body.classList.remove('cvTanitimda');
+    await bekle(560);
+    temizle();
+  }
+  function temizle(){ bitti=true; cancelAnimationFrame(raf); window.cvVsBitir=null; document.body.classList.remove('cvTanitimda'); if(el.isConnected) el.remove(); }
+  /* hemen=true: rakip hamlesi geldi -> perdesiz, anında oyuncunun dünyası (taşlar yerinde) */
+  const bitir=(hemen)=>{
+    if(bitti) return;
+    if(hemen){
+      bitti=true;
+      if(durum!=='son' || dunyaRakipte){ benimDunyam(false); }
+      try{ const t=performance.now(); for(const a of dizilmeAnim) a.basla=Math.min(a.basla, t-a.sure-1); dizilmeGuncelle(); }catch(e){}
+      temizle(); return;
+    }
+    perdeyleBitir();
   };
   window.cvVsBitir=bitir;
   el.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); bitir(false); });
-  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('acik')));
-  zam=setTimeout(()=>bitir(false), ACIL_MS);
+  akis().catch(e=>{ console.log('cvVs akış:',e); try{ bitir(true); }catch(_){} });
 }
 
 /* Odanın ayarını tek satırda yaz: "3+2 · animasyonlu", "Süresiz" */
