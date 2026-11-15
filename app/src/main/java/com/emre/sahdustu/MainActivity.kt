@@ -98,9 +98,8 @@ class MainActivity : AppCompatActivity() {
 
     /* BANNER (15 Kasim 2026): yalniz menu/liste ekranlarinda, altta. Ne zaman gorunecegine
        oyun kodu karar verir (AndroidKopru.bannerGoster); tahtada ve Premium'da hic yok.
-       !!! BANNER_GERCEK bos oldugu surece YAYIN surumu da Google TEST bannerini gosterir.
-       AdMob'da "Chess64 Android Banner" birimi olusturulunca kimligi buraya yazilmali. */
-    private val BANNER_GERCEK = ""
+       Debug derlemede Google TEST banneri, yayin surumunde gercek birim. */
+    private val BANNER_GERCEK = "ca-app-pub-6150501660747489/9202749668"   // AdMob: Chess64 Android Banner (15 Kasim 2026)
     private val BANNER_BIRIMI: String
         get() = if (REKLAM_TEST || BANNER_GERCEK.isEmpty()) "ca-app-pub-3940256099942544/9214589741" else BANNER_GERCEK
     private var bannerKap: android.widget.FrameLayout? = null
