@@ -402,6 +402,7 @@ canvas{display:block}
   transition:transform .45s cubic-bezier(.2,1.4,.4,1) .4s}
 #cvVs.acik .vsRozet{transform:none}
 #cvVs.kapan .vsRozet{transform:scale(0);transition-delay:0s;transition-duration:.25s}
+#inceleYorum .iyFikir{color:var(--txt,#E9E1CE);opacity:.92;font-style:italic}
 #gizlilikEkran{position:fixed;inset:0;z-index:61;display:flex;flex-direction:column;background:#06070b;
   padding-top:env(safe-area-inset-top,0px)}
 #gizlilikEkran.gizli{display:none}
@@ -8514,6 +8515,106 @@ function hamleAciklama(o){
     return '';
   }catch(e){ return ''; }
 }
+/* HAMLE FİKRİ (15 Kasım 2026, sahibin isteği; chess24'teki anlatım gibi): hamlenin NE YAPTIĞINI anlatır.
+   Rok, çatal, saldırı, gelişme + merkez kontrolü, merkez piyonu, geçer piyon, açık hatta kale, erken vezir;
+   yeni bir açılış hattına girildiyse adı. Hamleden ÖNCEKİ konumda çağrılır; Motor'u değiştirmeden bırakır.
+   Sonuç {tr, en}; inceleme ekranında yazılır ve sesli okunur. */
+function hamleFikri(h, i, k){
+  const tas=Motor.tasAl(h.from); if(!tas) return null;
+  const ben=tas.c, karsi=(ben==='w'?'b':'w');
+  const kare=x=>'abcdefgh'[x%8]+(8-Math.floor(x/8));
+  const YON={1:"'e",2:"'ye",3:"'e",4:"'e",5:"'e",6:"'ya",7:"'ye",8:"'e"};       // f3'e, b6'ya
+  const yonek=x=>kare(x)+YON[8-Math.floor(x/8)];
+  const AD_TR={p:'Piyon',n:'At',b:'Fil',r:'Kale',q:'Vezir',k:'Şah'};
+  const AD_EN={p:'pawn',n:'knight',b:'bishop',r:'rook',q:'queen',k:'king'};
+  const HEDEF_TR={p:'piyona',n:'ata',b:'file',r:'kaleye',q:'vezire',k:'şaha'};
+  const MERKEZ=[27,28,35,36];                       // d5 e5 d4 e4
+  const alinan=h.enpassant?{t:'p'}:Motor.tasAl(h.to);
+  const tr=[], en=[];
+  // Açılış adı: yalnız bir kez, oyunun bilinen EN DERİN açılış hattının son hamlesinde ("Sicilya — Najdorf")
+  try{
+    if(i<24 && typeof ACILISLAR!=='undefined'){
+      const tum=oyunKaydi.map(x=>x.notasyon.replace(/[+#]/g,''));
+      let enDerin=-1;
+      for(let n=Math.min(24,tum.length); n>=1; n--){ if(ACILISLAR[tum.slice(0,n).join(' ')]){ enDerin=n-1; break; } }
+      const ad=ACILISLAR[tum.slice(0,i+1).join(' ')];
+      if(ad && enDerin===i){
+        tr.push('Açılış: '+ad+'.');
+        const adEn=(typeof metniCevir==='function')?metniCevir(ad):ad;
+        if(adEn && adEn!==ad) en.push('Opening: '+adEn+'.');
+      }
+    }
+  }catch(e){}
+  const kk=Motor.yap(h);
+  let fikTr='', fikEn='';
+  try{
+    const benimHamleler=Motor.legal(ben).filter(m=>m.from===h.to);
+    const guvende = seeKare(h.to, karsi, 0)===0;   // rakip bu taşı kârla alamıyor
+    const deger=x=>x.t==='k'?100:(TAS_DEGER[x.t]||0);
+    // Saldırılan değerli taşlar (şah hariç): daha değerli ya da korumasız olanlar
+    const hedefler=[]; let sahCek=false;
+    for(const m of benimHamleler){
+      const t=Motor.tasAl(m.to); if(!t || t.c!==karsi) continue;
+      if(t.t==='k'){ sahCek=true; continue; }
+      if(t.t==='p') continue;
+      if(deger(t)>deger(tas) || seeKare(m.to, ben, 0)>=2) hedefler.push(t.t);
+    }
+    // Şah çekme saldırıları legal listede görünmez (şah alınamaz); notasyondaki + işaretinden anlaşılır
+    if(k && /\+/.test(k.notasyon||'')) sahCek=true;
+    const ayni=[...new Set(hedefler)].sort((a,b)=>(TAS_DEGER[b]||0)-(TAS_DEGER[a]||0));
+    const sut=h.to%8, sira=Math.floor(h.to/8), ileri=(ben==='w')?(7-sira):sira;   // ileri: kendi tarafından kaçıncı sıra (0..7)
+    if(h.rok){
+      if(h.rok==='K'){ fikTr='Kısa rok: şah güvene alındı, kale oyuna giriyor.'; fikEn='Short castling: the king is safe and the rook joins the game.'; }
+      else { fikTr='Uzun rok: şah vezir kanadına geçti, kale merkeze geliyor.'; fikEn='Long castling: the king goes queenside and the rook comes to the centre.'; }
+    } else if(guvende && (ayni.length>=2 || (sahCek && ayni.length>=1)) && tas.t!=='k'){
+      const a=sahCek?['k',ayni[0]]:[ayni[0],ayni[1]];
+      fikTr='Çatal! '+AD_TR[tas.t]+' hem '+HEDEF_TR[a[0]]+' hem '+HEDEF_TR[a[1]]+' saldırıyor.';
+      fikEn='Fork! The '+AD_EN[tas.t]+' attacks both the '+AD_EN[a[0]]+' and the '+AD_EN[a[1]]+'.';
+    } else if(guvende && ayni.length===1 && !alinan){
+      fikTr=AD_TR[tas.t]+' '+HEDEF_TR[ayni[0]]+' saldırıyor.';
+      fikEn='The '+AD_EN[tas.t]+' attacks the '+AD_EN[ayni[0]]+'.';
+    } else if((tas.t==='n'||tas.t==='b') && !alinan && i<30 &&
+              ((ben==='w' && h.from>=56) || (ben==='b' && h.from<8))){
+      const merkez=benimHamleler.some(m=>MERKEZ.includes(m.to)) || MERKEZ.includes(h.to);
+      fikTr=AD_TR[tas.t]+' '+yonek(h.to)+' gelişiyor'+(merkez?', merkezi kontrol ediyor.':'.');
+      fikEn='The '+AD_EN[tas.t]+' develops to '+kare(h.to)+(merkez?', eyeing the centre.':'.');
+    } else if(tas.t==='p' && !alinan && i<20 && MERKEZ.includes(h.to)){
+      fikTr='Piyon merkezde yer tutuyor.'; fikEn='A central pawn claims space.';
+    } else if(tas.t==='p' && ileri>=4 && !alinan){
+      let gecer=true;
+      for(let r=0;r<8 && gecer;r++){
+        const onde=(ben==='w')?(r<sira):(r>sira); if(!onde) continue;
+        for(let f=Math.max(0,sut-1); f<=Math.min(7,sut+1); f++){ const t=Motor.tasAl(r*8+f); if(t && t.t==='p' && t.c===karsi){ gecer=false; break; } }
+      }
+      if(gecer){ fikTr='Geçer piyon ilerliyor; önünde onu durduracak piyon yok.'; fikEn='The passed pawn marches on; no pawn can stop it.'; }
+    } else if(tas.t==='r' && !alinan){
+      let benim=0, onun=0;
+      for(let r=0;r<8;r++){ const t=Motor.tasAl(r*8+sut); if(t && t.t==='p'){ if(t.c===ben) benim++; else onun++; } }
+      if(!benim && !onun){ fikTr='Kale açık hatta yerleşiyor.'; fikEn='The rook takes the open file.'; }
+      else if(!benim){ fikTr='Kale yarı açık hatta baskı kuruyor.'; fikEn='The rook pressures the half-open file.'; }
+    } else if(tas.t==='q' && !alinan && i<10){
+      fikTr='Vezir erkenden oyuna giriyor.'; fikEn='The queen comes out early.';
+    }
+  }catch(e){}
+  finally{ Motor.gerial(kk); }
+  if(fikTr){ tr.push(fikTr); en.push(fikEn); }
+  return (tr.length) ? {tr:tr.join(' '), en:en.join(' ')} : null;
+}
+/* Değerlendirme değişimi: konumun genel durumu bir önceki hamleye göre başka bir sınıfa geçtiyse söyle */
+function dengeMetni(idx, dil){
+  const k=oyunKaydi[idx]; if(!k || typeof k._cpBeyaz!=='number') return '';
+  const sinif=cp=>{ const a=Math.abs(cp); if(a>=900) return null; const y=cp>0?'w':'b';
+    return a<60?'denge':(a<160?y+'1':(a<450?y+'2':y+'3')); };
+  const simdi=sinif(k._cpBeyaz); if(!simdi) return '';
+  let once='denge';
+  for(let j=idx-1;j>=0;j--){ const o=oyunKaydi[j]; if(o && typeof o._cpBeyaz==='number'){ once=sinif(o._cpBeyaz)||once; break; } }
+  if(simdi===once) return '';
+  const tr=(dil!=='en');
+  if(simdi==='denge') return tr?'Konum yeniden dengede.':'The position is balanced again.';
+  const r=simdi[0]==='w'?(tr?'Beyaz':'White'):(tr?'Siyah':'Black'), d=simdi[1];
+  if(tr) return d==='1'?r+' biraz önde.':(d==='2'?r+' açık ara önde.':r+' kazanmaya çok yakın.');
+  return d==='1'?r+' is slightly better.':(d==='2'?r+' is clearly better.':r+' is close to winning.');
+}
 function yorumUret(kalite, sfNot, dil){
   const Y=YORUM[dil]||YORUM.tr;
   const grup = Y[kalite] || Y.iyi;
@@ -8830,6 +8931,7 @@ async function stockfishDegerlendir(){
         const alinanD = oyuncuH.enpassant ? 1 : (_al ? (TAS_DEGER[_al.t]||0) : 0);
         const geriAlma = !!_al && oyuncuH.to===sonTo;   // rakibin az önce aldığı taşı geri almak: "tek hamle" sayılmaz
         const kacan = kacanKazanc(sfH);
+        try{ k._fikirDil=hamleFikri(oyuncuH, i, k); }catch(e){}
         Motor.yap(oyuncuH);
         let matEttiMi=false;
         try{ matEttiMi=(Motor.durum()==='mat'); }catch(e){}
@@ -12516,6 +12618,7 @@ function inceleYerelDoldur(){
       }
     }catch(e){}
     // Oyuncunun hamlesini oyna, skoru ölç (rakibin cevabı dahil)
+    try{ k._fikirDil=hamleFikri(oyuncuH, i, k); }catch(e){}
     Motor.yap(oyuncuH);
     /* Bu hamle rakibi MAT ettiyse en iyi hamledir — ölçmeye gerek yok.
        (Motorun mat skoru ±99999 olduğu için kayıp hesabı anlamsızlaşıyordu.) */
@@ -12617,6 +12720,7 @@ async function inceleStockfishDoldur(ilerleCb){
       const alinanD = oyuncuH.enpassant ? 1 : (_al ? (TAS_DEGER[_al.t]||0) : 0);
       const geriAlma = !!_al && oyuncuH.to===sonTo;
       const kacan = kacanKazanc(sfH);
+      try{ k._fikirDil=hamleFikri(oyuncuH, i, k); }catch(e){}
       Motor.yap(oyuncuH);
       k._fen=Motor.fen();
       let matEttiMi=false; try{ matEttiMi=(Motor.durum()==='mat'); }catch(e){}
@@ -12903,6 +13007,10 @@ function inceleYorumGoster(otomatik){
   if(k._olay===undefined) malzemeOlaylariHesapla();
   const olayMetni = malzemeOlayMetni(inceleIdx, _dilO, benimRenk);
   if(olayMetni) h+='<div class="iyMetin" style="color:var(--brass);font-weight:700">'+olayMetni+'</div>';
+  /* Hamle fikri + değerlendirme değişimi (chess24 tarzı anlatım) */
+  const fikirMetni = (k._fikirDil && k._fikirDil[_dilO==='en'?'en':'tr']) || '';
+  const dengeYazi = dengeMetni(inceleIdx, _dilO);
+  if(fikirMetni || dengeYazi) h+='<div class="iyMetin iyFikir">'+[fikirMetni, dengeYazi].filter(Boolean).join(' ')+'</div>';
 
   /* 2. satır: açıklama */
   if(!rakipHamlesi){
@@ -12934,7 +13042,8 @@ function inceleYorumGoster(otomatik){
     const cins=(typeof sesProfili!=='undefined')?sesProfili.cinsiyet:'kadin';
     // Notasyonu konuşma diline çevir: "Nf3" -> "At f3", "Qxd5" -> "Vezir d5'i aldı"
     const okunusMetni = (rakipMi ? (dil==='tr'?'Rakip, ':'Opponent: ') : '') + notasyonuSesleKurala(k.notasyon, dil);
-    Konus.oku(okunusMetni+'. '+(olayMetni?olayMetni+' ':'')+konusmaMetni(yorum, dil), dil==='tr'?'tr-TR':'en-US', cins, ()=>{
+    const fikirSes=[fikirMetni, dengeYazi].filter(Boolean).map(x=>konusmaMetni(x, dil)).join(' ');
+    Konus.oku(okunusMetni+'. '+(fikirSes?fikirSes+' ':'')+(olayMetni?olayMetni+' ':'')+konusmaMetni(yorum, dil), dil==='tr'?'tr-TR':'en-US', cins, ()=>{
       if(otomatik && inceleOtoCalisirken){
         otoDevam(700);
       }
