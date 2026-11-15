@@ -21,6 +21,8 @@ window.IKON={"sesAcik": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"curre
   --txt:#D7D3C8; --dim:#8B8A95;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+/* Yazı kutuları seçilebilir kalmalı: user-select:none Android klavyesinde harf oluşturmayı bozuyordu (sohbette 'ş' yazılamıyordu, 15 Kasım 2026) */
+input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--ink);
   font-family:'Manrope',system-ui,sans-serif;color:var(--txt)}
 #stage{position:fixed;inset:0;z-index:1;touch-action:none}
@@ -9582,7 +9584,8 @@ function menuKur(){
   };
   const cvK=document.getElementById('cvOdayaKatil'); if(cvK) cvK.onclick=async()=>{
     cevrimiciHata('');
-    const kod=document.getElementById('cvKodGiris').value;
+    const kg=document.getElementById('cvKodGiris'); const kod=kg.value;
+    try{ kg.blur(); }catch(e){}                       // klavye ve kod çubuğu açık kalmasın
     await odayaKatilAkis(kod, ()=>cvBeklemeGoster('Bağlanılıyor…'));
   };
   const cvI=document.getElementById('cvIptal'); if(cvI) cvI.onclick=()=>{
@@ -10621,6 +10624,7 @@ const Bildirim=(()=>{
 let cvSecilenSure={ dk:10, inc:0 }; // çevrimiçi seçilen süre (varsayılan 10+0, Kasım 2026)
 let ilkHamleYapildi=false, cevrimiciIptalZamanlayici=null;
 function cevrimiciOyunBaslat(rakipAd){
+  try{ const ae=document.activeElement; if(ae && ae.blur && /INPUT|TEXTAREA/.test(ae.tagName)) ae.blur(); }catch(e){}   // maç başlarken klavye kapansın
   if(botOyunundaMi()) botOyunSakla();
   cevrimiciAktif=true;
   oyunAktif=true;
@@ -13643,9 +13647,13 @@ function titresimGucAyarla(v){ titresimGuc=v; try{ localStorage.setItem('titresi
 /* Tahta ekranda görünüyor mu: oyun/inceleme ekranı ya da arkasında 3B sahne görünen Buzlu Cam menüsü.
    Diğer menülerde sahne tamamen örtülü; orada sürekli çizim boşuna ısıtır. */
 let _hudEl=null, _anEl=null;
+let _sohEl=null;
 function tahtaGorunur(){
   if(!_hudEl){ _hudEl=document.getElementById('hud'); _anEl=document.getElementById('analizEkran'); }
   if(_anEl && _anEl.classList.contains('acik')) return false;
+  /* Sohbet penceresi açıkken tahta arkada kalır: sürekli çizim yazarken kasıyordu (15 Kasım 2026). Hamle gelince yine çizilir. */
+  if(!_sohEl) _sohEl=document.getElementById('sohbetModal');
+  if(_sohEl && _sohEl.style.display && _sohEl.style.display!=='none') return false;
   /* Yalnız oyun/inceleme tahtası. Buzlu Cam menüsünde kartların arkası bulanıklaştırılıyor;
      orada her kare çizim bulanıklığı her karede yeniden hesaplatıp akıcılığı düşürür. */
   return !!(_hudEl && _hudEl.classList.contains('acik'));
