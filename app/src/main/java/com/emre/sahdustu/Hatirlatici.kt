@@ -97,9 +97,13 @@ object Hatirlatici {
     fun goster(c: Context) {
         if (!NotificationManagerCompat.from(c).areNotificationsEnabled()) return
         val l = METIN[Locale.getDefault().language] ?: METIN.getValue("en")
-        val (baslik, govde) = l[Calendar.getInstance().get(Calendar.DAY_OF_YEAR) % l.size]
+        val sira = Calendar.getInstance().get(Calendar.DAY_OF_YEAR) % l.size
+        val (baslik, govde) = l[sira]
+        // Dokununca dogrudan ilgili yere gidilir (acilis perdesi ve giris ekrani atlanir): 0 menu, 1 gunun bulmacasi, 2 cevrimici
+        val hedef = listOf("oyna", "bulmaca", "cevrimici")[sira]
         val ac = PendingIntent.getActivity(c, BILDIRIM_ID,
-            Intent(c, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP),
+            Intent(c, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .putExtra(MainActivity.BILDIRIM_HEDEF, hedef),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val b = NotificationCompat.Builder(c, KANAL_HATIRLATMA)
             .setSmallIcon(R.drawable.ic_bildirim).setContentTitle(baslik).setContentText(govde)

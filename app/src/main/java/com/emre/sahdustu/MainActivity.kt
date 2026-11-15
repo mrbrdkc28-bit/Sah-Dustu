@@ -64,6 +64,8 @@ import com.android.billingclient.api.QueryPurchasesParams
 
 class MainActivity : AppCompatActivity() {
 
+    companion object { const val BILDIRIM_HEDEF = "bildirimHedef" }
+
     private lateinit var webView: WebView
     /* GEZINME CUBUGU (3 Ekim 2026): menulerde Geri/Ana ekran tuslari gorunur, tahta
        ekraninda gizli (tam ekran). Cubuk gorundugunde WebView kapsayicinin icinde
@@ -1215,7 +1217,9 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        webView.loadUrl("https://appassets.androidplatform.net/assets/index.html")
+        /* Bildirimden acildiysa hedef adrese yazilir: sayfa acilis perdesini ve giris ekranini atlayip oraya gider */
+        val hedef = bildirimHedefi(intent)
+        webView.loadUrl("https://appassets.androidplatform.net/assets/index.html" + (if (hedef != null) "?hedef=$hedef" else ""))
         faturaBaslat()
 
         // Android 13+ bildirim izni iste
@@ -1229,6 +1233,20 @@ class MainActivity : AppCompatActivity() {
 
     // Dosya secici sonucu: secilen fotografi WebView'e teslim et
     @Deprecated("Deprecated in Java")
+    /* Uygulama arka plandayken bildirime dokunuldu: ayni sayfa hedefe gider (oyun sirasindaysa dokunmaz) */
+    override fun onNewIntent(yeni: Intent) {
+        super.onNewIntent(yeni)
+        setIntent(yeni)
+        val hedef = bildirimHedefi(yeni) ?: return
+        if (!webViewYok) webView.evaluateJavascript("window.bildirimHedefeGit&&bildirimHedefeGit('$hedef')", null)
+    }
+
+    private fun bildirimHedefi(i: Intent?): String? {
+        val h = i?.getStringExtra(BILDIRIM_HEDEF) ?: return null
+        i.removeExtra(BILDIRIM_HEDEF)   // ekran yeniden kurulursa tekrar yonlendirmesin
+        return h.takeIf { it in setOf("oyna", "bulmaca", "cevrimici") }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 3001) {

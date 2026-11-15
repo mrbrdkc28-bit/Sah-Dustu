@@ -344,6 +344,18 @@ canvas{display:block}
   background:radial-gradient(120% 90% at 50% 0%, #131726 0%, var(--ink) 62%)}
 #girisEkran.gizli{display:none}
 #lisansEkran.gizli{display:none}
+#gizlilikEkran{position:fixed;inset:0;z-index:61;display:flex;flex-direction:column;background:#06070b;
+  padding-top:env(safe-area-inset-top,0px)}
+#gizlilikEkran.gizli{display:none}
+#gizlilikUst{flex:none;display:flex;align-items:center;gap:14px;padding:12px 16px;border-bottom:1px solid rgba(232,182,76,.14)}
+#gizlilikGeri{background:none;border:1px solid #3a382f;color:#cfc9ba;padding:8px 16px;min-height:40px;font-size:14px;cursor:pointer;border-radius:10px}
+#gizlilikBaslik{font-family:'Cinzel',Georgia,serif;color:#E8E2D2;letter-spacing:.08em;font-size:15px}
+#gizlilikCerceve{flex:1;width:100%;border:0;background:#15120C}
+#gizlilikYok{padding:40px 24px;text-align:center;color:#cfc9ba;font:14px/1.7 Georgia,serif}
+html[data-tema="fildisi"] #gizlilikEkran{background:#f3ede2}
+html[data-tema="fildisi"] #gizlilikUst{border-bottom-color:rgba(120,95,50,.18)}
+html[data-tema="fildisi"] #gizlilikGeri{border-color:rgba(120,95,50,.25);color:#2b261d}
+html[data-tema="fildisi"] #gizlilikBaslik,html[data-tema="fildisi"] #gizlilikYok{color:#2b261d}
 #girisForm{display:flex;flex-direction:column;gap:12px;width:100%;max-width:340px}
 #girisForm input{background:var(--panel);border:1px solid var(--line);color:var(--txt);
   font-family:inherit;font-size:15px;padding:14px 16px;border-radius:6px;outline:none}
@@ -712,6 +724,19 @@ body:not(.dikeyAktif) #cevrimiciSerit{top:56px;left:14px;right:auto;text-align:l
 .anaKart.oyna .kartAd{color:var(--ink);font-size:20px}
 .anaKart.oyna .kartAlt{color:rgba(20,15,8,.7)}
 .anaKart.oyna .kartOk{color:rgba(20,15,8,.6)}
+/* Hızlı Oyna sağ bilgi (15 Kasım 2026, sahibin isteği): son oyunun süresi ve türü (ör. 3+2 / YZ · Orta) */
+.anaKart .kartBilgi{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:5px;
+  padding-inline-start:11px;border-inline-start:1px solid rgba(20,15,8,.18);text-align:end}
+.kartBilgi .kbSure{font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:17px;line-height:1;color:var(--ink);letter-spacing:.02em;white-space:nowrap}
+.kartBilgi .kbSure.kelime{font-size:11px;letter-spacing:.08em;line-height:1.2}
+.kartBilgi .kbTur{font-size:10.5px;line-height:1.1;letter-spacing:.04em;color:rgba(20,15,8,.66);white-space:nowrap}
+.anaKart.oyna .kartAd{white-space:nowrap;overflow:hidden}
+#hizliKart .kartOk{display:none}   /* sağdaki bilgi zaten dokunulacak yer; ok yer kaplamasın */
+@media (max-width:380px){ .anaKart.oyna .kartAd{font-size:18px;letter-spacing:.03em} }
+html[data-tema="fildisi"] .anaKart .kartBilgi{border-inline-start-color:rgba(232,182,76,.22)}
+html[data-tema="fildisi"] .kartBilgi .kbSure{color:#E8B64C}
+html[data-tema="fildisi"] .kartBilgi .kbTur{color:#b9b2a2}
+.kartBilgi:empty,.kartBilgi .kbSure:empty{display:none}
 /* MENÜ ÖLÇÜLERİ (3 Ekim 2026, sahibin onayı): kartlar 89→67 px, ikonlar ince çizgi SVG;
    menü telefonda tek ekrana sığar (1095→846 px). Izgara alternatifi:
    scratchpad'de denendi, sahibi alt alta düzeni seçti. */
@@ -2578,6 +2603,10 @@ html[data-tema="fildisi"] #secimSayfa .tsCip.secili,html[data-tema="fildisi"] #s
   const azHareket = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   const perde=document.getElementById('acilisPerde');
   window.ACILIS_MS=5800; window.ACILIS_KURULUM_MS=4250;
+  /* Bildirimden açıldı (?hedef=...): açılış hiç oynamaz, doğrudan hedefe gidilir (bkz. bildirimHedefeGit) */
+  window.BILDIRIM_HEDEF=null;
+  try{ const h=new URLSearchParams(location.search).get('hedef'); if(/^(oyna|bulmaca|cevrimici)$/.test(h||'')) window.BILDIRIM_HEDEF=h; }catch(e){}
+  if(window.BILDIRIM_HEDEF && perde){ perde.classList.add('bitti'); return; }
   if(!perde || tur!=='sinematik' || azHareket) return;
   perde.classList.add('sinematik');
   const T0=4300, T1=T0+780, TSAH=T1+620, TTAS=TSAH+520, ARA=270, TVEZ=TTAS+5*ARA+330, TMAT=TVEZ+430, TSON=TMAT+1800;
@@ -2884,6 +2913,7 @@ function perdeBittiginde(fn){
         <div class="kartAd">HIZLI OYNA</div>
         <div class="kartAlt">Son ayarlarınla hemen başla</div>
       </div>
+      <div class="kartBilgi" id="hizliBilgi" aria-hidden="true"><div class="kbSure"></div><div class="kbTur"></div></div>
       <div class="kartOk">›</div>
     </button>
 
@@ -2965,10 +2995,33 @@ function perdeBittiginde(fn){
     <span onclick="document.getElementById('lisansEkran').classList.remove('gizli')"
       style="cursor:pointer;text-decoration:underline">Lisanslar &amp; Atıflar</span>
     <span style="opacity:.4;margin:0 8px">·</span>
-    <span onclick="window.open('https://mrbrdkc28-bit.github.io/Sah-Dustu/privacy.html#'+(typeof uygDil!=='undefined'?uygDil:'tr'),'_blank')"
+    <span onclick="gizlilikAc()"
       style="cursor:pointer;text-decoration:underline">Gizlilik Politikası</span>
   </div>
 </div>
+<!-- GİZLİLİK POLİTİKASI (15 Kasım 2026, sahibin isteği): eskiden dış sayfa açılıyordu ve geri dönüş yoktu.
+     Artık uygulamanın içinde, üstte ‹ Geri ile açılır; Android geri tuşu ve iPhone soldan kaydırma da kapatır. -->
+<div id="gizlilikEkran" class="gizli">
+  <div id="gizlilikUst">
+    <button id="gizlilikGeri" onclick="gizlilikKapat()">‹ <span>Geri</span></button>
+    <span id="gizlilikBaslik">Gizlilik Politikası</span>
+  </div>
+  <div id="gizlilikYok" style="display:none">İnternet bağlantısı yok. Gizlilik politikasını görmek için internet gerekli.</div>
+  <iframe id="gizlilikCerceve" title="Gizlilik Politikası"></iframe>
+</div>
+<script>
+function gizlilikAc(){
+  const e=document.getElementById('gizlilikEkran'), f=document.getElementById('gizlilikCerceve'), y=document.getElementById('gizlilikYok');
+  const dil=(typeof uygDil!=='undefined'?uygDil:'tr');
+  const adres='https://mrbrdkc28-bit.github.io/Sah-Dustu/privacy.html#'+dil;
+  const cevrimdisi=(navigator.onLine===false);
+  y.style.display=cevrimdisi?'block':'none'; f.style.display=cevrimdisi?'none':'block';
+  if(!cevrimdisi && f.dataset.adres!==adres){ f.dataset.adres=adres; f.src=adres; }
+  e.classList.remove('gizli');
+  try{ if(typeof agacTara==='function') agacTara(e); }catch(_){}
+}
+function gizlilikKapat(){ document.getElementById('gizlilikEkran').classList.add('gizli'); }
+</script>
 
 <div id="lisansEkran" class="gizli" style="position:fixed;inset:0;background:rgba(6,7,11,.97);z-index:60;overflow-y:auto;padding:18px 16px 44px">
   <button onclick="document.getElementById('lisansEkran').classList.add('gizli')"
@@ -3593,13 +3646,15 @@ let fbAuth=null, fbDb=null, fbKullanici=null;
         // Oturum yok: perde kapandıktan sonra giriş ekranını göster
         const perde=document.getElementById('acilisPerde');
         const goster=()=>{ const g=document.getElementById('girisEkran'); if(g) g.classList.remove('gizli'); };
-        perdeBittiginde(goster);
+        if(window.BILDIRIM_HEDEF && typeof misafirDevam==='function') misafirDevam();
+        else perdeBittiginde(goster);
       }
+      window.authBelli=true;
       if(typeof girisDurumGuncelle==='function') girisDurumGuncelle();
     });
     // Güvenlik: Firebase hiç cevap vermezse 6 sn sonra giriş ekranını yine de göster
     setTimeout(()=>{
-      if(!fbKullanici){ const g=document.getElementById('girisEkran'); if(g) g.classList.remove('gizli'); }
+      if(!fbKullanici && !misafirMod && !window.BILDIRIM_HEDEF){ const g=document.getElementById('girisEkran'); if(g) g.classList.remove('gizli'); }
     }, (window.ACILIS_MS||5800)+200);
   }catch(e){ console.log('Firebase başlatılamadı:',e); }
 })();
@@ -9287,6 +9342,7 @@ function menuKur(){
   const og=document.getElementById('ogrenKart'); if(og) og.onclick=()=>ogrenAc();
   const kk=document.getElementById('kutupKart'); if(kk) kk.onclick=()=>kutupAc();
   const ok=document.getElementById('oynaKart'); if(ok) ok.onclick=()=>kurulumAc();
+  hizliBilgiYaz();
   const hk=document.getElementById('hizliKart'); if(hk) hk.onclick=()=>{
     let a=null; try{ a=JSON.parse(localStorage.getItem('sonAyar')||'null'); }catch(e){}
     if(a){
@@ -11788,6 +11844,7 @@ function oyunaBasla(){
     ordu:aktifOrdu?aktifOrdu.id:'klasik', arena:aktifArena?aktifArena.id:ARENALAR[0].id,
     zor:aiZorluk, renk:insanRenk, sure:sureSecim, artis:(typeof sureArtis!=='undefined'?sureArtis:0)
   })); }catch(e){}
+  try{ hizliBilgiYaz(); }catch(e){}
   setTimeout(()=>Ses.olay('basla'),60);
   document.getElementById('kurulumEkran').classList.remove('acik');
   document.getElementById('menu').classList.add('gizli');
@@ -12052,6 +12109,8 @@ window.geriTusu=function(){
   try{
     if(window.cikisPopKapat && window.cikisPopKapat()) return true;
     // -1. Yeni pencereler / ekranlar (premium, rapor, liderlik, inceleme, yardım, oyun kurulum)
+    const gz=document.getElementById('gizlilikEkran');
+    if(gz && !gz.classList.contains('gizli')){ gz.classList.add('gizli'); return true; }
     const pm=document.getElementById('premiumModal');
     if(pm){ pm.remove(); if(typeof pmBekleyen!=='undefined') pmBekleyen=null; return true; }
     const rm=document.getElementById('raporModal'); if(rm){ rm.remove(); return true; }
@@ -13447,7 +13506,7 @@ function acilisNotalari(perde){
     if(p){ p.classList.add('bitti'); }
   }
   const p=document.getElementById('acilisPerde');
-  if(p){
+  if(p && !p.classList.contains('bitti')){
     /* AÇILIŞ NOTALARI (sahibin isteği): oyun başlama sesi (basla.mp3) burada çalmaz.
        Her taş yere oturduğunda yükselen bir nota, her boya damlası çarptığında küçük bir
        "damla" sesi, logo belirirken yumuşak bir akor. Ses dosyası yok, anlık üretilir.
@@ -14055,6 +14114,76 @@ function otomatikGiris(){
   };
   perdeBittiginde(gec);   // perde kapanınca (süre ya da dokunuş) — sinematik açılış daha uzun
 }
+
+/* HIZLI OYNA kartının sağındaki bilgi: son oyunun süresi (3+2, Süresiz) ve türü (YZ · zorluk).
+   Hızlı Oyna her zaman yapay zekâya karşı başlar; burada gösterilen de tam olarak başlayacak oyundur. */
+function hizliBilgiYaz(){
+  const k=document.getElementById('hizliBilgi'); if(!k) return;
+  let a=null; try{ a=JSON.parse(localStorage.getItem('sonAyar')||'null'); }catch(e){}
+  const d=(typeof uygDil!=='undefined'?uygDil:'tr');
+  const S={
+    tr:{yz:'YZ',sz:'Süresiz',kolay:'Kolay',orta:'Orta',zor:'Zor'},
+    en:{yz:'AI',sz:'No limit',kolay:'Easy',orta:'Medium',zor:'Hard'},
+    ru:{yz:'ИИ',sz:'Без лимита',kolay:'Лёгкий',orta:'Средний',zor:'Сложный'},
+    ar:{yz:'الكمبيوتر',sz:'بلا وقت',kolay:'سهل',orta:'متوسط',zor:'صعب'},
+    fr:{yz:'IA',sz:'Sans limite',kolay:'Facile',orta:'Moyen',zor:'Difficile'},
+    de:{yz:'KI',sz:'Ohne Zeit',kolay:'Leicht',orta:'Mittel',zor:'Schwer'},
+    it:{yz:'IA',sz:'Senza limite',kolay:'Facile',orta:'Medio',zor:'Difficile'},
+    zh:{yz:'人机',sz:'不限时',kolay:'简单',orta:'中等',zor:'困难'}}[d] || null;
+  const L=S||{yz:'AI',sz:'No limit',kolay:'Easy',orta:'Medium',zor:'Hard'};
+  const sure=(a&&a.sure)||0, artis=(a&&a.artis)||0, zor=(a&&a.zor)||'orta';
+  const ks=k.querySelector('.kbSure');
+  ks.textContent = sure>0 ? (Math.round(sure/60)+'+'+artis) : L.sz;
+  ks.classList.toggle('kelime', !(sure>0));
+  k.querySelector('.kbTur').textContent = L.yz+' · '+(L[zor]||L.orta);
+  hizliBaslikSigdir();
+}
+/* Başlık tek satır kalsın: uzun dillerde (ör. SCHNELLSTART) kesmek yerine sığana kadar küçült */
+function hizliBaslikSigdir(){
+  const t=document.querySelector('#hizliKart .kartAd'); if(!t) return;
+  t.style.fontSize='';
+  if(!t.offsetWidth) return;   // menü gizli: görününce yeniden ölçülür
+  let f=parseFloat(getComputedStyle(t).fontSize);
+  while(t.scrollWidth>t.clientWidth+1 && f>13){ f-=.5; t.style.fontSize=f+'px'; }
+}
+(function(){
+  const m=document.getElementById('menu'); if(!m) return;
+  new MutationObserver(()=>{ if(!m.classList.contains('gizli')) requestAnimationFrame(hizliBaslikSigdir); }).observe(m,{attributes:true,attributeFilter:['class']});
+  addEventListener('resize',()=>requestAnimationFrame(hizliBaslikSigdir));
+})();
+
+/* BİLDİRİMDEN AÇILIŞ (15 Kasım 2026, sahibin isteği): bildirime dokununca açılış perdesi ve giriş ekranı
+   gösterilmez, doğrudan hedefe gidilir: 'bulmaca' → günün bulmacası (çözüldüyse bulmaca seçimi),
+   'cevrimici' → çevrimiçi lobi (hesap yoksa menü), 'oyna' → menü. Uygulama kapalıyken adres ?hedef=... ile gelir;
+   arka plandayken uygulama window.bildirimHedefeGit('...') çağırır. Oyun/bulmaca sürerken hiçbir şey yapılmaz. */
+function bildirimHedefeGit(h){
+  if(!/^(oyna|bulmaca|cevrimici)$/.test(h||'')) return;
+  window.BILDIRIM_HEDEF=h;
+  const p=document.getElementById('acilisPerde');
+  if(p && !p.classList.contains('bitti')){   // açılış hâlâ oynuyorsa dokunulmuş gibi geç
+    try{ p.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true})); }catch(e){}
+    p.classList.add('bitti');
+  }
+  let n=0;
+  const dene=()=>{
+    const yuk=document.getElementById('yukleniyor');
+    const kurulu=!yuk || yuk.classList.contains('gizli');
+    if(!kurulu || (!window.authBelli && n<40)){ if(++n<200) setTimeout(dene,150); return; }   // 3B kurulum + oturum bilgisi (en çok ~6 sn)
+    window.BILDIRIM_HEDEF=null;
+    try{ if(location.search) history.replaceState(null,'',location.pathname); }catch(e){}   // sayfa yenilenirse tekrar yönlendirmesin
+    const g=document.getElementById('girisEkran');
+    if(g && !g.classList.contains('gizli')){ if(fbKullanici) girisEkraniGec(); else misafirDevam(); }
+    const hud=document.getElementById('hud');
+    if((hud && hud.classList.contains('acik')) || cevrimiciAktif) return;   // oyunun ortasında bölme
+    try{
+      if(h==='bulmaca'){ if(gunlukCozulduMu()) bulmacaBaslat(); else bulmacaGunlukBaslat(); }
+      else if(h==='cevrimici' && fbKullanici) cevrimiciAc();
+    }catch(e){ console.log('bildirimHedefeGit:',e); }
+  };
+  dene();
+}
+window.bildirimHedefeGit=bildirimHedefeGit;
+if(window.BILDIRIM_HEDEF) bildirimHedefeGit(window.BILDIRIM_HEDEF);
 
 // Açılışta aktif çevrimiçi oyun varsa otomatik geri dön
 async function aktifOyunaDonKontrol(){
@@ -15369,7 +15498,8 @@ const DIL_BAG=[
  ['#istKart .kartAd','profilKart','metin'],
  ['#istKart .kartAlt','profilKartAlt','metin'],
  ['#menu span[onclick*="lisansEkran"]','lisanslar','metin'],
- ['#menu span[onclick*="privacy"]','gizlilik','metin']
+ ['#menu span[onclick*="gizlilikAc"]','gizlilik','metin'],
+ ['#gizlilikBaslik','gizlilik','metin']
 ];
 function dilUygula(){
   for(const [sec,anahtar,mod] of DIL_BAG){
@@ -15387,6 +15517,7 @@ function dilUygula(){
   }
   document.documentElement.lang=uygDil;
   document.documentElement.dir = (uygDil==='ar') ? 'rtl' : 'ltr';   // Arapça sağdan sola
+  try{ if(typeof hizliBilgiYaz==='function') hizliBilgiYaz(); }catch(e){}
   /* Aktif dil düğmesini vurgula */
   document.querySelectorAll('.dilBtn').forEach(b=>{
     const aktif=b.dataset.dil===uygDil;
@@ -15939,6 +16070,7 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM['Bunu seç']=CEVM['Bunu seç']||{en:'Choose this',ru:'Выбрать',ar:'اختر هذا',fr:'Choisir',de:'Auswählen',it:'Scegli',zh:'选择此项'};
   CEVM['Kilidi aç']=CEVM['Kilidi aç']||{en:'Unlock',ru:'Открыть',ar:'افتح القفل',fr:'Débloquer',de:'Freischalten',it:'Sblocca',zh:'解锁'};
   CEVM['Geri']=CEVM['Geri']||{en:'Back',ru:'Назад',ar:'رجوع',fr:'Retour',de:'Zurück',it:'Indietro',zh:'返回'};
+  CEVM['İnternet bağlantısı yok. Gizlilik politikasını görmek için internet gerekli.']={en:'No internet connection. The privacy policy needs the internet.',ru:'Нет подключения к интернету. Для политики конфиденциальности нужен интернет.',ar:'لا يوجد اتصال بالإنترنت. تحتاج سياسة الخصوصية إلى الإنترنت.',fr:'Pas de connexion Internet. La politique de confidentialité nécessite Internet.',de:'Keine Internetverbindung. Für die Datenschutzerklärung wird Internet benötigt.',it:'Nessuna connessione Internet. Per l’informativa sulla privacy serve Internet.',zh:'没有网络连接。查看隐私政策需要联网。'};
   CEVM['ARENA']=CEVM['ARENA']||{en:'ARENA',ru:'АРЕНА',ar:'الساحة',fr:'ARÈNE',de:'ARENA',it:'ARENA',zh:'场地'};
   CEVM['ORDU']=CEVM['ORDU']||{en:'ARMY',ru:'АРМИЯ',ar:'الجيش',fr:'ARMÉE',de:'ARMEE',it:'ESERCITO',zh:'棋子'};
   CEVM['Önizleme oyun sürerken kullanılamaz']=CEVM['Önizleme oyun sürerken kullanılamaz']||{en:'Preview is not available during a game',ru:'Предпросмотр недоступен во время игры',ar:'المعاينة غير متاحة أثناء اللعب',fr:'Aperçu indisponible pendant une partie',de:'Vorschau während einer Partie nicht verfügbar',it:'Anteprima non disponibile durante una partita',zh:'对局进行中无法预览'};
