@@ -4796,6 +4796,19 @@ const ORDULAR=[
      sahneden taş taş ayrıldı (scratchpad setler/bol.mjs), dokular küçültüldü. */
 ];
 let aktifOrdu=ORDULAR[0];
+/* SON SEÇİM (22 Kasım 2026, sahibin isteği): en son hangi taşlar ve tahtayla oynandıysa (yerel ya da çevrimiçi)
+   açılışta o seçili gelir. Oyun başlarken kaydedilir (sonSecimKaydet). Kilitliyse ekranlar zaten ücretsize çevirir. */
+function sonSecimKaydet(){
+  try{ localStorage.setItem('c64_sonSecim', JSON.stringify({ordu:aktifOrdu&&aktifOrdu.id, arena:aktifArena&&aktifArena.id})); }catch(e){}
+}
+try{
+  let ss=JSON.parse(localStorage.getItem('c64_sonSecim')||'null');
+  if(!ss){ const a=JSON.parse(localStorage.getItem('sonAyar')||'null'); if(a) ss={ordu:a.ordu, arena:a.arena}; }
+  if(ss){
+    aktifOrdu=ORDULAR.find(o=>o.id===ss.ordu)||aktifOrdu;
+    aktifArena=ARENALAR.find(a=>a.id===ss.arena)||aktifArena;
+  }
+}catch(e){}
 
 let _dokuOnbellek=null;
 function prosedurelDoku(){
@@ -10687,6 +10700,7 @@ function cevrimiciOyunBaslat(rakipAd){
   panelYerlesimGuncelle();
   sahneSimgeGuncelle();
   if(!aktifArena) aktifArena=ARENALAR[0];
+  try{ sonSecimKaydet(); }catch(e){}   // çevrimiçi maçta da son seçim kalıcı
   arenaKur(aktifArena);
   yeniOyun(); // içinde taslariDiz çağrılıyor (klasik için modeller hazır değilse animasyonsuz)
   // Siyah oyuncuysam tahtayı kendi tarafıma çevir
@@ -12191,6 +12205,7 @@ function oyunaBasla(){
   // sureArtis kurulum ekranındaki seçimden gelir (Süresiz'de 0)
   const by=document.getElementById('btnYeni'); if(by) by.style.display='';
   Ses.sesAc();
+  try{ sonSecimKaydet(); }catch(e){}
   // HIZLI OYNA için son ayarları kaydet
   try{ localStorage.setItem('sonAyar', JSON.stringify({
     ordu:aktifOrdu?aktifOrdu.id:'klasik', arena:aktifArena?aktifArena.id:ARENALAR[0].id,
@@ -12474,6 +12489,7 @@ window.geriTusu=function(){
       if(ss.classList.contains('zorunlu')) return true;
       if(ss.querySelector('.tsCipler') && window.tasSesleriAc){ window.tasSesleriAc(); return true; }      // ses seçimi → taş sesleri
       if(ss.querySelector('.tsSatirT') && window.oyunAyarlariAc){ window.oyunAyarlariAc(); return true; } // taş sesleri → ayarlar
+      if(ss.querySelector('.bsAltSayfa') && window.oyunAyarlariAc){ window.oyunAyarlariAc(); return true; } // bildirimler → ayarlar
       ss.classList.remove('acik'); return true;
     }
     const cap=document.getElementById('cvAyarPop'); if(cap && cap.classList.contains('acik')){ cap.classList.remove('acik'); return true; }
@@ -15126,8 +15142,11 @@ window.addEventListener('load',()=>{
   const agirKurulum=()=>{
     if(kuruldu) return; kuruldu=true;
     kur();
-    try{ arenaKur(ARENALAR[0]); }catch(e){ console.log('arenaKur hata:',e); }
-    try{ taslariDiz(); }catch(e){ console.log('taslariDiz hata:',e); }
+    /* Menü arka planı hep ilk arena; oyuncunun son seçimi (aktifArena) korunur, oyun başlarken o kurulur (22 Kasım 2026) */
+    { const secA=aktifArena, secO=aktifOrdu; aktifOrdu=ORDULAR[0];
+      try{ arenaKur(ARENALAR[0]); }catch(e){ console.log('arenaKur hata:',e); }
+      try{ taslariDiz(); }catch(e){ console.log('taslariDiz hata:',e); }
+      if(secA) aktifArena=secA; if(secO) aktifOrdu=secO; }
     try{ cburnettYukle(); }catch(e){}
     menuKur();
     dongu();
@@ -16517,6 +16536,8 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["Siyah ağır basıyor"]=CEVM["Siyah ağır basıyor"]||{"en": "Black is winning", "ru": "Чёрные выигрывают", "ar": "الأسود متفوق بوضوح", "fr": "Noirs nettement mieux", "de": "Schwarz klar besser", "it": "Nero in netto vantaggio", "zh": "黑方大优"};
   CEVM["Beyaz kazanıyor"]=CEVM["Beyaz kazanıyor"]||{"en": "White wins", "ru": "Белые побеждают", "ar": "الأبيض يفوز", "fr": "Les Blancs gagnent", "de": "Weiß gewinnt", "it": "Vince il Bianco", "zh": "白方胜势"};
   CEVM["Siyah kazanıyor"]=CEVM["Siyah kazanıyor"]||{"en": "Black wins", "ru": "Чёрные побеждают", "ar": "الأسود يفوز", "fr": "Les Noirs gagnent", "de": "Schwarz gewinnt", "it": "Vince il Nero", "zh": "黑方胜势"};
+  CEVM["Maç isteği açık"]=CEVM["Maç isteği açık"]||{"en": "Game requests on", "ru": "Приглашения вкл.", "ar": "طلبات اللعب مفعلة", "fr": "Demandes activées", "de": "Spielanfragen an", "it": "Richieste attive", "zh": "对局邀请已开启"};
+  CEVM["Maç isteği kapalı"]=CEVM["Maç isteği kapalı"]||{"en": "Game requests off", "ru": "Приглашения выкл.", "ar": "طلبات اللعب متوقفة", "fr": "Demandes désactivées", "de": "Spielanfragen aus", "it": "Richieste disattivate", "zh": "对局邀请已关闭"};
   CEVM['Titreşim']=CEVM['Titreşim']||{en:'Vibration',ru:'Вибрация',ar:'الاهتزاز',fr:'Vibration',de:'Vibration',it:'Vibrazione',zh:'振动'};
   CEVM['Hamle, savaş ve uyarı sesleri']=CEVM['Hamle, savaş ve uyarı sesleri']||{en:'Move, battle and alert sounds',ru:'Звуки ходов, боя и предупреждений',ar:'أصوات النقلات والمعارك والتنبيهات',fr:'Sons des coups, combats et alertes',de:'Zug-, Kampf- und Warntöne',it:'Suoni di mosse, battaglie e avvisi',zh:'走子、战斗和提醒音效'};
   CEVM['Tüm sesler kapalı']=CEVM['Tüm sesler kapalı']||{en:'All sounds off',ru:'Все звуки выключены',ar:'كل الأصوات متوقفة',fr:'Tous les sons coupés',de:'Alle Töne aus',it:'Tutti i suoni disattivati',zh:'关闭所有声音'};
@@ -19666,40 +19687,25 @@ function devPanelAc(){
   alt.appendChild(dB); alt.appendChild(tB); alt.appendChild(aB);
   /* OYUN AYARLARI (4 Ekim 2026): savaş animasyonu + grafik/yenileme hızı. Menüden ve
      çevrimiçi ekrandan açılır; seçimler kapanmadan uygulanır. */
-  function ayarAc(){
+  /* Bildirimler alt sayfası (22 Kasım 2026): maç isteği / oyun bildirimleri / çevrimiçi oyuncu + saat aralığı.
+     Geri tuşu ve Tamam ayarlara döner (.bsAltSayfa işareti). */
+  function bildirimAyarlariAc(){
     const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
-    sayfa.querySelector('.ssBaslik').textContent=c('Oyun Ayarları');
+    sayfa.classList.remove('zorunlu');
+    sayfa.querySelector('.ssBaslik').textContent=c('Bildirimler');
     const l=sayfa.querySelector('.ssListe'); l.innerHTML='';
+    const isaret=document.createElement('div'); isaret.className='bsAltSayfa'; isaret.hidden=true; l.appendChild(isaret);
     const grup=(baslik, secenekler, secili, sec)=>{
       const h=document.createElement('div'); h.className='ssGrup'; h.textContent=c(baslik); l.appendChild(h);
       const dugmeler=[];
       secenekler.forEach(o=>{
         const b=document.createElement('button'); b.type='button'; b.className='ssSec'+(o.id===secili?' secili':'');
-        b.innerHTML='<span class="ssAd"><span></span><small></small>'+(o.uyari?'<em class="ssUyari"></em>':'')+'</span><span class="ssTik">✓</span>';
+        b.innerHTML='<span class="ssAd"><span></span><small></small></span><span class="ssTik">✓</span>';
         b.querySelector('.ssAd span').textContent=c(o.ad); b.querySelector('.ssAd small').textContent=o.alt;
-        if(o.uyari) b.querySelector('.ssUyari').textContent=o.uyari;
         b.onclick=()=>{ dugmeler.forEach(x=>x.classList.toggle('secili', x===b)); sec(o.id); };
         dugmeler.push(b); l.appendChild(b);
       });
     };
-    const hz=maksHz();
-    grup('Savaş animasyonu', [
-      {id:1, ad:'Açık',   alt:c('Taş alınınca kamera savaşa iner')},
-      {id:0, ad:'Kapalı', alt:c('Hamleler hızlı geçer')}
-    ], sahneAyari?1:0, v=>{ if(typeof sahneAyarla==='function') sahneAyarla(v===1); });
-    grup('Ses', [
-      {id:1, ad:'Açık',   alt:c('Hamle, savaş ve uyarı sesleri')},
-      {id:0, ad:'Kapalı', alt:c('Tüm sesler kapalı')}
-    ], (typeof Ses!=='undefined' && Ses.sessizMi)?0:1, v=>{ if(typeof sesAyarla==='function') sesAyarla(v===1); });
-    /* Taş sesleri alt sayfası (4 Ekim 2026) */
-    { const PAD={klasik:'Klasik',ahsap:'Ahşap',ordu:'Ordu',gercek:'Gerçek',savas:'Savaş',destan:'Destan'};
-      const ts=(typeof Ses!=='undefined' && Ses.tasSesAyar) ? Ses.tasSesAyar : {paket:'klasik',ozel:{}};
-      const b=document.createElement('button'); b.type='button'; b.className='ssSec tsSatir';
-      b.innerHTML='<span class="ssAd"><span></span><small></small></span><span class="tsOk">›</span>';
-      b.querySelector('.ssAd span').textContent=c('Taş sesleri');
-      b.querySelector('.ssAd small').textContent=c(PAD[ts.paket]||'Klasik')+(Object.keys(ts.ozel).length?' · '+c('özel ayar'):'')+' · '+c('taş taş seçilebilir');
-      b.onclick=()=>tasSesleriAc();
-      l.appendChild(b); }
     /* BİLDİRİMLER (22 Kasım 2026, sahibin isteği): maç isteği / oyun bildirimleri (günlük hatırlatma) /
        çevrimiçi oyuncu (her seferinde) ayrı ayrı; sunucudan gelenler için saat aralığı (tüm gün, 08-22, özel).
        Tarayıcıda yerel hatırlatma yok; hesaplı tercihler sunucuya yazılır (bildirimTercihYaz). */
@@ -19707,8 +19713,6 @@ function devPanelAc(){
       const hesap=(typeof fbKullanici!=='undefined' && fbKullanici && !misafirMod);
       if(andH||iosH||hesap){
         const bt=bildirimTercih();
-        const h=document.createElement('div'); h.className='ssGrup'; h.style.cssText='font-size:12px;color:var(--brass,#E8B64C);margin-top:22px';
-        h.textContent=c('Bildirimler'); l.appendChild(h);
         if(hesap && (andH||iosH)){
           grup('Maç isteği bildirimleri', [
             {id:1, ad:'Açık',   alt:c('Bir oyuncu seni maça davet edince haber ver')},
@@ -19758,6 +19762,63 @@ function devPanelAc(){
           const not=document.createElement('div'); not.className='ssAcikla'; not.style.cssText='font-size:12px;opacity:.75;margin:-4px 4px 6px;text-align:center';
           not.textContent=c('Maç isteği ve çevrimiçi bildirimleri yalnız bu saatlerde gelir'); l.appendChild(not);
         }
+      } }
+    const alt=document.createElement('div'); alt.className='tsAlt';
+    const gr=document.createElement('button'); gr.type='button'; gr.className='ssTamam'; gr.textContent=c('Tamam');
+    gr.onclick=()=>ayarAc();
+    alt.appendChild(gr); l.appendChild(alt);
+    try{ if(typeof agacTara==='function') agacTara(sayfa); }catch(e){}
+    sayfa.classList.add('acik');
+    try{ l.parentNode.scrollTop=0; }catch(e){}
+  }
+  window.bildirimAyarlariAc=bildirimAyarlariAc;
+  function ayarAc(){
+    const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+    sayfa.querySelector('.ssBaslik').textContent=c('Oyun Ayarları');
+    const l=sayfa.querySelector('.ssListe'); l.innerHTML='';
+    const grup=(baslik, secenekler, secili, sec)=>{
+      const h=document.createElement('div'); h.className='ssGrup'; h.textContent=c(baslik); l.appendChild(h);
+      const dugmeler=[];
+      secenekler.forEach(o=>{
+        const b=document.createElement('button'); b.type='button'; b.className='ssSec'+(o.id===secili?' secili':'');
+        b.innerHTML='<span class="ssAd"><span></span><small></small>'+(o.uyari?'<em class="ssUyari"></em>':'')+'</span><span class="ssTik">✓</span>';
+        b.querySelector('.ssAd span').textContent=c(o.ad); b.querySelector('.ssAd small').textContent=o.alt;
+        if(o.uyari) b.querySelector('.ssUyari').textContent=o.uyari;
+        b.onclick=()=>{ dugmeler.forEach(x=>x.classList.toggle('secili', x===b)); sec(o.id); };
+        dugmeler.push(b); l.appendChild(b);
+      });
+    };
+    const hz=maksHz();
+    grup('Savaş animasyonu', [
+      {id:1, ad:'Açık',   alt:c('Taş alınınca kamera savaşa iner')},
+      {id:0, ad:'Kapalı', alt:c('Hamleler hızlı geçer')}
+    ], sahneAyari?1:0, v=>{ if(typeof sahneAyarla==='function') sahneAyarla(v===1); });
+    grup('Ses', [
+      {id:1, ad:'Açık',   alt:c('Hamle, savaş ve uyarı sesleri')},
+      {id:0, ad:'Kapalı', alt:c('Tüm sesler kapalı')}
+    ], (typeof Ses!=='undefined' && Ses.sessizMi)?0:1, v=>{ if(typeof sesAyarla==='function') sesAyarla(v===1); });
+    /* Taş sesleri alt sayfası (4 Ekim 2026) */
+    { const PAD={klasik:'Klasik',ahsap:'Ahşap',ordu:'Ordu',gercek:'Gerçek',savas:'Savaş',destan:'Destan'};
+      const ts=(typeof Ses!=='undefined' && Ses.tasSesAyar) ? Ses.tasSesAyar : {paket:'klasik',ozel:{}};
+      const b=document.createElement('button'); b.type='button'; b.className='ssSec tsSatir';
+      b.innerHTML='<span class="ssAd"><span></span><small></small></span><span class="tsOk">›</span>';
+      b.querySelector('.ssAd span').textContent=c('Taş sesleri');
+      b.querySelector('.ssAd small').textContent=c(PAD[ts.paket]||'Klasik')+(Object.keys(ts.ozel).length?' · '+c('özel ayar'):'')+' · '+c('taş taş seçilebilir');
+      b.onclick=()=>tasSesleriAc();
+      l.appendChild(b); }
+    /* BİLDİRİMLER (22 Kasım 2026): ayarlarda tek satır (özetli); dokununca kendi alt sayfası (bildirimAyarlariAc). */
+    { const andH=(typeof AndroidBildirim!=='undefined' && AndroidBildirim.hatirlatmaAyar), iosH=!!window.IOS_UYGULAMA;
+      const hesap=(typeof fbKullanici!=='undefined' && fbKullanici && !misafirMod);
+      if(andH||iosH||hesap){
+        const bt=bildirimTercih(), iki=n=>String(n).padStart(2,'0');
+        const saatYazi = bt.saat.tur==='tum' ? c('Tüm gün') : bt.saat.tur==='ozel' ? iki(bt.saat.bas)+':00 – '+iki(bt.saat.bit)+':00' : '08:00 – 22:00';
+        const ozet = (hesap && (andH||iosH)) ? c(bt.davetKapali?'Maç isteği kapalı':'Maç isteği açık')+' · '+saatYazi : c('Günlük hatırlatma');
+        const b=document.createElement('button'); b.type='button'; b.className='ssSec tsSatir';
+        b.innerHTML='<span class="ssAd"><span></span><small></small></span><span class="tsOk">›</span>';
+        b.querySelector('.ssAd span').textContent=c('Bildirimler');
+        b.querySelector('.ssAd small').textContent=ozet;
+        b.onclick=()=>bildirimAyarlariAc();
+        l.appendChild(b);
       } }
     grup('Açılış animasyonu', [
       {id:'sinematik', ad:'Sinematik', alt:c('Tahta birleşir, taşlar mat kurar')},
