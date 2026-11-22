@@ -2246,6 +2246,25 @@ body.onizlemede #anlatim{z-index:45;bottom:auto;top:calc(190px + env(safe-area-i
 
 #inceleGrafik{display:none}
 #inceleGrafik.acik{display:block}
+/* AVANTAJ ÇUBUĞU (22 Kasım 2026, chess24 benzeri): hamle sonrası değerlendirme; beyaz bölüm beyazın üstünlüğüyle büyür. */
+#inceleAvantaj{display:none;align-items:center;gap:10px}
+#inceleAvantaj.acik{display:flex}
+#inceleAvantaj .avCubuk{position:relative;flex:1;height:14px;border-radius:7px;overflow:hidden;background:#1d1f27;
+  box-shadow:inset 0 0 0 1px rgba(232,182,76,.28)}
+#inceleAvantaj .avBeyaz{position:absolute;left:0;top:0;bottom:0;width:50%;background:linear-gradient(180deg,#fbf8f1,#d9d1bf);
+  transition:width .45s cubic-bezier(.2,.8,.2,1)}
+#inceleAvantaj .avCubuk::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:rgba(232,182,76,.6)}
+#inceleAvantaj .avDeger{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font:800 10.5px Manrope,sans-serif;letter-spacing:.02em;color:#E8B64C;text-shadow:0 0 3px #000,0 0 6px #000;z-index:1}
+#inceleAvantaj .avYazi{flex:none;min-width:96px;text-align:right;font:700 12px Manrope,sans-serif;color:#d9cfb9;white-space:nowrap}
+#inceleAvantaj .avYazi.beyaz{color:#fbf8f1}
+#inceleAvantaj .avYazi.siyah{color:#9fa3ad}
+@media (min-width:1000px) and (min-height:560px) and (min-aspect-ratio:4/3){
+  #inceleHUD>#inceleAvantaj{grid-column:1;grid-row:4;align-self:start;flex-direction:column;align-items:stretch;gap:6px;
+    background:linear-gradient(180deg,#121319,#090a0e);border:1px solid rgba(232,182,76,.16);border-radius:18px;padding:10px 12px}
+  #inceleAvantaj .avCubuk{flex:none;height:16px}
+  #inceleAvantaj .avYazi{text-align:center;min-width:0}
+}
 #inceleGrafik .igUst{display:flex;justify-content:space-between;align-items:baseline;margin:0 2px 5px}
 #inceleGrafik .igEt{font:700 10px Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:rgba(232,182,76,.85)}
 #inceleSayac{font:600 11px Manrope,sans-serif!important;letter-spacing:.08em!important;color:var(--dim)!important;font-variant-numeric:tabular-nums}
@@ -3578,6 +3597,10 @@ function gizlilikKapat(){ document.getElementById('gizlilikEkran').classList.add
 <div id="anlatim"></div>
 
 <div id="inceleHUD">
+  <div id="inceleAvantaj" aria-live="polite">
+    <div class="avCubuk"><i class="avBeyaz"></i><span class="avDeger">0.0</span></div>
+    <div class="avYazi">Eşit</div>
+  </div>
   <div id="inceleUst">
     <button id="inceleCik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"/></svg><span>Bitir</span></button>
     <div class="iuSag">
@@ -13032,7 +13055,26 @@ function inceleGorunumAyarla(){
   if(typeof ResizeObserver!=='undefined') new ResizeObserver(plan).observe(hud);
   addEventListener('resize', ()=>setTimeout(inceleGorunumAyarla, 500));
 })();
+/* Avantaj çubuğu: idx hamlesinden SONRAKİ konum (idx<0 başlangıç). _cpBeyaz beyazın gözünden santipiyon (±1000 = mat/kesin). */
+function inceleAvantajYaz(idx){
+  const kap=document.getElementById('inceleAvantaj'); if(!kap) return;
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  if(!oyunKaydi.some(k=>k && typeof k._cpBeyaz==='number')){ kap.classList.remove('acik'); return; }
+  let cp=0;
+  for(let j=Math.min(idx, oyunKaydi.length-1); j>=0; j--){ const k=oyunKaydi[j]; if(k && typeof k._cpBeyaz==='number' && isFinite(k._cpBeyaz)){ cp=k._cpBeyaz; break; } }
+  const yuzde=50+50*(2/(1+Math.exp(-0.00368208*cp))-1);
+  kap.querySelector('.avBeyaz').style.width=Math.max(3, Math.min(97, yuzde)).toFixed(1)+'%';
+  const p=Math.abs(cp)/100;
+  kap.querySelector('.avDeger').textContent = Math.abs(cp)>=1000 ? (cp>0?'1-0':'0-1') : ((cp>0?'+':cp<0?'−':'')+p.toFixed(1));
+  const kim = cp>0 ? 'Beyaz' : 'Siyah';
+  const yazi = Math.abs(cp)<50 ? 'Eşit' : Math.abs(cp)<150 ? kim+' biraz üstün' : Math.abs(cp)<300 ? kim+' üstün'
+             : Math.abs(cp)<1000 ? kim+' ağır basıyor' : kim+' kazanıyor';
+  const y=kap.querySelector('.avYazi'); y.textContent=c(yazi);
+  y.classList.toggle('beyaz', cp>=50); y.classList.toggle('siyah', cp<=-50);
+  kap.classList.add('acik');
+}
 function inceleSayacYaz(idx){
+  try{ inceleAvantajYaz(idx); }catch(e){}
   const n=oyunKaydi.length;
   const el=document.getElementById('inceleSayac'); if(el) el.textContent='Hamle '+(idx+1)+' / '+n;
   const im=document.getElementById('igImlec'); if(im && n) im.style.left=(Math.max(0,idx+1)/n*100)+'%';
@@ -16466,6 +16508,15 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["Saatleri kendin seç"]=CEVM["Saatleri kendin seç"]||{"en": "Choose the hours yourself", "ru": "Выберите часы сами", "ar": "اختر الساعات بنفسك", "fr": "Choisissez vous-même les heures", "de": "Zeiten selbst wählen", "it": "Scegli tu gli orari", "zh": "自行选择时段"};
   CEVM["Maç isteği ve çevrimiçi bildirimleri yalnız bu saatlerde gelir"]=CEVM["Maç isteği ve çevrimiçi bildirimleri yalnız bu saatlerde gelir"]||{"en": "Game requests and online alerts arrive only in these hours", "ru": "Приглашения и уведомления о входе только в эти часы", "ar": "تصل طلبات اللعب وإشعارات الاتصال في هذه الساعات فقط", "fr": "Demandes et alertes de connexion uniquement à ces heures", "de": "Spielanfragen und Online-Hinweise nur in diesen Zeiten", "it": "Richieste e avvisi online solo in questi orari", "zh": "对局邀请和上线通知仅在此时段推送"};
   CEVM["arası"]=CEVM["arası"]||{"en": "to", "ru": "—", "ar": "إلى", "fr": "à", "de": "bis", "it": "–", "zh": "至"};
+  CEVM["Eşit"]=CEVM["Eşit"]||{"en": "Equal", "ru": "Равно", "ar": "متعادل", "fr": "Égalité", "de": "Ausgeglichen", "it": "Pari", "zh": "均势"};
+  CEVM["Beyaz biraz üstün"]=CEVM["Beyaz biraz üstün"]||{"en": "White slightly better", "ru": "У белых небольшой перевес", "ar": "الأبيض أفضل قليلًا", "fr": "Blancs légèrement mieux", "de": "Weiß etwas besser", "it": "Bianco leggermente meglio", "zh": "白方略优"};
+  CEVM["Siyah biraz üstün"]=CEVM["Siyah biraz üstün"]||{"en": "Black slightly better", "ru": "У чёрных небольшой перевес", "ar": "الأسود أفضل قليلًا", "fr": "Noirs légèrement mieux", "de": "Schwarz etwas besser", "it": "Nero leggermente meglio", "zh": "黑方略优"};
+  CEVM["Beyaz üstün"]=CEVM["Beyaz üstün"]||{"en": "White is better", "ru": "Белые лучше", "ar": "الأبيض أفضل", "fr": "Blancs mieux", "de": "Weiß steht besser", "it": "Bianco meglio", "zh": "白方占优"};
+  CEVM["Siyah üstün"]=CEVM["Siyah üstün"]||{"en": "Black is better", "ru": "Чёрные лучше", "ar": "الأسود أفضل", "fr": "Noirs mieux", "de": "Schwarz steht besser", "it": "Nero meglio", "zh": "黑方占优"};
+  CEVM["Beyaz ağır basıyor"]=CEVM["Beyaz ağır basıyor"]||{"en": "White is winning", "ru": "Белые выигрывают", "ar": "الأبيض متفوق بوضوح", "fr": "Blancs nettement mieux", "de": "Weiß klar besser", "it": "Bianco in netto vantaggio", "zh": "白方大优"};
+  CEVM["Siyah ağır basıyor"]=CEVM["Siyah ağır basıyor"]||{"en": "Black is winning", "ru": "Чёрные выигрывают", "ar": "الأسود متفوق بوضوح", "fr": "Noirs nettement mieux", "de": "Schwarz klar besser", "it": "Nero in netto vantaggio", "zh": "黑方大优"};
+  CEVM["Beyaz kazanıyor"]=CEVM["Beyaz kazanıyor"]||{"en": "White wins", "ru": "Белые побеждают", "ar": "الأبيض يفوز", "fr": "Les Blancs gagnent", "de": "Weiß gewinnt", "it": "Vince il Bianco", "zh": "白方胜势"};
+  CEVM["Siyah kazanıyor"]=CEVM["Siyah kazanıyor"]||{"en": "Black wins", "ru": "Чёрные побеждают", "ar": "الأسود يفوز", "fr": "Les Noirs gagnent", "de": "Schwarz gewinnt", "it": "Vince il Nero", "zh": "黑方胜势"};
   CEVM['Titreşim']=CEVM['Titreşim']||{en:'Vibration',ru:'Вибрация',ar:'الاهتزاز',fr:'Vibration',de:'Vibration',it:'Vibrazione',zh:'振动'};
   CEVM['Hamle, savaş ve uyarı sesleri']=CEVM['Hamle, savaş ve uyarı sesleri']||{en:'Move, battle and alert sounds',ru:'Звуки ходов, боя и предупреждений',ar:'أصوات النقلات والمعارك والتنبيهات',fr:'Sons des coups, combats et alertes',de:'Zug-, Kampf- und Warntöne',it:'Suoni di mosse, battaglie e avvisi',zh:'走子、战斗和提醒音效'};
   CEVM['Tüm sesler kapalı']=CEVM['Tüm sesler kapalı']||{en:'All sounds off',ru:'Все звуки выключены',ar:'كل الأصوات متوقفة',fr:'Tous les sons coupés',de:'Alle Töne aus',it:'Tutti i suoni disattivati',zh:'关闭所有声音'};
