@@ -13,6 +13,9 @@
     <!-- Mikrofon zorunlu degil: cihazda mikrofon yoksa da uygulama yuklenebilsin
          (Play Store aksi halde bu cihazlari haric tutar). -->
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
+    <!-- screenOrientation="portrait" Play'de "dikey ekran zorunlu" sayılıyordu; yatay tablet/PC'lerde yükleme
+         kısıtlanıyordu (22 Kasım 2026 Play uyarısı). Yön oyun içinde yönetiliyor; donanım şartı değil. -->
+    <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
 
     <!-- API 30+ paket gorunurlugu: bu olmadan SpeechRecognizer.isRecognitionAvailable()
          her zaman false doner, cunku tanima servisi baska bir pakette yasar. -->
