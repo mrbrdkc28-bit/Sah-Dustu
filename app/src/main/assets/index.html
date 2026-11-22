@@ -2071,6 +2071,9 @@ html[data-tema="fildisi"] #girisForm input{background:#fffdf8;border-color:rgba(
 /* ===== OYUN AYARLARI PENCERESİ + DİŞLİ (4 Ekim 2026) ===== */
 #altSecim #ayarAcBtn{padding:8px 11px}
 #altSecim #ayarAcBtn svg{width:16px;height:16px;display:block}
+#secimSayfa .bsSaatSatir{display:flex;align-items:center;justify-content:center;gap:10px;margin:-2px 0 10px;font:600 13px Manrope,sans-serif;color:inherit}
+#secimSayfa .bsSaatSatir select{font:700 15px Manrope,sans-serif;padding:8px 10px;border-radius:10px;border:1px solid rgba(232,182,76,.55);background:#1b1e27;color:#f1ece0;opacity:1}
+html[data-tema="fildisi"] #secimSayfa .bsSaatSatir select{background:#fff;color:#2b261d}
 #secimSayfa .ssGrup{font:700 10.5px Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#9a937f;margin:16px 4px 8px}
 #secimSayfa .ssGrup:first-child{margin-top:0}
 #secimSayfa .ssSec .ssAd{display:flex;flex-direction:column;gap:2px}
@@ -3685,6 +3688,7 @@ let fbAuth=null, fbDb=null, fbKullanici=null;
         misafirMod=false;
         if(typeof bulutIstYukle==='function') await bulutIstYukle();
         if(typeof otomatikGiris==='function') otomatikGiris();
+        try{ if(typeof bildirimTercihYaz==='function') bildirimTercihYaz(); }catch(e){}
         try{ if(typeof bildirimJetonuYaz==='function') bildirimJetonuYaz();
              if(typeof AndroidBildirim!=='undefined' && AndroidBildirim.uzakJeton) AndroidBildirim.uzakJeton(); }catch(e){}
       } else {
@@ -11098,6 +11102,24 @@ function cvAnimNotYaz(){
    Sunucu işlevi (functions/index.js) davet oluşunca bu adreslere gönderir. İzin, oyuncu Çevrimiçi'ne ilk
    girdiğinde sorulur (bağlamı belli olsun diye açılışta değil). */
 let _bildirimJeton=null;
+/* BİLDİRİM TERCİHLERİ (22 Kasım 2026, sahibin isteği). Yerelde saklanır, hesaba (ozel/bildirim) yazılır; sunucu okur:
+   davetKapali (maç isteği), cvKapali (çevrimiçi oyuncu), saat {tur:'tum'|'gunduz'|'ozel', bas, bit} (yerel saat), tz (dakika). */
+function bildirimTercih(){
+  let t={}; try{ t=JSON.parse(localStorage.getItem('c64_bildirimTercih')||'{}')||{}; }catch(e){}
+  try{ if(t.cvKapali===undefined && localStorage.getItem('cvBildirimKapali')==='1') t.cvKapali=true; }catch(e){}
+  return { davetKapali:!!t.davetKapali, cvKapali:!!t.cvKapali,
+           saat: (t.saat && ['tum','gunduz','ozel'].includes(t.saat.tur)) ? t.saat : {tur:'gunduz', bas:8, bit:22} };
+}
+function bildirimTercihYaz(degisen){
+  const t=Object.assign(bildirimTercih(), degisen||{});
+  try{ localStorage.setItem('c64_bildirimTercih', JSON.stringify(t)); localStorage.setItem('cvBildirimKapali', t.cvKapali?'1':'0'); }catch(e){}
+  try{
+    if(typeof fbDb==='undefined' || !fbDb || typeof fbKullanici==='undefined' || !fbKullanici || misafirMod) return;
+    fbDb.collection('oyuncular').doc(fbKullanici.uid).collection('ozel').doc('bildirim').set({
+      davetKapali:t.davetKapali, cvKapali:t.cvKapali, saat:t.saat, tz:-new Date().getTimezoneOffset()
+    },{merge:true}).catch(()=>{});
+  }catch(e){}
+}
 function bildirimJetonuYaz(){
   try{
     if(!_bildirimJeton || typeof fbDb==='undefined' || !fbDb || typeof fbKullanici==='undefined' || !fbKullanici || misafirMod) return;
@@ -11105,7 +11127,8 @@ function bildirimJetonuYaz(){
     const imza=fbKullanici.uid+'|'+platform+'|'+jeton+'|'+uygDil;
     if(window._bildirimYazilan===imza) return;
     fbDb.collection('oyuncular').doc(fbKullanici.uid).collection('ozel').doc('bildirim').set({
-      [platform]: firebase.firestore.FieldValue.arrayUnion(jeton), dil: uygDil, ts: Date.now()
+      [platform]: firebase.firestore.FieldValue.arrayUnion(jeton), dil: uygDil, ts: Date.now(),
+      tz: -new Date().getTimezoneOffset()
     },{merge:true}).then(()=>{ window._bildirimYazilan=imza; }).catch(()=>{});
   }catch(e){}
 }
@@ -16427,6 +16450,22 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["Açılan listede Chess64'ü bulup anahtarını aç."]=CEVM["Açılan listede Chess64'ü bulup anahtarını aç."]||{"en": "Find Chess64 in the list and switch it on.", "ru": "Найдите Chess64 в списке и включите.", "ar": "ابحث عن Chess64 في القائمة وشغّله.", "fr": "Trouvez Chess64 dans la liste et activez-le.", "de": "Suche Chess64 in der Liste und schalte es ein.", "it": "Trova Chess64 nell’elenco e attivalo.", "zh": "在列表中找到 Chess64 并打开开关。"};
   CEVM["Yaptım"]=CEVM["Yaptım"]||{"en": "Done", "ru": "Готово", "ar": "تم", "fr": "C’est fait", "de": "Erledigt", "it": "Fatto", "zh": "已完成"};
   CEVM["Sonra"]=CEVM["Sonra"]||{"en": "Later", "ru": "Позже", "ar": "لاحقًا", "fr": "Plus tard", "de": "Später", "it": "Più tardi", "zh": "稍后"};
+  CEVM["Bildirimler"]=CEVM["Bildirimler"]||{"en": "Notifications", "ru": "Уведомления", "ar": "الإشعارات", "fr": "Notifications", "de": "Benachrichtigungen", "it": "Notifiche", "zh": "通知"};
+  CEVM["Maç isteği bildirimleri"]=CEVM["Maç isteği bildirimleri"]||{"en": "Game request notifications", "ru": "Уведомления о приглашениях", "ar": "إشعارات طلبات اللعب", "fr": "Notifications de demandes de partie", "de": "Benachrichtigungen bei Spielanfragen", "it": "Notifiche delle richieste di partita", "zh": "对局邀请通知"};
+  CEVM["Bir oyuncu seni maça davet edince haber ver"]=CEVM["Bir oyuncu seni maça davet edince haber ver"]||{"en": "Tell me when a player invites me to a game", "ru": "Сообщать, когда игрок приглашает меня", "ar": "أخبرني عندما يدعوني لاعب إلى مباراة", "fr": "Me prévenir quand un joueur m’invite", "de": "Benachrichtigen, wenn mich jemand einlädt", "it": "Avvisami quando un giocatore mi invita", "zh": "有玩家邀请我对局时通知我"};
+  CEVM["Maç istekleri bildirim olarak gelmez"]=CEVM["Maç istekleri bildirim olarak gelmez"]||{"en": "Game requests won’t be sent as notifications", "ru": "Приглашения не приходят уведомлениями", "ar": "لن تصل طلبات اللعب كإشعارات", "fr": "Les demandes n’arrivent pas en notification", "de": "Spielanfragen kommen nicht als Benachrichtigung", "it": "Le richieste non arrivano come notifiche", "zh": "对局邀请不会以通知推送"};
+  CEVM["Oyun bildirimleri"]=CEVM["Oyun bildirimleri"]||{"en": "Game notifications", "ru": "Игровые уведомления", "ar": "إشعارات اللعبة", "fr": "Notifications de jeu", "de": "Spielbenachrichtigungen", "it": "Notifiche di gioco", "zh": "游戏通知"};
+  CEVM["Günlük hatırlatma: 13:00, o gün oynadıysan gelmez"]=CEVM["Günlük hatırlatma: 13:00, o gün oynadıysan gelmez"]||{"en": "Daily reminder at 13:00, skipped if you played that day", "ru": "Напоминание в 13:00, если вы ещё не играли", "ar": "تذكير يومي 13:00، لا يصل إن لعبت ذلك اليوم", "fr": "Rappel à 13:00, sauf si vous avez joué ce jour-là", "de": "Erinnerung um 13:00, entfällt wenn du gespielt hast", "it": "Promemoria alle 13:00, salvo se hai già giocato", "zh": "每日 13:00 提醒，当天玩过则不提醒"};
+  CEVM["Oyun bildirimi gönderilmez"]=CEVM["Oyun bildirimi gönderilmez"]||{"en": "No game notifications", "ru": "Игровые уведомления не приходят", "ar": "لا تُرسل إشعارات اللعبة", "fr": "Aucune notification de jeu", "de": "Keine Spielbenachrichtigungen", "it": "Nessuna notifica di gioco", "zh": "不发送游戏通知"};
+  CEVM["Bir oyuncu çevrimiçi olunca her seferinde haber ver"]=CEVM["Bir oyuncu çevrimiçi olunca her seferinde haber ver"]||{"en": "Tell me every time a player comes online", "ru": "Сообщать каждый раз, когда игрок в сети", "ar": "أخبرني في كل مرة يتصل فيها لاعب", "fr": "Me prévenir à chaque connexion d’un joueur", "de": "Jedes Mal benachrichtigen, wenn jemand online kommt", "it": "Avvisami ogni volta che un giocatore è online", "zh": "每次有玩家上线都通知我"};
+  CEVM["Bildirim saatleri"]=CEVM["Bildirim saatleri"]||{"en": "Notification hours", "ru": "Часы уведомлений", "ar": "ساعات الإشعارات", "fr": "Heures des notifications", "de": "Benachrichtigungszeiten", "it": "Orari delle notifiche", "zh": "通知时段"};
+  CEVM["Tüm gün"]=CEVM["Tüm gün"]||{"en": "All day", "ru": "Весь день", "ar": "طوال اليوم", "fr": "Toute la journée", "de": "Ganztägig", "it": "Tutto il giorno", "zh": "全天"};
+  CEVM["Gece de gelir"]=CEVM["Gece de gelir"]||{"en": "Also at night", "ru": "Также ночью", "ar": "حتى في الليل", "fr": "Aussi la nuit", "de": "Auch nachts", "it": "Anche di notte", "zh": "夜间也会推送"};
+  CEVM["Gündüz"]=CEVM["Gündüz"]||{"en": "Daytime", "ru": "Днём", "ar": "النهار", "fr": "En journée", "de": "Tagsüber", "it": "Di giorno", "zh": "白天"};
+  CEVM["Özel"]=CEVM["Özel"]||{"en": "Custom", "ru": "Своё", "ar": "مخصص", "fr": "Personnalisé", "de": "Benutzerdefiniert", "it": "Personalizzato", "zh": "自定义"};
+  CEVM["Saatleri kendin seç"]=CEVM["Saatleri kendin seç"]||{"en": "Choose the hours yourself", "ru": "Выберите часы сами", "ar": "اختر الساعات بنفسك", "fr": "Choisissez vous-même les heures", "de": "Zeiten selbst wählen", "it": "Scegli tu gli orari", "zh": "自行选择时段"};
+  CEVM["Maç isteği ve çevrimiçi bildirimleri yalnız bu saatlerde gelir"]=CEVM["Maç isteği ve çevrimiçi bildirimleri yalnız bu saatlerde gelir"]||{"en": "Game requests and online alerts arrive only in these hours", "ru": "Приглашения и уведомления о входе только в эти часы", "ar": "تصل طلبات اللعب وإشعارات الاتصال في هذه الساعات فقط", "fr": "Demandes et alertes de connexion uniquement à ces heures", "de": "Spielanfragen und Online-Hinweise nur in diesen Zeiten", "it": "Richieste e avvisi online solo in questi orari", "zh": "对局邀请和上线通知仅在此时段推送"};
+  CEVM["arası"]=CEVM["arası"]||{"en": "to", "ru": "—", "ar": "إلى", "fr": "à", "de": "bis", "it": "–", "zh": "至"};
   CEVM['Titreşim']=CEVM['Titreşim']||{en:'Vibration',ru:'Вибрация',ar:'الاهتزاز',fr:'Vibration',de:'Vibration',it:'Vibrazione',zh:'振动'};
   CEVM['Hamle, savaş ve uyarı sesleri']=CEVM['Hamle, savaş ve uyarı sesleri']||{en:'Move, battle and alert sounds',ru:'Звуки ходов, боя и предупреждений',ar:'أصوات النقلات والمعارك والتنبيهات',fr:'Sons des coups, combats et alertes',de:'Zug-, Kampf- und Warntöne',it:'Suoni di mosse, battaglie e avvisi',zh:'走子、战斗和提醒音效'};
   CEVM['Tüm sesler kapalı']=CEVM['Tüm sesler kapalı']||{en:'All sounds off',ru:'Все звуки выключены',ar:'كل الأصوات متوقفة',fr:'Tous les sons coupés',de:'Alle Töne aus',it:'Tutti i suoni disattivati',zh:'关闭所有声音'};
@@ -19610,28 +19649,64 @@ function devPanelAc(){
       b.querySelector('.ssAd small').textContent=c(PAD[ts.paket]||'Klasik')+(Object.keys(ts.ozel).length?' · '+c('özel ayar'):'')+' · '+c('taş taş seçilebilir');
       b.onclick=()=>tasSesleriAc();
       l.appendChild(b); }
-    /* Bildirim tercihleri (Kasım 2026). Tarayıcıda hatırlatma yok; çevrimiçi bildirimi hesaba yazılır, sunucu okur. */
+    /* BİLDİRİMLER (22 Kasım 2026, sahibin isteği): maç isteği / oyun bildirimleri (günlük hatırlatma) /
+       çevrimiçi oyuncu (her seferinde) ayrı ayrı; sunucudan gelenler için saat aralığı (tüm gün, 08-22, özel).
+       Tarayıcıda yerel hatırlatma yok; hesaplı tercihler sunucuya yazılır (bildirimTercihYaz). */
     { const andH=(typeof AndroidBildirim!=='undefined' && AndroidBildirim.hatirlatmaAyar), iosH=!!window.IOS_UYGULAMA;
-      if(andH||iosH){
-        const su=andH ? (AndroidBildirim.hatirlatmaAcik()?1:0) : ((()=>{ try{ return localStorage.getItem('hatirlatmaKapali')==='1'?0:1; }catch(e){ return 1; } })());
-        grup('Günlük hatırlatma', [
-          {id:1, ad:'Açık',   alt:c('Her gün 13:00, o gün oynadıysan gelmez')},
-          {id:0, ad:'Kapalı', alt:c('Hatırlatma gönderilmez')}
-        ], su, v=>{ try{
-            localStorage.setItem('hatirlatmaKapali', v===1?'0':'1');
-            if(andH) AndroidBildirim.hatirlatmaAyar(v===1);
-            else webkit.messageHandlers.ios.postMessage({ad:'hatirlatma', deger:v===1?'1':'0'});
-          }catch(e){} });
-      }
-      if(typeof fbKullanici!=='undefined' && fbKullanici && !misafirMod && (andH||iosH)){
-        const kapali=(()=>{ try{ return localStorage.getItem('cvBildirimKapali')==='1'; }catch(e){ return false; } })();
-        grup('Çevrimiçi oyuncu bildirimi', [
-          {id:1, ad:'Açık',   alt:c('Bir oyuncu çevrimiçi olunca haber ver (günde en çok 1)')},
-          {id:0, ad:'Kapalı', alt:c('Bu bildirim gönderilmez')}
-        ], kapali?0:1, v=>{ try{
-            localStorage.setItem('cvBildirimKapali', v===1?'0':'1');
-            fbDb.collection('oyuncular').doc(fbKullanici.uid).collection('ozel').doc('bildirim').set({cvKapali:v!==1},{merge:true}).catch(()=>{});
-          }catch(e){} });
+      const hesap=(typeof fbKullanici!=='undefined' && fbKullanici && !misafirMod);
+      if(andH||iosH||hesap){
+        const bt=bildirimTercih();
+        const h=document.createElement('div'); h.className='ssGrup'; h.style.cssText='font-size:12px;color:var(--brass,#E8B64C);margin-top:22px';
+        h.textContent=c('Bildirimler'); l.appendChild(h);
+        if(hesap && (andH||iosH)){
+          grup('Maç isteği bildirimleri', [
+            {id:1, ad:'Açık',   alt:c('Bir oyuncu seni maça davet edince haber ver')},
+            {id:0, ad:'Kapalı', alt:c('Maç istekleri bildirim olarak gelmez')}
+          ], bt.davetKapali?0:1, v=>bildirimTercihYaz({davetKapali:v!==1}));
+        }
+        if(andH||iosH){
+          const su=andH ? (AndroidBildirim.hatirlatmaAcik()?1:0) : ((()=>{ try{ return localStorage.getItem('hatirlatmaKapali')==='1'?0:1; }catch(e){ return 1; } })());
+          grup('Oyun bildirimleri', [
+            {id:1, ad:'Açık',   alt:c('Günlük hatırlatma: 13:00, o gün oynadıysan gelmez')},
+            {id:0, ad:'Kapalı', alt:c('Oyun bildirimi gönderilmez')}
+          ], su, v=>{ try{
+              localStorage.setItem('hatirlatmaKapali', v===1?'0':'1');
+              if(andH) AndroidBildirim.hatirlatmaAyar(v===1);
+              else webkit.messageHandlers.ios.postMessage({ad:'hatirlatma', deger:v===1?'1':'0'});
+            }catch(e){} });
+        }
+        if(hesap && (andH||iosH)){
+          grup('Çevrimiçi oyuncu bildirimi', [
+            {id:1, ad:'Açık',   alt:c('Bir oyuncu çevrimiçi olunca her seferinde haber ver')},
+            {id:0, ad:'Kapalı', alt:c('Bu bildirim gönderilmez')}
+          ], bt.cvKapali?0:1, v=>bildirimTercihYaz({cvKapali:v!==1}));
+          /* Saat aralığı: maç isteği + çevrimiçi bildirimleri (sunucudan gelenler) */
+          const saat=bt.saat, iki=n=>String(n).padStart(2,'0');
+          let ozelKutu=null;
+          const ozelYaz=()=>{ if(!ozelKutu) return; const t=bildirimTercih().saat; ozelKutu.style.display=t.tur==='ozel'?'':'none'; };
+          grup('Bildirim saatleri', [
+            {id:'tum',    ad:'Tüm gün', alt:c('Gece de gelir')},
+            {id:'gunduz', ad:'Gündüz',  alt:'08:00 – 22:00'},
+            {id:'ozel',   ad:'Özel',    alt:c('Saatleri kendin seç')+(saat.tur==='ozel'?' · '+iki(saat.bas)+':00 – '+iki(saat.bit)+':00':'')}
+          ], saat.tur, v=>{
+            const o=bildirimTercih().saat;
+            const yeni = v==='tum' ? {tur:'tum'} : v==='gunduz' ? {tur:'gunduz', bas:8, bit:22}
+                       : {tur:'ozel', bas:(o.tur==='ozel'?o.bas:8), bit:(o.tur==='ozel'?o.bit:22)};
+            bildirimTercihYaz({saat:yeni}); ozelYaz();
+          });
+          ozelKutu=document.createElement('div'); ozelKutu.className='bsSaatSatir';
+          const secici=(deger, ad)=>{ const se=document.createElement('select'); se.setAttribute('aria-label', ad);
+            for(let i=0;i<24;i++){ const op=document.createElement('option'); op.value=i; op.textContent=iki(i)+':00'; if(i===deger) op.selected=true; se.appendChild(op); }
+            return se; };
+          const t0=bildirimTercih().saat;
+          const sBas=secici(t0.tur==='ozel'?t0.bas:8, 'başlangıç'), sBit=secici(t0.tur==='ozel'?t0.bit:22, 'bitiş');
+          const ara=document.createElement('span'); ara.textContent=c('arası');
+          const degis=()=>bildirimTercihYaz({saat:{tur:'ozel', bas:+sBas.value, bit:+sBit.value}});
+          sBas.onchange=degis; sBit.onchange=degis;
+          ozelKutu.append(sBas, ara, sBit); l.appendChild(ozelKutu); ozelYaz();
+          const not=document.createElement('div'); not.className='ssAcikla'; not.style.cssText='font-size:12px;opacity:.75;margin:-4px 4px 6px;text-align:center';
+          not.textContent=c('Maç isteği ve çevrimiçi bildirimleri yalnız bu saatlerde gelir'); l.appendChild(not);
+        }
       } }
     grup('Açılış animasyonu', [
       {id:'sinematik', ad:'Sinematik', alt:c('Tahta birleşir, taşlar mat kurar')},
@@ -20535,7 +20610,29 @@ const SOZLER=[
     if(gor('girisEkran') || gor('yukleniyor')) return false;
     if(acik('hud') || acik('inceleHUD') || acik('analizEkran') || gor('analizEkran') || el('cvVs')) return false;
     if(gor('lisansEkran') || gor('gizlilikEkran') || el('premiumModal')) return false;
-    return gor('menu') || gor('cevrimiciEkran') || gor('istEkran') || gor('liderEkran') || gor('kutupEkran') || gor('bulmacaZorluk');
+    const ekranlar=LISTE.filter(gor);
+    if(!ekranlar.length) return false;
+    /* 22 Kasım 2026: liste ekranının ÜSTÜNDE alta kadar inen bir katman açıksa (Oyun Kur'daki SAVAŞ BAŞLASIN,
+       ilk açılış akıcılık seçimi, alttan açılan seçim sayfaları, davet/ayar pencereleri) banner gizlenir;
+       yoksa iOS'ta reklam o katmanın alt düğmelerini örtüyordu. Genel kural: yeni pencereler de kendiliğinden kapsanır. */
+    if(ustKatmanVar(ekranlar)) return false;
+    return true;
+  }
+  const LISTE=['menu','cevrimiciEkran','istEkran','liderEkran','kutupEkran','bulmacaZorluk'];
+  const zDegeri=e=>{ const z=parseInt(getComputedStyle(e).zIndex,10); return isNaN(z)?0:z; };
+  function ustKatmanVar(ekranlar){
+    const altSinir=innerHeight-2;
+    let zTaban=0; for(const id of ekranlar) zTaban=Math.max(zTaban, zDegeri(el(id)));
+    for(const e of document.body.children){
+      if(e.tagName==='SCRIPT' || e.tagName==='CANVAS' || e.id==='stage' || LISTE.includes(e.id)) continue;   // stage: arkadaki 3B sahne
+      const cs=getComputedStyle(e);
+      if(cs.position!=='fixed' || cs.display==='none' || cs.visibility==='hidden' || +cs.opacity===0 || cs.pointerEvents==='none') continue;
+      const r=e.getBoundingClientRect();
+      if(r.height<innerHeight*0.3 || r.bottom<altSinir) continue;
+      if(zDegeri(e)<=zTaban && zTaban>0) continue;
+      return true;
+    }
+    return false;
   }
   function guncelle(){
     bekliyor=false;

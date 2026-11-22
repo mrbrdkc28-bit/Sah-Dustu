@@ -62,6 +62,19 @@ function apnsGonder(istemci, jwt, cihaz, yuk) {
   });
 }
 
+/* Alıcının seçtiği bildirim saatleri (22 Kasım 2026): k.saat {tur:'tum'|'gunduz'|'ozel', bas, bit} alıcının YEREL saati,
+   k.tz dakika (uygulama yazar; yoksa Türkiye +180). Seçim hiç yapılmadıysa varsayılan gündüz 08:00-22:00.
+   bas > bit ise gece aşan aralık (ör. 20-02); bas == bit tüm gün sayılır. */
+function saatUygun(k) {
+  const s = (k && k.saat) || { tur: 'gunduz' };
+  if (s.tur === 'tum') return true;
+  const bas = s.tur === 'ozel' ? Number(s.bas) : 8, bit = s.tur === 'ozel' ? Number(s.bit) : 22;
+  if (!Number.isFinite(bas) || !Number.isFinite(bit) || bas === bit) return true;
+  const tz = Number.isFinite(Number(k.tz)) ? Number(k.tz) : 180;
+  const yerel = new Date(Date.now() + tz * 60000).getUTCHours();
+  return bas < bit ? (yerel >= bas && yerel < bit) : (yerel >= bas || yerel < bit);
+}
+
 exports.oyunIstegiBildir = onDocumentCreated(
   { document: 'davetler/{davetId}', region: 'europe-west1', secrets: [APNS_ANAHTAR] },
   async (olay) => {
@@ -73,6 +86,8 @@ exports.oyunIstegiBildir = onDocumentCreated(
     if (!kayit.exists) { logger.info('adres yok: alıcı bildirim adresi kaydetmemiş', { hedef: d.hedef }); return; }
     const k = kayit.data() || {};
     if (!(k.android || []).length && !(k.ios || []).length) { logger.info('adres yok: liste boş', { hedef: d.hedef }); return; }
+    if (k.davetKapali) { logger.info('alıcı maç isteği bildirimlerini kapatmış', { hedef: d.hedef }); return; }
+    if (!saatUygun(k)) { logger.info('alıcının bildirim saatleri dışında', { hedef: d.hedef }); return; }
 
     // Sunucu tarafı sınır: aynı gönderen → aynı alıcı 10 dk'da bir (yalnız gerçekten gönderilecekse sayılır)
     const sinirRef = db.collection('bildirimSinir').doc(d.hedef + '_' + d.gonderen);
@@ -136,7 +151,8 @@ exports.oyunIstegiBildir = onDocumentCreated(
 
 /* ---- "X şu an çevrimiçi" (Kasım 2026, sahibin isteği) ----
    Bir oyuncu en az 30 dakika sonra yeniden çevrimiçi olunca, lobideki çevrimdışı oyunculara haber verilir.
-   Sınırlar: aynı oyuncu en çok 3 saatte bir duyurulur; bir alıcıya günde en çok 1 bildirim; gece (23:00-09:00 TSİ) gönderilmez.
+   22 Kasım 2026 (sahibin isteği): alıcıya "günde 1" sınırı ve sabit gece yasağı kaldırıldı; her gelişte haber verilir,
+   ama yalnız alıcının seçtiği saatlerde (saatUygun: tüm gün / 08-22 / özel). Aynı oyuncu en erken 30 dk arayla duyurulur.
    Lobide gizli olan duyurulmaz. Alıcı Ayarlar'dan kapatabilir (oyuncular/{uid}/ozel/bildirim.cvKapali). */
 const CV_METIN = {
   tr: { b: (ad) => `${ad} şu an çevrimiçi`, g: 'Hemen oyun isteği gönder!' },
@@ -148,7 +164,7 @@ const CV_METIN = {
   it: { b: (ad) => `${ad} è online ora`, g: 'Invia una richiesta di partita!' },
   zh: { b: (ad) => `${ad} 现在在线`, g: '马上发起对局邀请！' },
 };
-const YOKLUK_MS = 30 * 60 * 1000, DUYURU_MS = 3 * 3600 * 1000, ALICI_MS = 20 * 3600 * 1000, CEVRIMICI_MS = 5 * 60 * 1000;
+const YOKLUK_MS = 30 * 60 * 1000, DUYURU_MS = 30 * 60 * 1000, CEVRIMICI_MS = 5 * 60 * 1000;
 const msAl = (s) => { const t = s && s.exists ? s.get('ts') : null; return t && t.toMillis ? t.toMillis() : 0; };
 
 exports.cevrimiciBildir = onDocumentWritten(
@@ -156,8 +172,6 @@ exports.cevrimiciBildir = onDocumentWritten(
   async (olay) => {
     const once = msAl(olay.data.before), simdi = msAl(olay.data.after);
     if (!simdi || simdi - once < YOKLUK_MS) return;          // 2 dakikalık kalp atışı: yeni gelmiş değil
-    const saat = new Date(Date.now() + 3 * 3600 * 1000).getUTCHours();
-    if (saat >= 23 || saat < 9) return;
     const uid = olay.params.uid;
     const prof = await db.doc(`oyuncular/${uid}`).get();
     if (!prof.exists || prof.get('lobiGizli')) return;
@@ -177,21 +191,15 @@ exports.cevrimiciBildir = onDocumentWritten(
     const lobi = await db.collection('cevrimici').orderBy('ts', 'desc').limit(60).get();
     const adaylar = lobi.docs.filter(d => d.id !== uid && Date.now() - msAl(d) > CEVRIMICI_MS).map(d => d.id);
     if (!adaylar.length) return;
-    const [kayitlar, sinirlar] = await Promise.all([
-      db.getAll(...adaylar.map(a => db.doc(`oyuncular/${a}/ozel/bildirim`))),
-      db.getAll(...adaylar.map(a => db.collection('bildirimSinir').doc('cvA_' + a))),
-    ]);
+    const kayitlar = await db.getAll(...adaylar.map(a => db.doc(`oyuncular/${a}/ozel/bildirim`)));
     const hedefler = [];
     adaylar.forEach((a, i) => {
       const k = kayitlar[i].exists ? kayitlar[i].data() : null;
       if (!k || k.cvKapali || (!(k.android || []).length && !(k.ios || []).length)) return;
-      if (sinirlar[i].exists && Date.now() - (sinirlar[i].get('ts') || 0) < ALICI_MS) return;
+      if (!saatUygun(k)) return;
       hedefler.push({ uid: a, k, ref: kayitlar[i].ref });
     });
     if (!hedefler.length) return;
-    const yaz = db.batch();
-    hedefler.forEach(h => yaz.set(db.collection('bildirimSinir').doc('cvA_' + h.uid), { ts: Date.now() }));
-    await yaz.commit();
     logger.info('çevrimiçi duyurusu', { uid, alici: hedefler.length });
 
     let istemci = null, jwt = null;
