@@ -2246,6 +2246,42 @@ body.onizlemede #anlatim{z-index:45;bottom:auto;top:calc(190px + env(safe-area-i
 
 #inceleGrafik{display:none}
 #inceleGrafik.acik{display:block}
+/* İNCELEME DÜZENİ (23 Kasım 2026, sahibin isteği):
+   - Gereksiz düğmeler (Berabere, Sohbet, Sahne) incelemede yok; Döndür tek (dikeyde üst sıradaki).
+   - Dikeyde "SİYAH · ŞAH MAT" satırı gizli: üst çubuk tek sıra, tahta onunla birlikte yukarı çıkar. */
+body.incelemede :is(#btnBerabere,#btnSohbet),body.incelemede #hud .hud-sag #btnSahne.ikincil.hbtn.hbtn-simge.hbtn-simge{display:none!important}
+body.incelemede.dikeyAktif #yonBtn{display:none!important}
+body.incelemede.dikeyAktif #hud .hud-sol{display:none!important}
+#inceleGrafik .igYon{font:600 10px Manrope,sans-serif;color:var(--dim);letter-spacing:.02em;white-space:nowrap}
+#inceleGrafik .igYon b{color:#f3eddf;font-weight:700}
+#inceleGrafik .igYon i{font-style:normal;color:#8d909a;font-weight:700}
+#igKutu .igOrta{position:absolute;right:6px;top:50%;transform:translateY(-50%);font:700 8.5px Manrope,sans-serif;
+  color:rgba(232,182,76,.75);letter-spacing:.08em;pointer-events:none;text-transform:uppercase}
+#inceleYorum .iyAcik{font:600 12.5px Manrope,sans-serif;color:#d9cfb9;margin:2px 0 4px;opacity:.92}
+/* Sınıf listesi (★ ! ? ?? …): tahta üzerinde yarı saydam katman, tahta bozulmaz */
+#sinifListe{position:fixed;inset:0;z-index:74;display:none;align-items:flex-end;justify-content:center;
+  background:rgba(6,7,11,.12)}
+#sinifListe.acik{display:flex}
+#sinifListe .slKart{width:min(440px,100%);max-height:58vh;margin:0 10px calc(10px + env(safe-area-inset-bottom,0px));
+  background:rgba(14,15,21,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(232,182,76,.28);border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.55);
+  display:flex;flex-direction:column;overflow:hidden;animation:slGel .22s ease-out}
+@keyframes slGel{from{transform:translateY(18px);opacity:0}to{transform:none;opacity:1}}
+#sinifListe .slBas{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid rgba(255,255,255,.06)}
+#sinifListe .slSem{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font:800 14px Manrope,sans-serif;color:#0b0c10}
+#sinifListe .slAd{flex:1;font:700 15px Manrope,sans-serif;color:#f3eddf}
+#sinifListe .slSay{font:700 12px Manrope,sans-serif;color:var(--dim)}
+#sinifListe .slKapat{background:none;border:0;color:#cfc6b2;font-size:20px;padding:4px 6px}
+#sinifListe .slListe{overflow-y:auto;padding:6px 8px 10px}
+#sinifListe .slSatir{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:0;border-radius:12px;
+  background:none;color:#e8e2d4;text-align:left;font:600 14px Manrope,sans-serif}
+#sinifListe .slSatir:active,#sinifListe .slSatir.secili{background:rgba(232,182,76,.12)}
+#sinifListe .slNo{min-width:40px;color:var(--dim);font-size:12.5px}
+#sinifListe .slNot{font-weight:800;min-width:56px}
+#sinifListe .slAcik{flex:1;font-size:12px;line-height:1.35;color:#b9b2a2}
+#sinifListe .slBos{padding:18px;text-align:center;color:var(--dim);font-size:13px}
+.ozetKutu{cursor:pointer}
 /* AVANTAJ ÇUBUĞU (22 Kasım 2026, chess24 benzeri): hamle sonrası değerlendirme; beyaz bölüm beyazın üstünlüğüyle büyür. */
 #inceleAvantaj{display:none;align-items:center;gap:10px}
 #inceleAvantaj.acik{display:flex}
@@ -2359,7 +2395,7 @@ body.ogrende .notSerit,body.ogrende #notPanel,body.ogrende #notPanelSag{display:
 #inceleOzet .ozetKutu{padding:3px 9px;gap:5px;font-size:12.5px}
 #inceleOzet .ozetAd{display:none}
 #inceleOzet .ozetSem{font-size:13px;min-width:0}
-#igKutu{height:30px}
+#igKutu{height:38px}
 #inceleGrafik .igUst{margin-bottom:3px}
 #inceleYorum{height:92px;min-height:0;padding:9px 12px;overflow-y:auto;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
 #inceleKontrol .ibtn{flex-basis:42px;height:42px}
@@ -2384,6 +2420,8 @@ body.ogrende .notSerit,body.ogrende #notPanel,body.ogrende #notPanelSag{display:
   #igKutu{height:64px}
   #inceleYorum{grid-column:3;grid-row:2 / span 3;height:auto!important;max-height:none;align-self:stretch}
   #inceleKontrol{grid-column:3;grid-row:5}
+  #inceleGrafik .igUst{flex-wrap:wrap;row-gap:2px}
+  #inceleGrafik .igYon{order:3;width:100%}
 }
 
 /* ===== OYUN SONU — premium karne (4 Ekim 2026) =====
@@ -3615,21 +3653,22 @@ function gizlilikKapat(){ document.getElementById('gizlilikEkran').classList.add
   </div>
   <div id="inceleOzet"></div>
   <div id="inceleGrafik">
-    <div class="igUst"><span class="igEt">Gidişat</span><span id="inceleSayac">Hamle 0 / 0</span></div>
+    <div class="igUst"><span class="igEt">Gidişat</span><span class="igYon"><b>▲ Beyaz üstün</b> · <i>▼ Siyah üstün</i></span><span id="inceleSayac">Hamle 0 / 0</span></div>
     <div class="igKutu" id="igKutu">
+      <span class="igOrta">eşit</span>
       <svg id="igSvg" viewBox="0 0 300 100" preserveAspectRatio="none" aria-hidden="true"></svg>
       <div id="igNoktalar"></div>
       <div id="igImlec"></div>
     </div>
   </div>
-  <div id="inceleYorum">Değerlendirme hazırlanıyor…</div>
-  <div id="inceleKontrol">
+  <div id="inceleKontrol" class="iKontrolUst">
     <button class="ibtn" id="iBasa" aria-label="Başa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 5.5v13M18 6l-8.5 6 8.5 6z"/></svg></button>
     <button class="ibtn" id="iGeri" aria-label="Geri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"/></svg></button>
     <button class="ibtn dolu" id="iOtomatik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg><span>Oynat</span></button>
     <button class="ibtn" id="iIleri" aria-label="İleri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg></button>
     <button class="ibtn" id="iSona" aria-label="Sona"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 5.5v13M6 6l8.5 6L6 18z"/></svg></button>
   </div>
+  <div id="inceleYorum">Değerlendirme hazırlanıyor…</div>
 </div>
 
 <div id="analizEkran">
@@ -12683,13 +12722,15 @@ async function tahtadaIncelemeBaslat(gecmis){
     inceleAnalizVar=true;
     inceleOzetDoldur();
   }
+  try{ inceleOzetDoldur(); }catch(e){}   // analiz oyun sonunda bittiyse de özet kutuları dolsun (23 Kasım 2026)
   if(!inceleAktif) return;   // analiz sürerken incelemeden çıkıldıysa
   malzemeOlaylariHesapla();
   inceleKapsamCiz();
   inceleGrafikCiz();
   inceleGit(-1);
   // Değerlendirme kendiliğinden başlasın, kritik anlara kadar hızlı gitsin
-  setTimeout(()=>{ if(inceleAktif) inceleOtoBasla(); }, 800);
+  /* Sınıf listesinden belirli hamleye gelindiyse (window._otoBaslamasin) otomatik oynatma başlamaz */
+  setTimeout(()=>{ if(inceleAktif && !window._otoBaslamasin) inceleOtoBasla(); window._otoBaslamasin=false; }, 800);
 }
 /* Statik skor asili taslari GOREMEZ: veziri bedava veren hamleden hemen
    sonra vezir hala tahtadadir ve skor degismez. Rakibin en iyi cevabini da
@@ -12759,6 +12800,58 @@ function inceleYerelDoldur(){
   }
   Motor.reset();
 }
+/* SINIF LİSTESİ (23 Kasım 2026, sahibin isteği): özetteki ★ ! ?! ? ?? kutularından birine dokununca
+   o türdeki hamleler (oyuncunun kendi hamleleri, karnedeki sayımla aynı) sırasıyla yarı saydam bir katmanda listelenir;
+   satıra dokununca tahta o hamleye gider. Oyun sonu kartından açılırsa önce tahtada inceleme başlatılır. */
+function sinifListesiAc(sinif){
+  const c=(typeof metniCevir==='function')?metniCevir:(x=>x);
+  const b=SINIF_BILGI[sinif]; if(!b) return;
+  const benimRenk=oyuncuRengi();
+  const hamleler=[];
+  oyunKaydi.forEach((k,i)=>{ if(k && k._kSinif===sinif && k.renk===benimRenk) hamleler.push(i); });
+  let kat=document.getElementById('sinifListe');
+  if(!kat){
+    kat=document.createElement('div'); kat.id='sinifListe';
+    kat.onclick=e=>{ if(e.target===kat) kat.classList.remove('acik'); };
+    document.body.appendChild(kat);
+  }
+  const kac=t=>String(t).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  const dil=(typeof yorumDil!=='undefined')?yorumDil:'tr';
+  let h='<div class="slKart" role="dialog" aria-label="'+kac(sinifAd(sinif))+'"><div class="slBas">'+
+    '<span class="slSem" style="background:'+b.renk+'">'+kac(b.sembol||'•')+'</span>'+
+    '<span class="slAd">'+kac(sinifAd(sinif))+'</span><span class="slSay">'+hamleler.length+' '+kac(c('hamle'))+'</span>'+
+    '<button type="button" class="slKapat" aria-label="Kapat">✕</button></div><div class="slListe">';
+  if(!hamleler.length) h+='<div class="slBos">'+kac(c('Bu türde hamle yok.'))+'</div>';
+  hamleler.forEach(i=>{
+    const k=oyunKaydi[i], no=Math.floor(i/2)+1;
+    h+='<button type="button" class="slSatir'+(typeof inceleIdx!=='undefined'&&inceleIdx===i&&inceleAktif?' secili':'')+'" data-i="'+i+'">'+
+       '<span class="slNo">'+no+(k.renk==='w'?'.':'…')+'</span><span class="slNot" style="color:'+b.renk+'">'+kac(k.notasyon)+'</span>'+
+       '<span class="slAcik">'+kac(hamleCumlesi(k, dil))+'</span></button>';
+  });
+  h+='</div></div>';
+  kat.innerHTML=h;
+  kat.querySelector('.slKapat').onclick=()=>kat.classList.remove('acik');
+  kat.querySelectorAll('.slSatir').forEach(sat=>sat.onclick=async ()=>{
+    const i=+sat.dataset.i;
+    kat.classList.remove('acik');
+    if(!inceleAktif){
+      const son=document.getElementById('son');
+      if(son && son.classList.contains('acik') && typeof tahtadaIncelemeBaslat==='function'){
+        window._otoBaslamasin=true;
+        await tahtadaIncelemeBaslat();
+      }
+    }
+    if(typeof inceleOtoDur==='function') inceleOtoDur();
+    if(typeof inceleGit==='function') inceleGit(i);
+  });
+  kat.classList.add('acik');
+}
+window.sinifListesiAc=sinifListesiAc;
+/* Özet kutularına (inceleme paneli ve oyun sonu karnesi) dokunma: tek dinleyici, kutular yeniden çizilse de çalışır */
+document.addEventListener('click', e=>{
+  const kutu=e.target.closest && e.target.closest('#inceleOzet .ozetKutu[data-sinif], #sonOzet .ozetKutu[data-sinif]');
+  if(kutu) sinifListesiAc(kutu.dataset.sinif);
+});
 function inceleOzetDoldur(hedefId){
   const el=document.getElementById(hedefId||'inceleOzet');
   if(!el) return;
@@ -12779,7 +12872,7 @@ function inceleOzetDoldur(hedefId){
     if(say[s]<=0) continue;
     const b=SINIF_BILGI[s];
     const sem=b.sembol?('<span class="ozetSem" style="color:'+b.renk+'">'+b.sembol+'</span>'):'';
-    html+='<div class="ozetKutu">'+sem+
+    html+='<div class="ozetKutu" data-sinif="'+s+'" role="button" tabindex="0">'+sem+
       '<span class="ozetSay">'+say[s]+'</span>'+
       '<span class="ozetAd">'+sinifAd(s)+'</span></div>';
   }
@@ -13057,8 +13150,12 @@ function inceleGorunumAyarla(){
       if(y===0) alt=Math.max(alt,py); ust=Math.min(ust,py);
     }
     const hudUst=hud.getBoundingClientRect().top;
+    /* Üst sınır: üst çubuktaki görünen düğmelerin alt kenarı (23 Kasım 2026; eskiden sabit 64 px ve H*%16) */
+    let ustSinir=64;
+    try{ const hb=[...document.querySelectorAll('#hud button')].filter(b=>b.offsetParent && b.getBoundingClientRect().height>0);
+      if(hb.length) ustSinir=Math.max(...hb.map(b=>b.getBoundingClientRect().bottom))+6; }catch(e){}
     let kay=Math.max(0, alt-hudUst+6);
-    kay=Math.min(kay, Math.max(0, ust-64), H*0.16);
+    kay=Math.min(kay, Math.max(0, ust-ustSinir), H*0.24);
     kay=Math.max(kay, _incKay); _incKay=kay;   // kart büyüyüp küçüldükçe tahta zıplamasın: yalnızca artar
     if(kay>1) camera.setViewOffset(innerWidth, H, 0, kay, innerWidth, H);
     cizimIste();
@@ -13097,6 +13194,26 @@ function inceleSayacYaz(idx){
 }
 function _hexRgba(h,a){ const m=/^#?([0-9a-f]{6})$/i.exec(h||''); if(!m) return 'rgba(159,168,181,'+a+')';
   const v=parseInt(m[1],16); return 'rgba('+(v>>16)+','+((v>>8)&255)+','+(v&255)+','+a+')'; }
+/* Hamleyi düz cümleyle anlatır: "Vezir d1 karesinden h5 karesine gitti." (ek uyumu derdi olmasın diye "karesinden/karesine") */
+function hamleCumlesi(k, dil){
+  if(!k || typeof k.from!=='number' || typeof k.to!=='number') return '';
+  const san=String(k.notasyon||''), en=(dil==='en');
+  const kr=q=>'abcdefgh'[q%8]+(8-Math.floor(q/8));
+  const AD=en?{K:'King',Q:'Queen',R:'Rook',B:'Bishop',N:'Knight',P:'Pawn'}:{K:'Şah',Q:'Vezir',R:'Kale',B:'Fil',N:'At',P:'Piyon'};
+  let c;
+  if(/^O-O-O/.test(san)) c = en ? 'Castled queenside (long castling).' : 'Uzun rok yaptı (şah vezir kanadına).';
+  else if(/^O-O/.test(san)) c = en ? 'Castled kingside (short castling).' : 'Kısa rok yaptı (şah şah kanadına).';
+  else{
+    const t=AD[/^[KQRBN]/.test(san)?san[0]:'P'];
+    c = en ? t+' moved from '+kr(k.from)+' to '+kr(k.to) : t+' '+kr(k.from)+' karesinden '+kr(k.to)+' karesine gitti';
+    if(san.includes('x')) c += en ? ' and captured a piece' : ' ve taş aldı';
+    const tf=/=([QRBN])/.exec(san); if(tf) c += en ? ', promoting to a '+AD[tf[1]] : ', '+AD[tf[1]]+' oldu';
+    c+='.';
+  }
+  if(san.includes('#')) c += en ? ' Checkmate!' : ' Şah mat!';
+  else if(san.includes('+')) c += en ? ' Check.' : ' Şah çekti.';
+  return c;
+}
 function inceleYorumGoster(otomatik){
   if(window._hikayeMac && typeof hikayeYorumGoster==='function'){ hikayeYorumGoster(otomatik); return; }
   const el=document.getElementById('inceleYorum');
@@ -13131,6 +13248,8 @@ function inceleYorumGoster(otomatik){
     h+='<span class="iyKayip">−'+Math.round(k._kayip)+'</span>';
   h+='</div>';
 
+  /* Açıklayıcı hamle cümlesi (23 Kasım 2026): "Qh5" uluslararası notasyon (SAN) olarak kalır, altına düz anlatım */
+  { const acik=hamleCumlesi(k, (typeof yorumDil!=='undefined')?yorumDil:'tr'); if(acik) h+='<div class="iyAcik">'+acik+'</div>'; }
   /* Malzeme olayı: "Vezirin gitti!", "Bir at yedin." */
   const _dilO=(typeof yorumDil!=='undefined')?yorumDil:'tr';
   if(k._olay===undefined) malzemeOlaylariHesapla();
@@ -16538,6 +16657,11 @@ const DIL_EK={"sozluk":{"hazirlaniyor":{"fr":"PRÉPARATION","de":"VORBEREITUNG",
   CEVM["Siyah kazanıyor"]=CEVM["Siyah kazanıyor"]||{"en": "Black wins", "ru": "Чёрные побеждают", "ar": "الأسود يفوز", "fr": "Les Noirs gagnent", "de": "Schwarz gewinnt", "it": "Vince il Nero", "zh": "黑方胜势"};
   CEVM["Maç isteği açık"]=CEVM["Maç isteği açık"]||{"en": "Game requests on", "ru": "Приглашения вкл.", "ar": "طلبات اللعب مفعلة", "fr": "Demandes activées", "de": "Spielanfragen an", "it": "Richieste attive", "zh": "对局邀请已开启"};
   CEVM["Maç isteği kapalı"]=CEVM["Maç isteği kapalı"]||{"en": "Game requests off", "ru": "Приглашения выкл.", "ar": "طلبات اللعب متوقفة", "fr": "Demandes désactivées", "de": "Spielanfragen aus", "it": "Richieste disattivate", "zh": "对局邀请已关闭"};
+  CEVM["▲ Beyaz üstün"]=CEVM["▲ Beyaz üstün"]||{"en": "▲ White better", "ru": "▲ Белые лучше", "ar": "▲ الأبيض أفضل", "fr": "▲ Blancs mieux", "de": "▲ Weiß besser", "it": "▲ Bianco meglio", "zh": "▲ 白方占优"};
+  CEVM["▼ Siyah üstün"]=CEVM["▼ Siyah üstün"]||{"en": "▼ Black better", "ru": "▼ Чёрные лучше", "ar": "▼ الأسود أفضل", "fr": "▼ Noirs mieux", "de": "▼ Schwarz besser", "it": "▼ Nero meglio", "zh": "▼ 黑方占优"};
+  CEVM["eşit"]=CEVM["eşit"]||{"en": "equal", "ru": "равно", "ar": "تعادل", "fr": "égal", "de": "gleich", "it": "pari", "zh": "均势"};
+  CEVM["Bu türde hamle yok."]=CEVM["Bu türde hamle yok."]||{"en": "No moves of this kind.", "ru": "Таких ходов нет.", "ar": "لا توجد نقلات من هذا النوع.", "fr": "Aucun coup de ce type.", "de": "Keine Züge dieser Art.", "it": "Nessuna mossa di questo tipo.", "zh": "没有此类着法。"};
+  CEVM["hamle"]=CEVM["hamle"]||{"en": "moves", "ru": "ходов", "ar": "نقلة", "fr": "coups", "de": "Züge", "it": "mosse", "zh": "步"};
   CEVM['Titreşim']=CEVM['Titreşim']||{en:'Vibration',ru:'Вибрация',ar:'الاهتزاز',fr:'Vibration',de:'Vibration',it:'Vibrazione',zh:'振动'};
   CEVM['Hamle, savaş ve uyarı sesleri']=CEVM['Hamle, savaş ve uyarı sesleri']||{en:'Move, battle and alert sounds',ru:'Звуки ходов, боя и предупреждений',ar:'أصوات النقلات والمعارك والتنبيهات',fr:'Sons des coups, combats et alertes',de:'Zug-, Kampf- und Warntöne',it:'Suoni di mosse, battaglie e avvisi',zh:'走子、战斗和提醒音效'};
   CEVM['Tüm sesler kapalı']=CEVM['Tüm sesler kapalı']||{en:'All sounds off',ru:'Все звуки выключены',ar:'كل الأصوات متوقفة',fr:'Tous les sons coupés',de:'Alle Töne aus',it:'Tutti i suoni disattivati',zh:'关闭所有声音'};
@@ -20481,7 +20605,8 @@ const SOZLER=[
   const ids=['btnSohbet','btnYonDikey'];
   const yer={}; ids.forEach(id=>{ const e=document.getElementById(id); if(e) yer[id]=e.nextElementSibling; });
   function duzenle(){
-    const dik=document.body.classList.contains('dikeyAktif');
+      /* İncelemede (23 Kasım 2026) ikinci satır gizli: Döndür üst sıraya, tek satır */
+    const dik=document.body.classList.contains('dikeyAktif') && !document.body.classList.contains('incelemede');
     ids.forEach(id=>{
       const e=document.getElementById(id); if(!e) return;
       if(dik){ if(e.parentElement!==orta) orta.appendChild(e); }

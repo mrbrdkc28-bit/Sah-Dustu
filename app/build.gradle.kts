@@ -27,8 +27,8 @@ android {
         applicationId = "com.emre.sahdustu"
         minSdk = 26
         targetSdk = 36
-        versionCode = 16
-        versionName = "2.3.1"
+        versionCode = 17
+        versionName = "2.3.2"
     }
 
     signingConfigs {
