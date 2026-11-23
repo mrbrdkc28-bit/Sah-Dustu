@@ -2359,6 +2359,14 @@ body.incelemede #yonBtn{transform:translateY(-98px) scale(.86);transition:transf
 #inceleHUD.uzun #inceleKontrol .ibtn.dolu{min-width:104px;height:38px;padding:0 16px;font-size:13px}
 #inceleHUD.uzun #inceleOzet .ozetKutu{padding:2px 9px}
 #inceleHUD.uzun>#inceleYorum{flex:1 1 0;height:auto;min-height:0;overflow-y:auto}
+/* İncelemede daha basık düğmeler (23 Kasım 2026, sahibin isteği): üst çubuk simge+yazı yan yana, oynat satırı alçak */
+body.incelemede.dikeyAktif #hud .hud-sag .hbtn{height:32px!important;min-height:0!important;padding:0 5px!important;
+  flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:4px!important}
+body.incelemede.dikeyAktif #hud .hud-sag .hbtn .sg,body.incelemede.dikeyAktif #hud .hud-sag .hbtn .sg svg{width:15px!important;height:15px!important;margin:0!important}
+body.incelemede.dikeyAktif #hud .hud-sag .hbtn i{margin:0!important;line-height:1!important}
+#inceleHUD.uzun #inceleKontrol .ibtn{flex-basis:44px;width:44px;height:32px;border-radius:16px}
+#inceleHUD.uzun #inceleKontrol .ibtn svg{width:16px;height:16px}
+#inceleHUD.uzun #inceleKontrol .ibtn.dolu{height:32px;min-width:96px;font-size:12.5px}
 /* ===== ÖĞREN ===== */
 :is(#ogrenEkran,#kutupEkran),:is(#ogrenEkran,#kutupEkran) *,#ogrenPanel,#ogrenPanel *{box-sizing:border-box}
 :is(#ogrenEkran,#kutupEkran){position:fixed;inset:0;z-index:60;display:none;overflow-y:auto;overflow-x:hidden;background:var(--ink,#0a0c12);padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 28px}

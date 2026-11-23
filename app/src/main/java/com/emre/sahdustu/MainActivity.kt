@@ -612,7 +612,11 @@ class MainActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(kok) { v, ins ->
             val n = ins.getInsets(WindowInsetsCompat.Type.navigationBars())
             v.setPadding(n.left, 0, n.right, n.bottom)
-            ins
+            /* 23 Kasım 2026: gezinme çubuğu payı kapsayıcıda verildi; WebView'e de iletilince CSS
+               env(safe-area-inset-bottom) aynı payı ikinci kez ekliyordu (incelemede altta boş şerit). */
+            WindowInsetsCompat.Builder(ins)
+                .setInsets(WindowInsetsCompat.Type.navigationBars(), androidx.core.graphics.Insets.NONE)
+                .build()
         }
         gezinmeUygula()
         isiDinle()
