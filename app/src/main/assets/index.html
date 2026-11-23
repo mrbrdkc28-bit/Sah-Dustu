@@ -7834,6 +7834,7 @@ function oyunReytingi(yuzde, hamleSayisi){
 
 function oyuncuRengi(){
   try{
+    if(typeof gecmisIncelemede!=='undefined' && gecmisIncelemede && window._gecmisRenk) return window._gecmisRenk;
     if(typeof cevrimiciAktif!=='undefined' && cevrimiciAktif &&
        typeof Cevrimici!=='undefined' && Cevrimici.benimRenk) return Cevrimici.benimRenk;
     if(typeof mod!=='undefined' && mod==='ai')
@@ -10640,6 +10641,7 @@ function duzGorunumDegistir(){
 }
 // Oyuncu siyah tarafta mı? (çevrimiçi veya AI'ya karşı siyah)
 function oyuncuSiyahMi(){
+  if(typeof gecmisIncelemede!=='undefined' && gecmisIncelemede && window._gecmisRenk) return window._gecmisRenk==='b';
   if(bulmacaModu) return BULMACALAR[bulmacaIndex].r==='b';
   if(ogrenModu) return false;
   if(cevrimiciAktif) return Cevrimici.benimRenk==='b';
@@ -13514,7 +13516,7 @@ function tahtadaIncelemeBitir(){
   document.body.classList.remove('incelemede');
   try{ if(typeof camera!=='undefined' && camera) camera.clearViewOffset(); }catch(e){}
   if(gecmisIncelemede){
-    gecmisIncelemede=false;
+    gecmisIncelemede=false; window._gecmisRenk=null;
     if(typeof _analizSuruyor!=='undefined' && _analizSuruyor) _analizIptal=true;
     oyunKaydi=[]; konumGecmisi=[]; Motor.reset();
     vurguTemizle();
@@ -15264,7 +15266,7 @@ function istRender(){
       const i=+btn.dataset.i;
       const oyun=bulutIst.sonOyunlar[i];
       /* Tahtada inceleme oyun sonunda reklamlı/Premium; profilden girilince kapı atlanıyordu (Kasım 2026) */
-      if(oyun && oyun.hamleler && oyun.hamleler.length) premiumKapi('analiz', null, ()=>gecmisOyunIncele(oyun.hamleler));
+      if(oyun && oyun.hamleler && oyun.hamleler.length) premiumKapi('analiz', null, ()=>gecmisOyunIncele(oyun.hamleler, oyun.renk));
     };
   });
 }
@@ -15281,7 +15283,10 @@ function oyunRakipMetni(o){
   if(o.rk==='b'){ const z={kolay:'Kolay',orta:'Orta',zor:'Zor'}[o.rz]; return c('Bot')+(z?' · '+c(z):''); }
   return c('İki Oyuncu');
 }
-function gecmisOyunIncele(hamleler){
+/* Geçmiş oyunda oyuncunun rengi (23 Kasım 2026): eskiden tahta hep beyazın tarafından açılıyordu; siyahla oynanmış
+   oyunda rakip altta, taşlar ters duruyordu. Kayıttaki renk kamera, 2B semboller ve "benim hamlelerim" için kullanılır. */
+function gecmisOyunIncele(hamleler, renk){
+  window._gecmisRenk=(renk==='b'||renk==='w')?renk:null;
   Motor.reset();
   oyunKaydi=[]; konumGecmisi=[];
   for(const not of hamleler){
@@ -15300,7 +15305,8 @@ function gecmisOyunIncele(hamleler){
   arenaKur(aktifArena); taslariDiz();
   /* Ana menünün arkasındaki sahnenin kamerası (yakın, eğik) kalıyordu; tahta orantısız büyük ve yarım görünüyordu */
   const _duz=(typeof duzGorunum!=='undefined' && duzGorunum);
-  kamHedef.set(0,0,0); kamYaw=0; kamUzak=_duz?duzUzaklik():uygunUzaklik(); kamPitch=_duz?1.55:dikeyKamPitch();
+  try{ panelYerlesimGuncelle(); }catch(e){}   // uygulama açılır açılmaz geçmiş oyuna girilince dikey düzen sınıfı yoktu
+  kamHedef.set(0,0,0); kamYaw=(window._gecmisRenk==='b')?Math.PI:0; kamUzak=_duz?duzUzaklik():uygunUzaklik(); kamPitch=_duz?1.55:dikeyKamPitch();
   inceleAnalizVar=!!window._hikayeMac;   // efsane maç hikâyesinde analiz yok, her hamle anlatılır
   tahtadaIncelemeBaslat(true);
   /* Panel açıldı, inceleme kaydırması devrede: kadraj yeni kamerayla sıfırdan ölçülür */
