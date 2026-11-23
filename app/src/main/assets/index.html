@@ -2257,7 +2257,7 @@ body.incelemede.dikeyAktif #hud .hud-sol{display:none!important}
 #inceleGrafik .igYon i{font-style:normal;color:#8d909a;font-weight:700}
 #igKutu .igOrta{position:absolute;right:6px;top:50%;transform:translateY(-50%);font:700 8.5px Manrope,sans-serif;
   color:rgba(232,182,76,.75);letter-spacing:.08em;pointer-events:none;text-transform:uppercase}
-#inceleYorum .iyAcik{font:600 12.5px Manrope,sans-serif;color:#d9cfb9;margin:2px 0 4px;opacity:.92}
+#inceleYorum .iyAcik{font:600 14px/1.45 Manrope,sans-serif;color:#f3eddf;margin:6px 0 4px}
 /* Sınıf listesi (★ ! ? ?? …): tahta üzerinde yarı saydam katman, tahta bozulmaz */
 #sinifListe{position:fixed;inset:0;z-index:74;display:none;align-items:flex-end;justify-content:center;
   background:rgba(6,7,11,.12)}
@@ -2350,6 +2350,15 @@ body.incelemede #yonBtn{transform:translateY(-98px) scale(.86);transition:transf
   background:linear-gradient(135deg,#F2C765,#C9912A);color:#1a1408;font:800 14px Manrope,sans-serif;letter-spacing:.04em;
   box-shadow:0 8px 20px rgba(201,145,42,.32),inset 0 1px 0 rgba(255,255,255,.35)}
 #inceleKontrol .ibtn.dolu svg{width:15px;height:15px}
+/* Sıkı panel (23 Kasım 2026): Bitir/dil/ses satırı ve oynat düğmeleri inceltildi; açıklama kutusu kalan yeri doldurur */
+#inceleHUD.uzun{gap:7px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px))}
+#inceleHUD.uzun #inceleUst #inceleCik,#inceleHUD.uzun #inceleUst .seg2{height:30px}
+#inceleHUD.uzun #inceleUst #inceleSes{width:30px;height:30px}
+#inceleHUD.uzun #inceleUst .seg2 span{padding:0 9px;font-size:11px}
+#inceleHUD.uzun #inceleKontrol .ibtn{flex-basis:38px;height:38px}
+#inceleHUD.uzun #inceleKontrol .ibtn.dolu{min-width:104px;height:38px;padding:0 16px;font-size:13px}
+#inceleHUD.uzun #inceleOzet .ozetKutu{padding:2px 9px}
+#inceleHUD.uzun>#inceleYorum{flex:1 1 0;height:auto;min-height:0;overflow-y:auto}
 /* ===== ÖĞREN ===== */
 :is(#ogrenEkran,#kutupEkran),:is(#ogrenEkran,#kutupEkran) *,#ogrenPanel,#ogrenPanel *{box-sizing:border-box}
 :is(#ogrenEkran,#kutupEkran){position:fixed;inset:0;z-index:60;display:none;overflow-y:auto;overflow-x:hidden;background:var(--ink,#0a0c12);padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 28px}
@@ -12691,6 +12700,9 @@ async function tahtadaIncelemeBaslat(gecmis){
   document.getElementById('inceleHUD').classList.add('acik');
   document.getElementById('notPanel').classList.remove('acik'); document.getElementById('notPanelSag').classList.remove('acik');
   inceleAktif=true; inceleIdx=-1;
+  /* İncelemede varsayılan 2B (23 Kasım 2026, sahibin isteği); incelemeden çıkınca önceki görünüme dönülür */
+  window._inceDuzAcildi=false;
+  try{ if(!duzGorunum){ duzGorunumDegistir(); window._inceDuzAcildi=true; } }catch(e){}
   // TTS'i uyandır (kullanıcı bu butona dokundu, izin var) — sessiz kısa ifadeyle motoru aç
   if(typeof speechSynthesis!=='undefined'){
     try{ speechSynthesis.resume();
@@ -12826,7 +12838,7 @@ function sinifListesiAc(sinif){
     const k=oyunKaydi[i], no=Math.floor(i/2)+1;
     h+='<button type="button" class="slSatir'+(typeof inceleIdx!=='undefined'&&inceleIdx===i&&inceleAktif?' secili':'')+'" data-i="'+i+'">'+
        '<span class="slNo">'+no+(k.renk==='w'?'.':'…')+'</span><span class="slNot" style="color:'+b.renk+'">'+kac(k.notasyon)+'</span>'+
-       '<span class="slAcik">'+kac(hamleCumlesi(k, dil))+'</span></button>';
+       '<span class="slAcik">'+kac(hamleCumlesi(i, dil))+'</span></button>';
   });
   h+='</div></div>';
   kat.innerHTML=h;
@@ -13089,6 +13101,8 @@ function inceleGorunumAyarla(){
     const hud=ogrenAltta ? ogrenP : document.getElementById('inceleHUD');
     camera.clearViewOffset();
     window._duzIncKadraj=null;
+    { const ih=document.getElementById('inceleHUD');
+      if(ih && (ogrenAltta || !ih.classList.contains('acik') || getComputedStyle(ih).display==='grid')){ ih.style.top=''; ih.classList.remove('uzun'); } }
     if(!hud || !hud.classList.contains('acik')){ if(camera.zoom!==1){ camera.zoom=1; camera.updateProjectionMatrix(); } _incKay=0; _incZoom=1; document.body.classList.remove('incelemede'); cizimIste(); return; }
     if(!ogrenAltta) document.body.classList.add('incelemede');
     if(camera.zoom!==1){ camera.zoom=1; camera.updateProjectionMatrix(); }
@@ -13114,6 +13128,50 @@ function inceleGorunumAyarla(){
       const yarim=Math.max(W/2-xMin, xMax-W/2), bos=Math.min(W/2-sol, sag-W/2);
       if(yarim>bos && bos>80){ camera.zoom=Math.max(0.55, bos/yarim); camera.updateProjectionMatrix(); }
       cizimIste(); return;
+    }
+    /* DİKEY YERLEŞİM (23 Kasım 2026, sahibin isteği): tahta üst düğmelerin hemen altına, ekran genişliğince;
+       panel tahtanın altından ekranın dibine kadar uzar ve artan yerin tamamı açıklama kutusuna (#inceleYorum) gider.
+       2B ve 3B için aynı mantık; 3B'de tahta gerekirse yakınlaştırılır (eskiden küçük ve uzakta kalıyordu). */
+    if(!ogrenAltta){
+      const H=innerHeight, W=innerWidth;
+      let ustSinir=64;
+      try{ const hb=[...document.querySelectorAll('#hud button')].filter(b=>b.offsetParent && b.getBoundingClientRect().height>0);
+        if(hb.length) ustSinir=Math.max(...hb.map(b=>b.getBoundingClientRect().bottom))+4; }catch(e){}
+      /* Açıklama kutusu dışındaki panel öğelerinin yüksekliği + kutu için en az 118 px */
+      const cs=getComputedStyle(hud), bosluk=parseFloat(cs.rowGap)||8;
+      let panelMin=parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom)+118, adet=0;
+      for(const ch of hud.children){ if(getComputedStyle(ch).display==='none') continue; adet++; if(ch.id!=='inceleYorum') panelMin+=ch.offsetHeight; }
+      panelMin+=bosluk*Math.max(0,adet-1);
+      const bant=Math.max(160, H-ustSinir-panelMin-6);   // tahtaya ayrılabilecek en çok yükseklik
+      let tahtaAlt;
+      if(typeof duzGorunum!=='undefined' && duzGorunum){
+        _incKay=0;
+        const tanY=Math.tan(camera.fov/2*Math.PI/180), S=9;
+        const boy=Math.min(W-6, bant);                    // tahtanın (koordinatlarıyla) piksel boyu
+        const uzak=S*H/(boy*2*tanY), pxBirim=H/(2*uzak*tanY);
+        window._duzIncKadraj={uzak, kay:-((ustSinir+boy/2)-H/2)/pxBirim};
+        tahtaAlt=ustSinir+boy;
+      } else {
+        window._duzIncKadraj=null;
+        camera.updateMatrixWorld();
+        let xYari=0, yUst=1e9, yAlt=-1e9;
+        for(const x of [-4.9,4.9]) for(const z of [-4.9,4.9]) for(const y of [0,1.1]){
+          const v=new THREE.Vector3(x,y,z).project(camera);
+          if(y===0){ xYari=Math.max(xYari, Math.abs(v.x)*W/2); }
+          const py=(1-v.y)/2*H; yUst=Math.min(yUst,py); if(y===0) yAlt=Math.max(yAlt,py);
+        }
+        const zoom=Math.max(0.55, Math.min(1.9, (W/2-4)/xYari, bant/Math.max(1,yAlt-yUst)));
+        camera.zoom=zoom; camera.updateProjectionMatrix(); _incZoom=zoom;
+        const ustZ=H/2+(yUst-H/2)*zoom, altZ=H/2+(yAlt-H/2)*zoom;
+        const kay=ustZ-ustSinir; _incKay=kay;
+        camera.setViewOffset(W, H, 0, kay, W, H);
+        tahtaAlt=altZ-kay;
+      }
+      const ust=Math.round(Math.min(H-panelMin, tahtaAlt+4));
+      if(hud.style.top!==ust+'px') hud.style.top=ust+'px';
+      hud.classList.add('uzun');
+      cizimIste();
+      return;
     }
     if(typeof duzGorunum!=='undefined' && duzGorunum){
       /* 2B (8 Ekim 2026): tam ekran genişliğindeki düz tahta üst çubuk ile panel arasına sığmıyordu
@@ -13194,24 +13252,78 @@ function inceleSayacYaz(idx){
 }
 function _hexRgba(h,a){ const m=/^#?([0-9a-f]{6})$/i.exec(h||''); if(!m) return 'rgba(159,168,181,'+a+')';
   const v=parseInt(m[1],16); return 'rgba('+(v>>16)+','+((v>>8)&255)+','+(v&255)+','+a+')'; }
-/* Hamleyi düz cümleyle anlatır: "Vezir d1 karesinden h5 karesine gitti." (ek uyumu derdi olmasın diye "karesinden/karesine") */
-function hamleCumlesi(k, dil){
-  if(!k || typeof k.from!=='number' || typeof k.to!=='number') return '';
-  const san=String(k.notasyon||''), en=(dil==='en');
+/* Hamleyi düz cümleyle anlatır (23 Kasım 2026, sahibin isteği): uluslararası notasyon (SAN, ör. Bxg7) yerinde kalır,
+   altına "Fil g5'ten g7'ye giderek atı aldı." gibi açıklama gelir. Taş, çıkış/varış karesi ve alınan taş konum
+   geçmişinden (konumGecmisi: her hamleden SONRAKİ tahta) bulunur; geçmiş oyunlarda from/to kaydı olmasa da çalışır. */
+function hamleDetay(i){
+  const k=oyunKaydi[i]; if(!k) return null;
+  const BAS=(()=>{ const b=new Array(64).fill(null), a=['r','n','b','q','k','b','n','r'];
+    for(let f=0;f<8;f++){ b[f]={t:a[f],c:'b'}; b[8+f]={t:'p',c:'b'}; b[48+f]={t:'p',c:'w'}; b[56+f]={t:a[f],c:'w'}; } return b; })();
+  let once=null, sonra=null;
+  if(Array.isArray(konumGecmisi) && konumGecmisi.length===oyunKaydi.length){
+    once = i>0 ? konumGecmisi[i-1] : BAS; sonra = konumGecmisi[i];
+  }
+  let from=(typeof k.from==='number')?k.from:-1, to=(typeof k.to==='number')?k.to:-1;
+  if(once && sonra && (from<0 || to<0)){
+    const renk=k.renk;
+    const giden=[], gelen=[];
+    for(let q=0;q<64;q++){
+      const a=once[q], b=sonra[q];
+      if(a && a.c===renk && !(b && b.c===renk && b.t===a.t)) giden.push(q);
+      if(b && b.c===renk && !(a && a.c===renk && a.t===b.t)) gelen.push(q);
+    }
+    if(giden.length && gelen.length){
+      const sahG=giden.find(q=>once[q].t==='k'), sahV=gelen.find(q=>sonra[q].t==='k');
+      if(giden.length>1 && sahG!==undefined){ from=sahG; to=(sahV!==undefined)?sahV:gelen[0]; }
+      else { from=giden[0]; to=gelen[0]; }
+    }
+  }
+  if(from<0 || to<0) return null;
+  const tas = once && once[from] ? once[from].t : null;
+  let yenen = once && once[to] && once[to].c!==k.renk ? once[to].t : null;
+  let gecerken=false;
+  if(!yenen && tas==='p' && (from%8)!==(to%8)){ yenen='p'; gecerken=true; }
+  return {k, from, to, tas, yenen, gecerken};
+}
+function hamleCumlesi(i, dil){
+  const d=hamleDetay(i); if(!d) return '';
+  const k=d.k, san=String(k.notasyon||''), en=(dil==='en');
   const kr=q=>'abcdefgh'[q%8]+(8-Math.floor(q/8));
-  const AD=en?{K:'King',Q:'Queen',R:'Rook',B:'Bishop',N:'Knight',P:'Pawn'}:{K:'Şah',Q:'Vezir',R:'Kale',B:'Fil',N:'At',P:'Piyon'};
+  const harf=san[0];
+  const tur = d.tas || (/^[KQRBN]/.test(san) ? {K:'k',Q:'q',R:'r',B:'b',N:'n'}[harf] : 'p');
+  const renkAd = en ? (k.renk==='w'?'White':'Black') : (k.renk==='w'?'Beyaz':'Siyah');
   let c;
-  if(/^O-O-O/.test(san)) c = en ? 'Castled queenside (long castling).' : 'Uzun rok yaptı (şah vezir kanadına).';
-  else if(/^O-O/.test(san)) c = en ? 'Castled kingside (short castling).' : 'Kısa rok yaptı (şah şah kanadına).';
+  if(en){
+    const AD={k:'king',q:'queen',r:'rook',b:'bishop',n:'knight',p:'pawn'};
+    if(/^O-O-O/.test(san)) c=renkAd+' castled long (queenside): king '+kr(d.from)+'→'+kr(d.to)+'.';
+    else if(/^O-O/.test(san)) c=renkAd+' castled short (kingside): king '+kr(d.from)+'→'+kr(d.to)+'.';
+    else{
+      c=renkAd+' '+AD[tur]+' went from '+kr(d.from)+' to '+kr(d.to);
+      if(d.yenen) c+=' and captured the '+AD[d.yenen]+(d.gecerken?' en passant':'');
+      const tf=/=([QRBN])/.exec(san); if(tf) c+=' and promoted to a '+AD[tf[1].toLowerCase()];
+      c+='.';
+    }
+    if(san.includes('#')) c+=' Checkmate!'; else if(san.includes('+')) c+=' Check!';
+    return c;
+  }
+  /* Türkçe: karenin okunuşu rakamla biter (g7 = "ge yedi"), ek ona göre: g7'den, g7'ye, e3'ten, e3'e, a6'dan, a6'ya */
+  const AYR={1:"'den",2:"'den",3:"'ten",4:"'ten",5:"'ten",6:"'dan",7:"'den",8:"'den"};
+  const YON={1:"'e",2:"'ye",3:"'e",4:"'e",5:"'e",6:"'ya",7:"'ye",8:"'e"};
+  const den=q=>kr(q)+AYR[8-Math.floor(q/8)], e=q=>kr(q)+YON[8-Math.floor(q/8)];
+  const AD={k:'şah',q:'vezir',r:'kale',b:'fil',n:'at',p:'piyon'};
+  const BELIRTME={k:'şahı',q:'veziri',r:'kaleyi',b:'fili',n:'atı',p:'piyonu'};
+  const YONELME={q:'vezire',r:'kaleye',b:'file',n:'ata'};
+  if(/^O-O-O/.test(san)) c=renkAd+' uzun rok yaptı: şah '+den(d.from)+' '+e(d.to)+' geçti, kale de yanına geldi.';
+  else if(/^O-O/.test(san)) c=renkAd+' kısa rok yaptı: şah '+den(d.from)+' '+e(d.to)+' geçti, kale de yanına geldi.';
   else{
-    const t=AD[/^[KQRBN]/.test(san)?san[0]:'P'];
-    c = en ? t+' moved from '+kr(k.from)+' to '+kr(k.to) : t+' '+kr(k.from)+' karesinden '+kr(k.to)+' karesine gitti';
-    if(san.includes('x')) c += en ? ' and captured a piece' : ' ve taş aldı';
-    const tf=/=([QRBN])/.exec(san); if(tf) c += en ? ', promoting to a '+AD[tf[1]] : ', '+AD[tf[1]]+' oldu';
+    const tf=/=([QRBN])/.exec(san);
+    c=renkAd+' '+AD[tur]+' '+den(d.from)+' '+e(d.to);
+    if(d.yenen) c+=' giderek '+(d.gecerken?'geçerken alma ile ':'')+BELIRTME[d.yenen]+' aldı';
+    else c+=' gitti';
+    if(tf) c+=' ve '+YONELME[tf[1].toLowerCase()]+' terfi etti';
     c+='.';
   }
-  if(san.includes('#')) c += en ? ' Checkmate!' : ' Şah mat!';
-  else if(san.includes('+')) c += en ? ' Check.' : ' Şah çekti.';
+  if(san.includes('#')) c+=' Şah mat!'; else if(san.includes('+')) c+=' Şah çekti!';
   return c;
 }
 function inceleYorumGoster(otomatik){
@@ -13249,7 +13361,7 @@ function inceleYorumGoster(otomatik){
   h+='</div>';
 
   /* Açıklayıcı hamle cümlesi (23 Kasım 2026): "Qh5" uluslararası notasyon (SAN) olarak kalır, altına düz anlatım */
-  { const acik=hamleCumlesi(k, (typeof yorumDil!=='undefined')?yorumDil:'tr'); if(acik) h+='<div class="iyAcik">'+acik+'</div>'; }
+  { const acik=hamleCumlesi(inceleIdx, (typeof yorumDil!=='undefined')?yorumDil:'tr'); if(acik) h+='<div class="iyAcik">'+acik+'</div>'; }
   /* Malzeme olayı: "Vezirin gitti!", "Bir at yedin." */
   const _dilO=(typeof yorumDil!=='undefined')?yorumDil:'tr';
   if(k._olay===undefined) malzemeOlaylariHesapla();
@@ -13394,6 +13506,9 @@ function tahtadaIncelemeBitir(){
   if(dahaIyiOkGrup){ scene.remove(dahaIyiOkGrup); nesneyiSerbestBirak(dahaIyiOkGrup,false); dahaIyiOkGrup=null; }
   inceleAktif=false;
   if(typeof Konus!=='undefined') Konus.sustur();
+  try{ if(window._inceDuzAcildi && duzGorunum) duzGorunumDegistir(); }catch(e){}
+  window._inceDuzAcildi=false;
+  { const hh=document.getElementById('inceleHUD'); if(hh){ hh.style.top=''; hh.classList.remove('uzun'); } }
   const oz=document.getElementById('inceleOzet'); if(oz) oz.classList.remove('acik');
   document.getElementById('inceleHUD').classList.remove('acik');
   document.body.classList.remove('incelemede');
@@ -15174,7 +15289,7 @@ function gecmisOyunIncele(hamleler){
     if(!h) break;
     const renk=Motor.turn;
     let konumSkor=0; try{ Motor.yap(h); konumSkor=Motor.skorla(); }catch(e){ try{Motor.yap(h);}catch(e2){} }
-    oyunKaydi.push({notasyon:not, renk:renk, konumSkor:konumSkor, kalite:''});
+    oyunKaydi.push({notasyon:not, renk:renk, from:h.from, to:h.to, konumSkor:konumSkor, kalite:''});
     const kopya=[]; for(let j=0;j<64;j++){ const p=Motor.tasAl(j); kopya[j]=p?{t:p.t,c:p.c}:null; }
     konumGecmisi.push(kopya);
   }
