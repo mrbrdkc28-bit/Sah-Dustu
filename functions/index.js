@@ -279,3 +279,104 @@ exports.qrAl = onCall({ region: 'europe-west1', maxInstances: 10, serviceAccount
   await ref.delete();
   return { durum: 'tamam', token };
 });
+
+/* ===================== BOT OYUNCULAR (28 Kasım 2026, sahibin kararı) =====================
+   10 bot oyuncu oyuncular/{uid} kayıtlarıyla var olur (giriş yapılan hesap değildir). Oyunu oyuncunun telefonu
+   botun yerine oynatır; maç bitince istemci botSonuc/{oda} yazar, botSonucIsle botun puanını gerçek oyuncu gibi
+   işler (oyun başına bir kez: oyunlar/{oda}/sayim/{botUid}). botNabiz 2 saatte bir kayıtları kurar ve botların
+   başkalarıyla da oynuyormuş gibi görünmesi için puanlarını hedef güçlerine doğru küçük adımlarla kaydırır.
+   Hepsini kaldırmak: BOTLAR listesini boşalt, iki işlevi sil, oyuncular'daki bu 10 kaydı sil (bot:true). */
+const { onSchedule } = require('firebase-functions/v2/scheduler');
+const BOTLAR = [
+  { uid: 'gKby1KpvP1cllle2yyqOTjuaU343', ad: 'qaraambar',   ulke: 'TR', avatar: '♜', guc: 1250 },
+  { uid: 'EC2bvpCyBSZx59W32Z0ooxaSk2jI', ad: 'darkknight',  ulke: 'TR', avatar: '♞', guc: 1550 },
+  { uid: '5wIJiebWGs6TronqXK45uEb0rWtr', ad: 'foxxmulder',  ulke: 'TR', avatar: '♝', guc: 1100 },
+  { uid: 'SGP67meK3aDejqAPrOvFI05dOAmX', ad: 'Heisennberg', ulke: 'DE', avatar: '♚', guc: 1800 },
+  { uid: '1dv4rVR8vM8SDhPkLlcQrjKcT6lE', ad: 'trueelove',   ulke: 'US', avatar: '♛', guc: 950 },
+  { uid: '08W65AfcqyGv35zJTrvuz5Avc2ef', ad: 'realcastle',  ulke: 'ES', avatar: '♜', guc: 1650 },
+  { uid: 'KDIdhweMXKkAP0HJVn9XOwgTEeyM', ad: 'leooomate',   ulke: 'BR', avatar: '♟', guc: 1350 },
+  { uid: '10g8KGZxxvgCwimpvopKVGQ5q70c', ad: 'icecream',    ulke: 'IT', avatar: '♕', guc: 1000 },
+  { uid: 'umAJGzNzkfKLW1bRVJG7m6ZpMKzR', ad: 'malatyalıı',  ulke: 'TR', avatar: '⚔', guc: 1450 },
+  { uid: 'AuASIQXz8SubhMxLBeMDB7O0c8pf', ad: 'statics',     ulke: 'GB', avatar: '♗', guc: 2000 },
+];
+const botBul = uid => BOTLAR.find(b => b.uid === uid);
+
+/* İstemcideki haftaId ile birebir aynı: hafta pazar 00:00'da (Türkiye saati) başlar */
+function haftaId() {
+  const tr = new Date(Date.now() + 3 * 3600000);
+  const pazar = new Date(Date.UTC(tr.getUTCFullYear(), tr.getUTCMonth(), tr.getUTCDate() - tr.getUTCDay()));
+  const d = new Date(pazar.getTime() + 86400000);
+  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const gun = (t.getUTCDay() + 6) % 7;
+  t.setUTCDate(t.getUTCDate() - gun + 3);
+  const ilk = new Date(Date.UTC(t.getUTCFullYear(), 0, 4));
+  const hafta = 1 + Math.round(((t - ilk) / 86400000 - 3 + ((ilk.getUTCDay() + 6) % 7)) / 7);
+  return t.getUTCFullYear() + '_' + (hafta < 10 ? '0' : '') + hafta;
+}
+
+/* Bir sonucu bot kaydına işler (gercek: 1 kazandı, 0.5 berabere, 0 kaybetti) */
+function sonucYaz(p, gercek, rakipPuan) {
+  const eski = p.puan || 800;
+  const beklenen = 1 / (1 + Math.pow(10, (rakipPuan - eski) / 400));
+  const yeni = Math.max(100, eski + Math.round(24 * (gercek - beklenen)));
+  const fark = yeni - eski;
+  const h = haftaId(), alan = 'hp_' + h;
+  const yaz = { puan: yeni, haftaId: h, haftaAlan: alan, [alan]: (p.haftaId === h ? (p[alan] || 0) : 0) + Math.max(0, fark),
+    oyun: (p.oyun || 0) + 1 };
+  if (gercek === 1) yaz.galibiyet = (p.galibiyet || 0) + 1;
+  else if (gercek === 0) yaz.maglubiyet = (p.maglubiyet || 0) + 1;
+  else yaz.beraberlik = (p.beraberlik || 0) + 1;
+  return yaz;
+}
+
+exports.botSonucIsle = onDocumentCreated(
+  { document: 'botSonuc/{oda}', region: 'europe-west1', maxInstances: 5 },
+  async (olay) => {
+    const oda = olay.params.oda;
+    const o = await db.collection('oyunlar').doc(oda).get();
+    if (!o.exists) return;
+    const v = o.data() || {};
+    if (v.durum !== 'bitti') return;
+    const renk = botBul(v.beyaz) ? 'w' : (botBul(v.siyah) ? 'b' : null);
+    if (!renk) return;
+    const botUid = renk === 'w' ? v.beyaz : v.siyah;
+    if ((v.hamleSayi || 0) < 2 && v.sonucTip !== 'berabere') return;   // iptal sayılan oyun
+    const gercek = v.kazanan == null ? 0.5 : (v.kazanan === renk ? 1 : 0);
+    const rakipPuan = (renk === 'w' ? v.siyahPuan : v.beyazPuan) || 800;
+    const sayimRef = db.collection('oyunlar').doc(oda).collection('sayim').doc(botUid);
+    const profRef = db.collection('oyuncular').doc(botUid);
+    await db.runTransaction(async tx => {
+      const s = await tx.get(sayimRef);
+      if (s.exists) return;
+      const p = (await tx.get(profRef)).data() || {};
+      tx.set(sayimRef, { t: Date.now() });
+      tx.set(profRef, sonucYaz(p, gercek, rakipPuan), { merge: true });
+    });
+    logger.info('bot sonucu işlendi', { oda, bot: botUid, gercek });
+  });
+
+exports.botNabiz = onSchedule({ schedule: 'every 120 minutes', region: 'europe-west1', timeZone: 'Europe/Istanbul' }, async () => {
+  for (const b of BOTLAR) {
+    const ref = db.collection('oyuncular').doc(b.uid);
+    const snap = await ref.get();
+    if (!snap.exists) {
+      await ref.set({ kullaniciAdi: b.ad, ulke: b.ulke, avatar: b.avatar, puan: 800, oyun: 0, galibiyet: 0, beraberlik: 0,
+        maglubiyet: 0, lobiGizli: false, bot: true, olusturma: Date.now() });
+      continue;
+    }
+    const p = snap.data() || {};
+    // Her turda yaklaşık yarı olasılıkla 1–2 "başka oyuncuyla" maç: hedef gücüne doğru eğilimli sonuç
+    if (Math.random() < 0.5) continue;
+    let yaz = {}, q = Object.assign({}, p);
+    const mac = 1 + (Math.random() < 0.35 ? 1 : 0);
+    for (let i = 0; i < mac; i++) {
+      const rakip = Math.round((q.puan || 800) + (Math.random() - 0.5) * 260);
+      const kazanmaOlas = 1 / (1 + Math.pow(10, (rakip - b.guc) / 400));
+      const r = Math.random();
+      const gercek = r < kazanmaOlas * 0.9 ? 1 : (r < kazanmaOlas * 0.9 + 0.1 ? 0.5 : 0);
+      const y = sonucYaz(q, gercek, rakip);
+      q = Object.assign(q, y); yaz = Object.assign(yaz, y);
+    }
+    await ref.set(yaz, { merge: true });
+  }
+});

@@ -4,6 +4,14 @@ service cloud.firestore {
 
     function yol(p) { return path('/databases/' + database + '/documents/' + p); }
 
+    // BOT OYUNCULAR (28 Kasim 2026): oyunu oyuncunun telefonu botun yerine oynatir. Liste functions/index.js BOTLAR ile ayni.
+    function botMu(u) {
+      return u in ['gKby1KpvP1cllle2yyqOTjuaU343', 'EC2bvpCyBSZx59W32Z0ooxaSk2jI', '5wIJiebWGs6TronqXK45uEb0rWtr',
+                   'SGP67meK3aDejqAPrOvFI05dOAmX', '1dv4rVR8vM8SDhPkLlcQrjKcT6lE', '08W65AfcqyGv35zJTrvuz5Avc2ef',
+                   'KDIdhweMXKkAP0HJVn9XOwgTEeyM', '10g8KGZxxvgCwimpvopKVGQ5q70c', 'umAJGzNzkfKLW1bRVJG7m6ZpMKzR',
+                   'AuASIQXz8SubhMxLBeMDB7O0c8pf'];
+    }
+
     // Profil fotoğrafı: 256x256 JPEG ~10-25 KB (eski kayıtlar 64x64). 40.000 karakterden büyüğü reddedilir.
     function fotoGecerli(yeni) {
       return !('avatarFoto' in yeni)
@@ -143,9 +151,14 @@ service cloud.firestore {
       // KATILIM: "bu oyunda oynadım" kaydı. Yalnız odadaki oyuncu, kendi adına, bir kez.
       match /katilim/{uid} {
         allow read: if request.auth != null;
-        allow create: if request.auth != null && request.auth.uid == uid
-                      && (get(yol('oyunlar/' + odaId)).data.beyaz == uid
-                          || get(yol('oyunlar/' + odaId)).data.siyah == uid);
+        allow create: if request.auth != null && (
+                        (request.auth.uid == uid
+                          && (get(yol('oyunlar/' + odaId)).data.beyaz == uid
+                              || get(yol('oyunlar/' + odaId)).data.siyah == uid))
+                        // Bot rakibin katılım kaydını odadaki gerçek oyuncu yazar
+                        || (botMu(uid)
+                          && ((get(yol('oyunlar/' + odaId)).data.beyaz == uid && get(yol('oyunlar/' + odaId)).data.siyah == request.auth.uid)
+                              || (get(yol('oyunlar/' + odaId)).data.siyah == uid && get(yol('oyunlar/' + odaId)).data.beyaz == request.auth.uid))));
       }
       // SAYIM: bu oyunun puanı bu oyuncu için işlendi. Puan yazımıyla aynı
       // toplu işlemde oluşturulur; değiştirilemez, silinemez.
@@ -154,6 +167,13 @@ service cloud.firestore {
         allow create: if request.auth != null && request.auth.uid == uid
                       && getAfter(yol('oyuncular/' + uid)).data.get('sayilanOda', '') == odaId;
       }
+    }
+
+    // BOT MAÇ SONUCU: bot maçı bitince odadaki gerçek oyuncu yazar; puanı sunucu (botSonucIsle) işler.
+    match /botSonuc/{oda} {
+      allow create: if request.auth != null
+                    && (get(yol('oyunlar/' + oda)).data.beyaz == request.auth.uid
+                        || get(yol('oyunlar/' + oda)).data.siyah == request.auth.uid);
     }
 
     // DAVETLER: Rövanş ve arkadaşa oyun daveti.

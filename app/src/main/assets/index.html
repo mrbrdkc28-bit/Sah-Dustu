@@ -8644,7 +8644,7 @@ const BotSF=(()=>{
   function hazirOl(){ ac(); if(hazir) return Promise.resolve(true); if(hata) return Promise.resolve(false);
     return new Promise(r=>hazirBekleyen.push(r)); }
   async function hamle(fen, seviye){
-    const a=BOT_SEVIYE[seviye]; if(!a) return null;
+    const a=(typeof seviye==='object' && seviye) ? seviye : BOT_SEVIYE[seviye]; if(!a) return null;
     if(!(await hazirOl())) return null;
     if(bekle){ try{ w.postMessage('stop'); }catch(e){} }
     return new Promise(res=>{
@@ -11955,6 +11955,200 @@ function beraberBekleGoster(goster){
   el.style.display = goster ? 'flex' : 'none';
 }
 let sonIslenenBeraberRet=0;
+/* ===================== ÇEVRİMİÇİ BOT OYUNCULAR (28 Kasım 2026, sahibin kararı) =====================
+   10 bot gerçek oyuncu gibi davranır: lobide görünür (2'si 2 saatlik vardiyalarla hep çevrimiçi), oyun isteğini kabul
+   eder, rakip aramada 15–20 sn içinde kimse çıkmazsa eşleşir. Oyunu oyuncunun telefonu botun yerine oynatır
+   (Stockfish / yerleşik motor, insan gibi düşünme süresi). Puanı sunucu işler (functions: botSonucIsle, botNabiz).
+   Liste functions/index.js ve firestore.rules (botMu) ile AYNI olmalı. Kaldırmak: CV_BOTLAR'ı boşalt. */
+const CV_BOTLAR=[
+  {uid:'gKby1KpvP1cllle2yyqOTjuaU343', ad:'qaraambar'}, {uid:'EC2bvpCyBSZx59W32Z0ooxaSk2jI', ad:'darkknight'},
+  {uid:'5wIJiebWGs6TronqXK45uEb0rWtr', ad:'foxxmulder'}, {uid:'SGP67meK3aDejqAPrOvFI05dOAmX', ad:'Heisennberg'},
+  {uid:'1dv4rVR8vM8SDhPkLlcQrjKcT6lE', ad:'trueelove'}, {uid:'08W65AfcqyGv35zJTrvuz5Avc2ef', ad:'realcastle'},
+  {uid:'KDIdhweMXKkAP0HJVn9XOwgTEeyM', ad:'leooomate'}, {uid:'10g8KGZxxvgCwimpvopKVGQ5q70c', ad:'icecream'},
+  {uid:'umAJGzNzkfKLW1bRVJG7m6ZpMKzR', ad:'malatyalıı'}, {uid:'AuASIQXz8SubhMxLBeMDB7O0c8pf', ad:'statics'}
+];
+const CvBot=(()=>{
+  const botMu=u=>!!u && CV_BOTLAR.some(b=>b.uid===u);
+  const SLOT=2*3600000;
+  const slotNo=t=>Math.floor((t+3*3600000)/SLOT);
+  const vardiya=(t)=>{ const n=CV_BOTLAR.length; if(!n) return []; const k=slotNo(t||Date.now()); return [CV_BOTLAR[(k*2)%n], CV_BOTLAR[(k*2+1)%n]]; };
+  const cevrimiciMi=u=>vardiya().some(b=>b && b.uid===u);
+  // Vardiyada değilse son görülme: en son vardiyasının bittiği an (en çok ~10 saat önce)
+  function sonGorulme(u){
+    if(cevrimiciMi(u)) return Date.now()-Math.floor(Math.random()*40000);
+    const k=slotNo(Date.now());
+    for(let i=1;i<12;i++){ const v=vardiya((k-i)*SLOT-3*3600000+1); if(v.some(b=>b.uid===u)) return (k-i+1)*SLOT-3*3600000-60000*(3+((u.charCodeAt(0)+i)%25)); }
+    return Date.now()-86400000;
+  }
+  // Bot profilleri (sunucudaki kayıt): puan, ülke, avatar — 2 dk önbellek
+  let prof={}, profT=0;
+  async function profiller(){
+    if(!CV_BOTLAR.length || typeof fbDb==='undefined' || !fbDb) return prof;
+    if(Date.now()-profT<120000) return prof;
+    try{
+      const q=await fbDb.collection('oyuncular').where(firebase.firestore.FieldPath.documentId(),'in',CV_BOTLAR.map(b=>b.uid)).get();
+      const y={}; q.forEach(d=>{ y[d.id]=d.data()||{}; }); prof=y; profT=Date.now();
+    }catch(e){}
+    return prof;
+  }
+  async function lobiyeEkle(liste){
+    const p=await profiller(); const simdi=Date.now();
+    const l=(liste||[]).filter(k=>!botMu(k.uid));
+    CV_BOTLAR.forEach(b=>{
+      const v=p[b.uid]; if(!v) return;
+      const son=sonGorulme(b.uid), cv=cevrimiciMi(b.uid);
+      l.push({uid:b.uid, ad:v.kullaniciAdi||b.ad, puan:v.puan||800, ulke:v.ulke||'', foto:v.avatarFoto||'', avatar:v.avatar||'',
+        son, cevrimici:cv, oyunda:!!(oyundakiBot===b.uid)});
+    });
+    return l.sort((a,b)=>(b.cevrimici-a.cevrimici)||(b.son-a.son));
+  }
+  const rastgele=(a,b)=>a+Math.random()*(b-a);
+  const bekle_=ms=>new Promise(r=>setTimeout(r,ms));
+  function secim(){
+    try{ const o=ORDULAR[Math.floor(Math.random()*Math.min(ORDULAR.length,4))], a=ARENALAR[Math.floor(Math.random()*Math.min(ARENALAR.length,4))];
+      return {o:o.id, a:a.id, d:Math.random()<0.25?1:0}; }catch(e){ return null; }
+  }
+  // Davet: vardiyadaki bot birkaç saniye sonra kabul eder (rövanşta oyun yeni bittiyse %65)
+  let sonOynanan=null;
+  async function davetKabul(hedef, kod){
+    const rovans = sonOynanan===hedef;
+    if(!cevrimiciMi(hedef) && !rovans) return;           // çevrimdışı bot yanıt vermez (davet süresi dolar)
+    if(rovans && Math.random()>0.65){ await bekle_(rastgele(4000,9000)); try{ await fbDb.collection('davetler').doc(hedef+'_'+fbKullanici.uid).delete(); }catch(e){} return; }
+    await bekle_(rastgele(2500,7000));
+    const p=(await profiller())[hedef]||{}; const b=CV_BOTLAR.find(x=>x.uid===hedef)||{};
+    const ref=fbDb.collection('oyunlar').doc(kod);
+    try{
+      const o=await ref.get(); const v=o.exists?(o.data()||{}):null;
+      if(!v || v.durum!=='bekliyor' || v.siyah) return;
+      await ref.update({ siyah:hedef, siyahAd:p.kullaniciAdi||b.ad, siyahPuan:p.puan||800, siyahUlke:p.ulke||'', siyahSecim:secim(), durum:'oynaniyor' });
+      try{ await fbDb.collection('davetler').doc(hedef+'_'+fbKullanici.uid).delete(); }catch(e){}
+    }catch(e){ console.log('bot davet', e); }
+  }
+  // Rakip aramada kimse çıkmadı: puanına en yakın vardiyadaki botla eşleş
+  async function eslesBot(){
+    if(Cevrimici.durum!=='araniyor' || !CV_BOTLAR.length) return false;
+    const p=await profiller();
+    const benP=(typeof bulutIst!=='undefined' && bulutIst.puan)||800;
+    const adaylar=vardiya().filter(b=>p[b.uid]);
+    if(!adaylar.length) return false;
+    adaylar.sort((a,b)=>Math.abs((p[a.uid].puan||800)-benP)-Math.abs((p[b.uid].puan||800)-benP));
+    const bot=adaylar[0], bp=p[bot.uid];
+    if(Cevrimici.durum!=='araniyor') return false;
+    await Cevrimici.beklemeIptal();
+    const ben=fbKullanici.uid, benAd=(bulutIst&&bulutIst.kullaniciAdi)||'Oyuncu';
+    const benimRenk=Math.random()<0.5?'w':'b';
+    const harf='ACDEFGHJKLMNPRTUVXYZ234679'; let kod=''; for(let i=0;i<6;i++) kod+=harf[Math.floor(Math.random()*harf.length)];
+    const benK={id:ben, ad:benAd, puan:(bulutIst&&bulutIst.puan)||800, ulke:(bulutIst&&bulutIst.ulke)||'', secim:(typeof cvSecimim==='function'?cvSecimim():null)};
+    const botK={id:bot.uid, ad:bp.kullaniciAdi||bot.ad, puan:bp.puan||800, ulke:bp.ulke||'', secim:secim()};
+    const B=benimRenk==='w'?benK:botK, S=benimRenk==='w'?botK:benK;
+    const dk=(typeof cvSecilenSure!=='undefined'?cvSecilenSure.dk:3), inc=(typeof cvSecilenSure!=='undefined'?cvSecilenSure.inc:0);
+    try{
+      await fbDb.collection('oyunlar').doc(kod).set({
+        durum:'oynaniyor', olusturan:B.id,
+        beyaz:B.id, beyazAd:B.ad, beyazPuan:B.puan, beyazUlke:B.ulke, beyazSecim:B.secim,
+        siyah:S.id, siyahAd:S.ad, siyahPuan:S.puan, siyahUlke:S.ulke, siyahSecim:S.secim,
+        sira:'w', sonHamle:null, hamleSayi:0, sureDk:dk, sureInc:inc,
+        sahne: dk>0 ? (sahneAyari?1:0) : null,
+        olusturmaZamani: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      Cevrimici.odayaBagla(kod, benimRenk);
+      return true;
+    }catch(e){ console.log('bot eşleşme', e); return false; }
+  }
+
+  // ---- Oyun içi: botun yerine oynayan denetleyici ----
+  let oda_=null, botRenk=null, botUid=null, kalp=null, dusunulen=-1, cevaplananTeklif=0, raporlandi={}, selam=false, oyundakiBot=null;
+  function sifirla(){ if(kalp){ clearInterval(kalp); kalp=null; } oda_=null; botRenk=null; botUid=null; dusunulen=-1; selam=false; oyundakiBot=null; }
+  const ref=()=>fbDb.collection('oyunlar').doc(oda_);
+  function sohbet(metin){ try{ ref().update({ sohbet: firebase.firestore.FieldValue.arrayUnion({kim:botRenk, metin, ts:Date.now(), hazir:true}) }); }catch(e){} }
+  function malzeme(){ try{ const s_=Motor.skorla(); return botRenk==='w'?s_:-s_; }catch(e){ return 0; } }
+  function durum(v, oda, benimRenk){
+    if(!v) return;
+    const r = botMu(v.beyaz) ? 'w' : (botMu(v.siyah) ? 'b' : null);
+    if(!r || r===benimRenk){ if(oda_===oda) sifirla(); return; }
+    if(oda_!==oda){ sifirla(); oda_=oda; botRenk=r; botUid = r==='w'?v.beyaz:v.siyah; }
+    oyundakiBot=botUid; sonOynanan=botUid;
+    if(v.durum==='bitti' || v.durum==='iptal' || v.durum==='terk'){
+      if(kalp){ clearInterval(kalp); kalp=null; }
+      oyundakiBot=null;
+      if(v.durum==='bitti' && !raporlandi[oda]){
+        raporlandi[oda]=1;
+        setTimeout(()=>{ try{ fbDb.collection('botSonuc').doc(oda).set({oda, t:Date.now()}).catch(()=>{}); }catch(e){} }, 2500);
+        if(Math.random()<0.5) setTimeout(()=>sohbet('İyi oyundu 🤝'), rastgele(1500,4000));
+      }
+      return;
+    }
+    if(v.durum!=='oynaniyor') return;
+    if(!kalp){
+      const yaz=()=>{ if(oda_) try{ ref().update({['sonGorulme_'+botRenk]:Date.now()}); }catch(e){} };
+      yaz(); kalp=setInterval(yaz, 8000);
+    }
+    if(!selam && (v.hamleSayi||0)<2){ selam=true; if(Math.random()<0.3) setTimeout(()=>sohbet(Math.random()<0.5?'Merhaba! 👋':'İyi şanslar! 🍀'), rastgele(2500,6000)); }
+    // Beraberlik teklifi
+    if(v.beraberTeklif && v.beraberTeklif.kim!==botRenk && v.beraberTeklif.ts!==cevaplananTeklif){
+      cevaplananTeklif=v.beraberTeklif.ts;
+      setTimeout(()=>{
+        if(oda_!==oda) return;
+        const kabul = Math.abs(malzeme())<150 && (v.hamleSayi||0)>40 && Math.random()<0.7;
+        try{
+          if(kabul) ref().update({ durum:'bitti', sonucTip:'berabere', kazanan:null, beraberTeklif:null, beraberNeden:'berabere' });
+          else ref().update({ beraberTeklif:null, beraberRet:{ kim:botRenk, ts:Date.now() } });
+        }catch(e){}
+      }, rastgele(2500,6000));
+    }
+    // Sıra botta mı?
+    if(v.sira===botRenk && (v.hamleSayi||0)!==dusunulen){ dusunulen=v.hamleSayi||0; dusun(oda, dusunulen); }
+  }
+  async function dusun(oda, sayi){
+    // Yerel tahtada sıranın bota geçmesini bekle (rakip hamlesi animasyonla uygulanır)
+    for(let i=0;i<60;i++){ if(oda_!==oda || oyunBitti) return; if(Motor.turn===botRenk && !kilitHamleAnimasyonu()) break; await bekle_(150); }
+    if(oda_!==oda || oyunBitti || Motor.turn!==botRenk) return;
+    const v=Cevrimici.veri||{};
+    const p=(await profiller())[botUid]||{};
+    const puan=p.puan||(botRenk==='w'?v.beyazPuan:v.siyahPuan)||800;
+    // Kaybedeceği belli oyunda teslim (bazen)
+    if(sayi>30 && malzeme()<-900 && Math.random()<0.35){
+      await bekle_(rastgele(2000,5000)); if(oda_!==oda || oyunBitti) return;
+      try{ await ref().update({ durum:'bitti', sonucTip:'terk', kazanan:(botRenk==='w'?'b':'w'), teslim:true, bitisZamani:Date.now() }); }catch(e){}
+      return;
+    }
+    // İnsan gibi düşünme süresi
+    const sureli=sureSecim>0, kalan=sureli?Math.max(0,saatler[botRenk]):Infinity;
+    let hedefMs;
+    if(sayi<8) hedefMs=rastgele(700,2600);
+    else if(sureli) hedefMs=Math.min(kalan*1000/Math.max(18, 45-sayi/2)*rastgele(0.5,1.7), 40000);
+    else hedefMs=rastgele(2500,11000);
+    if(sureli) hedefMs=Math.min(hedefMs, Math.max(400, kalan*1000*0.25));
+    if(sayi<2 && v.sahne!==0) hedefMs+=2500;   // açılış tanıtımı sürerken
+    const t0=Date.now();
+    const fen=Motor.fen();
+    let m=null;
+    try{
+      if(puan<1000) m=Motor.enIyiHamle('kolay');
+      else if(puan<1320) m=Motor.enIyiHamle('orta');
+      else{
+        const bm=await BotSF.hamle(fen, {elo:Math.min(3000,Math.round(puan+rastgele(-60,60))), ms:Math.max(300,Math.min(2500,hedefMs*0.6)), gd:puan>1800?6:4});
+        if(oda_!==oda || oyunBitti || Motor.fen()!==fen) return;
+        if(bm && bm!=='(none)'){ const fr=uciKare(bm.slice(0,2)), to=uciKare(bm.slice(2,4)), tf=bm[4]||null;
+          m=Motor.legal(Motor.turn).find(x=>x.from===fr && x.to===to && (!tf || x.terfi===tf)); }
+        if(!m) m=Motor.enIyiHamle('zor');
+      }
+    }catch(e){ try{ m=Motor.enIyiHamle('orta'); }catch(x){} }
+    if(!m) return;
+    const kalanBekle=hedefMs-(Date.now()-t0); if(kalanBekle>0) await bekle_(kalanBekle);
+    if(oda_!==oda || oyunBitti || Motor.fen()!==fen || Motor.turn!==botRenk) return;
+    let sonFen=null; try{ const k=Motor.yap(m); sonFen=Motor.fen(); Motor.gerial(k); }catch(e){}
+    const benim=botRenk==='w'?'b':'w';
+    const g={ sonHamle:{ from:m.from, to:m.to, terfi:m.terfi||null, oynayan:botRenk, sayac:Date.now(), sahne:(v.sahne===0?0:1),
+                         kalan:(sureli?Math.max(0,saatler[botRenk]):null) },
+              sira:benim, hamleSayi: firebase.firestore.FieldValue.increment(1), ['sonGorulme_'+botRenk]:Date.now() };
+    if(sonFen) g.fen=sonFen;
+    try{ await ref().update(g); }catch(e){ console.log('bot hamle', e); dusunulen=-1; }
+  }
+  function kilitHamleAnimasyonu(){ try{ return (typeof tweenler!=='undefined' && tweenler.length>0); }catch(e){ return false; } }
+  return { botMu, cevrimiciMi, lobiyeEkle, davetKabul, eslesBot, durum, profiller,
+    get oyundaki(){ return oyundakiBot; } };
+})();
 function cevrimiciGuncelle(veri){
   if(!veri) return;
   const ikiOyuncuVar = !!(veri.beyaz && veri.siyah);
@@ -12374,6 +12568,8 @@ function katilimKaydet(){
   const uid=fbKullanici.uid;
   // Yeniden bağlanınca belge zaten var; kural güncellemeye izin vermez, hata yok sayılır.
   fbDb.collection('oyunlar').doc(oda).collection('katilim').doc(uid).set({t:Date.now()}).catch(()=>{});
+  try{ const v=Cevrimici.veri||{}; const r=(v.beyaz===uid)?v.siyah:v.beyaz;
+    if(typeof CvBot!=='undefined' && CvBot.botMu(r)) fbDb.collection('oyunlar').doc(oda).collection('katilim').doc(r).set({t:Date.now()}).catch(()=>{}); }catch(e){}
   bulutIst.acikOda=oda;
   fbDb.collection('oyuncular').doc(uid).update({acikOda:oda}).catch(()=>{});
 }
@@ -16164,6 +16360,7 @@ const Cevrimici=(()=>{
         durum='oynaniyor';
       }
       if(typeof cevrimiciGuncelle==='function') cevrimiciGuncelle(oyunVerisi);
+      try{ if(typeof CvBot!=='undefined') CvBot.durum(oyunVerisi, kod, benimRenk); }catch(e){ console.log('bot', e); }
       if(typeof rakipIzlemeGuncelle==='function' && benimRenk)
         rakipIzlemeGuncelle(oyunVerisi['izliyor_'+(benimRenk==='w'?'b':'w')]||0);
     }, err=>{ cevrimiciHata('Bağlantı hatası.'); });
@@ -16613,7 +16810,15 @@ const Cevrimici=(()=>{
     try{ await fbDb.collection('davetler').doc(id).delete(); }catch(e){}
   }
 
+  /* Bot eşleşmesi için (28 Kasım 2026): bekleme havuzundan çık, hazır odaya bağlan */
+  async function beklemeIptal(){
+    if(beklemeOdaDinleyici){ beklemeOdaDinleyici(); beklemeOdaDinleyici=null; }
+    try{ if(beklemeRef){ await beklemeRef.delete(); beklemeRef=null; } }catch(e){}
+  }
+  function odayaBagla(kod, renk){ odaId=kod; benimRenk=renk; durum='oynaniyor'; odaDinle(kod); }
+
   return {
+    beklemeIptal, odayaBagla,
     odaOlustur, odayaKatil, rastgeleEsles, ayril, hamleGonder, oyunIptal, sonucBildir,
     izlemeYaz, lobiListesi, lobiGizliYaz,
     arkadasAra, arkadasIstekGonder, arkadasIstekleriAl, arkadasKabul, arkadasReddet, davetGecerli,
@@ -16626,6 +16831,22 @@ const Cevrimici=(()=>{
     get odaId(){return odaId}, get benimRenk(){return benimRenk},
     get durum(){return durum}, get veri(){return oyunVerisi},
     aktifMi, rakipRengi, hazirMi
+  };
+})();
+/* Çevrimiçi modülüne bağla: lobi, davet, rastgele eşleşme */
+(function(){
+  const ll=Cevrimici.lobiListesi;
+  Cevrimici.lobiListesi=async function(){ const l=await ll.apply(this, arguments); try{ return await CvBot.lobiyeEkle(l); }catch(e){ return l; } };
+  const dg=Cevrimici.oyunDavetGonder;
+  Cevrimici.oyunDavetGonder=async function(hedef, ad){ const kod=await dg.apply(this, arguments); try{ if(kod && CvBot.botMu(hedef)) CvBot.davetKabul(hedef, kod); }catch(e){} return kod; };
+  const re=Cevrimici.rastgeleEsles;
+  Cevrimici.rastgeleEsles=async function(){
+    const r=await re.apply(this, arguments);
+    if(Cevrimici.durum==='araniyor'){
+      const bas=Date.now();
+      setTimeout(()=>{ try{ if(Cevrimici.durum==='araniyor' && document.getElementById('cvBekleme').classList.contains('acik')) CvBot.eslesBot(); }catch(e){} }, 15000+Math.random()*5000);
+    }
+    return r;
   };
 })();
 
@@ -21570,6 +21791,9 @@ const SOZLER=[
     if(gor('girisEkran') || gor('yukleniyor')) return false;
     if(acik('hud') || acik('inceleHUD') || acik('analizEkran') || gor('analizEkran') || el('cvVs')) return false;
     if(gor('lisansEkran') || gor('gizlilikEkran') || el('premiumModal')) return false;
+    /* 28 Kasım 2026: taş seti / arena önizlemesi (alttaki "Seç" düğmesiyle). Kabuğu pointer-events:none olduğu için
+       ustKatmanVar onu atlıyordu; reklam Seç düğmesini örtüyordu. */
+    if(gor('onizlemeEkran')) return false;
     const ekranlar=LISTE.filter(gor);
     if(!ekranlar.length) return false;
     /* 22 Kasım 2026: liste ekranının ÜSTÜNDE alta kadar inen bir katman açıksa (Oyun Kur'daki SAVAŞ BAŞLASIN,
