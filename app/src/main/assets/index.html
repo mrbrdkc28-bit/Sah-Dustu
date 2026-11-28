@@ -4757,8 +4757,12 @@ function arenaKur(a){
   isikDikeyAyar(); // dikey moddaysa ışığı ayarla
 }
 
+/* 28 Kasım 2026 (sahibin kararı): havada süzülen toz/kar/kül parçacıkları KAPALI. Görsel katkıları azdı ama tahta
+   dururken bile saniyede ~30 çizim yaptırıp pil ve ısı harcatıyorlardı; kapalıyken tahta boşta neredeyse hiç çizilmez. */
+const ORTAM_PARCACIK=false;
 function parcacikKur(a){
   if(parcacikSys){ scene.remove(parcacikSys); parcacikSys.geometry.dispose(); parcacikSys=null; }
+  if(!ORTAM_PARCACIK) return;
   parcacikTip=a.parcacik;
   const N = parcacikTip==='atesbocegi' ? 90 : 260;
   const poz = new Float32Array(N*3), hiz = new Float32Array(N*3);
@@ -6290,8 +6294,20 @@ const Ses=(()=>{
     muzikAcik=false;
     if(muzikDugum){ muzikDugum.durdur(); muzikDugum=null; }
   }
+  /* Nitelikli hamle tonu (28 Kasım 2026, sahibin isteği; chess.com'daki gibi): incelemede taş sesinin ardından
+     sınıfa göre kısa bir ton — parlak/harika yükselen çan, en iyi tek çan, ?! / ? / ?? giderek kalınlaşan iniş. */
+  function nitelik(sinif){
+    if(sessiz) return;
+    const z=(ms,f)=>setTimeout(f,ms);
+    if(sinif==='parlak'){ pat(784,.2,'sine',.11); z(95,()=>pat(1175,.26,'sine',.11)); z(190,()=>pat(1568,.42,'sine',.09)); z(190,()=>pat(3136,.3,'sine',.02)); }
+    else if(sinif==='harika'){ pat(880,.2,'sine',.11); z(110,()=>pat(1319,.36,'sine',.1)); }
+    else if(sinif==='enIyi'){ pat(1047,.34,'sine',.09); pat(2094,.22,'sine',.025); }
+    else if(sinif==='yanlislik'){ pat(523,.26,'triangle',.09,440); }
+    else if(sinif==='hata'||sinif==='kacirilan'){ pat(392,.3,'triangle',.11,262); }
+    else if(sinif==='vahim'){ pat(262,.42,'triangle',.12,147); z(60,()=>pat(131,.4,'sine',.08,98)); }
+  }
   return {
-    cal, sesAc, muzikBaslat, muzikDurdur,
+    cal, sesAc, muzikBaslat, muzikDurdur, nitelik,
     sesAcKapa(){ sessiz=!sessiz; try{ localStorage.setItem('sesKapali', sessiz?'1':'0'); }catch(e){} return sessiz; },
     get sessizMi(){ return sessiz; },
     get muzikCalisirkenMi(){ return muzikAcik; },
@@ -13466,10 +13482,23 @@ function _motoruKoruyarak(asil){
 }
 inceleStockfishDoldur=_motoruKoruyarak(inceleStockfishDoldur);
 stockfishDegerlendir=_motoruKoruyarak(stockfishDegerlendir);
+
+/* İnceleme hamle sesi (28 Kasım 2026): taş sesi; ileri giderken nitelikli hamlede ardından sınıf tonu */
+function inceleHamleSesi(i, ileri){
+  try{
+    if(typeof Ses==='undefined' || Ses.sessizMi) return;
+    const hk=oyunKaydi[i]; if(!hk) return;
+    const tip=/^[KQRBN]/.test(hk.notasyon||'') ? hk.notasyon[0].toLowerCase() : 'p';
+    if(/x/.test(hk.notasyon||'')) Ses.yeme(tip); else Ses.hamle(tip);
+    if(ileri && hk._kSinif && !inceleRakipAtla(hk)) setTimeout(()=>Ses.nitelik(hk._kSinif), 90);
+  }catch(e){}
+}
 function inceleGit(idx){
   inceleOtoDur();
   if(!oyunKaydi.length) return;
+  const _onceki=inceleIdx;
   inceleIdx=Math.max(-1,Math.min(idx,oyunKaydi.length-1));
+  if(Math.abs(inceleIdx-_onceki)===1) inceleHamleSesi(Math.max(inceleIdx,_onceki), inceleIdx===_onceki+1);
   // Tahtayı o konuma getir (gezinme altyapısını kullan)
   if(dahaIyiOkGrup){ scene.remove(dahaIyiOkGrup); nesneyiSerbestBirak(dahaIyiOkGrup,false); dahaIyiOkGrup=null; }
   if(typeof kaliteRozetTemizle==='function') kaliteRozetTemizle();
@@ -13985,7 +14014,9 @@ function inceleOtoAdim(){
     if(!inceleOtoCalisirken || _n!==inceleOtoNesil) return;
     if(j>=hedef || !inceleAnalizVar){ kritikGoster(); return; }
     inceleIdx=j;
+    if(typeof kaliteRozetTemizle==='function') kaliteRozetTemizle();
     konumGoster(j); vurguTemizle(); hamleVurgula(j);
+    inceleHamleSesi(j, true);
     inceleSayacYaz(j);
     { const kk=oyunKaydi[j], no=Math.floor(j/2)+1, yz=document.getElementById('inceleYorum');
       yz.style.removeProperty('--sc'); yz.style.removeProperty('--sca'); yz.style.removeProperty('--scb'); yz.classList.remove('yeni');
@@ -13999,7 +14030,10 @@ function inceleOtoAdim(){
   function kritikGoster(){
     if(!inceleOtoCalisirken || _n!==inceleOtoNesil) return;
     inceleIdx=hedef;
+    if(typeof kaliteRozetTemizle==='function') kaliteRozetTemizle();
     konumGoster(hedef); vurguTemizle(); hamleVurgula(hedef);
+    inceleHamleSesi(hedef, true);
+    if(typeof kaliteRozetGoster==='function' && oyunKaydi[hedef] && !inceleRakipAtla(oyunKaydi[hedef])) kaliteRozetGoster(hedef);
     if(inceleAnalizVar && oyunKaydi[hedef] && oyunKaydi[hedef]._sfNot) dahaIyiOkGoster(hedef);
     inceleSayacYaz(hedef);
     // Yorumu göster + sesli oku; ses BİTİNCE sonraki adıma geç
@@ -18589,7 +18623,9 @@ function kaliteRozetGoster(idx){
   const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false,depthWrite:false,toneMapped:false}));
   const pv=kareKonum(sonVurguTo);
   const duz=(typeof duzGorunum!=='undefined'&&duzGorunum);
-  spr.position.set(pv.x+.42, duz? .95 : 1.45, pv.z-.42);
+  /* Chess.com gibi karenin izleyiciye göre SAĞ ÜST köşesi (siyah taraftan bakarken eskiden sol alta düşüyordu) */
+  const ters=(typeof oyuncuSiyahMi==='function' && oyuncuSiyahMi()) ? -1 : 1;
+  spr.position.set(pv.x+.42*ters, duz? .95 : 1.45, pv.z-.42*ters);
   spr.renderOrder=5;
   kaliteRozetGrup=new THREE.Group(); kaliteRozetGrup.add(spr);
   scene.add(kaliteRozetGrup);
