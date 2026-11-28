@@ -2,7 +2,7 @@
    oyunIstegiBildir: davetler/{id} oluşunca davet edilen oyuncunun telefonlarına bildirim gönderir
    (uygulama kapalıyken de). Android: Firebase Cloud Messaging. iOS: doğrudan Apple (APNs, .p8 anahtarı).
    Bildirim adresleri oyuncular/{uid}/ozel/bildirim belgesinde: {android:[...], ios:[...], dil:'tr'}.
-   Aynı gönderen → aynı alıcı en çok 10 dakikada bir bildirim (sunucuda da sınırlı; istemci sınırı atlatılsa bile). */
+   Aynı gönderen → aynı alıcı en çok 5 saniyede bir bildirim (çift basma koruması; 28 Kasım 2026'ya kadar 10 dk). */
 const { onDocumentCreated, onDocumentWritten } = require('firebase-functions/v2/firestore');
 const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { defineSecret } = require('firebase-functions/params');
@@ -18,7 +18,9 @@ const APNS_ANAHTAR = defineSecret('APNS_ANAHTAR');       // .p8 dosyasının iç
 const APNS_ANAHTAR_ID = 'AQKFN55HZS';   // Key ID (gizli değil): Apple Developer → Keys → "Ucuzcum Push" (takım geneli)
 const APPLE_TAKIM = 'PSZ843QLH4';
 const PAKET = 'com.emre.sahdustu';
-const SINIR_MS = 10 * 60 * 1000;
+const SINIR_MS = 10 * 60 * 1000;   // bildirimin geçerlilik süresi (davet ömrü)
+/* 28 Kasım 2026 (sahibin isteği): davet sıklığı sınırsız; yalnız çift basmaya karşı 5 sn (eskiden 10 dk) */
+const BILDIRIM_ARA_MS = 5 * 1000;
 
 const METIN = {
   tr: { b: 'Oyun isteği', g: (ad, s) => `${ad} seni oyuna davet ediyor (${s})` },
@@ -89,11 +91,11 @@ exports.oyunIstegiBildir = onDocumentCreated(
     if (k.davetKapali) { logger.info('alıcı maç isteği bildirimlerini kapatmış', { hedef: d.hedef }); return; }
     if (!saatUygun(k)) { logger.info('alıcının bildirim saatleri dışında', { hedef: d.hedef }); return; }
 
-    // Sunucu tarafı sınır: aynı gönderen → aynı alıcı 10 dk'da bir (yalnız gerçekten gönderilecekse sayılır)
+    // Sunucu tarafı sınır: aynı gönderen → aynı alıcı 5 sn'de bir (yalnız gerçekten gönderilecekse sayılır)
     const sinirRef = db.collection('bildirimSinir').doc(d.hedef + '_' + d.gonderen);
     const gec = await db.runTransaction(async tx => {
       const s = await tx.get(sinirRef);
-      if (s.exists && Date.now() - (s.get('ts') || 0) < SINIR_MS) return false;
+      if (s.exists && Date.now() - (s.get('ts') || 0) < BILDIRIM_ARA_MS) return false;
       tx.set(sinirRef, { ts: Date.now() });
       return true;
     });

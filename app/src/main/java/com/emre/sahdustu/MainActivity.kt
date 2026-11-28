@@ -105,15 +105,18 @@ class MainActivity : AppCompatActivity() {
     private var bannerKap: android.widget.FrameLayout? = null
     private var bannerView: AdView? = null
     @Volatile private var bannerIstek = false
+    /* 28 Kasim 2026: reklam gercekten yuklenmeden yer ayrilmiyor (yuklenmeyince menunun altinda bos kutu kaliyordu) */
+    @Volatile private var bannerYuklendi = false
 
     private fun bannerUygula() {
         runOnUiThread {
             if (webViewYok) return@runOnUiThread
             val goster = bannerIstek && !premiumVar && reklamSdkHazir
             if (goster && bannerView == null) bannerKur()
-            bannerKap?.visibility = if (goster) android.view.View.VISIBLE else android.view.View.GONE
+            val gorunur = goster && bannerYuklendi
+            bannerKap?.visibility = if (gorunur) android.view.View.VISIBLE else android.view.View.GONE
             if (goster) bannerView?.resume() else bannerView?.pause()
-            val h = if (goster) (bannerView?.adSize?.height ?: 0) else 0
+            val h = if (gorunur) (bannerView?.adSize?.height ?: 0) else 0
             webView.evaluateJavascript("window.bannerYukseklik&&bannerYukseklik($h)", null)
         }
     }
@@ -135,6 +138,7 @@ class MainActivity : AppCompatActivity() {
                 android.widget.FrameLayout.LayoutParams.WRAP_CONTENT, android.view.Gravity.CENTER_HORIZONTAL))
             av.adListener = object : AdListener() {
                 override fun onAdFailedToLoad(e: LoadAdError) { hataKaydet("Banner yuklenemedi: " + e.code + " " + e.message) }
+                override fun onAdLoaded() { if (!bannerYuklendi) { bannerYuklendi = true; bannerUygula() } }
             }
             av.loadAd(AdRequest.Builder().build())
             bannerKap = kap; bannerView = av
