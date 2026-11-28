@@ -314,6 +314,25 @@ function haftaId() {
   return t.getUTCFullYear() + '_' + (hafta < 10 ? '0' : '') + hafta;
 }
 
+/* OYUN GEÇMİŞİ (28 Kasım 2026, sahibin isteği): profilde "SON OYUNLAR" görünsün. Kayıt biçimi uygulamadakiyle aynı:
+   {sonuc:'G'|'B'|'M', renk:'w'|'b', hamle, tarih, rk:'o', rAd, rUid}. Gerçek maçlarda rakip gerçek oyuncu; botNabiz'in
+   "başka oyuncularla" maçlarında rakip adı aşağıdaki havuzdan (gerçek kişi adı değil, takma ad gibi). En fazla 20 kayıt. */
+const RAKIP_HAVUZ = ['kral_06', 'satrancsever', 'mehmet1903', 'aysek', 'deniz34', 'emirhan_x', 'burak.tr', 'zeynepchess',
+  'kaanmate', 'ali_rook', 'selin44', 'mert.b', 'ozan_knight', 'elifpiyon', 'yusuf35', 'tunahan61', 'berkay_07', 'irem.s',
+  'cem_d4', 'efe1453', 'pawnstorm', 'nightowl88', 'luca_it', 'max.de', 'knightrider7', 'gambitboy', 'sicilian_k', 'ruy_lopez22',
+  'blitzqueen', 'e4e5', 'ahmet.k', 'hakan_61', 'oguz.chess', 'yasin16', 'busra_m', 'canberk', 'umut_42', 'kerem.ss'];
+const rastgeleRakip = () => RAKIP_HAVUZ[Math.floor(Math.random() * RAKIP_HAVUZ.length)];
+function gecmiseEkle(p, kayit) {
+  const l = Array.isArray(p.sonOyunlar) ? p.sonOyunlar.slice() : [];
+  l.unshift(kayit);
+  return l.slice(0, 20);
+}
+const harf = g => g === 1 ? 'G' : (g === 0.5 ? 'B' : 'M');
+function seriYaz(p, gercek) {
+  const anlik = gercek === 1 ? (p.anlikSeri || 0) + 1 : 0;
+  return { anlikSeri: anlik, enIyiSeri: Math.max(p.enIyiSeri || 0, anlik) };
+}
+
 /* Bir sonucu bot kaydına işler (gercek: 1 kazandı, 0.5 berabere, 0 kaybetti) */
 function sonucYaz(p, gercek, rakipPuan) {
   const eski = p.puan || 800;
@@ -350,7 +369,10 @@ exports.botSonucIsle = onDocumentCreated(
       if (s.exists) return;
       const p = (await tx.get(profRef)).data() || {};
       tx.set(sayimRef, { t: Date.now() });
-      tx.set(profRef, sonucYaz(p, gercek, rakipPuan), { merge: true });
+      const y = Object.assign(sonucYaz(p, gercek, rakipPuan), seriYaz(p, gercek));
+      y.sonOyunlar = gecmiseEkle(p, { sonuc: harf(gercek), renk, hamle: Math.ceil((v.hamleSayi || 0) / 2), tarih: Date.now(),
+        rk: 'o', rAd: String((renk === 'w' ? v.siyahAd : v.beyazAd) || 'Oyuncu').slice(0, 30), rUid: (renk === 'w' ? v.siyah : v.beyaz) || '' });
+      tx.set(profRef, y, { merge: true });
     });
     logger.info('bot sonucu işlendi', { oda, bot: botUid, gercek });
   });
@@ -365,6 +387,23 @@ exports.botNabiz = onSchedule({ schedule: 'every 120 minutes', region: 'europe-w
       continue;
     }
     const p = snap.data() || {};
+    // Geçmişi hiç olmayan bota bir kez geçmiş: son birkaç güne yayılmış, puanı değiştirmeyen dengeli maçlar
+    if (!Array.isArray(p.sonOyunlar) || p.sonOyunlar.length < 3) {
+      const n = 8 + Math.floor(Math.random() * 8);
+      const l = Array.isArray(p.sonOyunlar) ? p.sonOyunlar.slice() : [];
+      let g = 0, m = 0, bb = 0;
+      for (let i = 0; i < n; i++) {
+        const r = Math.random(), sn = r < 0.46 ? 'G' : (r < 0.54 ? 'B' : 'M');
+        if (sn === 'G') g++; else if (sn === 'B') bb++; else m++;
+        l.push({ sonuc: sn, renk: Math.random() < 0.5 ? 'w' : 'b', hamle: 18 + Math.floor(Math.random() * 45),
+          tarih: Date.now() - (i + 1) * (3 + Math.random() * 7) * 3600000, rk: 'o', rAd: rastgeleRakip(), rUid: '' });
+      }
+      l.sort((a, b) => b.tarih - a.tarih);
+      await ref.set({ sonOyunlar: l.slice(0, 20), oyun: (p.oyun || 0) + n, galibiyet: (p.galibiyet || 0) + g,
+        beraberlik: (p.beraberlik || 0) + bb, maglubiyet: (p.maglubiyet || 0) + m,
+        enIyiSeri: Math.max(p.enIyiSeri || 0, 2 + Math.floor(Math.random() * 4)) }, { merge: true });
+      continue;
+    }
     // Her turda yaklaşık yarı olasılıkla 1–2 "başka oyuncuyla" maç: hedef gücüne doğru eğilimli sonuç
     if (Math.random() < 0.5) continue;
     let yaz = {}, q = Object.assign({}, p);
@@ -374,7 +413,9 @@ exports.botNabiz = onSchedule({ schedule: 'every 120 minutes', region: 'europe-w
       const kazanmaOlas = 1 / (1 + Math.pow(10, (rakip - b.guc) / 400));
       const r = Math.random();
       const gercek = r < kazanmaOlas * 0.9 ? 1 : (r < kazanmaOlas * 0.9 + 0.1 ? 0.5 : 0);
-      const y = sonucYaz(q, gercek, rakip);
+      const y = Object.assign(sonucYaz(q, gercek, rakip), seriYaz(q, gercek));
+      y.sonOyunlar = gecmiseEkle(q, { sonuc: harf(gercek), renk: Math.random() < 0.5 ? 'w' : 'b', hamle: 18 + Math.floor(Math.random() * 45),
+        tarih: Date.now() - Math.floor(Math.random() * 100) * 60000, rk: 'o', rAd: rastgeleRakip(), rUid: '' });
       q = Object.assign(q, y); yaz = Object.assign(yaz, y);
     }
     await ref.set(yaz, { merge: true });
