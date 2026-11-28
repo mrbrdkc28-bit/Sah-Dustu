@@ -8464,18 +8464,19 @@ const SF=(()=>{
    (güç sınırı, MultiPV) birbirini bozmasın. Yalnız bu seviyelerde, ilk bot hamlesinde açılır.
    Motor yüklenemezse eski yerleşik motora (Zor ayarı) düşülür; oyun hiç takılmaz. */
 const BOT_SEVIYE={
-  zor:       {elo:1900, ms:900},
-  usta:      {elo:2500, ms:1400},
-  buyukusta: {elo:0,    ms:2600}   // sınırsız: Stockfish'in tam gücü
-};
+  zor:       {elo:1900, ms:900,  gd:4},
+  usta:      {elo:2500, ms:1400, gd:99},
+  buyukusta: {elo:0,    ms:2600, gd:99}   // sınırsız: motorun tam gücü
+};   /* gd: iOS'taki GarboChess güç sınırı tanımaz; seviye orada derinlik + süreyle ayrılır */
 const BotSF=(()=>{
-  let w=null, hazir=false, hata=false, bekle=null, hazirBekleyen=[];
+  let w=null, hazir=false, hata=false, bekle=null, hazirBekleyen=[], garbo=false;
   function ac(){
     if(w||hata) return;
     try{
       w=new Worker('engine/stockfish.js');
       w.onmessage=(e)=>{
         const s=typeof e.data==='string'?e.data:(e.data&&e.data.data)||'';
+        if(s.startsWith('id name') && /garbo/i.test(s)) garbo=true;
         if(s==='uciok'){ w.postMessage('setoption name Hash value 16'); w.postMessage('isready'); }
         else if(s==='readyok'){
           if(!hazir){ hazir=true; hazirBekleyen.splice(0).forEach(f=>f(true)); }
@@ -8498,7 +8499,7 @@ const BotSF=(()=>{
       const b={cb:res, basla:null, zam:null};
       b.basla=()=>{
         w.postMessage('position fen '+fen);
-        w.postMessage('go movetime '+a.ms);
+        w.postMessage('go movetime '+a.ms+(garbo?' depth '+a.gd:''));
       };
       bekle=b;
       w.postMessage('setoption name UCI_LimitStrength value '+(a.elo?'true':'false'));
