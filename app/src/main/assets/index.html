@@ -11961,11 +11961,11 @@ let sonIslenenBeraberRet=0;
    (Stockfish / yerleşik motor, insan gibi düşünme süresi). Puanı sunucu işler (functions: botSonucIsle, botNabiz).
    Liste functions/index.js ve firestore.rules (botMu) ile AYNI olmalı. Kaldırmak: CV_BOTLAR'ı boşalt. */
 const CV_BOTLAR=[
-  {uid:'gKby1KpvP1cllle2yyqOTjuaU343', ad:'qaraambar'}, {uid:'EC2bvpCyBSZx59W32Z0ooxaSk2jI', ad:'darkknight'},
-  {uid:'5wIJiebWGs6TronqXK45uEb0rWtr', ad:'foxxmulder'}, {uid:'SGP67meK3aDejqAPrOvFI05dOAmX', ad:'Heisennberg'},
-  {uid:'1dv4rVR8vM8SDhPkLlcQrjKcT6lE', ad:'trueelove'}, {uid:'08W65AfcqyGv35zJTrvuz5Avc2ef', ad:'realcastle'},
-  {uid:'KDIdhweMXKkAP0HJVn9XOwgTEeyM', ad:'leooomate'}, {uid:'10g8KGZxxvgCwimpvopKVGQ5q70c', ad:'icecream'},
-  {uid:'umAJGzNzkfKLW1bRVJG7m6ZpMKzR', ad:'malatyalıı'}, {uid:'AuASIQXz8SubhMxLBeMDB7O0c8pf', ad:'statics'}
+  {uid:'gKby1KpvP1cllle2yyqOTjuaU343', ad:'qaraambar', guc:1250}, {uid:'EC2bvpCyBSZx59W32Z0ooxaSk2jI', ad:'darkknight', guc:1550},
+  {uid:'5wIJiebWGs6TronqXK45uEb0rWtr', ad:'foxxmulder', guc:1100}, {uid:'SGP67meK3aDejqAPrOvFI05dOAmX', ad:'Heisennberg', guc:1800},
+  {uid:'1dv4rVR8vM8SDhPkLlcQrjKcT6lE', ad:'trueelove', guc:950}, {uid:'08W65AfcqyGv35zJTrvuz5Avc2ef', ad:'realcastle', guc:1650},
+  {uid:'KDIdhweMXKkAP0HJVn9XOwgTEeyM', ad:'leooomate', guc:1350}, {uid:'10g8KGZxxvgCwimpvopKVGQ5q70c', ad:'icecream', guc:1000},
+  {uid:'umAJGzNzkfKLW1bRVJG7m6ZpMKzR', ad:'malatyalıı', guc:1450}, {uid:'AuASIQXz8SubhMxLBeMDB7O0c8pf', ad:'statics', guc:2000}
 ];
 const CvBot=(()=>{
   const botMu=u=>!!u && CV_BOTLAR.some(b=>b.uid===u);
@@ -12104,8 +12104,9 @@ const CvBot=(()=>{
     for(let i=0;i<60;i++){ if(oda_!==oda || oyunBitti) return; if(Motor.turn===botRenk && !kilitHamleAnimasyonu()) break; await bekle_(150); }
     if(oda_!==oda || oyunBitti || Motor.turn!==botRenk) return;
     const v=Cevrimici.veri||{};
-    const p=(await profiller())[botUid]||{};
-    const puan=p.puan||(botRenk==='w'?v.beyazPuan:v.siyahPuan)||800;
+    /* Oyun gücü botun SABİT gücü (functions BOTLAR.guc ile aynı); puan değil. Puanlar 800'den başlar, maçlarla güce oturur. */
+    const bb=CV_BOTLAR.find(x=>x.uid===botUid)||{};
+    const guc=bb.guc||1200;
     // Kaybedeceği belli oyunda teslim (bazen)
     if(sayi>30 && malzeme()<-900 && Math.random()<0.35){
       await bekle_(rastgele(2000,5000)); if(oda_!==oda || oyunBitti) return;
@@ -12114,20 +12115,30 @@ const CvBot=(()=>{
     }
     // İnsan gibi düşünme süresi
     const sureli=sureSecim>0, kalan=sureli?Math.max(0,saatler[botRenk]):Infinity;
+    /* Süre yönetimi (28 Kasım 2026, telefonda 3+0 denemesinde bot kazanırken süreden kaybetti):
+       kalan süreyi ~35 hamleye böler, süre azaldıkça belirgin hızlanır; animasyon/ağ payı için 0.6 sn düşülür. */
     let hedefMs;
-    if(sayi<8) hedefMs=rastgele(700,2600);
-    else if(sureli) hedefMs=Math.min(kalan*1000/Math.max(18, 45-sayi/2)*rastgele(0.5,1.7), 40000);
+    const artis=(typeof sureArtis!=='undefined'?sureArtis:0)*1000;
+    if(sayi<8) hedefMs=rastgele(600,2000);
+    else if(sureli){
+      const ms=kalan*1000;
+      hedefMs=(ms/Math.max(25, 50-sayi/3)+artis*0.8)*rastgele(0.4,1.4);
+      if(ms<60000) hedefMs=Math.min(hedefMs, ms/30+artis*0.8);
+      if(ms<20000) hedefMs=Math.min(hedefMs, rastgele(300,900)+artis*0.5);
+      hedefMs=Math.min(hedefMs, 30000);
+    }
     else hedefMs=rastgele(2500,11000);
-    if(sureli) hedefMs=Math.min(hedefMs, Math.max(400, kalan*1000*0.25));
+    if(sureli) hedefMs=Math.max(250, Math.min(hedefMs, kalan*1000*0.2)-600);
     if(sayi<2 && v.sahne!==0) hedefMs+=2500;   // açılış tanıtımı sürerken
     const t0=Date.now();
     const fen=Motor.fen();
     let m=null;
     try{
-      if(puan<1000) m=Motor.enIyiHamle('kolay');
-      else if(puan<1320) m=Motor.enIyiHamle('orta');
+      // 1320 altı: Stockfish'in en düşük ayarı + güç oranında insan hatası (yerleşik motorun orta hamlesi)
+      const hataOlas = guc<1320 ? Math.min(0.45, (1320-guc)/1000) : 0;
+      if(hataOlas && Math.random()<hataOlas) m=Motor.enIyiHamle('orta');
       else{
-        const bm=await BotSF.hamle(fen, {elo:Math.min(3000,Math.round(puan+rastgele(-60,60))), ms:Math.max(300,Math.min(2500,hedefMs*0.6)), gd:puan>1800?6:4});
+        const bm=await BotSF.hamle(fen, {elo:Math.max(1320, Math.min(3000, Math.round(guc+rastgele(-50,50)))), ms:Math.max(300,Math.min(2500,hedefMs*0.6)), gd:guc>1800?6:(guc<1320?3:4)});
         if(oda_!==oda || oyunBitti || Motor.fen()!==fen) return;
         if(bm && bm!=='(none)'){ const fr=uciKare(bm.slice(0,2)), to=uciKare(bm.slice(2,4)), tf=bm[4]||null;
           m=Motor.legal(Motor.turn).find(x=>x.from===fr && x.to===to && (!tf || x.terfi===tf)); }
